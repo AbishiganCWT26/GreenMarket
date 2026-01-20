@@ -19,7 +19,7 @@
 <div class="dashboard-wrapper">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="{{ asset('assets/images/logo-4.png') }}" class="logo">
+            <img src="{{ asset('assets/images/Logo-4.png') }}" class="logo">
             <h3>Farmer Panel</h3>
             <button id="sidebar-close" class="sidebar-toggle">
                 <i class="fa-solid fa-times"></i>

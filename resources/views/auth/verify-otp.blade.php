@@ -89,7 +89,7 @@
 		<div class="login-wrapper">
 			<div class="logo-section" onclick="window.location.href='/'" tabindex="0" role="button">
 				<div class="logo-container">
-					<img src="{{ asset('assets/images/logo-4.png') }}" alt="GreenMarket Logo" class="logo">
+					<img src="{{ asset('assets/images/Logo-4.png') }}" alt="GreenMarket Logo" class="logo">
 					<h1 class="logo-title">GreenMarket</h1>
 				</div>
 				<p class="logo-tagline">Secure password reset</p>

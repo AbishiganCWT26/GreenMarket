@@ -1244,7 +1244,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td style="width: 65%; vertical-align: middle;">
                                     <div style="display: table;">
                                         <div style="display: table-cell; width: 140px; height: 80px; background-color: #4d7c32; border-radius: 40px; text-align: center; vertical-align: middle;">
-                                            <img src="/assets/images/logo-4.png" alt="GreenMarket Logo" style="max-width: 135px; max-height: 75px;" onerror="this.src='https://via.placeholder.com/135x75?text=Logo'">
+                                            <img src="/assets/images/Logo-4.png" alt="GreenMarket Logo" style="max-width: 135px; max-height: 75px;" onerror="this.src='https://via.placeholder.com/135x75?text=Logo'">
                                         </div>
                                         <span style="display: table-cell; padding-left: 18px; font-size: 28px; font-weight: 900; color: #3e7033; vertical-align: middle; font-family: 'Georgia', serif;">
                                             GreenMarket

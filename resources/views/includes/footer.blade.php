@@ -32,7 +32,7 @@
 				<div class="footer-column brand-column">
 					<div class="brand-wrapper">
 						<a href="{{ url('/') }}" class="logo-wrapper">
-							<img src="{{ asset('assets/images/logo-4.png') }}" alt="GreenMarket" class="logo-img" oncontextmenu="return false;">
+							<img src="{{ asset('assets/images/Logo-4.png') }}" alt="GreenMarket" class="logo-img" oncontextmenu="return false;">
 							<div class="logo-text">
 								<h3>GreenMarket</h3>
 								<p>Fresh & Simple</p>

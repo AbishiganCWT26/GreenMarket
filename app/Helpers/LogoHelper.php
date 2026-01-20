@@ -9,7 +9,7 @@ class LogoHelper
         $logoPaths = [
             public_path('assets/images/Logo-4.svg'),
             public_path('assets/images/Logo-4.png'),
-            public_path('assets/images/logo-4.png'),
+            public_path('assets/images/Logo-4.png'),
         ];
 
         foreach ($logoPaths as $path) {
@@ -27,7 +27,7 @@ class LogoHelper
         $logoFiles = [
             'Logo-4.svg',
             'Logo-4.png',
-            'logo-4.png',
+            'Logo-4.png',
         ];
 
         foreach ($logoFiles as $file) {
