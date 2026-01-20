@@ -497,7 +497,7 @@
                 class="logo-link float-animation"
                 oncontextmenu="return false;">
 
-                    <img src="{{ asset('assets/images/logo-4.png') }}"
+                    <img src="{{ asset('assets/images/Logo-4.png') }}"
                         alt="GreenMarket Logo"
                         class="logo-img"
                         draggable="false">
