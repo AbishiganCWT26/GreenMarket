@@ -1,0 +1,63 @@
+.profile-settings {
+    margin-bottom: 20px;
+}
+
+.tabs-container {
+    padding: 20px;
+}
+
+.tabs {
+    border-bottom: 2px solid #eee;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    color: #7f8c8d;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.tab-button.active {
+    color: var(--primary-green);
+    border-bottom: 3px solid var(--primary-green);
+}
+
+.tab-button:hover {
+    color: var(--dark-teal);
+}
+
+.tab-content {
+    display: none;
+    padding-top: 15px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.photo-uploader {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.current-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #ecf0f1;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.photo-uploader form {
+    flex-grow: 1;
+}
