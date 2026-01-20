@@ -207,7 +207,7 @@
 
 			<div class="service-card">
 				<div class="service-icon">
-					<img src="{{ asset('assets/icons/100 persentage Organic.svg') }}" alt="100% Organic">
+					<img src="{{ asset('assets/icons/100 percentage Organic.svg') }}" alt="100% Organic">
 				</div>
 				<h4 class="service-title">100% ORGANIC</h4>
 				<p class="service-description">Natural & chemical-free</p>
