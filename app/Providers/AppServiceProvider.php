@@ -16,16 +16,21 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        if (Schema::hasTable('system_config')) {
-            $dbAdminEmail = DB::table('system_config')
-            ->where('config_key', 'admin_email')
-            ->value('config_value');
+        try {
+            if (Schema::hasTable('system_config')) {
+                $dbAdminEmail = DB::table('system_config')
+                ->where('config_key', 'admin_email')
+                ->value('config_value');
 
 
-            if ($dbAdminEmail) {
-            // This overrides the .env value for the current request
-            Config::set('mail.admin_email', $dbAdminEmail);
+                if ($dbAdminEmail) {
+                // This overrides the .env value for the current request
+                Config::set('mail.admin_email', $dbAdminEmail);
+                }
             }
+        } catch (\Exception $e) {
+            // Suppress database connection errors during build/console commands
+            // where the database might not be available.
         }
     }
 }
