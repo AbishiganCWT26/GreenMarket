@@ -153,11 +153,12 @@ Route::prefix('lead-farmer')
     Route::post('/register-farmer', [LeadFarmerController::class, 'storeFarmer'])->name('lf.storeFarmer');
     Route::get('/manage-farmers', [LeadFarmerController::class, 'manageFarmers'])->name('lf.manageFarmers');
 
-    Route::get('/farmers/{id}/details', [LeadFarmerController::class, 'getFarmerDetails'])->name('lf.farmer.details');
+    Route::get('/farmer-details/{id}', [LeadFarmerController::class, 'getFarmerDetails'])->name('lf.farmer.details');
     Route::get('/edit-farmer/{id}', [LeadFarmerController::class, 'editFarmer'])->name('lf.editFarmer');
     Route::post('/update-farmer/{id}', [LeadFarmerController::class, 'updateFarmer'])->name('lf.updateFarmer');
+    Route::delete('/delete-farmer/{id}', [LeadFarmerController::class, 'deleteFarmer'])->name('lf.farmer.delete');
     Route::delete('/farmers/{id}', [LeadFarmerController::class, 'deleteFarmer'])->name('lf.deleteFarmer');
-
+    
     // Product Management
     Route::get('/add-product', [LeadFarmerController::class, 'addProduct'])->name('lf.addProduct');
     Route::post('/add-product', [LeadFarmerController::class, 'storeProduct'])->name('lf.storeProduct');
