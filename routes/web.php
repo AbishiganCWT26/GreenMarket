@@ -158,6 +158,7 @@ Route::prefix('lead-farmer')
     Route::post('/update-farmer/{id}', [LeadFarmerController::class, 'updateFarmer'])->name('lf.updateFarmer');
     Route::delete('/delete-farmer/{id}', [LeadFarmerController::class, 'deleteFarmer'])->name('lf.farmer.delete');
     Route::delete('/farmers/{id}', [LeadFarmerController::class, 'deleteFarmer'])->name('lf.deleteFarmer');
+    Route::post('/farmer/{id}/send-otp', [LeadFarmerController::class, 'sendUpdateOtp'])->name('lf.farmer.sendUpdateOtp');
     
     // Product Management
     Route::get('/add-product', [LeadFarmerController::class, 'addProduct'])->name('lf.addProduct');

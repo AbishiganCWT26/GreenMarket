@@ -1,8 +1,8 @@
 @extends('lead_farmer.layouts.lead_farmer_master')
 
-@section('title', 'Register Farmer')
+@section('title', 'Edit Farmer')
 
-@section('page-title', 'Register Farmer')
+@section('page-title', 'Edit Farmer')
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/lead_farmer/farmer_registation.css') }}">
@@ -12,12 +12,12 @@
 <div class="registration-container">
     <div class="registration-card">
         <div class="card-header">
-            <i class="fas fa-user-plus"></i>
-            <h2>Register New Farmer</h2>
-            <p class="subtitle">Add a new farmer to your group</p>
+            <i class="fas fa-user-edit"></i>
+            <h2>Edit Farmer</h2>
+            <p class="subtitle">Update farmer information</p>
         </div>
 
-        <form id="farmerRegistrationForm" action="{{ route('lf.storeFarmer') }}" method="POST" enctype="multipart/form-data" class="registration-form">
+        <form id="farmerEditForm" action="{{ route('lf.updateFarmer', $farmer->id) }}" method="POST" enctype="multipart/form-data" class="registration-form">
             @csrf
             
             <div class="form-grid">
@@ -34,7 +34,7 @@
                         </label>
                         <div class="input-with-icon">
                             <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                   id="name" name="name" value="{{ old('name') }}" 
+                                   id="name" name="name" value="{{ old('name', $farmer->name) }}" 
                                    placeholder="Enter farmer's full name" required>
                         </div>
                         @error('name')
@@ -50,7 +50,7 @@
                             <div class="input-with-icon">
                                 <i class="fas fa-id-card"></i>
                                 <input type="text" class="form-control @error('nic_no') is-invalid @enderror"
-                                       id="nic_no" name="nic_no" value="{{ old('nic_no') }}"
+                                       id="nic_no" name="nic_no" value="{{ old('nic_no', $farmer->nic_no) }}"
                                        placeholder="Enter NIC (e.g., 123456789V or 200123456789)"
                                        pattern="^([0-9]{9}[xXvV]|[0-9]{12})$"
                                        title="Enter valid NIC number (9 digits with letter or 12 digits)"
@@ -68,49 +68,25 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="username" class="form-label required-field">
+                        <label for="username" class="form-label">
                             <i class="fas fa-at"></i> Username
                         </label>
                         <div class="input-with-icon">
-                            <input type="text" class="form-control @error('username') is-invalid @enderror" 
-                                   id="username" name="username" value="{{ old('username') }}" 
-                                   placeholder="Choose a username" required>
+                            <input type="text" class="form-control" 
+                                   id="username" value="{{ $farmer->user->username ?? 'N/A' }}" 
+                                   disabled readonly>
                         </div>
-                        @error('username')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <small class="form-text text-muted">Username cannot be changed</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="password" class="form-label required-field">
-                            <i class="fas fa-lock"></i> Password
+                        <label class="form-label">
+                            <i class="fas fa-toggle-on"></i> Status
                         </label>
-                        <div class="password-container">
-                            <div class="input-with-icon">
-                                <i class="fas fa-key"></i>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                       id="password" name="password" 
-                                       placeholder="Enter password" required>
-                            </div>
-                            <i class="fa-regular fa-eye password-toggle" id="password-toggle-icon" onclick="togglePasswordVisibility()"></i>
-                        </div>
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password_confirmation" class="form-label required-field">
-                            <i class="fas fa-lock"></i> Confirm Password
-                        </label>
-                        <div class="password-container">
-                            <div class="input-with-icon">
-                                <i class="fas fa-key"></i>
-                                <input type="password" class="form-control" 
-                                       id="password_confirmation" name="password_confirmation" 
-                                       placeholder="Confirm password" required>
-                            </div>
-                            <i class="fa-regular fa-eye password-toggle" id="confirm-password-toggle-icon" onclick="toggleConfirmPasswordVisibility()"></i>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                   {{ old('is_active', $farmer->is_active) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_active">Active Farmer</label>
                         </div>
                     </div>
                 </div>
@@ -128,7 +104,8 @@
                         </label>
                         <div class="input-with-icon">
                             <input type="tel" class="form-control @error('primary_mobile') is-invalid @enderror" 
-                                   id="primary_mobile" name="primary_mobile" value="{{ old('primary_mobile') }}" 
+                                   id="primary_mobile" name="primary_mobile" 
+                                   value="{{ old('primary_mobile', $farmer->primary_mobile) }}" 
                                    placeholder="e.g., 0771234567" pattern="[0-9]{10}" 
                                    title="Enter 10 digit mobile number" required>
                         </div>
@@ -143,7 +120,8 @@
                         </label>
                         <div class="input-with-icon">
                             <input type="tel" class="form-control @error('whatsapp_number') is-invalid @enderror" 
-                                   id="whatsapp_number" name="whatsapp_number" value="{{ old('whatsapp_number') }}" 
+                                   id="whatsapp_number" name="whatsapp_number" 
+                                   value="{{ old('whatsapp_number', $farmer->whatsapp_number) }}" 
                                    placeholder="e.g., 0771234567" pattern="[0-9]{10}">
                         </div>
                         @error('whatsapp_number')
@@ -157,7 +135,8 @@
                         </label>
                         <div class="input-with-icon">
                             <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                   id="email" name="email" value="{{ old('email') }}" 
+                                   id="email" name="email" 
+                                   value="{{ old('email', $farmer->email) }}" 
                                    placeholder="farmer@email.com">
                         </div>
                         @error('email')
@@ -180,7 +159,16 @@
 
                     <div class="profile-preview-container">
                         <div class="profile-preview" id="profilePreview">
-                            <img src="{{ asset('assets/images/default-avatar.png') }}" alt="Profile Preview" id="profilePreviewImg">
+                            @php
+                                $profileUrl = asset('assets/images/default-avatar.png');
+                                if ($farmer->user && $farmer->user->profile_photo) {
+                                    $photoPath = 'uploads/profile_pictures/' . $farmer->user->profile_photo;
+                                    if (file_exists(public_path($photoPath))) {
+                                        $profileUrl = asset($photoPath);
+                                    }
+                                }
+                            @endphp
+                            <img src="{{ $profileUrl }}" alt="Profile Preview" id="profilePreviewImg">
                             <div class="preview-overlay">
                                 <i class="fas fa-user"></i>
                             </div>
@@ -201,7 +189,7 @@
                         </label>
                         <textarea class="form-control @error('residential_address') is-invalid @enderror" 
                                   id="residential_address" name="residential_address" 
-                                  rows="3" placeholder="Enter complete residential address" required>{{ old('residential_address') }}</textarea>
+                                  rows="3" placeholder="Enter complete residential address" required>{{ old('residential_address', $farmer->residential_address) }}</textarea>
                         @error('residential_address')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -214,31 +202,9 @@
                         <select class="form-select @error('district') is-invalid @enderror" 
                                 id="district" name="district" required>
                             <option value="">Select District</option>
-                            <option value="Colombo" {{ old('district') == 'Colombo' ? 'selected' : '' }}>Colombo</option>
-                            <option value="Gampaha" {{ old('district') == 'Gampaha' ? 'selected' : '' }}>Gampaha</option>
-                            <option value="Kalutara" {{ old('district') == 'Kalutara' ? 'selected' : '' }}>Kalutara</option>
-                            <option value="Kandy" {{ old('district') == 'Kandy' ? 'selected' : '' }}>Kandy</option>
-                            <option value="Matale" {{ old('district') == 'Matale' ? 'selected' : '' }}>Matale</option>
-                            <option value="Nuwara Eliya" {{ old('district') == 'Nuwara Eliya' ? 'selected' : '' }}>Nuwara Eliya</option>
-                            <option value="Galle" {{ old('district') == 'Galle' ? 'selected' : '' }}>Galle</option>
-                            <option value="Matara" {{ old('district') == 'Matara' ? 'selected' : '' }}>Matara</option>
-                            <option value="Hambantota" {{ old('district') == 'Hambantota' ? 'selected' : '' }}>Hambantota</option>
-                            <option value="Jaffna" {{ old('district') == 'Jaffna' ? 'selected' : '' }}>Jaffna</option>
-                            <option value="Kilinochchi" {{ old('district') == 'Kilinochchi' ? 'selected' : '' }}>Kilinochchi</option>
-                            <option value="Mannar" {{ old('district') == 'Mannar' ? 'selected' : '' }}>Mannar</option>
-                            <option value="Mullaitivu" {{ old('district') == 'Mullaitivu' ? 'selected' : '' }}>Mullaitivu</option>
-                            <option value="Vavuniya" {{ old('district') == 'Vavuniya' ? 'selected' : '' }}>Vavuniya</option>
-                            <option value="Batticaloa" {{ old('district') == 'Batticaloa' ? 'selected' : '' }}>Batticaloa</option>
-                            <option value="Ampara" {{ old('district') == 'Ampara' ? 'selected' : '' }}>Ampara</option>
-                            <option value="Trincomalee" {{ old('district') == 'Trincomalee' ? 'selected' : '' }}>Trincomalee</option>
-                            <option value="Kurunegala" {{ old('district') == 'Kurunegala' ? 'selected' : '' }}>Kurunegala</option>
-                            <option value="Puttalam" {{ old('district') == 'Puttalam' ? 'selected' : '' }}>Puttalam</option>
-                            <option value="Anuradhapura" {{ old('district') == 'Anuradhapura' ? 'selected' : '' }}>Anuradhapura</option>
-                            <option value="Polonnaruwa" {{ old('district') == 'Polonnaruwa' ? 'selected' : '' }}>Polonnaruwa</option>
-                            <option value="Badulla" {{ old('district') == 'Badulla' ? 'selected' : '' }}>Badulla</option>
-                            <option value="Monaragala" {{ old('district') == 'Monaragala' ? 'selected' : '' }}>Monaragala</option>
-                            <option value="Ratnapura" {{ old('district') == 'Ratnapura' ? 'selected' : '' }}>Ratnapura</option>
-                            <option value="Kegalle" {{ old('district') == 'Kegalle' ? 'selected' : '' }}>Kegalle</option>
+                            @foreach($districts as $district)
+                                <option value="{{ $district }}" {{ old('district', $farmer->district) == $district ? 'selected' : '' }}>{{ $district }}</option>
+                            @endforeach
                         </select>
                         @error('district')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -252,7 +218,7 @@
                         <div class="input-with-icon">
                             <input type="text" class="form-control @error('grama_niladhari_division') is-invalid @enderror" 
                                    id="grama_niladhari_division" name="grama_niladhari_division" 
-                                   value="{{ old('grama_niladhari_division') }}" 
+                                   value="{{ old('grama_niladhari_division', $farmer->grama_niladhari_division) }}" 
                                    placeholder="Enter GN Division" required>
                         </div>
                         @error('grama_niladhari_division')
@@ -267,7 +233,7 @@
                         <div class="input-with-icon">
                             <input type="url" class="form-control @error('address_map_link') is-invalid @enderror" 
                                    id="address_map_link" name="address_map_link" 
-                                   value="{{ old('address_map_link') }}" 
+                                   value="{{ old('address_map_link', $farmer->address_map_link) }}" 
                                    placeholder="https://maps.google.com/?q=..." 
                                    pattern="https?://.*" required>
                             <div class="input-hint">
@@ -295,17 +261,17 @@
                         <select class="form-select @error('preferred_payment') is-invalid @enderror" 
                                 id="preferred_payment" name="preferred_payment" required>
                             <option value="">Select Payment Method</option>
-                            <option value="bank" {{ old('preferred_payment') == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
-                            <option value="ezcash" {{ old('preferred_payment') == 'ezcash' ? 'selected' : '' }}>EzCash</option>
-                            <option value="mcash" {{ old('preferred_payment') == 'mcash' ? 'selected' : '' }}>mCash</option>
-                            <option value="all" {{ old('preferred_payment') == 'all' ? 'selected' : '' }}>All Methods</option>
+                            <option value="bank" {{ old('preferred_payment', $farmer->preferred_payment) == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
+                            <option value="ezcash" {{ old('preferred_payment', $farmer->preferred_payment) == 'ezcash' ? 'selected' : '' }}>EzCash</option>
+                            <option value="mcash" {{ old('preferred_payment', $farmer->preferred_payment) == 'mcash' ? 'selected' : '' }}>mCash</option>
+                            <option value="all" {{ old('preferred_payment', $farmer->preferred_payment) == 'all' ? 'selected' : '' }}>All Methods</option>
                         </select>
                         @error('preferred_payment')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Bank Details Section (Initially hidden) -->
+                    <!-- Bank Details Section -->
                     <div id="bankDetails" class="payment-details-section" style="display: none;">
                         <h4 class="payment-section-title">
                             <i class="fas fa-university"></i> Bank Account Details
@@ -314,7 +280,8 @@
                             <div class="form-group col-md-6">
                                 <label for="bank_name" class="form-label required-field">Bank Name</label>
                                 <input type="text" class="form-control @error('bank_name') is-invalid @enderror" 
-                                       id="bank_name" name="bank_name" value="{{ old('bank_name') }}" 
+                                       id="bank_name" name="bank_name" 
+                                       value="{{ old('bank_name', $farmer->bank_name) }}" 
                                        placeholder="e.g., Commercial Bank">
                                 @error('bank_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -323,7 +290,8 @@
                             <div class="form-group col-md-6">
                                 <label for="bank_branch" class="form-label required-field">Bank Branch</label>
                                 <input type="text" class="form-control @error('bank_branch') is-invalid @enderror" 
-                                       id="bank_branch" name="bank_branch" value="{{ old('bank_branch') }}" 
+                                       id="bank_branch" name="bank_branch" 
+                                       value="{{ old('bank_branch', $farmer->bank_branch) }}" 
                                        placeholder="e.g., Colombo 03">
                                 @error('bank_branch')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -335,7 +303,7 @@
                                 <label for="account_holder_name" class="form-label required-field">Account Holder Name</label>
                                 <input type="text" class="form-control @error('account_holder_name') is-invalid @enderror" 
                                        id="account_holder_name" name="account_holder_name" 
-                                       value="{{ old('account_holder_name') }}" 
+                                       value="{{ old('account_holder_name', $farmer->account_holder_name) }}" 
                                        placeholder="Account holder's name as in bank">
                                 @error('account_holder_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -345,7 +313,7 @@
                                 <label for="account_number" class="form-label required-field">Account Number</label>
                                 <input type="text" class="form-control @error('account_number') is-invalid @enderror" 
                                        id="account_number" name="account_number" 
-                                       value="{{ old('account_number') }}" 
+                                       value="{{ old('account_number', $farmer->account_number) }}" 
                                        placeholder="e.g., 1234567890">
                                 @error('account_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -354,7 +322,7 @@
                         </div>
                     </div>
 
-                    <!-- EzCash Details Section (Initially hidden) -->
+                    <!-- EzCash Details Section -->
                     <div id="ezcashDetails" class="payment-details-section" style="display: none;">
                         <h4 class="payment-section-title">
                             <i class="fas fa-mobile-alt"></i> EzCash Details
@@ -364,7 +332,7 @@
                             <div class="input-with-icon">
                                 <input type="tel" class="form-control @error('ezcash_mobile') is-invalid @enderror" 
                                        id="ezcash_mobile" name="ezcash_mobile" 
-                                       value="{{ old('ezcash_mobile') }}" 
+                                       value="{{ old('ezcash_mobile', $farmer->ezcash_mobile) }}" 
                                        placeholder="e.g., 0771234567" pattern="[0-9]{10}">
                             </div>
                             @error('ezcash_mobile')
@@ -373,7 +341,7 @@
                         </div>
                     </div>
 
-                    <!-- mCash Details Section (Initially hidden) -->
+                    <!-- mCash Details Section -->
                     <div id="mcashDetails" class="payment-details-section" style="display: none;">
                         <h4 class="payment-section-title">
                             <i class="fas fa-mobile-alt"></i> mCash Details
@@ -383,7 +351,7 @@
                             <div class="input-with-icon">
                                 <input type="tel" class="form-control @error('mcash_mobile') is-invalid @enderror" 
                                        id="mcash_mobile" name="mcash_mobile" 
-                                       value="{{ old('mcash_mobile') }}" 
+                                       value="{{ old('mcash_mobile', $farmer->mcash_mobile) }}" 
                                        placeholder="e.g., 0771234567" pattern="[0-9]{10}">
                             </div>
                             @error('mcash_mobile')
@@ -399,7 +367,7 @@
                     <i class="fas fa-arrow-left"></i> Back to Farmers List
                 </a>
                 <button type="submit" class="btn btn-register" id="submitBtn">
-                    <i class="fas fa-user-plus"></i> Register Farmer
+                    <i class="fas fa-save"></i> Update Farmer
                 </button>
             </div>
         </form>
@@ -410,60 +378,12 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('password_confirmation');
     const nicInput = document.getElementById('nic_no');
     const nicStatus = document.getElementById('nicStatus');
     const preferredPayment = document.getElementById('preferred_payment');
     const profilePhotoInput = document.getElementById('profile_photo');
     const profilePreviewImg = document.getElementById('profilePreviewImg');
-    const form = document.getElementById('farmerRegistrationForm');
-
-    function togglePasswordVisibility() {
-        const passwordField = document.getElementById('password');
-        const toggleIcon = document.getElementById('password-toggle-icon');
-        if (passwordField.type === 'password') {
-            passwordField.type = 'text';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        } else {
-            passwordField.type = 'password';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
-        }
-    }
-
-    function toggleConfirmPasswordVisibility() {
-        const confirmPasswordField = document.getElementById('password_confirmation');
-        const toggleIcon = document.getElementById('confirm-password-toggle-icon');
-        if (confirmPasswordField.type === 'password') {
-            confirmPasswordField.type = 'text';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        } else {
-            confirmPasswordField.type = 'password';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
-        }
-    }
-
-    window.togglePasswordVisibility = togglePasswordVisibility;
-    window.toggleConfirmPasswordVisibility = toggleConfirmPasswordVisibility;
-
-    function validatePasswordStrength() {
-        const passwordValue = password.value;
-        if (!passwordValue) return false;
-        let strength = 0;
-        if (passwordValue.length >= 8) strength++;
-        if (/[A-Z]/.test(passwordValue)) strength++;
-        if (/[0-9]/.test(passwordValue)) strength++;
-        if (/[^A-Za-z0-9]/.test(passwordValue)) strength++;
-        return strength >= 2;
-    }
-
-    function validatePasswordMatch() {
-        return password.value === confirmPassword.value;
-    }
+    const form = document.getElementById('farmerEditForm');
 
     function validateNIC(nic) {
         if (!nic) return false;
@@ -471,7 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const oldNicPattern = /^[0-9]{9}[VX]$/;
         const newNicPattern = /^[0-9]{12}$/;
         if (oldNicPattern.test(nic)) {
-            const year = parseInt(nic.substr(0, 2));
             const days = parseInt(nic.substr(2, 3));
             if (days > 500) {
                 return days <= 866;
@@ -492,12 +411,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function formatNIC(nic) {
         if (!nic) return '';
         nic = nic.trim().toUpperCase();
-        if (nic.length === 10 && /^[0-9]{9}[VX]$/.test(nic)) {
-            return nic;
-        }
-        if (nic.length === 12 && /^[0-9]{12}$/.test(nic)) {
-            return nic;
-        }
         return nic;
     }
 
@@ -605,26 +518,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
-        if (!validatePasswordStrength()) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Weak Password',
-                text: 'Password must be at least 8 characters with letters and numbers.',
-                confirmButtonColor: '#10B981'
-            });
-            return false;
-        }
-
-        if (!validatePasswordMatch()) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Passwords Mismatch',
-                text: 'Password and confirmation do not match.',
-                confirmButtonColor: '#10B981'
-            });
-            return false;
-        }
-
         const paymentMethod = preferredPayment.value;
         if (paymentMethod === 'bank') {
             const bankFields = ['bank_name', 'bank_branch', 'account_holder_name', 'account_number'];
@@ -680,6 +573,147 @@ document.addEventListener('DOMContentLoaded', function() {
     nicInput.addEventListener('input', updateNICStatus);
     preferredPayment.addEventListener('change', togglePaymentDetails);
     
+    async function submitForm(otp = null) {
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        const formData = new FormData(form);
+        if (otp) {
+            formData.append('otp', otp);
+        }
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Farmer Updated Successfully!',
+                    text: data.message || 'Farmer details have been updated.',
+                    confirmButtonColor: '#10B981'
+                }).then(() => {
+                    window.location.href = '{{ route("lf.manageFarmers") }}';
+                });
+            } else if (data.requires_otp) {
+                // Sensitive changes detected, request OTP
+                requestOtp();
+            } else {
+                // Validation error or other failure
+                handleErrors(data);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Operation Failed',
+                text: 'An unexpected error occurred. Please try again.',
+                confirmButtonColor: '#10B981'
+            });
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Farmer';
+        }
+    }
+
+    async function requestOtp() {
+        Swal.fire({
+            title: 'OTP Verification',
+            text: 'Sending OTP to your mobile number...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const formData = new FormData(form);
+        try {
+            const response = await fetch('{{ route("lf.farmer.sendUpdateOtp", $farmer->id) }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                const { value: otp } = await Swal.fire({
+                    title: 'Enter OTP',
+                    text: 'OTP has been sent to the farmer mobile number. Please enter it below to confirm changes.',
+                    input: 'text',
+                    inputAttributes: {
+                        maxlength: 6,
+                        autocapitalize: 'off',
+                        autocorrect: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Verify & Update',
+                    confirmButtonColor: '#10B981',
+                    preConfirm: (otp) => {
+                        if (!otp || otp.length !== 6 || isNaN(otp)) {
+                            Swal.showValidationMessage('Please enter a valid 6-digit OTP');
+                        }
+                        return otp;
+                    }
+                });
+
+                if (otp) {
+                    submitForm(otp);
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Send OTP',
+                    text: data.message || 'An error occurred while sending the OTP.',
+                    confirmButtonColor: '#10B981'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Could not connect to the server. Please check your connection.',
+                confirmButtonColor: '#10B981'
+            });
+        }
+    }
+
+    function handleErrors(data) {
+        let errorMessage = data.message || 'Update failed';
+        if (data.errors) {
+            let errorList = '<ul style="text-align: left; margin-top: 10px;">';
+            for (const [field, messages] of Object.entries(data.errors)) {
+                const fieldName = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                messages.forEach(msg => {
+                    errorList += `<li><strong>${fieldName}:</strong> ${msg}</li>`;
+                });
+            }
+            errorList += '</ul>';
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Failed',
+                html: `<p>Please fix the following errors:</p>${errorList}`,
+                confirmButtonColor: '#10B981'
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: errorMessage,
+                confirmButtonColor: '#10B981'
+            });
+        }
+    }
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -687,63 +721,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
-
-        const formData = new FormData(this);
-        
-        fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Farmer Registered Successfully!',
-                    html: `
-                        <div style="text-align: left; padding: 10px;">
-                            <p><strong>Name:</strong> ${data.farmer.name}</p>
-                            <p><strong>Username:</strong> ${data.username}</p>
-                            <p><strong>Mobile:</strong> ${data.farmer.primary_mobile}</p>
-                            <p>SMS and email sent with login details.</p>
-                        </div>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Add New Farmer',
-                    cancelButtonText: 'View Farmer List',
-                    confirmButtonColor: '#10B981',
-                    cancelButtonColor: '#6B7280'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.reload();
-                    } else {
-                        window.location.href = '{{ route("lf.manageFarmers") }}';
-                    }
-                });
-            } else {
-                throw new Error(data.message || 'Registration failed');
-            }
-        })
-        .catch(error => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Registration Failed',
-                text: error.message || 'An error occurred while registering the farmer.',
-                confirmButtonColor: '#10B981'
-            });
-        })
-        .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register Farmer';
-        });
+        submitForm();
     });
 
+    // Initialize on page load
     togglePaymentDetails();
     updateNICStatus();
 });

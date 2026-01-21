@@ -12,6 +12,8 @@ use App\Models\SystemStandard;
 use App\Models\Order;
 use App\Models\Notification;
 use App\Mail\FarmerRegistrationMail;
+use App\Models\OtpVerification;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
@@ -1089,13 +1091,51 @@ class LeadFarmerController extends Controller
             'grama_niladhari_division' => 'required|string|max:100',
             'preferred_payment' => 'required|in:bank,ezcash,mcash,all',
             'profile_photo' => 'nullable|image|max:2048',
-            'is_active' => 'boolean',
+            // Note: is_active is handled separately via $request->has('is_active')
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Check for sensitive changes
+        $hasSensitiveChanges = $this->hasSensitiveChanges($request, $farmer);
+
+        if ($hasSensitiveChanges) {
+            // Check if OTP is provided
+            if (!$request->has('otp')) {
+                return response()->json([
+                    'success' => false,
+                    'requires_otp' => true,
+                    'message' => 'Sensitive information change detected. OTP verification required.'
+                ]);
+            }
+
+            // Verify OTP
+            $otpRecord = OtpVerification::where('user_id', Auth::id())
+                ->where('otp', $request->otp)
+                ->where('action', 'update_farmer_' . $id)
+                ->where('used', false)
+                ->where('expires_at', '>', Carbon::now())
+                ->latest()
+                ->first();
+
+            if (!$otpRecord) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired OTP.'
+                ], 400);
+            }
+
+            // Mark OTP as used
+            $otpRecord->update([
+                'used' => true,
+                'used_at' => Carbon::now()
+            ]);
         }
 
         DB::beginTransaction();
@@ -1146,19 +1186,93 @@ class LeadFarmerController extends Controller
 
             DB::commit();
 
-            return redirect()->route('lf.manageFarmers')
-                ->with('success', 'Farmer updated successfully!');
+            return response()->json([
+                'success' => true,
+                'message' => 'Farmer updated successfully!',
+                'farmer' => $farmer
+            ]);
 
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()
-                ->with('error', 'Error updating farmer: ' . $e->getMessage())
-                ->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating farmer: ' . $e->getMessage()
+            ], 500);
         }
     }
 
     /**
-     * Delete Farmer
+     * Send OTP for Farmer Update
+     */
+    public function sendUpdateOtp($id, Request $request)
+    {
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+        $farmer = Farmer::where('id', $id)
+            ->where('lead_farmer_id', $leadFarmerId)
+            ->firstOrFail();
+
+        // Check if sensitive changes are present to allow OTP request
+        if (!$this->hasSensitiveChanges($request, $farmer)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No sensitive changes detected.'
+            ], 400);
+        }
+
+        try {
+            // Generate 6-digit OTP
+            $otp = rand(100000, 999999);
+            
+            // Log OTP for debugging (remove in production)
+            \Log::info("Farmer Update OTP for User " . Auth::id() . ": " . $otp);
+
+            // Save OTP to database
+            OtpVerification::create([
+                'user_id' => Auth::id(),
+                'otp' => $otp,
+                'action' => 'update_farmer_' . $id,
+                'expires_at' => Carbon::now()->addMinutes(10),
+                'used' => false
+            ]);
+
+            // Send OTP via SMS to the Farmer
+            $mobileNumber = $farmer->primary_mobile;
+            $message = "Your GreenMarket OTP for updating your Mobile Number/Payment Info is: $otp. This code is valid for 10 minutes. Please do not share this with anyone.";
+            
+            $this->sendSMS($mobileNumber, $message);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully to your mobile number.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Check for sensitive changes
+     */
+    private function hasSensitiveChanges(Request $request, $farmer)
+    {
+        if ($request->primary_mobile !== $farmer->primary_mobile) return true;
+        if ($request->preferred_payment !== $farmer->preferred_payment) return true;
+        if ($request->bank_name !== $farmer->bank_name) return true;
+        if ($request->bank_branch !== $farmer->bank_branch) return true;
+        if ($request->account_holder_name !== $farmer->account_holder_name) return true;
+        if ($request->account_number !== $farmer->account_number) return true;
+        if ($request->ezcash_mobile !== $farmer->ezcash_mobile) return true;
+        if ($request->mcash_mobile !== $farmer->mcash_mobile) return true;
+        return false;
+    }
+
+    /**
+     * Delete Farmer (Soft Delete - Deactivate)
+     * Sets farmer is_active to false and updates product statuses
      */
     public function deleteFarmer($id)
     {
@@ -1170,31 +1284,29 @@ class LeadFarmerController extends Controller
 
         DB::beginTransaction();
         try {
-            // Delete user account
-            if ($farmer->user) {
-                // Delete profile photo if exists
-                if ($farmer->user->profile_photo && $farmer->user->profile_photo != 'default-avatar.png') {
-                    Storage::delete('public/uploads/profile_pictures/' . $farmer->user->profile_photo);
-                }
+            // Set farmer as inactive (soft delete)
+            $farmer->is_active = false;
+            $farmer->save();
 
-                $farmer->user->delete();
-            }
-
-            // Delete farmer record (cascade will delete products)
-            $farmer->delete();
+            // Update all products belonging to this farmer
+            // Set product_status to "removed by lead farmer"
+            $farmer->products()->update([
+                'product_status' => 'removed by lead farmer',
+                'is_available' => false
+            ]);
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Farmer deleted successfully!'
+                'message' => 'Farmer deactivated successfully! All products have been marked as removed.'
             ]);
 
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting farmer: ' . $e->getMessage()
+                'message' => 'Error deactivating farmer: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -1208,11 +1320,16 @@ class LeadFarmerController extends Controller
         $password = env('SMS_PASSWORD');
         $baseurl = env('SMS_API_URL', 'https://textit.biz/sendmsg');
 
+        // Clean the mobile number (remove any non-digit characters)
+        $to = preg_replace('/[^0-9]/', '', $to);
+
         $text = urlencode($message);
         
-        // $url = "$baseurl/?id=$user&pw=$password&to=$to&text=$text";
-        // Ensure proper URL forming
-        $url = $baseurl . "/?id=" . $user . "&pw=" . $password . "&to=" . $to . "&text=" . $text;
+        // Ensure trailing slash is present as the API seems to require it
+        $baseurl = rtrim($baseurl, '/') . '/';
+        
+        // Form the URL with the trailing slash before parameters
+        $url = $baseurl . "?id=" . $user . "&pw=" . $password . "&to=" . $to . "&text=" . $text;
         
         $ret = $this->get_web_page($url);
         
@@ -1220,9 +1337,10 @@ class LeadFarmerController extends Controller
         
         // Check if response starts with OK
         if (trim($res[0]) == "OK") {
+            \Log::info("SMS Sent successfully to $to. Response: $ret");
             return true;
         } else {
-            // Log failure or throw exception to be caught in storeFarmer
+            \Log::error("SMS Sending Failed to $to. Response: $ret");
             throw new \Exception("SMS API Failed: " . $ret);
         }
     }
@@ -1230,8 +1348,11 @@ class LeadFarmerController extends Controller
     private function get_web_page($url)
     {
         $options = array(
-            CURLOPT_RETURNTRANSFER => true, // return web page
-            CURLOPT_HEADER => false, // don't return headers
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => false,
+            CURLOPT_FOLLOWLOCATION => true, // Automatically follow the 301 redirect
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => 30,
         );
 
         $ch = curl_init($url);
