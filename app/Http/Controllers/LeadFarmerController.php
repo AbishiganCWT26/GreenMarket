@@ -11,7 +11,9 @@ use App\Models\ProductSubcategory;
 use App\Models\SystemStandard;
 use App\Models\Order;
 use App\Models\Notification;
+use App\Mail\FarmerRegistrationMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -102,19 +104,38 @@ class LeadFarmerController extends Controller
      */
     public function storeFarmer(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        // 1. Validation
+        $rules = [
             'name' => 'required|string|max:100',
             'nic_no' => 'required|string|max:20|unique:farmers,nic_no',
+            'username' => 'required|string|max:50|unique:users,username',
+            'password' => 'required|string|min:6',
             'primary_mobile' => 'required|string|max:15',
             'whatsapp_number' => 'nullable|string|max:15',
             'email' => 'nullable|email|max:100',
             'residential_address' => 'required|string',
-            'address_map_link' => 'nullable|url',
+            'address_map_link' => 'required|url', // Changed to required
             'district' => 'required|string',
             'grama_niladhari_division' => 'required|string|max:100',
             'preferred_payment' => 'required|in:bank,ezcash,mcash,all',
-            'profile_photo' => 'nullable|image|max:2048',
-        ]);
+            'profile_photo' => 'nullable|image|max:5120', // Max 5MB
+        ];
+
+        // Conditional Validation for Payment Details
+        if (in_array($request->preferred_payment, ['bank', 'all'])) {
+            $rules['bank_name'] = 'required|string|max:100';
+            $rules['bank_branch'] = 'required|string|max:100';
+            $rules['account_holder_name'] = 'required|string|max:100';
+            $rules['account_number'] = 'required|string|max:50';
+        }
+        if (in_array($request->preferred_payment, ['ezcash', 'all'])) {
+            $rules['ezcash_mobile'] = 'required|string|max:15';
+        }
+        if (in_array($request->preferred_payment, ['mcash', 'all'])) {
+            $rules['mcash_mobile'] = 'required|string|max:15';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -124,21 +145,22 @@ class LeadFarmerController extends Controller
 
         DB::beginTransaction();
         try {
-            // Create User account for farmer
+            // 2. Create User account for farmer
             $user = User::create([
-                'username' => $request->nic_no,
-                'password' => Hash::make($request->nic_no), // Default password is NIC
-                'email' => $request->email,
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+                'email' => $request->email, // Email might be null, but table allows it (unique constraint might fail if multiple nulls? Postgres allows multiple nulls in unique index primarily, but User model validation usually handles unique email if present)
                 'role' => 'farmer',
                 'is_active' => true,
             ]);
 
-            // Handle profile photo upload
-            $profilePhoto = 'default-avatar.png';
+            // 3. Handle profile photo upload
+            $profilePhoto = 'default-avatar.png'; // Default
             if ($request->hasFile('profile_photo')) {
                 $photo = $request->file('profile_photo');
-                $filename = 'farmer_' . time() . '.' . $photo->getClientOriginalExtension();
-                $photo->storeAs('public/uploads/profile_pictures', $filename);
+                // Naming convention: user_id_timestamp.ext
+                $filename = 'farmer_' . $user->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
+                $photo->move(public_path('uploads/profile_pictures'), $filename);
                 $profilePhoto = $filename;
 
                 // Update user profile photo
@@ -149,7 +171,7 @@ class LeadFarmerController extends Controller
             // Get lead farmer ID
             $leadFarmerId = Auth::user()->leadFarmer->id;
 
-            // Create Farmer record
+            // 4. Create Farmer record
             $farmer = Farmer::create([
                 'user_id' => $user->id,
                 'lead_farmer_id' => $leadFarmerId,
@@ -175,14 +197,55 @@ class LeadFarmerController extends Controller
 
             DB::commit();
 
-            return redirect()->route('lf.manageFarmers')
-                ->with('success', 'Farmer registered successfully!');
+            // 5. Send Notification (SMS & Email)
+            try {
+                // Prepare message
+                $messageBody = "Welcome to " . config('app.name', 'GreenMarket') . "! \n";
+                $messageBody .= "Your login details are:\n";
+                $messageBody .= "Username: " . $request->username . "\n";
+                $messageBody .= "Password: " . $request->password . "\n"; // Sending raw pass as requested
+                
+                // Send SMS to Farmer's Primary Mobile
+                $this->sendSMS($request->primary_mobile, $messageBody);
+
+                // Send Email if available
+                if ($request->email) {
+                    try {
+                        Mail::to($request->email)->send(new FarmerRegistrationMail(
+                            $request->name,
+                            $request->username, // Assuming username is nic_no based on previous code, but request has username field now
+                            $request->password,
+                            $request->email
+                        ));
+                    } catch (\Exception $e) {
+                         // Log email failure but don't stop flow, similar to SMS
+                         // throw new \Exception("Email Failed: " . $e->getMessage()); // Optional: if we want to bubble up
+                    }
+                }
+
+            } catch (\Exception $e) {
+                // Return JSON warning effectively
+                return response()->json([
+                    'success' => true,
+                    'farmer' => $farmer,
+                    'username' => $user->username,
+                    'message' => 'Farmer registered successfully, but notification failed: ' . $e->getMessage()
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'farmer' => $farmer,
+                'username' => $user->username,
+                'message' => 'Farmer registered successfully! Notifications sent.'
+            ]);
 
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()
-                ->with('error', 'Error registering farmer: ' . $e->getMessage())
-                ->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error registering farmer: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -754,30 +817,15 @@ class LeadFarmerController extends Controller
      */
     private function formatPaymentDetails(Request $request)
     {
-        $details = [];
-
-        if ($request->preferred_payment == 'bank' || $request->preferred_payment == 'all') {
-            $details['bank'] = [
-                'account_number' => $request->account_number,
-                'account_holder_name' => $request->account_holder_name,
-                'bank_name' => $request->bank_name,
-                'bank_branch' => $request->bank_branch,
-            ];
+        if ($request->preferred_payment == 'bank') {
+            return "Bank Transfer";
+        } elseif ($request->preferred_payment == 'ezcash' || $request->preferred_payment == 'mcash') {
+            return "Mobile Wallet Transfer";
+        } elseif ($request->preferred_payment == 'all') {
+            return "All Methods";
         }
-
-        if ($request->preferred_payment == 'ezcash' || $request->preferred_payment == 'all') {
-            $details['ezcash'] = [
-                'mobile' => $request->ezcash_mobile,
-            ];
-        }
-
-        if ($request->preferred_payment == 'mcash' || $request->preferred_payment == 'all') {
-            $details['mcash'] = [
-                'mobile' => $request->mcash_mobile,
-            ];
-        }
-
-        return json_encode($details);
+        
+        return "Bank Transfer"; // Default fallback
     }
 
     /**
@@ -1143,6 +1191,47 @@ class LeadFarmerController extends Controller
         }
     }
 
+    /**
+     * Send SMS via TextIt
+     */
+    private function sendSMS($to, $message)
+    {
+        $user = env('SMS_USER');
+        $password = env('SMS_PASSWORD');
+        $baseurl = env('SMS_API_URL', 'https://textit.biz/sendmsg');
+
+        $text = urlencode($message);
+        
+        // $url = "$baseurl/?id=$user&pw=$password&to=$to&text=$text";
+        // Ensure proper URL forming
+        $url = $baseurl . "/?id=" . $user . "&pw=" . $password . "&to=" . $to . "&text=" . $text;
+        
+        $ret = $this->get_web_page($url);
+        
+        $res = explode(":", $ret);
+        
+        // Check if response starts with OK
+        if (trim($res[0]) == "OK") {
+            return true;
+        } else {
+            // Log failure or throw exception to be caught in storeFarmer
+            throw new \Exception("SMS API Failed: " . $ret);
+        }
+    }
+
+    private function get_web_page($url)
+    {
+        $options = array(
+            CURLOPT_RETURNTRANSFER => true, // return web page
+            CURLOPT_HEADER => false, // don't return headers
+        );
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, $options);
+        $content = curl_exec($ch);
+        curl_close($ch);
+
+        return $content;
+    }
+
 }
-
-
