@@ -459,7 +459,7 @@ class LeadFarmerController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('product_name', 'like', "%$search%")
-                  ->orWhere('product_description', 'like', "%$search%");
+                ->orWhere('product_description', 'like', "%$search%");
             });
         }
 
@@ -473,17 +473,21 @@ class LeadFarmerController extends Controller
 
         if ($request->filled('status')) {
             if ($request->status == 'available') {
-                $query->where('is_available', true);
+                $query->where('is_available', true)
+                    ->where('quantity', '>', 0);
             } elseif ($request->status == 'sold_out') {
-                $query->where('is_available', false)
-                      ->orWhere('quantity', '<=', 0);
+                $query->where(function($q) {
+                    $q->where('is_available', false)
+                    ->orWhere('quantity', '<=', 0);
+                });
             }
         }
 
         $products = $query->orderBy('created_at', 'desc')->get();
 
-        // Get farmers for filter dropdown
+        // Get farmers for filter dropdown (only active farmers)
         $farmers = Farmer::where('lead_farmer_id', $leadFarmerId)
+            ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
@@ -494,6 +498,34 @@ class LeadFarmerController extends Controller
 
         return view('lead_farmer.manage_products', compact('products', 'farmers', 'categories'));
     }
+
+    /**
+     * Get Product Details (AJAX)
+     */
+    public function getProductDetails($id)
+    {
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+
+        $product = Product::with(['farmer', 'category', 'subcategory', 'productExample'])
+            ->where('id', $id)
+            ->where('lead_farmer_id', $leadFarmerId)
+            ->first();
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product not found'
+            ]);
+        }
+
+        $html = view('lead_farmer.partials.product_details', compact('product'))->render();
+
+        return response()->json([
+            'success' => true,
+            'html' => $html
+        ]);
+    }
+    
 
     /**
      * Edit Product Page

@@ -167,6 +167,7 @@ Route::prefix('lead-farmer')
     Route::get('/edit-product/{id}', [LeadFarmerController::class, 'editProduct'])->name('lf.editProduct');
     Route::post('/update-product/{id}', [LeadFarmerController::class, 'updateProduct'])->name('lf.updateProduct');
     Route::delete('/delete-product/{id}', [LeadFarmerController::class, 'deleteProduct'])->name('lf.deleteProduct');
+    Route::get('/product-details/{id}', [LeadFarmerController::class, 'getProductDetails'])->name('lf.product.details');
 
     // Orders
     Route::get('/orders', [LeadFarmerController::class, 'viewOrders'])->name('lf.orders');
