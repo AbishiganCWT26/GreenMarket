@@ -29,6 +29,7 @@ class Product extends Model
         'pickup_map_link',
         'is_available',
         'views_count',
+        'product_examples_id',
     ];
 
     protected $casts = [
@@ -72,6 +73,14 @@ class Product extends Model
     public function subcategory()
     {
         return $this->belongsTo(ProductSubcategory::class, 'subcategory_id');
+    }
+
+    /**
+     * Get the specific product example.
+     */
+    public function productExample()
+    {
+        return $this->belongsTo(ProductExample::class, 'product_examples_id');
     }
 
     /**

@@ -190,6 +190,7 @@ Route::prefix('lead-farmer')
 
     // AJAX Routes
     Route::get('/get-subcategories/{categoryId}', [LeadFarmerController::class, 'getSubcategories'])->name('lf.getSubcategories');
+    Route::get('/get-product-examples/{subcategoryId}', [LeadFarmerController::class, 'getProductExamples'])->name('lf.getProductExamples');
 });
 
 /*

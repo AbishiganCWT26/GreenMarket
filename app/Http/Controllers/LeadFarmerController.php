@@ -11,6 +11,7 @@ use App\Models\ProductSubcategory;
 use App\Models\SystemStandard;
 use App\Models\Order;
 use App\Models\Notification;
+use App\Models\ProductExample;
 use App\Mail\FarmerRegistrationMail;
 use App\Models\OtpVerification;
 use Carbon\Carbon;
@@ -303,15 +304,12 @@ class LeadFarmerController extends Controller
 
         // Get farmers belonging to this lead farmer
         $farmers = Farmer::where('lead_farmer_id', $leadFarmerId)
+            ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
-        // Get product categories and subcategories
+        // Get product categories
         $categories = ProductCategory::where('is_active', true)
-            ->orderBy('display_order')
-            ->get();
-
-        $subcategories = ProductSubcategory::where('is_active', true)
             ->orderBy('display_order')
             ->get();
 
@@ -332,7 +330,6 @@ class LeadFarmerController extends Controller
         return view('lead_farmer.add_product', compact(
             'farmers',
             'categories',
-            'subcategories',
             'units',
             'grades'
         ));
@@ -346,26 +343,30 @@ class LeadFarmerController extends Controller
         $validator = Validator::make($request->all(), [
             'product_name' => 'required|string|max:200',
             'product_description' => 'nullable|string',
-            'product_photo' => 'nullable|image|max:2048',
+            'product_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // Max 5MB
             'farmer_id' => 'required|exists:farmers,id',
             'type_variant' => 'nullable|string|max:50',
             'category_id' => 'required|exists:product_categories,id',
             'subcategory_id' => 'required|exists:product_subcategories,id',
-            'quantity' => 'required|numeric|min:0',
+            'product_examples_id' => 'required|exists:product_examples,id',
+            'quantity' => 'required|numeric|min:0.01',
             'unit_of_measure' => 'required|string|max:20',
             'quality_grade' => 'nullable|string|max:50',
             'expected_availability_date' => 'required|date',
-            'selling_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0.01',
             'pickup_address' => 'nullable|string',
             'pickup_map_link' => 'nullable|url',
+            'is_available' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
         }
 
+        DB::beginTransaction();
         try {
             // Get lead farmer ID
             $leadFarmer = Auth::user()->leadFarmer;
@@ -375,11 +376,22 @@ class LeadFarmerController extends Controller
             $productPhoto = null;
             if ($request->hasFile('product_photo')) {
                 $photo = $request->file('product_photo');
-                $filename = 'product_' . time() . '.' . $photo->getClientOriginalExtension();
-                $photo->storeAs('public/product_photos', $filename);
+                $filename = 'product_' . time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                
+                // Create directory if it doesn't exist
+                $uploadPath = public_path('uploads/product_images');
+                if (!file_exists($uploadPath)) {
+                    mkdir($uploadPath, 0777, true);
+                }
+                
+                // Move the uploaded file
+                $photo->move($uploadPath, $filename);
                 $productPhoto = $filename;
             }
 
+            // Get farmer details for default pickup location
+            $farmer = Farmer::find($request->farmer_id);
+            
             // Create product
             $product = Product::create([
                 'farmer_id' => $request->farmer_id,
@@ -390,25 +402,47 @@ class LeadFarmerController extends Controller
                 'type_variant' => $request->type_variant,
                 'category_id' => $request->category_id,
                 'subcategory_id' => $request->subcategory_id,
+                'product_examples_id' => $request->product_examples_id,
                 'quantity' => $request->quantity,
                 'unit_of_measure' => $request->unit_of_measure,
                 'quality_grade' => $request->quality_grade,
                 'expected_availability_date' => $request->expected_availability_date,
                 'selling_price' => $request->selling_price,
-                'pickup_address' => $request->pickup_address ?: Farmer::find($request->farmer_id)->residential_address,
-                'pickup_map_link' => $request->pickup_map_link ?: Farmer::find($request->farmer_id)->address_map_link,
-                'is_available' => true,
+                'pickup_address' => $request->pickup_address ?: $farmer->residential_address,
+                'pickup_map_link' => $request->pickup_map_link ?: $farmer->address_map_link,
+                'is_available' => $request->has('is_available') ? true : false,
             ]);
 
-            return redirect()->route('lf.manageProducts')
-                ->with('success', 'Product added successfully!');
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added successfully!',
+                'product_id' => $product->id,
+                'product_name' => $product->product_name
+            ]);
 
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Error adding product: ' . $e->getMessage())
-                ->withInput();
+            DB::rollback();
+            
+            // Log the error for debugging
+            \Log::error('Product creation error: ' . $e->getMessage());
+            \Log::error('File: ' . $e->getFile());
+            \Log::error('Line: ' . $e->getLine());
+            \Log::error('Trace: ' . $e->getTraceAsString());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error adding product: ' . $e->getMessage(),
+                'error_details' => [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            ], 500);
         }
     }
+    
 
     /**
      * Manage Products Page
@@ -526,6 +560,7 @@ class LeadFarmerController extends Controller
             'type_variant' => 'nullable|string|max:50',
             'category_id' => 'required|exists:product_categories,id',
             'subcategory_id' => 'required|exists:product_subcategories,id',
+            'product_examples_id' => 'required|exists:product_examples,id',
             'quantity' => 'required|numeric|min:0',
             'unit_of_measure' => 'required|string|max:20',
             'quality_grade' => 'nullable|string|max:50',
@@ -564,6 +599,7 @@ class LeadFarmerController extends Controller
                 'type_variant' => $request->type_variant,
                 'category_id' => $request->category_id,
                 'subcategory_id' => $request->subcategory_id,
+                'product_examples_id' => $request->product_examples_id,
                 'quantity' => $request->quantity,
                 'unit_of_measure' => $request->unit_of_measure,
                 'quality_grade' => $request->quality_grade,
@@ -735,6 +771,19 @@ class LeadFarmerController extends Controller
             ->get();
 
         return response()->json($subcategories);
+    }
+
+    /**
+     * Get Product Examples by Subcategory (AJAX)
+     */
+    public function getProductExamples($subcategoryId)
+    {
+        $products = ProductExample::where('subcategory_id', $subcategoryId)
+            ->where('is_active', true)
+            ->orderBy('display_order')
+            ->get();
+
+        return response()->json($products);
     }
 
     /**
