@@ -454,7 +454,7 @@ class LeadFarmerController extends Controller
         $query = Product::with(['farmer', 'category', 'subcategory'])
             ->where('lead_farmer_id', $leadFarmerId);
 
-        // Apply filters
+        // --- 1. Apply Filters (Your original logic) ---
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -483,20 +483,33 @@ class LeadFarmerController extends Controller
             }
         }
 
-        $products = $query->orderBy('created_at', 'desc')->get();
+        // --- 2. New Logic: Dynamic Pagination ---
+        
+        // Check if the user wants 'card' or 'table' view (default to card)
+        $viewType = $request->input('view_type', 'card');
+        
+        // Set items per page based on the view type
+        $itemsPerPage = ($viewType === 'card') ? 15 : 10;
 
-        // Get farmers for filter dropdown (only active farmers)
+        // Replace ->get() with ->paginate()
+        $products = $query->orderBy('created_at', 'desc')->paginate($itemsPerPage);
+
+        // IMPORTANT: Ensure filters and view_type persist when clicking "Next Page"
+        $products->appends($request->all());
+
+        // --- 3. Get Dropdown Data ---
+        
         $farmers = Farmer::where('lead_farmer_id', $leadFarmerId)
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
-        // Get categories for filter dropdown
         $categories = ProductCategory::where('is_active', true)
             ->orderBy('display_order')
             ->get();
 
-        return view('lead_farmer.manage_products', compact('products', 'farmers', 'categories'));
+        // Pass 'viewType' to the view so you can toggle the UI class
+        return view('lead_farmer.manage_products', compact('products', 'farmers', 'categories', 'viewType'));
     }
 
     /**
@@ -613,7 +626,7 @@ class LeadFarmerController extends Controller
             // Handle product photo update
             if ($request->hasFile('product_photo')) {
                 // Delete old photo if exists
-                if ($product->product_photo && $product->product_photo != 'default-product.jpg') {
+                if ($product->product_photo && $product->product_photo != 'product-placeholder.png') {
                     Storage::delete('public/product_photos/' . $product->product_photo);
                 }
 
@@ -665,7 +678,7 @@ class LeadFarmerController extends Controller
 
         try {
             // Delete product photo if exists
-            if ($product->product_photo && $product->product_photo != 'default-product.jpg') {
+            if ($product->product_photo && $product->product_photo != 'product-placeholder.png') {
                 Storage::delete('public/product_photos/' . $product->product_photo);
             }
 
