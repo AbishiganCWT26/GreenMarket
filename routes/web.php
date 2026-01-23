@@ -160,7 +160,6 @@ Route::prefix('lead-farmer')
     Route::delete('/farmers/{id}', [LeadFarmerController::class, 'deleteFarmer'])->name('lf.deleteFarmer');
     Route::post('/farmer/{id}/send-otp', [LeadFarmerController::class, 'sendUpdateOtp'])->name('lf.farmer.sendUpdateOtp');
     
-    // Product Management
     Route::get('/add-product', [LeadFarmerController::class, 'addProduct'])->name('lf.addProduct');
     Route::post('/add-product', [LeadFarmerController::class, 'storeProduct'])->name('lf.storeProduct');
     Route::get('/manage-products', [LeadFarmerController::class, 'manageProducts'])->name('lf.manageProducts');
@@ -168,28 +167,26 @@ Route::prefix('lead-farmer')
     Route::post('/update-product/{id}', [LeadFarmerController::class, 'updateProduct'])->name('lf.updateProduct');
     Route::delete('/delete-product/{id}', [LeadFarmerController::class, 'deleteProduct'])->name('lf.deleteProduct');
     Route::get('/product-details/{id}', [LeadFarmerController::class, 'getProductDetails'])->name('lf.product.details');
-
-    // Orders
+    
+    Route::post('/product/{id}/send-otp', [LeadFarmerController::class, 'sendProductUpdateOtp'])->name('lf.sendProductUpdateOtp');
+    Route::post('/product/{id}/verify-otp', [LeadFarmerController::class, 'verifyProductUpdateOtp'])->name('lf.verifyProductUpdateOtp');
+    
     Route::get('/orders', [LeadFarmerController::class, 'viewOrders'])->name('lf.orders');
     Route::get('/order/{id}', [LeadFarmerController::class, 'viewOrder'])->name('lf.order.details');
     Route::post('/order/{id}/status', [LeadFarmerController::class, 'updateOrderStatus'])->name('lf.order.status');
 
-    // Profile
     Route::get('/profile', [LeadFarmerController::class, 'editProfile'])->name('lf.profile');
     Route::post('/profile/update', [LeadFarmerController::class, 'updateProfile'])->name('lf.profile.update');
     Route::post('/profile/photo', [LeadFarmerController::class, 'updatePhoto'])->name('lf.profile.photo');
 
-    // Reports
     Route::get('/reports/sales', [LeadFarmerController::class, 'salesReports'])->name('lf.reports.sales');
     Route::get('/reports/inventory', [LeadFarmerController::class, 'inventoryReports'])->name('lf.reports.inventory');
     Route::get('/reports/farmer-performance', [LeadFarmerController::class, 'farmerPerformanceReports'])->name('lf.reports.farmer-performance');
 
-    // Notifications
     Route::get('/notifications', [LeadFarmerController::class, 'notifications'])->name('lf.notifications');
     Route::post('/notifications/mark-all-read', [LeadFarmerController::class, 'markAllNotificationsRead'])->name('lf.notifications.mark-all-read');
     Route::post('/notifications/{id}/read', [LeadFarmerController::class, 'markNotificationRead'])->name('lf.notifications.read');
 
-    // AJAX Routes
     Route::get('/get-subcategories/{categoryId}', [LeadFarmerController::class, 'getSubcategories'])->name('lf.getSubcategories');
     Route::get('/get-product-examples/{subcategoryId}', [LeadFarmerController::class, 'getProductExamples'])->name('lf.getProductExamples');
 });
