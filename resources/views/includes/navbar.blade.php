@@ -490,6 +490,7 @@
 	</style>
 </head>
 <body>
+	@include('includes.loader')
 	<header class="site-header">
 		<div class="header-container">
 			<div class="logo-section">
