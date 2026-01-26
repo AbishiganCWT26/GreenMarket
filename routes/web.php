@@ -450,6 +450,7 @@ Route::prefix('admin')
     Route::get('/buyer-requests', [BuyerRequestProductsController::class, 'index'])->name('buyer-requests.index');
     Route::delete('/buyer-requests/{id}', [BuyerRequestProductsController::class, 'destroy'])->name('buyer-requests.destroy');
 
+    // Taxonomy Routes
     Route::get('/taxonomy', [TaxonomyController::class, 'index'])->name('taxonomy.index');
     Route::get('/taxonomy/categories/data', [TaxonomyController::class, 'getCategories'])->name('taxonomy.categories.data');
     Route::get('/taxonomy/subcategories/data', [TaxonomyController::class, 'getSubcategories'])->name('taxonomy.subcategories.data');
@@ -461,9 +462,12 @@ Route::prefix('admin')
     Route::get('/taxonomy/edit/category/{id}', [TaxonomyController::class, 'editCategory'])->name('taxonomy.edit.category');
     Route::get('/taxonomy/edit/subcategory/{id}', [TaxonomyController::class, 'editSubcategory'])->name('taxonomy.edit.subcategory');
     Route::get('/taxonomy/edit/product/{id}', [TaxonomyController::class, 'editProduct'])->name('taxonomy.edit.product');
-    Route::put('/taxonomy/update/category/{id}', [TaxonomyController::class, 'updateCategory'])->name('taxonomy.update.category');
-    Route::put('/taxonomy/update/subcategory/{id}', [TaxonomyController::class, 'updateSubcategory'])->name('taxonomy.update.subcategory');
-    Route::put('/taxonomy/update/product/{id}', [TaxonomyController::class, 'updateProduct'])->name('taxonomy.update.product');
+    
+    // New taxonomy update routes (POST method)
+    Route::post('/taxonomy/category/update', [TaxonomyController::class, 'updateCategory'])->name('taxonomy.update.category');
+    Route::post('/taxonomy/subcategory/update', [TaxonomyController::class, 'updateSubcategory'])->name('taxonomy.update.subcategory');
+    Route::post('/taxonomy/product/example/update', [TaxonomyController::class, 'updateProductExample'])->name('taxonomy.update.product.example');
+    
     Route::delete('/taxonomy/delete/category/{id}', [TaxonomyController::class, 'deleteCategory'])->name('taxonomy.delete.category');
     Route::delete('/taxonomy/delete/subcategory/{id}', [TaxonomyController::class, 'deleteSubcategory'])->name('taxonomy.delete.subcategory');
     Route::delete('/taxonomy/delete/product/{id}', [TaxonomyController::class, 'deleteProduct'])->name('taxonomy.delete.product');

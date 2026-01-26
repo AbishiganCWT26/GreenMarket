@@ -310,7 +310,224 @@ class TaxonomyController extends Controller
         return response()->json($product);
     }
 
-    public function updateCategory(Request $request, $id)
+    // Update the updateCategory method - FIXED
+    public function updateCategory(Request $request)
+    {
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:product_categories,id',
+                'name' => 'required|string|max:100|unique:product_categories,category_name,' . $request->id,
+                'description' => 'nullable|string'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Update the category
+            $updated = DB::table('product_categories')
+                ->where('id', $request->id)
+                ->update([
+                    'category_name' => $request->name,
+                    'description' => $request->description ?? null,
+                    'updated_at' => now()
+                ]);
+
+            if ($updated) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Category updated successfully!'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found or no changes made'
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating category: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Update the updateSubcategory method - FIXED
+    public function updateSubcategory(Request $request)
+    {
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:product_subcategories,id',
+                'name' => 'required|string|max:100',
+                'description' => 'nullable|string',
+                'category_id' => 'required|exists:product_categories,id'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Check for duplicate subcategory name in the same category (excluding current)
+            $existing = DB::table('product_subcategories')
+                ->where('category_id', $request->category_id)
+                ->where('subcategory_name', $request->name)
+                ->where('id', '!=', $request->id)
+                ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Subcategory with this name already exists in this category!'
+                ], 400);
+            }
+
+            // Update the subcategory
+            $updated = DB::table('product_subcategories')
+                ->where('id', $request->id)
+                ->update([
+                    'category_id' => $request->category_id,
+                    'subcategory_name' => $request->name,
+                    'description' => $request->description ?? null,
+                    'updated_at' => now()
+                ]);
+
+            if ($updated) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Subcategory updated successfully!'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Subcategory not found or no changes made'
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating subcategory: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Update the updateProductExample method - FIXED
+    public function updateProductExample(Request $request)
+    {
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:product_examples,id',
+                'name' => 'required|string|max:200',
+                'description' => 'nullable|string',
+                'subcategory_id' => 'required|exists:product_subcategories,id'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Check for duplicate product name in the same subcategory (excluding current)
+            $existing = DB::table('product_examples')
+                ->where('subcategory_id', $request->subcategory_id)
+                ->where('product_name', $request->name)
+                ->where('id', '!=', $request->id)
+                ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product with this name already exists in this subcategory!'
+                ], 400);
+            }
+
+            // Update the product example
+            $updated = DB::table('product_examples')
+                ->where('id', $request->id)
+                ->update([
+                    'subcategory_id' => $request->subcategory_id,
+                    'product_name' => $request->name,
+                    'description' => $request->description ?? null,
+                    'updated_at' => now()
+                ]);
+
+            if ($updated) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product example updated successfully!'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product not found or no changes made'
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Keep the old updateProduct method for compatibility with other routes if needed
+    public function updateProduct(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_name' => 'required|string|max:200|unique:product_examples,product_name,' . $id,
+            'description' => 'nullable|string',
+            'display_order' => 'integer|min:0',
+            'is_active' => 'boolean'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $product = DB::table('product_examples')->find($id);
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product not found'
+            ], 404);
+        }
+
+        DB::table('product_examples')
+            ->where('id', $id)
+            ->update([
+                'product_name' => $request->product_name,
+                'description' => $request->description,
+                'display_order' => $request->display_order,
+                'is_active' => $request->is_active,
+                'updated_at' => now()
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product updated successfully'
+        ]);
+    }
+
+    // Add new updateCategoryOld method to replace the old one for other routes
+    public function updateCategoryOld(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'category_name' => 'required|string|max:100|unique:product_categories,category_name,' . $id,
@@ -374,7 +591,8 @@ class TaxonomyController extends Controller
         ]);
     }
 
-    public function updateSubcategory(Request $request, $id)
+    // Add new updateSubcategoryOld method to replace the old one for other routes
+    public function updateSubcategoryOld(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|exists:product_categories,id',
@@ -415,48 +633,6 @@ class TaxonomyController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Sub-category updated successfully'
-        ]);
-    }
-
-    public function updateProduct(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'product_name' => 'required|string|max:200|unique:product_examples,product_name,' . $id,
-            'description' => 'nullable|string',
-            'display_order' => 'integer|min:0',
-            'is_active' => 'boolean'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $product = DB::table('product_examples')->find($id);
-
-        if (!$product) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Product not found'
-            ], 404);
-        }
-
-        DB::table('product_examples')
-            ->where('id', $id)
-            ->update([
-                'product_name' => $request->product_name,
-                'description' => $request->description,
-                'display_order' => $request->display_order,
-                'is_active' => $request->is_active,
-                'updated_at' => now()
-            ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Product updated successfully'
         ]);
     }
 

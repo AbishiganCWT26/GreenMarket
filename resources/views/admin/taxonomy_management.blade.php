@@ -326,7 +326,7 @@
                     </span></td>
                     <td>
                         <div class="action-buttons">
-                            <button class="action-btn btn-edit" onclick="editItem('category', ${cat.id})" title="Edit">
+                            <button class="action-btn btn-edit" onclick="editCategory(${cat.id}, '${cat.category_name.replace(/'/g, "\\'")}', '${(cat.description || '').replace(/'/g, "\\'")}')" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="action-btn btn-delete" onclick="deleteItem('category', ${cat.id})"
@@ -380,7 +380,7 @@
                     </span></td>
                     <td>
                         <div class="action-buttons">
-                            <button class="action-btn btn-edit" onclick="editItem('subcategory', ${sub.id})" title="Edit">
+                            <button class="action-btn btn-edit" onclick="editSubcategory(${sub.id}, '${sub.subcategory_name.replace(/'/g, "\\'")}', '${(sub.description || '').replace(/'/g, "\\'")}', ${sub.category_id})" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="action-btn btn-delete" onclick="deleteItem('subcategory', ${sub.id})"
@@ -431,7 +431,7 @@
                     </span></td>
                     <td>
                         <div class="action-buttons">
-                            <button class="action-btn btn-edit" onclick="editItem('product', ${prod.id})" title="Edit">
+                            <button class="action-btn btn-edit" onclick="editProductExample(${prod.id}, '${prod.product_name.replace(/'/g, "\\'")}', '${(prod.description || '').replace(/'/g, "\\'")}', ${prod.subcategory_id})" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="action-btn btn-delete" onclick="deleteItem('product', ${prod.id})" title="Delete">
@@ -1125,180 +1125,227 @@
         document.getElementById('formContent').innerHTML = '';
     }
 
-    async function editItem(type, id) {
-        try {
-            let url = '';
-            let title = '';
-
-            switch(type) {
-                case 'category':
-                    url = '{{ route("admin.taxonomy.edit.category", ":id") }}'.replace(':id', id);
-                    title = 'Edit Main Category';
-                    break;
-                case 'subcategory':
-                    url = '{{ route("admin.taxonomy.edit.subcategory", ":id") }}'.replace(':id', id);
-                    title = 'Edit Sub-Category';
-                    break;
-                case 'product':
-                    url = '{{ route("admin.taxonomy.edit.product", ":id") }}'.replace(':id', id);
-                    title = 'Edit Product';
-                    break;
+    // Edit category using new method
+    function editCategory(id, name, description) {
+        Swal.fire({
+            title: 'Edit Category',
+            html: `
+                <div class="text-start">
+                    <div class="mb-3">
+                        <label class="form-label">Category Name *</label>
+                        <input type="text" class="form-control swal2-input" id="editCategoryName" value="${name}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control swal2-textarea" id="editCategoryDesc" rows="3">${description || ''}</textarea>
+                    </div>
+                    <input type="hidden" id="categoryId" value="${id}">
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Update Category',
+            confirmButtonColor: '#10B981',
+            cancelButtonColor: '#6b7280',
+            background: '#ffffff',
+            color: '#0f1724',
+            width: '500px',
+            preConfirm: () => {
+                const name = document.getElementById('editCategoryName').value;
+                if (!name) {
+                    Swal.showValidationMessage('Category name is required');
+                    return false;
+                }
+                return {
+                    id: document.getElementById('categoryId').value,
+                    name: name,
+                    description: document.getElementById('editCategoryDesc').value
+                };
             }
+        }).then(result => {
+            if (result.isConfirmed) {
+                const data = result.value;
+                showLoading();
 
-            const response = await fetch(url);
-            const data = await response.json();
-
-            let formHTML = '';
-
-            if (type === 'category') {
-                const iconUrl = data.icon_filename ?
-                    `/assets/images/taxonomy-icons/${data.icon_filename}` : null;
-
-                formHTML = `
-                    <h3><i class="fas fa-edit"></i> ${title}</h3>
-                    <form onsubmit="updateItem('${type}', ${id}, event)" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label class="form-label">Category Name</label>
-                            <input type="text" class="form-input" name="category_name"
-                                   value="${data.category_name}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-textarea" name="description" rows="3">${data.description || ''}</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Category Icon Image (PNG only)</label>
-                            ${iconUrl ? `
-                                <div class="image-preview-container">
-                                    <img class="preview-image" src="${iconUrl}" alt="Current Icon">
-                                    <div class="preview-info">
-                                        <div style="font-weight: 500; font-size: 0.9rem;">Current Image</div>
-                                        <div style="font-size: 0.8rem; color: var(--muted);">${data.icon_filename}</div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            <div class="image-upload-area" onclick="document.getElementById('editCategoryImage').click()">
-                                <div class="upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
-                                <div class="upload-text">Click to upload new image</div>
-                                <div class="upload-text" style="font-size: 0.8rem; color: #9ca3af;">
-                                    PNG format only, max 2MB
-                                </div>
-                            </div>
-                            <input type="file" id="editCategoryImage" name="image" accept=".png" style="display: none;"
-                                   onchange="previewEditImage(this, 'editCategoryPreview')">
-                            <div id="editCategoryPreview" class="image-preview-container" style="display: none;">
-                                <img class="preview-image" id="previewEditCategoryImage" src="" alt="Preview">
-                                <div class="preview-info">
-                                    <div style="font-weight: 500; font-size: 0.9rem;" id="previewEditFileName"></div>
-                                    <div style="font-size: 0.8rem; color: var(--muted);" id="previewEditFileSize"></div>
-                                </div>
-                                <div class="remove-image" onclick="removeImage('editCategoryImage', 'editCategoryPreview')">
-                                    <i class="fas fa-times"></i> Remove
-                                </div>
-                            </div>
-                            <input type="hidden" name="current_image" value="${data.icon_filename || ''}">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Display Order</label>
-                            <input type="number" class="form-input" name="display_order"
-                                   value="${data.display_order}" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" name="is_active">
-                                <option value="1" ${data.is_active ? 'selected' : ''}>Active</option>
-                                <option value="0" ${!data.is_active ? 'selected' : ''}>Inactive</option>
-                            </select>
-                        </div>
-                        <div class="step-buttons">
-                            <button type="submit" class="btn-primary">Update</button>
-                            <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                        </div>
-                    </form>
-                `;
-            } else if (type === 'subcategory') {
-                formHTML = `
-                    <h3><i class="fas fa-edit"></i> ${title}</h3>
-                    <form onsubmit="updateItem('${type}', ${id}, event)">
-                        <div class="form-group">
-                            <label class="form-label">Main Category</label>
-                            <select class="form-select" name="category_id" required>
-                                ${categories.map(cat => `
-                                    <option value="${cat.id}" ${cat.id == data.category_id ? 'selected' : ''}>
-                                        ${cat.category_name}
-                                    </option>
-                                `).join('')}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Sub-Category Name</label>
-                            <input type="text" class="form-input" name="subcategory_name"
-                                   value="${data.subcategory_name}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-textarea" name="description" rows="3">${data.description || ''}</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Display Order</label>
-                            <input type="number" class="form-input" name="display_order"
-                                   value="${data.display_order}" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" name="is_active">
-                                <option value="1" ${data.is_active ? 'selected' : ''}>Active</option>
-                                <option value="0" ${!data.is_active ? 'selected' : ''}>Inactive</option>
-                            </select>
-                        </div>
-                        <div class="step-buttons">
-                            <button type="submit" class="btn-primary">Update</button>
-                            <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                        </div>
-                    </form>
-                `;
-            } else if (type === 'product') {
-                formHTML = `
-                    <h3><i class="fas fa-edit"></i> ${title}</h3>
-                    <form onsubmit="updateItem('${type}', ${id}, event)">
-                        <div class="form-group">
-                            <label class="form-label">Product Name</label>
-                            <input type="text" class="form-input" name="product_name"
-                                   value="${data.product_name}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-textarea" name="description" rows="3">${data.description || ''}</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Display Order</label>
-                            <input type="number" class="form-input" name="display_order"
-                                   value="${data.display_order}" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" name="is_active">
-                                <option value="1" ${data.is_active ? 'selected' : ''}>Active</option>
-                                <option value="0" ${!data.is_active ? 'selected' : ''}>Inactive</option>
-                            </select>
-                        </div>
-                        <div class="step-buttons">
-                            <button type="submit" class="btn-primary">Update</button>
-                            <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                        </div>
-                    </form>
-                `;
+                fetch('{{ route("admin.taxonomy.update.category") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        showSuccess(data.message);
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showError(data.message || 'Failed to update category');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error('Error:', error);
+                    showError('Error updating category: ' + error.message);
+                });
             }
+        });
+    }
 
-            document.getElementById('editFormContent').innerHTML = formHTML;
-            document.getElementById('editModal').style.display = 'block';
+    // Edit subcategory using new method
+    function editSubcategory(id, name, description, categoryId) {
+        Swal.fire({
+            title: 'Edit Subcategory',
+            html: `
+                <div class="text-start">
+                    <div class="mb-3">
+                        <label class="form-label">Subcategory Name *</label>
+                        <input type="text" class="form-control swal2-input" id="editSubcategoryName" value="${name}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control swal2-textarea" id="editSubcategoryDesc" rows="3">${description || ''}</textarea>
+                    </div>
+                    <input type="hidden" id="subcategoryId" value="${id}">
+                    <input type="hidden" id="editCategoryId" value="${categoryId}">
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Update Subcategory',
+            confirmButtonColor: '#10B981',
+            cancelButtonColor: '#6b7280',
+            background: '#ffffff',
+            color: '#0f1724',
+            width: '500px',
+            preConfirm: () => {
+                const name = document.getElementById('editSubcategoryName').value;
+                if (!name) {
+                    Swal.showValidationMessage('Subcategory name is required');
+                    return false;
+                }
+                return {
+                    id: document.getElementById('subcategoryId').value,
+                    name: name,
+                    description: document.getElementById('editSubcategoryDesc').value,
+                    category_id: document.getElementById('editCategoryId').value
+                };
+            }
+        }).then(result => {
+            if (result.isConfirmed) {
+                const data = result.value;
+                showLoading();
 
-        } catch (error) {
-            console.error('Error editing item:', error);
-            Swal.fire('Error', 'Failed to load item for editing', 'error');
-        }
+                fetch('{{ route("admin.taxonomy.update.subcategory") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        showSuccess(data.message);
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showError(data.message || 'Failed to update subcategory');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error('Error:', error);
+                    showError('Error updating subcategory: ' + error.message);
+                });
+            }
+        });
+    }
+
+    // Edit product example using new method
+    function editProductExample(id, name, description, subcategoryId) {
+        Swal.fire({
+            title: 'Edit Product',
+            html: `
+                <div class="text-start">
+                    <div class="mb-3">
+                        <label class="form-label">Product Name *</label>
+                        <input type="text" class="form-control swal2-input" id="editProductName" value="${name}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control swal2-textarea" id="editProductDesc" rows="3">${description || ''}</textarea>
+                    </div>
+                    <input type="hidden" id="productId" value="${id}">
+                    <input type="hidden" id="editSubcategoryId" value="${subcategoryId}">
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Update Product',
+            confirmButtonColor: '#10B981',
+            cancelButtonColor: '#6b7280',
+            background: '#ffffff',
+            color: '#0f1724',
+            width: '500px',
+            preConfirm: () => {
+                const name = document.getElementById('editProductName').value;
+                if (!name) {
+                    Swal.showValidationMessage('Product name is required');
+                    return false;
+                }
+                return {
+                    id: document.getElementById('productId').value,
+                    name: name,
+                    description: document.getElementById('editProductDesc').value,
+                    subcategory_id: document.getElementById('editSubcategoryId').value
+                };
+            }
+        }).then(result => {
+            if (result.isConfirmed) {
+                const data = result.value;
+                showLoading();
+
+                fetch('{{ route("admin.taxonomy.update.product.example") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        showSuccess(data.message);
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showError(data.message || 'Failed to update product');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error('Error:', error);
+                    showError('Error updating product: ' + error.message);
+                });
+            }
+        });
     }
 
     function previewEditImage(input, previewContainerId) {
@@ -1337,111 +1384,31 @@
         document.getElementById('editFormContent').innerHTML = '';
     }
 
-    async function updateItem(type, id, e) {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-
-        try {
-            let url = '';
-            switch(type) {
-                case 'category':
-                    url = '{{ route("admin.taxonomy.update.category", ":id") }}'.replace(':id', id);
-                    break;
-                case 'subcategory':
-                    url = '{{ route("admin.taxonomy.update.subcategory", ":id") }}'.replace(':id', id);
-                    break;
-                case 'product':
-                    url = '{{ route("admin.taxonomy.update.product", ":id") }}'.replace(':id', id);
-                    break;
-            }
-
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: formData
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: 'Item updated successfully',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-
-                closeModal();
-                loadAllData();
-            } else {
-                throw new Error(result.message || 'Failed to update item');
-            }
-        } catch (error) {
-            Swal.fire('Error', error.message, 'error');
-        }
+    // Helper functions
+    function showLoading() {
+        Swal.showLoading();
     }
 
-    async function deleteItem(type, id) {
-        const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: `This will delete the ${type} and all associated data!`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
+    function hideLoading() {
+        Swal.close();
+    }
+
+    function showSuccess(message) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: message,
+            showConfirmButton: false,
+            timer: 2000
         });
-
-        if (!result.isConfirmed) return;
-
-        try {
-            let url = '';
-            switch(type) {
-                case 'category':
-                    url = '{{ route("admin.taxonomy.delete.category", ":id") }}'.replace(':id', id);
-                    break;
-                case 'subcategory':
-                    url = '{{ route("admin.taxonomy.delete.subcategory", ":id") }}'.replace(':id', id);
-                    break;
-                case 'product':
-                    url = '{{ route("admin.taxonomy.delete.product", ":id") }}'.replace(':id', id);
-                    break;
-            }
-
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Deleted!',
-                    text: 'Item has been deleted successfully',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-
-                loadAllData();
-            } else {
-                throw new Error(data.message || 'Failed to delete item');
-            }
-        } catch (error) {
-            Swal.fire('Error', error.message, 'error');
-        }
     }
 
-    function loadParentSelects() {
-        updateProductSubcategorySelects();
+    function showError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: message
+        });
     }
 
     // Initialize drag and drop for image upload
