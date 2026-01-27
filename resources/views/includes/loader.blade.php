@@ -203,26 +203,30 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    function updateProgress() {
-        const percent = Math.round((loadedImages / totalImages) * 100);
-        percentageEl.textContent = percent + "%";
+    function markLoaded(img) {
+        if (img.dataset.counted) return; // ✅ prevent double counting
+        img.dataset.counted = "true";
 
-        if (loadedImages === totalImages) {
-            finishLoading();
-        }
-    }
-
-    function imageLoaded() {
         loadedImages++;
         updateProgress();
     }
 
+    function updateProgress() {
+        const percent = Math.round((loadedImages / totalImages) * 100);
+        percentageEl.textContent = percent + "%";
+
+        if (loadedImages >= totalImages) {
+            finishLoading();
+        }
+    }
+
     images.forEach(img => {
-        if (img.complete && img.naturalHeight !== 0) {
-            imageLoaded();
+        // Already loaded or already failed
+        if (img.complete) {
+            markLoaded(img);
         } else {
-            img.addEventListener("load", imageLoaded, { once: true });
-            img.addEventListener("error", imageLoaded, { once: true });
+            img.addEventListener("load", () => markLoaded(img), { once: true });
+            img.addEventListener("error", () => markLoaded(img), { once: true });
         }
     });
 

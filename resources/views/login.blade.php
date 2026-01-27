@@ -9,6 +9,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+    @include('includes.loader')
 	<div class="container">
 		<div class="login-wrapper">
 			<div class="logo-section" onclick="window.location.href='/'" tabindex="0" role="button">
