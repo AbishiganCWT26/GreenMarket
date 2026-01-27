@@ -61,6 +61,19 @@
 								<span class="tooltip">Blog</span>
 							</a>
 						</div>
+
+						<!-- Added three logos below social media buttons -->
+						<div class="logos-wrapper">
+							<div class="logo-item">
+								<img src="{{ asset('assets/images/CSIAP Logo.png') }}" alt="Climate Smart Irrigated Agriculture Project" class="partner-logo">
+							</div>
+							<div class="logo-item">
+								<img src="{{ asset('assets/images/Sri Lank logo.png') }}" alt="Sri Lanka National Emblem" class="partner-logo">
+							</div>
+							<div class="logo-item">
+								<img src="{{ asset('assets/images/world bank logo.png') }}" alt="The World Bank" class="partner-logo">
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -383,6 +396,42 @@
 	transform: translateX(-50%) translateY(0);
 }
 
+/* Added styles for partner logos */
+.logos-wrapper {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 15px;
+	margin-top: 20px;
+	padding: 15px;
+	background: rgba(16, 185, 129, 0.03);
+	border: 1px solid rgba(16, 185, 129, 0.1);
+	border-radius: var(--border-radius);
+}
+
+.logo-item {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 5px;
+}
+
+.partner-logo {
+	max-width: 100%;
+	height: 60px;
+	object-fit: contain;
+	transition: var(--transition);
+	filter: grayscale(20%);
+	opacity: 0.9;
+}
+
+.partner-logo:hover {
+	transform: translateY(-3px);
+	filter: grayscale(0%);
+	opacity: 1;
+}
+
 .section {
 	font-size: 1.1rem;
 	font-weight: 600;
@@ -694,6 +743,16 @@
 		justify-content: center;
 	}
 
+	.logos-wrapper {
+		justify-content: center;
+		gap: 20px;
+		padding: 12px;
+	}
+
+	.partner-logo {
+		height: 50px;
+	}
+
 	.footer-main {
 		padding: 40px 0 30px;
 	}
@@ -742,6 +801,20 @@
 		width: 38px;
 		height: 38px;
 		font-size: 0.9rem;
+	}
+
+	.logos-wrapper {
+		flex-wrap: wrap;
+		gap: 15px;
+		padding: 10px;
+	}
+
+	.logo-item {
+		flex: 0 0 calc(33.333% - 10px);
+	}
+
+	.partner-logo {
+		height: 45px;
 	}
 
 	.links-list {
@@ -838,6 +911,19 @@
 		padding: 10px;
 	}
 
+	.logos-wrapper {
+		gap: 10px;
+		padding: 8px;
+	}
+
+	.logo-item {
+		flex: 0 0 calc(33.333% - 7px);
+	}
+
+	.partner-logo {
+		height: 40px;
+	}
+
 	.links-list {
 		grid-template-columns: 1fr;
 	}
@@ -896,6 +982,19 @@
 		height: 34px;
 	}
 
+	.logos-wrapper {
+		gap: 8px;
+		padding: 6px;
+	}
+
+	.logo-item {
+		flex: 0 0 calc(33.333% - 6px);
+	}
+
+	.partner-logo {
+		height: 35px;
+	}
+
 	.nav-item {
 		padding: 10px 12px;
 	}
@@ -915,7 +1014,8 @@
 	.nav-item,
 	.social-icon,
 	.contact-item,
-	.legal-item {
+	.legal-item,
+	.partner-logo {
 		transition: none !important;
 	}
 
@@ -923,7 +1023,8 @@
 	.logo-wrapper:hover,
 	.nav-item:hover,
 	.social-icon:hover,
-	.contact-item:hover {
+	.contact-item:hover,
+	.partner-logo:hover {
 		transform: none !important;
 	}
 
