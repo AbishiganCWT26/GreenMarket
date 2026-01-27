@@ -13,7 +13,7 @@
     <div class="loader-container">
         <div class="glow-effect"></div>
 
-        <div class="logo-wrapper">
+        <div class="logo-wrapper1">
             <div class="logo-spinner">
                 <div class="logo-image-container">
                     <img src="{{ asset('assets/images/Logo-4-loader.png') }}" class="logo-image" alt="GreenMarket Logo">
@@ -104,7 +104,7 @@
 }
 
 /* Logo spinner - Fixed alignment */
-.logo-wrapper {
+.logo-wrapper1 {
     position: relative;
     width: 200px;
     height: 150px;
