@@ -47,8 +47,15 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .products-header {
@@ -92,9 +99,17 @@ body {
 }
 
 @keyframes pulse {
-    0% { opacity: 0.9; }
-    50% { opacity: 1; }
-    100% { opacity: 0.9; }
+    0% {
+        opacity: 0.9;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.9;
+    }
 }
 
 /* =========================================
@@ -257,7 +272,8 @@ body {
     margin-top: 0.2rem;
 }
 
-.apply-btn, .clear-btn {
+.apply-btn,
+.clear-btn {
     padding: 0.3rem 0.6rem;
     border-radius: var(--radius-sm);
     font-size: 0.65rem;
@@ -363,8 +379,15 @@ body {
 }
 
 @keyframes cardAppear {
-    from { opacity: 0; transform: translateY(10px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .product-card:hover {
@@ -401,12 +424,18 @@ body {
     gap: 0.1rem;
     line-height: 1;
     z-index: 2;
-    animation: bounce 2s infinite;
 }
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-2px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-2px);
+    }
 }
 
 /* =========================================

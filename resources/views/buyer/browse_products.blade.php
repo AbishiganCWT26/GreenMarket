@@ -303,18 +303,55 @@
             if (loadingOverlay) loadingOverlay.style.display = 'flex';
 
             fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json, text/html'
+                }
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type');
+                
+                // Handle JSON response
+                if (contentType && contentType.includes('application/json')) {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
+                        });
                     }
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
-                })
+                }
+                
+                // Handle HTML/error response
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        // Try to extract error from Laravel error page
+                        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                        // Simple extraction of error message from Laravel HTML error
+                        const errorMatch = text.match(/<div class="title"[^>]*>([^<]*)<\/div>/);
+                        if (errorMatch && errorMatch[1]) {
+                            errorMessage = errorMatch[1];
+                        }
+                        throw new Error(errorMessage);
+                    });
+                }
+                
+                return response.text().then(text => {
+                    // If we get HTML when expecting JSON, something went wrong
+                    throw new Error('Unexpected response format from server');
+                });
+            })
                 .then(data => {
+                    // Check if data has error property
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
                     // Update products grid
-                    productsGridContainer.innerHTML = data.products_html;
+                    if (data.products_html) {
+                        productsGridContainer.innerHTML = data.products_html;
+                    } else {
+                        productsGridContainer.innerHTML = '<div class="no-products">No products found matching your criteria.</div>';
+                    }
 
                     // Update pagination
                     if (paginationContainer) {
@@ -327,7 +364,9 @@
                     }
 
                     // Update products count
-                    if (productsCount) productsCount.textContent = data.count || 0;
+                    if (productsCount) {
+                        productsCount.textContent = data.count || 0;
+                    }
 
                     // Show/hide empty state
                     if (emptyState) {
@@ -336,7 +375,23 @@
                 })
                 .catch(error => {
                     console.error('Error loading products:', error);
-                    alert('Error loading products. Please try again.');
+                    // Show error message
+                    productsGridContainer.innerHTML = `
+                        <div class="error-message" style="text-align: center; padding: 40px; color: #dc3545;">
+                            <i class="fa-solid fa-exclamation-triangle fa-3x mb-3"></i>
+                            <h3>Error Loading Products</h3>
+                            <p>${error.message || 'Please try again.'}</p>
+                            <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                                Try clearing filters or refreshing the page.
+                            </p>
+                            <button class="apply-btn mt-3" onclick="loadProducts()">
+                                <i class="fa-solid fa-rotate-right"></i> Retry
+                            </button>
+                        </div>
+                    `;
+                    if (paginationContainer) paginationContainer.style.display = 'none';
+                    if (emptyState) emptyState.style.display = 'none';
+                    if (productsCount) productsCount.textContent = '0';
                 })
                 .finally(() => {
                     if (loadingOverlay) loadingOverlay.style.display = 'none';
@@ -356,8 +411,7 @@
                 grade: gradeFilter.value,
                 min_price: minPrice.value,
                 max_price: maxPrice.value,
-                sort: sortSelect.value,
-                per_page: 15 // Always show 15 products per page
+                sort: sortSelect.value
             };
         }
 
@@ -365,7 +419,7 @@
             const url = new URL('{{ route("buyer.browseProducts") }}');
 
             Object.keys(params).forEach(key => {
-                if (params[key]) {
+                if (params[key] || params[key] === 0) {
                     url.searchParams.append(key, params[key]);
                 }
             });

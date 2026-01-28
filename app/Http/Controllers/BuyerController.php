@@ -98,35 +98,59 @@ class BuyerController extends Controller
 
     private function applyFilters($query, $request)
     {
+        // Search with case-insensitive search across multiple fields
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('products.product_name', 'ILIKE', "%{$search}%")
-                ->orWhere('products.product_description', 'ILIKE', "%{$search}%")
-                ->orWhere('farmers.name', 'ILIKE', "%{$search}%")
-                ->orWhere('product_categories.category_name', 'ILIKE', "%{$search}%")
-                ->orWhere('product_subcategories.subcategory_name', 'ILIKE', "%{$search}%")
-                ->orWhere('lead_farmers.name', 'ILIKE', "%{$search}%");
+                // For PostgreSQL, use ILIKE; for MySQL, use LIKE with LOWER()
+                if (DB::connection()->getDriverName() === 'pgsql') {
+                    $q->where('products.product_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('products.product_description', 'ILIKE', "%{$search}%")
+                    ->orWhere('farmers.name', 'ILIKE', "%{$search}%")
+                    ->orWhere('product_categories.category_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('product_subcategories.subcategory_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('lead_farmers.name', 'ILIKE', "%{$search}%");
+                } else {
+                    // For MySQL/MariaDB - case-insensitive search
+                    $q->whereRaw('LOWER(products.product_name) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(products.product_description) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(farmers.name) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(product_categories.category_name) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(product_subcategories.subcategory_name) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(lead_farmers.name) LIKE ?', ['%' . strtolower($search) . '%']);
+                }
             });
         }
-        if ($request->has('category') && $request->category != 'all') {
-            $query->where('product_categories.category_name', 'ILIKE', "%{$request->category}%");
+        
+        // Category filter
+        if ($request->has('category') && $request->category != 'all' && !empty($request->category)) {
+            $query->where('product_categories.category_name', 'LIKE', "%{$request->category}%");
         }
+        
+        // Subcategory filter
         if ($request->has('subcategory') && !empty($request->subcategory)) {
-            $query->where('product_subcategories.subcategory_name', 'ILIKE', "%{$request->subcategory}%");
+            $query->where('product_subcategories.subcategory_name', 'LIKE', "%{$request->subcategory}%");
         }
+        
+        // District filter
         if ($request->has('district') && !empty($request->district)) {
             $query->where('farmers.district', $request->district);
         }
+        
+        // Grade filter
         if ($request->has('grade') && !empty($request->grade)) {
             $query->where('products.quality_grade', $request->grade);
         }
-        if ($request->has('min_price') && is_numeric($request->min_price)) {
+        
+        // Price filters
+        if ($request->has('min_price') && is_numeric($request->min_price) && $request->min_price > 0) {
             $query->where('products.selling_price', '>=', $request->min_price);
         }
-        if ($request->has('max_price') && is_numeric($request->max_price)) {
+        if ($request->has('max_price') && is_numeric($request->max_price) && $request->max_price > 0) {
             $query->where('products.selling_price', '<=', $request->max_price);
         }
+        
+        // Sorting
         if ($request->has('sort')) {
             switch ($request->sort) {
                 case 'price_low':
@@ -224,7 +248,6 @@ class BuyerController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'products_html' => view('buyer.partials.products_grid', compact('products'))->render(),
-                'pagination_html' => view('buyer.partials.pagination', compact('products'))->render(),
                 'count' => $products->total()
             ]);
         }
