@@ -171,9 +171,11 @@ Route::prefix('lead-farmer')
     Route::post('/product/{id}/send-otp', [LeadFarmerController::class, 'sendProductUpdateOtp'])->name('lf.sendProductUpdateOtp');
     Route::post('/product/{id}/verify-otp', [LeadFarmerController::class, 'verifyProductUpdateOtp'])->name('lf.verifyProductUpdateOtp');
     
+
     Route::get('/orders', [LeadFarmerController::class, 'viewOrders'])->name('lf.orders');
-    Route::get('/order/{id}', [LeadFarmerController::class, 'viewOrder'])->name('lf.order.details');
-    Route::post('/order/{id}/status', [LeadFarmerController::class, 'updateOrderStatus'])->name('lf.order.status');
+    Route::post('/orders/mark-payment', [LeadFarmerController::class, 'markPaymentReceived'])->name('lf.orders.markPayment');
+    Route::post('/orders/update-status', [LeadFarmerController::class, 'updateOrderStatus'])->name('lf.orders.updateStatus');
+    Route::get('/orders/{id}', [LeadFarmerController::class, 'viewOrder'])->name('lf.orders.view');
 
     Route::get('/profile', [LeadFarmerController::class, 'editProfile'])->name('lf.profile');
     Route::post('/profile/update', [LeadFarmerController::class, 'updateProfile'])->name('lf.profile.update');

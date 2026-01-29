@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\Notification;
 use App\Models\ProductExample;
 use App\Models\OtpVerification;
+use App\Models\Payment;
 use App\Mail\FarmerRegistrationMail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -941,18 +942,6 @@ class LeadFarmerController extends Controller
         return response()->json($products);
     }
 
-    public function viewOrders()
-    {
-        $leadFarmerId = Auth::user()->leadFarmer->id;
-
-        $orders = Order::with(['buyer', 'farmer', 'orderItems.product'])
-            ->where('lead_farmer_id', $leadFarmerId)
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
-        return view('lead_farmer.orders', compact('orders'));
-    }
-
     public function viewOrder($id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
@@ -963,48 +952,6 @@ class LeadFarmerController extends Controller
             ->firstOrFail();
 
         return view('lead_farmer.order_details', compact('order'));
-    }
-
-    public function updateOrderStatus(Request $request, $id)
-    {
-        $leadFarmerId = Auth::user()->leadFarmer->id;
-
-        $order = Order::where('id', $id)
-            ->where('lead_farmer_id', $leadFarmerId)
-            ->firstOrFail();
-
-        $request->validate([
-            'status' => 'required|in:confirmed,ready_for_pickup,completed,cancelled',
-        ]);
-
-        try {
-            $oldStatus = $order->order_status;
-            $order->order_status = $request->status;
-
-            if ($request->status == 'completed' && !$order->completed_date) {
-                $order->completed_date = now();
-            }
-
-            $order->save();
-
-            if ($request->status != $oldStatus) {
-                Notification::create([
-                    'user_id' => $order->buyer->user_id,
-                    'recipient_type' => 'user',
-                    'title' => 'Order Status Updated',
-                    'message' => "Your order #{$order->order_number} status has been updated to: " . ucfirst(str_replace('_', ' ', $request->status)),
-                    'notification_type' => 'system',
-                    'related_id' => $order->id,
-                ]);
-            }
-
-            return redirect()->back()
-                ->with('success', 'Order status updated successfully!');
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Error updating order status: ' . $e->getMessage());
-        }
     }
 
     private function formatPaymentDetails(Request $request)
@@ -1484,5 +1431,177 @@ class LeadFarmerController extends Controller
         curl_close($ch);
 
         return $content;
+    }
+
+    public function viewOrders()
+    {
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+
+        $orders = Order::with(['buyer', 'farmer', 'orderItems', 'payments'])
+            ->where('lead_farmer_id', $leadFarmerId)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('lead_farmer.view_orders', compact('orders'));
+    }
+
+    public function markPaymentReceived(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required|exists:orders,id',
+            'payment_method' => 'required|in:cash,bank,mobile_wallet',
+            'transaction_number' => 'nullable|string|max:100'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+
+        DB::beginTransaction();
+        try {
+            $order = Order::where('id', $request->order_id)
+                ->where('lead_farmer_id', $leadFarmerId)
+                ->firstOrFail();
+
+            if ($order->order_status == 'cancelled') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot mark payment for cancelled order'
+                ], 400);
+            }
+
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'payment_reference' => 'PAY-' . time() . '-' . $order->id,
+                'amount' => $order->total_amount,
+                'payment_method' => $request->payment_method,
+                'payment_status' => 'completed',
+                'payment_date' => now(),
+                'transaction_id' => $request->transaction_number,
+                'receipt_url' => null
+            ]);
+
+            $order->order_status = 'paid';
+            $order->paid_date = now();
+            $order->save();
+
+            foreach ($order->orderItems as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->quantity = max(0, $product->quantity - $item->quantity_ordered);
+                    if ($product->quantity <= 0) {
+                        $product->is_available = false;
+                    }
+                    $product->save();
+                }
+            }
+
+            Notification::create([
+                'user_id' => $order->buyer->user_id,
+                'recipient_type' => 'buyer',
+                'title' => 'Payment Confirmed',
+                'message' => "Your payment for order #{$order->order_number} has been confirmed by the lead farmer.",
+                'notification_type' => 'payment_confirmation',
+                'related_id' => $order->id,
+                'is_read' => false
+            ]);
+
+            if ($order->farmer && $order->farmer->user) {
+                Notification::create([
+                    'user_id' => $order->farmer->user_id,
+                    'recipient_type' => 'farmer',
+                    'title' => 'Payment Received',
+                    'message' => "Payment received for your products in order #{$order->order_number}. Please prepare the products for pickup.",
+                    'notification_type' => 'payment_received',
+                    'related_id' => $order->id,
+                    'is_read' => false
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment marked as received successfully!'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error marking payment: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateOrderStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required|exists:orders,id',
+            'status' => 'required|in:confirmed,ready_for_pickup,completed,cancelled'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+
+        try {
+            $order = Order::where('id', $request->order_id)
+                ->where('lead_farmer_id', $leadFarmerId)
+                ->firstOrFail();
+
+            $oldStatus = $order->order_status;
+            $order->order_status = $request->status;
+
+            if ($request->status == 'completed' && !$order->completed_date) {
+                $order->completed_date = now();
+            } elseif ($request->status == 'ready_for_pickup') {
+                Notification::create([
+                    'user_id' => $order->buyer->user_id,
+                    'recipient_type' => 'buyer',
+                    'title' => 'Ready for Pickup',
+                    'message' => "Your order #{$order->order_number} is ready for pickup. Please contact the lead farmer to arrange pickup.",
+                    'notification_type' => 'ready_for_pickup',
+                    'related_id' => $order->id,
+                    'is_read' => false
+                ]);
+            }
+
+            $order->save();
+
+            if ($request->status != $oldStatus) {
+                Notification::create([
+                    'user_id' => $order->buyer->user_id,
+                    'recipient_type' => 'user',
+                    'title' => 'Order Status Updated',
+                    'message' => "Your order #{$order->order_number} status has been updated to: " . ucfirst(str_replace('_', ' ', $request->status)),
+                    'notification_type' => 'system',
+                    'related_id' => $order->id,
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order status updated successfully!'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating order status: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
