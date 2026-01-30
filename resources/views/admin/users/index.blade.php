@@ -3,852 +3,1105 @@
 @section('title', 'User Management')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/index-user-management.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/index-user-management.css') }}">
+    <style>
+        :root{
+            --primary-green:#10B981;
+            --dark-green:#059669;
+            --card-bg:#ffffff;
+            --body-bg:#f6f8fa;
+            --text-dark:#0f1724;
+            --muted:#6b7280;
+            --sidebar-width:240px;
+            --shadow-xs:0 1px 3px rgba(15,23,36,0.04);
+            --shadow-sm:0 4px 10px rgba(15,23,36,0.06);
+            --shadow-md:0 7px 15px rgba(15,23,36,0.08);
+            --accent-amber:#f59e0b;
+            --blue:#3b82f6;
+            --purple:#8b5cf6;
+            --yellow:#f59e0b;
+            --border-color:#e5e7eb;
+            --focus-shadow:rgba(16, 185, 129, 0.1);
+        }
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:"Poppins", sans-serif;
+        }
+
+        body{
+            background:var(--body-bg);
+            color:var(--text-dark);
+            font-size:13px;
+            min-height:100vh;
+        }
+
+        .container{
+            max-width:100%;
+            padding:10px;
+        }
+
+        .header{
+            background:white;
+            border-radius:10px;
+            padding:15px;
+            margin-bottom:15px;
+            box-shadow:var(--shadow-sm);
+            border:1px solid var(--border-color);
+        }
+
+        .header-top{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:15px;
+            flex-wrap:wrap;
+            gap:10px;
+        }
+
+        .title-section h1{
+            font-size:18px;
+            font-weight:600;
+            color:var(--text-dark);
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .title-section h1 i{
+            color:var(--primary-green);
+        }
+
+        .stats-cards{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+            gap:10px;
+            margin:15px 0;
+        }
+
+        .stat-card{
+            background:white;
+            border-radius:8px;
+            padding:12px;
+            text-align:center;
+            box-shadow:var(--shadow-xs);
+            border:1px solid var(--border-color);
+            transition:transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover{
+            transform:translateY(-2px);
+            box-shadow:var(--shadow-sm);
+        }
+
+        .stat-card i{
+            font-size:20px;
+            margin-bottom:5px;
+        }
+
+        .stat-card.total i{ color:var(--primary-green); }
+        .stat-card.active i{ color:#22c55e; }
+        .stat-card.inactive i{ color:#ef4444; }
+        .stat-card.admins i{ color:var(--blue); }
+
+        .stat-card .number{
+            font-size:20px;
+            font-weight:600;
+            display:block;
+            margin:5px 0;
+        }
+
+        .stat-card .label{
+            font-size:11px;
+            color:var(--muted);
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+
+        .controls{
+            display:flex;
+            gap:8px;
+            align-items:center;
+            flex-wrap:wrap;
+        }
+
+
+
+        .search-box{
+            position:relative;
+            min-width:200px;
+        }
+
+        .search-box i{
+            position:absolute;
+            left:10px;
+            top:50%;
+            transform:translateY(-50%);
+            color:var(--muted);
+            font-size:14px;
+        }
+
+        .search-box input{
+            width:100%;
+            padding:8px 8px 8px 32px;
+            border:1px solid var(--border-color);
+            border-radius:6px;
+            font-size:13px;
+            transition:border-color 0.2s;
+        }
+
+        .search-box input:focus{
+            outline:none;
+            border-color:var(--primary-green);
+            box-shadow:0 0 0 3px var(--focus-shadow);
+        }
+
+        .btn{
+            padding:8px 14px;
+            border:none;
+            border-radius:6px;
+            font-size:13px;
+            cursor:pointer;
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            transition:all 0.2s;
+            font-weight:500;
+        }
+
+        .btn-primary{
+            background:var(--primary-green);
+            color:white;
+        }
+
+        .btn-primary:hover{
+            background:var(--dark-green);
+            transform:translateY(-1px);
+            box-shadow:0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-outline{
+            background:white;
+            color:var(--text-dark);
+            border:1px solid var(--border-color);
+        }
+
+        .btn-outline:hover{
+            border-color:var(--primary-green);
+            color:var(--primary-green);
+        }
+
+        .content-area{
+            background:white;
+            border-radius:10px;
+            padding:15px;
+            box-shadow:var(--shadow-sm);
+            border:1px solid var(--border-color);
+            min-height:400px;
+        }
+
+        .loading{
+            text-align:center;
+            padding:40px;
+            color:var(--muted);
+        }
+
+        .loading i{
+            font-size:24px;
+            margin-bottom:10px;
+            color:var(--primary-green);
+        }
+
+        .pagination-container{
+            margin-top:15px;
+            display:flex;
+            justify-content:center;
+        }
+
+        .pagination{
+            display:flex;
+            gap:5px;
+            list-style:none;
+        }
+
+        .pagination li{
+            min-width:32px;
+            height:32px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:6px;
+            font-size:13px;
+            cursor:pointer;
+            transition:all 0.2s;
+        }
+
+        .pagination li a{
+            color:var(--muted);
+            text-decoration:none;
+            width:100%;
+            height:100%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .pagination li.active{
+            background:var(--primary-green);
+        }
+
+        .pagination li.active a{
+            color:white;
+        }
+
+        .pagination li:not(.active):hover{
+            background:var(--body-bg);
+        }
+
+        .pagination li.disabled{
+            opacity:0.5;
+            cursor:not-allowed;
+        }
+
+        .empty-state{
+            text-align:center;
+            padding:50px 20px;
+            color:var(--muted);
+        }
+
+        .empty-state i{
+            font-size:40px;
+            margin-bottom:15px;
+            opacity:0.5;
+        }
+
+        .swal2-popup{
+            font-size:13px !important;
+            border-radius:10px !important;
+            border:1px solid var(--border-color) !important;
+            box-shadow:var(--shadow-md) !important;
+        }
+
+        @media (max-width:768px){
+            .header-top{
+                flex-direction:column;
+                align-items:stretch;
+            }
+            
+            .controls{
+                width:100%;
+            }
+            
+            .search-box{
+                width:100%;
+            }
+            
+
+            
+            .stats-cards{
+                grid-template-columns:repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width:480px){
+            .stats-cards{
+                grid-template-columns:1fr;
+            }
+            
+            .container{
+                padding:5px;
+            }
+            
+            .header, .content-area{
+                padding:10px;
+            }
+        }
+    </style>
 @endsection
 
 @section('content')
-<div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-</div>
-
-<div class="user-management-container">
-    <div class="header-section">
-        <div class="header-content">
-            <h1><i class="fas fa-users-cog"></i> User Management</h1>
-            <p>Manage all user accounts with complete control</p>
-        </div>
-        <button class="btn-add-user" id="add-user-btn">
-            <i class="fas fa-user-plus"></i>
-            <span>Add User</span>
-        </button>
-    </div>
-
-    <div class="filters-section">
-        <div class="filter-group">
-            <div class="filter-item filter-search">
-                <div class="search-wrapper">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-user" placeholder="Search users by name, email, NIC, username...">
-                    <button type="button" id="search-btn">
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <div class="title-section">
+                    <h1><i class="fas fa-users-cog"></i> User Management</h1>
+                </div>
+                <div class="controls">
+                    <div class="search-box">
                         <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="users-table-section">
-        <div class="table-header">
-            <div class="table-stats">
-                <i class="fas fa-users"></i>
-                <span>Total Users: <span class="users-count" id="total-users">{{ $totalUsers }}</span></span>
-            </div>
-        </div>
-
-        <div id="users-container">
-            @include('admin.users.partials.user_cards', ['users' => $users])
-        </div>
-
-        @if($paginator->hasPages())
-        <div class="pagination-wrapper" id="main-pagination">
-            {{ $paginator->links('vendor.pagination.simple-unique') }}
-        </div>
-        @endif
-    </div>
-</div>
-
-<div class="modal-overlay" id="otpModal">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3>OTP Verification</h3>
-                <button class="btn-close" id="cancelOtp">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p class="otp-description">Enter the 6-digit OTP sent to user's mobile number</p>
-
-                <div class="otp-input-group">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="1">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="2">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="3">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="4">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="5">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="6">
-                </div>
-
-                <div class="otp-timer">
-                    <i class="fas fa-clock"></i>
-                    <span>OTP expires in: <strong id="otpTimer">05:00</strong></span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" id="resendOtp">
-                    <i class="fas fa-redo"></i> Resend OTP
-                </button>
-                <button class="btn-primary" id="verifyOtp">
-                    <i class="fas fa-check"></i> Verify
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="addUserModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <h3>Add New User</h3>
-                <button class="btn-close" id="closeAddModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="addUserForm">
-                <div class="modal-body">
-                    <div class="form-section">
-                        <label class="form-label">
-                            <i class="fas fa-user-tag"></i> User Type
-                        </label>
-                        <select name="user_type" id="userType" class="form-select" required>
-                            <option value="">Select User Type</option>
-                            <option value="farmer">Farmer</option>
-                            <option value="lead_farmer">Lead Farmer</option>
-                            <option value="buyer">Buyer</option>
-                            <option value="facilitator">Facilitator</option>
-                            <option value="admin">Administrator</option>
-                            <option value="subadmin">Sub Administrator</option>
-                        </select>
+                        <input type="text" id="search-input" placeholder="Search users..." autocomplete="off">
                     </div>
 
-                    <div id="userFields">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-user"></i> Full Name *
-                                </label>
-                                <input type="text" name="name" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-at"></i> Username *
-                                </label>
-                                <input type="text" name="username" class="form-input" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-envelope"></i> Email
-                            </label>
-                            <input type="email" name="email" class="form-input">
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-lock"></i> Password *
-                                </label>
-                                <input type="password" name="password" class="form-input" required minlength="8">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-lock"></i> Confirm Password *
-                                </label>
-                                <input type="password" name="password_confirmation" class="form-input" required>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" id="closeModal">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i> Create User
+                    <button class="btn btn-primary" id="add-user-btn">
+                        <i class="fas fa-user-plus"></i> Add User
                     </button>
                 </div>
-            </form>
+            </div>
+            
+            <div class="stats-cards">
+                <div class="stat-card total">
+                    <i class="fas fa-users"></i>
+                    <span class="number">{{ $totalUsers }}</span>
+                    <span class="label">Total Users</span>
+                </div>
+                <div class="stat-card active">
+                    <i class="fas fa-user-check"></i>
+                    <span class="number">0</span>
+                    <span class="label">Active</span>
+                </div>
+                <div class="stat-card inactive">
+                    <i class="fas fa-user-slash"></i>
+                    <span class="number">0</span>
+                    <span class="label">Inactive</span>
+                </div>
+                <div class="stat-card admins">
+                    <i class="fas fa-user-shield"></i>
+                    <span class="number">0</span>
+                    <span class="label">Admins</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div id="users-content">
+                @include('admin.users.partials.user_cards', ['users' => $users])
+            </div>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading users...</p>
+            </div>
+            
+            <div class="pagination-container" id="pagination-container">
+                {!! $paginator->links('vendor.pagination.simple-unique') !!}
+            </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    let currentUserId = null;
-    let currentAction = null;
-    let otpTimer = null;
-    let timeLeft = 300;
-    let currentPage = 1;
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let currentView = 'card';
+            let currentPage = 1;
+            let searchTerm = '';
+            let loading = false;
 
-    function showLoading() {
-        $('#loadingOverlay').css('display', 'flex').hide().fadeIn();
-    }
+            // Update view buttons based on current view
 
-    function hideLoading() {
-        $('#loadingOverlay').fadeOut();
-    }
 
-    function showAlert(icon, title, text) {
-        Swal.fire({
-            icon: icon,
-            title: title,
-            text: text,
-            confirmButtonColor: '#10B981',
-            confirmButtonText: 'OK',
-            timer: 3000,
-            timerProgressBar: true
-        });
-    }
+            function updateActiveStats() {
+                const total = {{ $totalUsers }};
+                let active = 0;
+                let inactive = 0;
+                let admins = 0;
 
-    function startOtpTimer() {
-        clearInterval(otpTimer);
-        timeLeft = 300;
+                $('.user-card').each(function() {
+                    const status = $(this).data('status');
+                    const role = $(this).data('role');
+                    
+                    if (status === 'active') active++;
+                    else if (status === 'inactive') inactive++;
+                    
+                    if (role === 'admin' || role === 'subadmin') admins++;
+                });
 
-        otpTimer = setInterval(function() {
-            timeLeft--;
-            let minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-
-            $('#otpTimer').text(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-
-            if (timeLeft <= 0) {
-                clearInterval(otpTimer);
-                showAlert('error', 'OTP Expired', 'Please request a new OTP');
+                $('.stat-card.active .number').text(active);
+                $('.stat-card.inactive .number').text(inactive);
+                $('.stat-card.admins .number').text(admins);
             }
-        }, 1000);
-    }
 
-    $('#add-user-btn').click(function() {
-        $('#userType').val('');
-        $('#userFields').html(`
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-user"></i> Full Name *
-                    </label>
-                    <input type="text" name="name" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-at"></i> Username *
-                    </label>
-                    <input type="text" name="username" class="form-input" required>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-envelope"></i> Email
-                </label>
-                <input type="email" name="email" class="form-input">
-            </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-lock"></i> Password *
-                    </label>
-                    <input type="password" name="password" class="form-input" required minlength="8">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-lock"></i> Confirm Password *
-                    </label>
-                    <input type="password" name="password_confirmation" class="form-input" required>
-                </div>
-            </div>
-        `);
-        $('#addUserModal').fadeIn();
-    });
-
-    $('#userType').change(function() {
-        const type = $(this).val();
-        let fields = '';
-
-        if (type === 'farmer' || type === 'lead_farmer') {
-            fields = `
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-id-card"></i> NIC Number *
-                        </label>
-                        <input type="text" name="nic_no" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-phone"></i> Mobile Number *
-                        </label>
-                        <input type="tel" name="primary_mobile" class="form-input" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-map-marker-alt"></i> Grama Niladhari Division *
-                        </label>
-                        <input type="text" name="grama_niladhari_division" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-whatsapp"></i> WhatsApp Number
-                        </label>
-                        <input type="tel" name="whatsapp_number" class="form-input">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-home"></i> Residential Address *
-                    </label>
-                    <textarea name="residential_address" class="form-input" rows="2" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-credit-card"></i> Preferred Payment Method
-                    </label>
-                    <select name="preferred_payment" class="form-select">
-                        <option value="bank">Bank Transfer</option>
-                        <option value="ezcash">Ez Cash</option>
-                        <option value="mcash">mCash</option>
-                        <option value="all">All Methods</option>
-                    </select>
-                </div>
-            `;
-
-            if (type === 'lead_farmer') {
-                fields += `
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-users"></i> Group Name *
-                            </label>
-                            <input type="text" name="group_name" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-hashtag"></i> Group Number *
-                            </label>
-                            <input type="text" name="group_number" class="form-input" required>
-                        </div>
-                    </div>
-                `;
-            }
-        } else if (type === 'buyer') {
-            fields = `
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-phone"></i> Mobile Number *
-                    </label>
-                    <input type="tel" name="primary_mobile" class="form-input" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-briefcase"></i> Business Name
-                        </label>
-                    <input type="text" name="business_name" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-building"></i> Business Type
-                        </label>
-                        <select name="business_type" class="form-select">
-                            <option value="individual">Individual</option>
-                            <option value="restaurant">Restaurant</option>
-                            <option value="hotel">Hotel</option>
-                            <option value="retailer">Retailer</option>
-                            <option value="wholesaler">Wholesaler</option>
-                        </select>
-                    </div>
-                </div>
-            `;
-        } else if (type === 'facilitator') {
-            fields = `
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-id-card"></i> NIC Number *
-                        </label>
-                        <input type="text" name="nic_no" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-phone"></i> Mobile Number *
-                        </label>
-                        <input type="tel" name="primary_mobile" class="form-input" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-map-pin"></i> Assigned Division *
-                    </label>
-                    <input type="text" name="assigned_division" class="form-input" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-whatsapp"></i> WhatsApp Number
-                    </label>
-                    <input type="tel" name="whatsapp_number" class="form-input">
-                </div>
-            `;
-        } else if (type === 'admin' || type === 'subadmin') {
-        }
-
-        $('#userFields').find('.dynamic-field').remove();
-        if (fields) {
-            $('#userFields').append(`<div class="dynamic-field">${fields}</div>`);
-        }
-    });
-
-    $('#addUserForm').submit(function(e) {
-        e.preventDefault();
-
-        showLoading();
-
-        const formData = $(this).serialize();
-
-        $.ajax({
-            url: '{{ route("admin.users.store") }}',
-            method: 'POST',
-            data: formData,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                hideLoading();
-                if (response.success) {
-                    showAlert('success', 'User Created!', 'User account has been created successfully');
-                    $('#addUserModal').fadeOut();
-                    $('#addUserForm')[0].reset();
-                    filterUsers();
+            function showLoading(show) {
+                loading = show;
+                if (show) {
+                    $('#loading').show();
+                    $('#users-content').hide();
                 } else {
-                    showAlert('error', 'Creation Failed', response.message);
+                    $('#loading').hide();
+                    $('#users-content').show();
                 }
-            },
-            error: function(xhr) {
-                hideLoading();
-                let errorMessage = 'Failed to create user';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
-                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    errorMessage = Object.values(xhr.responseJSON.errors).join('<br>');
-                }
-                showAlert('error', 'Creation Failed', errorMessage);
             }
-        });
-    });
 
-    $(document).on('click', '.view-user', function() {
-        const userId = $(this).data('id');
-        window.location.href = '/admin/users/' + userId;
-    });
+            function loadUsers(page = 1, search = '') {
+                if (loading) return;
+                
+                showLoading(true);
+                currentPage = page;
+                searchTerm = search;
 
-    $(document).on('click', '.edit-user', function() {
-        const userId = $(this).data('id');
-        const userCard = $(this).closest('.user-card');
-        const userRole = userCard.data('role');
+                console.log('Loading users:', { view: currentView, page: page, search: search });
 
-        if (userRole === 'farmer' || userRole === 'lead_farmer') {
-            currentUserId = userId;
-            currentAction = 'edit_payment';
-
-            Swal.fire({
-                title: 'OTP Verification Required',
-                text: 'Updating payment details requires OTP verification. We will send an OTP to the user\'s mobile number.',
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#10B981',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Send OTP',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '{{ route("admin.users.sendOtp") }}',
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            user_id: userId,
-                            action: 'edit_payment'
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                $('#otpModal').fadeIn();
-                                $('.otp-digit').val('');
-                                startOtpTimer();
-                            } else {
-                                showAlert('error', 'Failed', response.message);
+                $.ajax({
+                    url: "{{ route('admin.users.index') }}",
+                    method: 'GET',
+                    data: {
+                        view: currentView,
+                        q: search,
+                        page: page
+                    },
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function(response) {
+                        console.log('Response received:', response);
+                        if (response.success && response.html) {
+                            $('#users-content').html(response.html);
+                            if (response.pagination) {
+                                $('#pagination-container').html(response.pagination);
                             }
-                        },
-                        error: function(xhr) {
-                            showAlert('error', 'Failed', 'Failed to send OTP');
+                            updateActiveStats();
+                        } else {
+                            console.error('Invalid response format:', response);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Invalid response format',
+                                confirmButtonColor: '#10B981'
+                            });
                         }
-                    });
+                        showLoading(false);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', {
+                            status: xhr.status,
+                            statusText: xhr.statusText,
+                            responseText: xhr.responseText,
+                            error: error
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to load users. Status: ' + xhr.status,
+                            confirmButtonColor: '#10B981'
+                        });
+                        showLoading(false);
+                    }
+                });
+            }
+
+            function showAddUserModal() {
+                Swal.fire({
+                    title: 'Add New User',
+                    html: `
+                        <div class="user-form">
+                            <div class="form-group">
+                                <label>User Type <span class="required">*</span></label>
+                                <select id="user-type" class="form-select" required>
+                                    <option value="">Select Type</option>
+                                    <option value="farmer">Farmer</option>
+                                    <option value="lead_farmer">Lead Farmer</option>
+                                    <option value="buyer">Buyer</option>
+                                    <option value="facilitator">Facilitator</option>
+                                    <option value="admin">Administrator</option>
+                                    <option value="subadmin">Sub Administrator</option>
+                                </select>
+                            </div>
+                            
+                            <div id="common-fields">
+                                <div class="form-group">
+                                    <label>Full Name <span class="required">*</span></label>
+                                    <input type="text" id="name" class="form-input" placeholder="Enter full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Username <span class="required">*</span></label>
+                                    <input type="text" id="username" class="form-input" placeholder="Enter username" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" id="email" class="form-input" placeholder="Enter email">
+                                </div>
+                                <div class="form-group">
+                                    <label>Password <span class="required">*</span></label>
+                                    <div class="password-container">
+                                        <input type="password" id="password" class="form-input" placeholder="Enter password" required>
+                                        <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+                                    </div>
+                                    <small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirm Password <span class="required">*</span></label>
+                                    <div class="password-container">
+                                        <input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+                                        <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="role-specific-fields" style="display:none;"></div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Create User',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#10B981',
+                    cancelButtonColor: '#6b7280',
+                    width: '500px',
+                    preConfirm: function() {
+                        const userType = $('#user-type').val();
+                        const name = $('#name').val();
+                        const username = $('#username').val();
+                        const email = $('#email').val();
+                        const password = $('#password').val();
+                        const passwordConfirmation = $('#password_confirmation').val();
+
+                        if (!userType || !name || !username || !password) {
+                            Swal.showValidationMessage('Please fill all required fields');
+                            return false;
+                        }
+
+                        if (password !== passwordConfirmation) {
+                            Swal.showValidationMessage('Passwords do not match');
+                            return false;
+                        }
+
+                        if (password.length < 8) {
+                            Swal.showValidationMessage('Password must be at least 8 characters');
+                            return false;
+                        }
+
+                        if (!/(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(password)) {
+                            Swal.showValidationMessage('Password must include uppercase, number and special character');
+                            return false;
+                        }
+
+                        const formData = {
+                            user_type: userType,
+                            name: name,
+                            username: username,
+                            email: email,
+                            password: password,
+                            password_confirmation: passwordConfirmation
+                        };
+
+                        if (userType === 'farmer') {
+                            formData.nic_no = $('#farmer_nic').val() || '';
+                            formData.primary_mobile = $('#farmer_mobile').val() || '';
+                            formData.whatsapp_number = $('#farmer_whatsapp').val() || '';
+                            formData.residential_address = $('#farmer_address').val() || '';
+                            formData.grama_niladhari_division = $('#farmer_gnd').val() || '';
+                            formData.district = $('#farmer_district').val() || 'Colombo';
+                            formData.preferred_payment = $('#farmer_payment').val() || 'bank';
+                            formData.account_number = $('#farmer_account').val() || '';
+                            formData.account_holder_name = $('#farmer_account_name').val() || '';
+                            formData.bank_name = $('#farmer_bank').val() || '';
+                            formData.bank_branch = $('#farmer_branch').val() || '';
+                            formData.ezcash_mobile = $('#farmer_ezcash').val() || '';
+                            formData.mcash_mobile = $('#farmer_mcash').val() || '';
+                        } else if (userType === 'lead_farmer') {
+                            formData.nic_no = $('#lead_nic').val() || '';
+                            formData.primary_mobile = $('#lead_mobile').val() || '';
+                            formData.whatsapp_number = $('#lead_whatsapp').val() || '';
+                            formData.residential_address = $('#lead_address').val() || '';
+                            formData.grama_niladhari_division = $('#lead_gnd').val() || '';
+                            formData.group_name = $('#lead_group_name').val() || '';
+                            formData.group_number = $('#lead_group_number').val() || '';
+                            formData.account_number = $('#lead_account').val() || '';
+                            formData.account_holder_name = $('#lead_account_name').val() || '';
+                            formData.bank_name = $('#lead_bank').val() || '';
+                            formData.bank_branch = $('#lead_branch').val() || '';
+                        } else if (userType === 'buyer') {
+                            formData.nic_no = $('#buyer_nic').val() || '';
+                            formData.primary_mobile = $('#buyer_mobile').val() || '';
+                            formData.whatsapp_number = $('#buyer_whatsapp').val() || '';
+                            formData.residential_address = $('#buyer_address').val() || '';
+                            formData.business_name = $('#buyer_business').val() || '';
+                            formData.business_type = $('#buyer_type').val() || 'individual';
+                        } else if (userType === 'facilitator') {
+                            formData.nic_no = $('#facilitator_nic').val() || '';
+                            formData.primary_mobile = $('#facilitator_mobile').val() || '';
+                            formData.whatsapp_number = $('#facilitator_whatsapp').val() || '';
+                            formData.assigned_division = $('#facilitator_division').val() || '';
+                        } else if (userType === 'admin' || userType === 'subadmin') {
+                            formData.nic_no = $('#admin_nic').val() || '';
+                            formData.phone_number = $('#admin_phone').val() || '';
+                        }
+
+                        return formData;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const formData = result.value;
+                        
+                        $.ajax({
+                            url: "{{ route('admin.users.store') }}",
+                            method: 'POST',
+                            data: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Success!',
+                                        text: response.message,
+                                        confirmButtonColor: '#10B981'
+                                    }).then(() => {
+                                        loadUsers();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.message,
+                                        confirmButtonColor: '#10B981'
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                const error = xhr.responseJSON?.message || 'Failed to create user';
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: error,
+                                    confirmButtonColor: '#10B981'
+                                });
+                            }
+                        });
+                    }
+                });
+
+                $('#user-type').on('change', function() {
+                    const userType = $(this).val();
+                    let html = '';
+                    
+                    switch(userType) {
+                        case 'farmer':
+                            html = `
+                                <div class="form-section">
+                                    <h4>Farmer Details</h4>
+                                    <div class="form-group">
+                                        <label>NIC Number</label>
+                                        <input type="text" id="farmer_nic" class="form-input" placeholder="Enter NIC">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Primary Mobile <span class="required">*</span></label>
+                                        <input type="tel" id="farmer_mobile" class="form-input" placeholder="Enter mobile number" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>WhatsApp Number</label>
+                                        <input type="tel" id="farmer_whatsapp" class="form-input" placeholder="Enter WhatsApp">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Residential Address <span class="required">*</span></label>
+                                        <textarea id="farmer_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Grama Niladhari Division</label>
+                                        <input type="text" id="farmer_gnd" class="form-input" placeholder="Enter GND">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>District</label>
+                                        <select id="farmer_district" class="form-select">
+                                            <option value="Colombo">Colombo</option>
+                                            <option value="Gampaha">Gampaha</option>
+                                            <option value="Kalutara">Kalutara</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Preferred Payment</label>
+                                        <select id="farmer_payment" class="form-select">
+                                            <option value="bank">Bank Transfer</option>
+                                            <option value="ezcash">EzCash</option>
+                                            <option value="mcash">mCash</option>
+                                            <option value="all">All Methods</option>
+                                        </select>
+                                    </div>
+                                    <div id="farmer-bank-fields">
+                                        <div class="form-group">
+                                            <label>Account Number</label>
+                                            <input type="text" id="farmer_account" class="form-input" placeholder="Enter account number">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Account Holder Name</label>
+                                            <input type="text" id="farmer_account_name" class="form-input" placeholder="Enter holder name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Bank Name</label>
+                                            <input type="text" id="farmer_bank" class="form-input" placeholder="Enter bank name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Bank Branch</label>
+                                            <input type="text" id="farmer_branch" class="form-input" placeholder="Enter branch">
+                                        </div>
+                                    </div>
+                                    <div id="farmer-ezcash-fields" style="display:none;">
+                                        <div class="form-group">
+                                            <label>EzCash Mobile Number</label>
+                                            <input type="tel" id="farmer_ezcash" class="form-input" placeholder="Enter EzCash mobile">
+                                        </div>
+                                    </div>
+                                    <div id="farmer-mcash-fields" style="display:none;">
+                                        <div class="form-group">
+                                            <label>mCash Mobile Number</label>
+                                            <input type="tel" id="farmer_mcash" class="form-input" placeholder="Enter mCash mobile">
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            break;
+                        case 'lead_farmer':
+                            html = `
+                                <div class="form-section">
+                                    <h4>Lead Farmer Details</h4>
+                                    <div class="form-group">
+                                        <label>NIC Number <span class="required">*</span></label>
+                                        <input type="text" id="lead_nic" class="form-input" placeholder="Enter NIC" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Primary Mobile <span class="required">*</span></label>
+                                        <input type="tel" id="lead_mobile" class="form-input" placeholder="Enter mobile number" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>WhatsApp Number</label>
+                                        <input type="tel" id="lead_whatsapp" class="form-input" placeholder="Enter WhatsApp">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Residential Address <span class="required">*</span></label>
+                                        <textarea id="lead_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Grama Niladhari Division</label>
+                                        <input type="text" id="lead_gnd" class="form-input" placeholder="Enter GND">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Group Name <span class="required">*</span></label>
+                                        <input type="text" id="lead_group_name" class="form-input" placeholder="Enter group name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Group Number <span class="required">*</span></label>
+                                        <input type="text" id="lead_group_number" class="form-input" placeholder="Enter group number" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Account Number <span class="required">*</span></label>
+                                        <input type="text" id="lead_account" class="form-input" placeholder="Enter account number" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Account Holder Name <span class="required">*</span></label>
+                                        <input type="text" id="lead_account_name" class="form-input" placeholder="Enter holder name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Bank Name <span class="required">*</span></label>
+                                        <input type="text" id="lead_bank" class="form-input" placeholder="Enter bank name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Bank Branch <span class="required">*</span></label>
+                                        <input type="text" id="lead_branch" class="form-input" placeholder="Enter branch" required>
+                                    </div>
+                                </div>
+                            `;
+                            break;
+                        case 'buyer':
+                            html = `
+                                <div class="form-section">
+                                    <h4>Buyer Details</h4>
+                                    <div class="form-group">
+                                        <label>NIC Number</label>
+                                        <input type="text" id="buyer_nic" class="form-input" placeholder="Enter NIC">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Primary Mobile <span class="required">*</span></label>
+                                        <input type="tel" id="buyer_mobile" class="form-input" placeholder="Enter mobile number" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>WhatsApp Number</label>
+                                        <input type="tel" id="buyer_whatsapp" class="form-input" placeholder="Enter WhatsApp">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Residential Address</label>
+                                        <textarea id="buyer_address" class="form-input" placeholder="Enter address" rows="2"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Business Name</label>
+                                        <input type="text" id="buyer_business" class="form-input" placeholder="Enter business name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Business Type</label>
+                                        <select id="buyer_type" class="form-select">
+                                            <option value="individual">Individual</option>
+                                            <option value="restaurant">Restaurant</option>
+                                            <option value="hotel">Hotel</option>
+                                            <option value="retailer">Retailer</option>
+                                            <option value="wholesaler">Wholesaler</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            `;
+                            break;
+                        case 'facilitator':
+                            html = `
+                                <div class="form-section">
+                                    <h4>Facilitator Details</h4>
+                                    <div class="form-group">
+                                        <label>NIC Number <span class="required">*</span></label>
+                                        <input type="text" id="facilitator_nic" class="form-input" placeholder="Enter NIC" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Primary Mobile <span class="required">*</span></label>
+                                        <input type="tel" id="facilitator_mobile" class="form-input" placeholder="Enter mobile number" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>WhatsApp Number</label>
+                                        <input type="tel" id="facilitator_whatsapp" class="form-input" placeholder="Enter WhatsApp">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Assigned Division <span class="required">*</span></label>
+                                        <input type="text" id="facilitator_division" class="form-input" placeholder="Enter assigned division" required>
+                                    </div>
+                                </div>
+                            `;
+                            break;
+                        case 'admin':
+                        case 'subadmin':
+                            html = `
+                                <div class="form-section">
+                                    <h4>${userType === 'admin' ? 'Administrator' : 'Sub Administrator'} Details</h4>
+                                    <div class="form-group">
+                                        <label>Full Name <span class="required">*</span></label>
+                                        <input type="text" id="admin_name" class="form-input" value="${$('#name').val()}" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>NIC Number</label>
+                                        <input type="text" id="admin_nic" class="form-input" placeholder="Enter NIC">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Phone Number <span class="required">*</span></label>
+                                        <input type="tel" id="admin_phone" class="form-input" placeholder="Enter phone number" required>
+                                    </div>
+                                </div>
+                            `;
+                            break;
+                    }
+                    
+                    $('#role-specific-fields').html(html).show();
+                    
+                    if (userType === 'farmer') {
+                        $('#farmer_payment').on('change', function() {
+                            const payment = $(this).val();
+                            $('#farmer-bank-fields, #farmer-ezcash-fields, #farmer-mcash-fields').hide();
+                            
+                            if (payment === 'bank' || payment === 'all') {
+                                $('#farmer-bank-fields').show();
+                            }
+                            if (payment === 'ezcash' || payment === 'all') {
+                                $('#farmer-ezcash-fields').show();
+                            }
+                            if (payment === 'mcash' || payment === 'all') {
+                                $('#farmer-mcash-fields').show();
+                            }
+                        }).trigger('change');
+                    }
+                });
+            }
+
+            window.togglePasswordVisibility = function(fieldId) {
+                const field = $('#' + fieldId);
+                const toggleIcon = field.next('.password-toggle');
+                
+                if (field.attr('type') === 'password') {
+                    field.attr('type', 'text');
+                    toggleIcon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    field.attr('type', 'password');
+                    toggleIcon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            }
+
+
+
+            $('#search-input').on('input', function() {
+                const search = $(this).val();
+                clearTimeout($(this).data('timeout'));
+                $(this).data('timeout', setTimeout(() => {
+                    loadUsers(1, search);
+                }, 500));
+            });
+
+            $('#add-user-btn').click(showAddUserModal);
+
+            $(document).on('click', '.pagination a', function(e) {
+                e.preventDefault();
+                const page = $(this).attr('href').split('page=')[1];
+                loadUsers(page, searchTerm);
+            });
+
+            $(document).on('click', '.action-btn', function(e) {
+                e.preventDefault();
+                const action = $(this).data('action');
+                const userId = $(this).data('user-id');
+                const userName = $(this).data('user-name') || 'User';
+
+                switch(action) {
+                    case 'view':
+                        window.location.href = `/admin/users/${userId}`;
+                        break;
+                    case 'edit':
+                        window.location.href = `/admin/users/${userId}/edit`;
+                        break;
+                    case 'suspend':
+                        Swal.fire({
+                            title: 'Suspend User',
+                            text: `Are you sure you want to suspend ${userName}?`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#10B981',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Yes, suspend',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: `/admin/users/${userId}/suspend`,
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Suspended!',
+                                                text: response.message,
+                                                confirmButtonColor: '#10B981'
+                                            }).then(() => {
+                                                loadUsers(currentPage, searchTerm);
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error',
+                                                text: response.message,
+                                                confirmButtonColor: '#10B981'
+                                            });
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'Failed to suspend user',
+                                            confirmButtonColor: '#10B981'
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                        break;
+                    case 'activate':
+                        $.ajax({
+                            url: `/admin/users/${userId}/activate`,
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Activated!',
+                                        text: response.message,
+                                        confirmButtonColor: '#10B981'
+                                    }).then(() => {
+                                        loadUsers(currentPage, searchTerm);
+                                    });
+                                }
+                            }
+                        });
+                        break;
+                    case 'delete':
+                        Swal.fire({
+                            title: 'Delete User',
+                            text: `Are you sure you want to delete ${userName}? This action cannot be undone.`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Yes, delete',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: `/admin/users/${userId}`,
+                                    method: 'DELETE',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Deleted!',
+                                                text: response.message,
+                                                confirmButtonColor: '#10B981'
+                                            }).then(() => {
+                                                loadUsers(currentPage, searchTerm);
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        break;
+                    case 'promote':
+                        Swal.fire({
+                            title: 'Promote to Lead Farmer',
+                            text: `Promote ${userName} to Lead Farmer role?`,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#10B981',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Yes, promote',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: `/admin/users/${userId}/promote`,
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Promoted!',
+                                                text: response.message,
+                                                confirmButtonColor: '#10B981'
+                                            }).then(() => {
+                                                loadUsers(currentPage, searchTerm);
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        break;
                 }
             });
-        } else {
-            window.location.href = '/admin/users/' + userId + '/edit';
-        }
-    });
 
-    $(document).on('click', '.promote-user', function() {
-        const userId = $(this).data('id');
-        const userName = $(this).closest('.user-card').find('.user-name').text();
-
-        Swal.fire({
-            title: 'Promote to Lead Farmer?',
-            html: `Promote <strong>${userName}</strong> to Lead Farmer?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#10B981',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, Promote',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                showLoading();
-                $.ajax({
-                    url: '/admin/users/' + userId + '/promote',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        hideLoading();
-                        if (response.success) {
-                            showAlert('success', 'Promoted!', 'User is now a Lead Farmer');
-                            filterUsers();
-                        } else {
-                            showAlert('error', 'Failed', response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        hideLoading();
-                        showAlert('error', 'Failed', 'Failed to promote user');
-                    }
+            $(document).on('click', '.view-photo', function(e) {
+                e.preventDefault();
+                const photoUrl = $(this).data('photo');
+                Swal.fire({
+                    imageUrl: photoUrl,
+                    imageAlt: 'Profile Photo',
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    width: '300px',
+                    padding: '10px'
                 });
-            }
+            });
+
+            updateActiveStats();
         });
-    });
-
-    $(document).on('click', '.delete-user', function() {
-        const userId = $(this).data('id');
-        const userName = $(this).closest('.user-card').find('.user-name').text();
-
-        Swal.fire({
-            title: 'Deactivate User?',
-            html: `Are you sure you want to deactivate <strong>${userName}</strong>?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, Deactivate',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                showLoading();
-                $.ajax({
-                    url: '/admin/users/' + userId + '/deactivate',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        hideLoading();
-                        if (response.success) {
-                            showAlert('success', 'Deactivated!', 'User has been deactivated');
-                            filterUsers();
-                        } else {
-                            showAlert('error', 'Failed', response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        hideLoading();
-                        showAlert('error', 'Failed', 'Failed to deactivate user');
-                    }
-                });
-            }
-        });
-    });
-
-    $(document).on('click', '.suspend-user', function() {
-        const userId = $(this).data('id');
-        const userName = $(this).closest('.user-card').find('.user-name').text();
-
-        Swal.fire({
-            title: 'Suspend User?',
-            html: `Suspend <strong>${userName}</strong>?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#f59e0b',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, Suspend',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                showLoading();
-                $.ajax({
-                    url: '/admin/users/' + userId + '/suspend',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        hideLoading();
-                        if (response.success) {
-                            showAlert('success', 'Suspended!', 'User has been suspended');
-                            filterUsers();
-                        } else {
-                            showAlert('error', 'Failed', response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        hideLoading();
-                        showAlert('error', 'Failed', 'Failed to suspend user');
-                    }
-                });
-            }
-        });
-    });
-
-    $(document).on('click', '.activate-user', function() {
-        const userId = $(this).data('id');
-
-        showLoading();
-        $.ajax({
-            url: '/admin/users/' + userId + '/activate',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                hideLoading();
-                if (response.success) {
-                    showAlert('success', 'Activated!', 'User has been activated');
-                    filterUsers();
-                } else {
-                    showAlert('error', 'Failed', response.message);
-                }
-            },
-            error: function(xhr) {
-                hideLoading();
-                showAlert('error', 'Failed', 'Failed to activate user');
-            }
-        });
-    });
-
-    $(document).on('click', '.make-subadmin', function() {
-        const userId = $(this).data('id');
-        const userName = $(this).closest('.user-card').find('.user-name').text();
-
-        Swal.fire({
-            title: 'Make Sub-Administrator?',
-            html: `Make <strong>${userName}</strong> a Sub-Administrator?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#10B981',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, Make Sub-Admin',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                showLoading();
-                $.ajax({
-                    url: '/admin/users/' + userId + '/make-subadmin',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        hideLoading();
-                        if (response.success) {
-                            showAlert('success', 'Success!', 'User is now a Sub-Admin');
-                            filterUsers();
-                        } else {
-                            showAlert('error', 'Failed', response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        hideLoading();
-                        showAlert('error', 'Failed', 'Failed to update user role');
-                    }
-                });
-            }
-        });
-    });
-
-    $('.otp-digit').on('input', function() {
-        const index = parseInt($(this).data('index'));
-        const value = $(this).val();
-
-        if (value.length === 1 && index < 6) {
-            $(`.otp-digit[data-index="${index + 1}"]`).focus();
-        }
-    });
-
-    $('.otp-digit').on('keydown', function(e) {
-        if (e.key === 'Backspace' && $(this).val() === '') {
-            const index = parseInt($(this).data('index'));
-            if (index > 1) {
-                $(`.otp-digit[data-index="${index - 1}"]`).focus();
-            }
-        }
-    });
-
-    $('#verifyOtp').click(function() {
-        const otp = $('.otp-digit').map(function() {
-            return $(this).val();
-        }).get().join('');
-
-        if (otp.length !== 6) {
-            showAlert('error', 'Invalid OTP', 'Please enter the complete 6-digit OTP');
-            return;
-        }
-
-        showLoading();
-        $.ajax({
-            url: '{{ route("admin.users.verifyOtp") }}',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                user_id: currentUserId,
-                otp: otp,
-                action: currentAction
-            },
-            success: function(response) {
-                hideLoading();
-                if (response.success) {
-                    clearInterval(otpTimer);
-                    $('#otpModal').fadeOut();
-                    window.location.href = '/admin/users/' + currentUserId + '/edit';
-                } else {
-                    showAlert('error', 'Verification Failed', response.message);
-                }
-            },
-            error: function(xhr) {
-                hideLoading();
-                showAlert('error', 'Verification Failed', 'Invalid OTP');
-            }
-        });
-    });
-
-    $('#resendOtp').click(function() {
-        showLoading();
-        $.ajax({
-            url: '{{ route("admin.users.resendOtp") }}',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                user_id: currentUserId
-            },
-            success: function(response) {
-                hideLoading();
-                if (response.success) {
-                    showAlert('success', 'OTP Resent!', 'New OTP has been sent');
-                    startOtpTimer();
-                } else {
-                    showAlert('error', 'Failed', response.message);
-                }
-            },
-            error: function() {
-                hideLoading();
-                showAlert('error', 'Failed', 'Failed to resend OTP');
-            }
-        });
-    });
-
-    $('#cancelOtp, #closeModal, #closeAddModal, .btn-close').click(function() {
-        $('#otpModal').fadeOut();
-        $('#addUserModal').fadeOut();
-        clearInterval(otpTimer);
-    });
-
-    $('#search-btn').click(function() {
-        currentPage = 1;
-        filterUsers();
-    });
-
-    $('#search-user').on('keyup', function(e) {
-        if (e.key === 'Enter') {
-            currentPage = 1;
-            filterUsers();
-        }
-    });
-
-    function filterUsers(page = currentPage) {
-        showLoading();
-
-        const search = $('#search-user').val();
-
-        $.ajax({
-            url: '{{ route("admin.users.index") }}',
-            method: 'GET',
-            data: {
-                q: search,
-                page: page
-            },
-            success: function(response) {
-                hideLoading();
-
-                if (typeof response === 'object' && response.html) {
-                    $('#users-container').html(response.html);
-                    $('#total-users').text(response.total);
-
-                    if (response.pagination) {
-                        $('#main-pagination').html(response.pagination).show();
-                    } else {
-                        $('#main-pagination').html('').hide();
-                    }
-
-                    const urlParams = new URLSearchParams(window.location.search);
-                    currentPage = urlParams.get('page') || 1;
-                } else {
-                    $('#users-container').html(response);
-                }
-            },
-            error: function(xhr) {
-                hideLoading();
-                showAlert('error', 'Error', 'Failed to filter users');
-            }
-        });
-    }
-
-    $(document).on('click', '.pagination a', function(e) {
-        e.preventDefault();
-
-        const url = $(this).attr('href');
-
-        const urlParams = new URLSearchParams(url.split('?')[1] || '');
-        const pageNumber = urlParams.get('page') || 1;
-
-        currentPage = pageNumber;
-        filterUsers(pageNumber);
-    });
-
-    $(window).click(function(e) {
-        if ($(e.target).hasClass('modal-overlay')) {
-            $(e.target).fadeOut();
-            clearInterval(otpTimer);
-        }
-    });
-});
-</script>
+    </script>
 @endsection

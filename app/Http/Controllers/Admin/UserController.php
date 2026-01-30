@@ -24,51 +24,78 @@ class UserController extends Controller
                 'users.*',
                 'farmers.name as farmer_name',
                 'farmers.nic_no as farmer_nic',
+                'farmers.primary_mobile as farmer_mobile',
                 'lead_farmers.name as lead_farmer_name',
                 'lead_farmers.nic_no as lead_farmer_nic',
+                'lead_farmers.primary_mobile as lead_farmer_mobile',
                 'buyers.name as buyer_name',
                 'buyers.nic_no as buyer_nic',
+                'buyers.primary_mobile as buyer_mobile',
                 'facilitators.name as facilitator_name',
-                'facilitators.nic_no as facilitator_nic'
+                'facilitators.nic_no as facilitator_nic',
+                'facilitators.primary_mobile as facilitator_mobile'
             )
             ->orderBy('users.created_at', 'desc');
 
         if ($request->filled('q')) {
             $search = '%' . $request->q . '%';
-
+            
             $query->where(function($q) use ($search) {
                 $q->where('users.username', 'ILIKE', $search)
-                  ->orWhere('users.email', 'ILIKE', $search)
-                  ->orWhere('farmers.name', 'ILIKE', $search)
-                  ->orWhere('lead_farmers.name', 'ILIKE', $search)
-                  ->orWhere('buyers.name', 'ILIKE', $search)
-                  ->orWhere('facilitators.name', 'ILIKE', $search)
-                  ->orWhere('farmers.nic_no', 'ILIKE', $search)
-                  ->orWhere('lead_farmers.nic_no', 'ILIKE', $search)
-                  ->orWhere('buyers.nic_no', 'ILIKE', $search)
-                  ->orWhere('facilitators.nic_no', 'ILIKE', $search);
+                    ->orWhere('users.email', 'ILIKE', $search)
+                    ->orWhere('farmers.name', 'ILIKE', $search)
+                    ->orWhere('lead_farmers.name', 'ILIKE', $search)
+                    ->orWhere('buyers.name', 'ILIKE', $search)
+                    ->orWhere('facilitators.name', 'ILIKE', $search)
+                    ->orWhere('farmers.nic_no', 'ILIKE', $search)
+                    ->orWhere('lead_farmers.nic_no', 'ILIKE', $search)
+                    ->orWhere('buyers.nic_no', 'ILIKE', $search)
+                    ->orWhere('facilitators.nic_no', 'ILIKE', $search)
+                    ->orWhere('farmers.primary_mobile', 'ILIKE', $search)
+                    ->orWhere('lead_farmers.primary_mobile', 'ILIKE', $search)
+                    ->orWhere('buyers.primary_mobile', 'ILIKE', $search)
+                    ->orWhere('facilitators.primary_mobile', 'ILIKE', $search);
             });
         }
 
-        $usersPaginator = $query->paginate(12);
+        $viewType = $request->get('view', 'card');
+        $perPage = $viewType === 'table' ? 15 : 10;
+        
+        $usersPaginator = $query->paginate($perPage);
 
         if ($request->ajax()) {
-            $usersWithDetails = $usersPaginator->map(function($user) {
-                return $this->getFullUserDetails($user);
-            });
+            try {
+                $usersWithDetails = $usersPaginator->getCollection()->map(function($user) {
+                    return $this->getFullUserDetails($user);
+                });
 
-            return response()->json([
-                'html' => view('admin.users.partials.user_cards', [
-                    'users' => $usersWithDetails
-                ])->render(),
-                'pagination' => view('vendor.pagination.simple-unique', ['paginator' => $usersPaginator])->render(),
-                'total' => $usersPaginator->total()
-            ]);
+                $usersPaginator->setCollection($usersWithDetails);
+
+                // FIXED: Changed the view name to match what actually exists
+                $viewName = $viewType == 'table' ? 'admin.users.partials.user_table' : 'admin.users.partials.user_cards';
+
+                return response()->json([
+                    'success' => true,
+                    'html' => view($viewName, [
+                        'users' => $usersPaginator->getCollection()
+                    ])->render(),
+                    'pagination' => $usersPaginator->links('vendor.pagination.simple-unique')->render(),
+                    'total' => $usersPaginator->total()
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Error loading users via AJAX: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Failed to load users: ' . $e->getMessage()
+                ], 500);
+            }
         }
 
-        $usersWithDetails = $usersPaginator->map(function($user) {
+        $usersWithDetails = $usersPaginator->getCollection()->map(function($user) {
             return $this->getFullUserDetails($user);
         });
+
+        $usersPaginator->setCollection($usersWithDetails);
 
         return view('admin.users.index', [
             'users' => $usersWithDetails,
@@ -82,25 +109,25 @@ class UserController extends Controller
         switch($user->role) {
             case 'farmer':
                 $user->display_name = $user->farmer_name ?? $user->username;
-                $user->contact_number = DB::table('farmers')->where('user_id', $user->id)->value('primary_mobile') ?? 'N/A';
+                $user->contact_number = $user->farmer_mobile ?? 'N/A';
                 $user->nic_number = $user->farmer_nic ?? '';
                 break;
 
             case 'lead_farmer':
                 $user->display_name = $user->lead_farmer_name ?? $user->username;
-                $user->contact_number = DB::table('lead_farmers')->where('user_id', $user->id)->value('primary_mobile') ?? 'N/A';
+                $user->contact_number = $user->lead_farmer_mobile ?? 'N/A';
                 $user->nic_number = $user->lead_farmer_nic ?? '';
                 break;
 
             case 'buyer':
                 $user->display_name = $user->buyer_name ?? $user->username;
-                $user->contact_number = DB::table('buyers')->where('user_id', $user->id)->value('primary_mobile') ?? 'N/A';
+                $user->contact_number = $user->buyer_mobile ?? 'N/A';
                 $user->nic_number = $user->buyer_nic ?? '';
                 break;
 
             case 'facilitator':
                 $user->display_name = $user->facilitator_name ?? $user->username;
-                $user->contact_number = DB::table('facilitators')->where('user_id', $user->id)->value('primary_mobile') ?? 'N/A';
+                $user->contact_number = $user->facilitator_mobile ?? 'N/A';
                 $user->nic_number = $user->facilitator_nic ?? '';
                 break;
 

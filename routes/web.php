@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\LeadfarmerControlleradmin;
 use App\Http\Controllers\Admin\BuyerRequestProductsController;
 use App\Http\Controllers\Admin\NotificationAdminController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', [PublicController::class, 'index'])->name('home');
 
