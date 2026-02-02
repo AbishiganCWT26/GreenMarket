@@ -179,8 +179,7 @@ Route::prefix('lead-farmer')
     Route::get('/orders/{id}', [LeadFarmerController::class, 'viewOrder'])->name('lf.orders.view');
 
     Route::get('/profile', [LeadFarmerController::class, 'editProfile'])->name('lf.profile');
-    Route::put('/profile/update', [LeadFarmerController::class, 'updateProfile'])->name('lf.profile.update');
-    Route::post('/profile/update-password', [LeadFarmerController::class, 'updatePassword'])->name('lf.profile.update.password');
+    Route::post('/profile/update', [LeadFarmerController::class, 'updateProfile'])->name('lf.profile.update');
     Route::get('/profile/photo', [LeadFarmerController::class, 'showPhotoForm'])->name('lf.profile.photo');
     Route::post('/profile/photo', [LeadFarmerController::class, 'updatePhoto'])->name('lf.profile.photo.update');
 
@@ -421,10 +420,10 @@ Route::prefix('admin')
     });
 
     Route::get('/notifications', [NotificationAdminController::class, 'index'])->name('notifications.index');
-	Route::get('/notifications/search', [NotificationAdminController::class, 'search'])->name('notifications.search');
-	Route::post('/notifications/send', [NotificationAdminController::class, 'sendNotification'])->name('notifications.send');
-	Route::post('/notifications/mark-all-read', [NotificationAdminController::class, 'markAllAsRead'])->name('notifications.markAllRead');
-	Route::post('/notifications/mark-read/{id}', [NotificationAdminController::class, 'markAsRead'])->name('notifications.markRead');
+    Route::get('/notifications/search', [NotificationAdminController::class, 'search'])->name('notifications.search');
+    Route::post('/notifications/send', [NotificationAdminController::class, 'sendNotification'])->name('notifications.send');
+    Route::post('/notifications/mark-all-read', [NotificationAdminController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+    Route::post('/notifications/mark-read/{id}', [NotificationAdminController::class, 'markAsRead'])->name('notifications.markRead');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
@@ -441,6 +440,9 @@ Route::prefix('admin')
     Route::post('/users/verify-otp', [UserController::class, 'verifyOtp'])->name('users.verifyOtp');
     Route::post('/users/resend-otp', [UserController::class, 'resendOtp'])->name('users.resendOtp');
     Route::post('/users/send-notification', [UserController::class, 'sendNotification'])->name('users.sendNotification');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{id}/process-deletion', [UserController::class, 'processLeadFarmerDeletion'])->name('users.processDeletion');
+    Route::get('/get-lead-farmers-for-transfer', [UserController::class, 'getLeadFarmersForTransfer'])->name('users.getLeadFarmersForTransfer');
 
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
@@ -494,7 +496,7 @@ Route::prefix('admin')
     Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile/details', [AdminProfileController::class, 'editDetails'])->name('profile.details');
     Route::post('/profile/update-details', [AdminProfileController::class, 'updateDetails'])->name('profile.updateDetails');
-    Route::get('/profile/photo', [AdminProfileController::class, 'photoPage'])->name('profile.photo'); // FIXED METHOD NAME
+    Route::get('/profile/photo', [AdminProfileController::class, 'photoPage'])->name('profile.photo');
     Route::post('/profile/update-photo', [AdminProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
     Route::delete('/profile/delete-photo', [AdminProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
     Route::post('/profile/update-password', [AdminProfileController::class, 'updatePassword'])->name('profile.updatePassword');

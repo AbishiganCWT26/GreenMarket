@@ -185,17 +185,6 @@
             box-shadow:0 4px 12px rgba(16, 185, 129, 0.2);
         }
 
-        .btn-outline{
-            background:white;
-            color:var(--text-dark);
-            border:1px solid var(--border-color);
-        }
-
-        .btn-outline:hover{
-            border-color:var(--primary-green);
-            color:var(--primary-green);
-        }
-
         .content-area{
             background:white;
             border-radius:10px;
@@ -287,6 +276,216 @@
             box-shadow:var(--shadow-md) !important;
         }
 
+        .swal2-title{
+            font-size:18px !important;
+            font-weight:600 !important;
+            color:var(--text-dark) !important;
+        }
+
+        .swal2-content{
+            font-size:13px !important;
+            color:var(--muted) !important;
+        }
+
+        .swal2-confirm{
+            background-color:var(--primary-green) !important;
+            border:none !important;
+            font-size:13px !important;
+            padding:8px 20px !important;
+            border-radius:6px !important;
+        }
+
+        .swal2-cancel{
+            background-color:#6b7280 !important;
+            border:none !important;
+            font-size:13px !important;
+            padding:8px 20px !important;
+            border-radius:6px !important;
+        }
+
+        .swal2-image{
+            border-radius:8px !important;
+            max-width:250px !important;
+            margin:10px auto !important;
+        }
+
+        .modal-overlay{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+            z-index:1000;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+        }
+
+        .modal-dialog{
+            background:white;
+            border-radius:12px;
+            max-width:500px;
+            width:100%;
+            box-shadow:var(--shadow-md);
+            animation:modalSlideUp 0.3s ease;
+        }
+
+        @keyframes modalSlideUp{
+            from{ transform:translateY(20px); opacity:0; }
+            to{ transform:translateY(0); opacity:1; }
+        }
+
+        .modal-header{
+            padding:15px 20px;
+            border-bottom:1px solid var(--border-color);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .modal-header h3{
+            font-size:16px;
+            font-weight:600;
+            color:var(--text-dark);
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .modal-close{
+            background:none;
+            border:none;
+            font-size:18px;
+            color:var(--muted);
+            cursor:pointer;
+            padding:5px;
+            border-radius:4px;
+            transition:all 0.2s;
+        }
+
+        .modal-close:hover{
+            background:var(--body-bg);
+            color:var(--text-dark);
+        }
+
+        .modal-body{
+            padding:20px;
+        }
+
+        .deletion-options{
+            display:grid;
+            gap:12px;
+            margin:20px 0;
+        }
+
+        .option-card{
+            background:var(--body-bg);
+            border:2px solid var(--border-color);
+            border-radius:8px;
+            padding:15px;
+            cursor:pointer;
+            transition:all 0.2s;
+            display:flex;
+            gap:12px;
+            align-items:flex-start;
+        }
+
+        .option-card:hover{
+            border-color:var(--primary-green);
+            background:white;
+            transform:translateY(-2px);
+            box-shadow:var(--shadow-sm);
+        }
+
+        .option-card.selected{
+            border-color:var(--primary-green);
+            background:rgba(16, 185, 129, 0.05);
+        }
+
+        .option-icon{
+            width:40px;
+            height:40px;
+            border-radius:8px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+        }
+
+        .option-card[data-action="delete_all"] .option-icon{
+            background:var(--danger-bg);
+            color:var(--danger-color);
+        }
+
+        .option-card[data-action="transfer"] .option-icon{
+            background:var(--info-bg);
+            color:var(--info-color);
+        }
+
+        .option-content{
+            flex:1;
+        }
+
+        .option-content h4{
+            font-size:14px;
+            font-weight:600;
+            margin-bottom:4px;
+            color:var(--text-dark);
+        }
+
+        .option-content p{
+            font-size:12px;
+            color:var(--muted);
+            line-height:1.4;
+        }
+
+        .transfer-select{
+            margin-top:10px;
+        }
+
+        .form-select{
+            width:100%;
+            padding:8px 12px;
+            border:1px solid var(--border-color);
+            border-radius:6px;
+            font-size:13px;
+            background:white;
+            transition:border-color 0.2s;
+        }
+
+        .form-select:focus{
+            outline:none;
+            border-color:var(--primary-green);
+            box-shadow:0 0 0 3px var(--focus-shadow);
+        }
+
+        .modal-actions{
+            display:flex;
+            gap:10px;
+            justify-content:flex-end;
+            margin-top:20px;
+            padding-top:20px;
+            border-top:1px solid var(--border-color);
+        }
+
+        .btn-secondary{
+            padding:8px 16px;
+            background:#6b7280;
+            color:white;
+            border:none;
+            border-radius:6px;
+            font-size:13px;
+            cursor:pointer;
+            transition:all 0.2s;
+            font-weight:500;
+        }
+
+        .btn-secondary:hover{
+            background:#4b5563;
+        }
+
         @media (max-width:768px){
             .header-top{
                 flex-direction:column;
@@ -301,10 +500,13 @@
                 width:100%;
             }
             
-
-            
             .stats-cards{
                 grid-template-columns:repeat(2, 1fr);
+            }
+            
+            .modal-dialog{
+                max-width:90%;
+                margin:auto;
             }
         }
 
@@ -319,6 +521,18 @@
             
             .header, .content-area{
                 padding:10px;
+            }
+            
+            .modal-body{
+                padding:15px;
+            }
+            
+            .modal-actions{
+                flex-direction:column;
+            }
+            
+            .modal-actions button{
+                width:100%;
             }
         }
     </style>
@@ -382,6 +596,23 @@
             </div>
         </div>
     </div>
+
+    <div id="leadFarmerDeletionModal" class="modal-overlay" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Lead Farmer Deletion</h3>
+                    <button class="modal-close" id="closeLeadFarmerModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="leadFarmerModalContent">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
@@ -393,9 +624,6 @@
             let currentPage = 1;
             let searchTerm = '';
             let loading = false;
-
-            // Update view buttons based on current view
-
 
             function updateActiveStats() {
                 const total = {{ $totalUsers }};
@@ -418,8 +646,6 @@
                 $('.stat-card.admins .number').text(admins);
             }
 
-
-
             function showLoading(show) {
                 loading = show;
                 if (show) {
@@ -438,8 +664,6 @@
                 currentPage = page;
                 searchTerm = search;
 
-                console.log('Loading users:', { view: currentView, page: page, search: search });
-
                 $.ajax({
                     url: "{{ route('admin.users.index') }}",
                     method: 'GET',
@@ -452,7 +676,6 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     success: function(response) {
-                        console.log('Response received:', response);
                         if (response.success && response.html) {
                             $('#users-content').html(response.html);
                             if (response.pagination) {
@@ -460,7 +683,6 @@
                             }
                             updateActiveStats();
                         } else {
-                            console.error('Invalid response format:', response);
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -470,17 +692,11 @@
                         }
                         showLoading(false);
                     },
-                    error: function(xhr, status, error) {
-                        console.error('AJAX Error:', {
-                            status: xhr.status,
-                            statusText: xhr.statusText,
-                            responseText: xhr.responseText,
-                            error: error
-                        });
+                    error: function(xhr) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Failed to load users. Status: ' + xhr.status,
+                            text: 'Failed to load users',
                             confirmButtonColor: '#10B981'
                         });
                         showLoading(false);
@@ -916,8 +1132,6 @@
                 }
             }
 
-
-
             $('#search-input').on('input', function() {
                 const search = $(this).val();
                 clearTimeout($(this).data('timeout'));
@@ -1018,38 +1232,7 @@
                         });
                         break;
                     case 'delete':
-                        Swal.fire({
-                            title: 'Delete User',
-                            text: `Are you sure you want to delete ${userName}? This action cannot be undone.`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#ef4444',
-                            cancelButtonColor: '#6b7280',
-                            confirmButtonText: 'Yes, delete',
-                            cancelButtonText: 'Cancel'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $.ajax({
-                                    url: `/admin/users/${userId}`,
-                                    method: 'DELETE',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                    },
-                                    success: function(response) {
-                                        if (response.success) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Deleted!',
-                                                text: response.message,
-                                                confirmButtonColor: '#10B981'
-                                            }).then(() => {
-                                                loadUsers(currentPage, searchTerm);
-                                            });
-                                        }
-                                    }
-                                });
-                            }
-                        });
+                        handleDeleteUser(userId, userName);
                         break;
                     case 'promote':
                         Swal.fire({
@@ -1087,6 +1270,194 @@
                         break;
                 }
             });
+
+            function handleDeleteUser(userId, userName) {
+                Swal.fire({
+                    title: 'Delete User',
+                    html: `Are you sure you want to delete <strong>${userName}</strong>?<br><br>
+                        <small class="text-muted">This action cannot be undone and all related data will be permanently deleted.</small>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, delete',
+                    cancelButtonText: 'Cancel',
+                    width: '500px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/users/${userId}`,
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Deleted!',
+                                        text: response.message,
+                                        confirmButtonColor: '#10B981'
+                                    }).then(() => {
+                                        loadUsers(currentPage, searchTerm);
+                                    });
+                                } else if (response.requires_action) {
+                                    showLeadFarmerDeletionModal(userId, response);
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.message,
+                                        confirmButtonColor: '#10B981'
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message || 'Failed to delete user',
+                                    confirmButtonColor: '#10B981'
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            function showLeadFarmerDeletionModal(userId, response) {
+                $.ajax({
+                    url: `/admin/get-lead-farmers-for-transfer`,
+                    method: 'GET',
+                    success: function(leadFarmersResponse) {
+                        let leadFarmersHtml = '';
+                        if (leadFarmersResponse.leadFarmers && leadFarmersResponse.leadFarmers.length > 0) {
+                            leadFarmersHtml = '<option value="">Select Lead Farmer</option>';
+                            leadFarmersResponse.leadFarmers.forEach(function(leadFarmer) {
+                                if (leadFarmer.id != response.lead_farmer_id) {
+                                    leadFarmersHtml += `<option value="${leadFarmer.id}">${leadFarmer.name} - ${leadFarmer.group_name}</option>`;
+                                }
+                            });
+                        }
+                        
+                        const modalHtml = `
+                            <p>${response.message}</p>
+                            <div class="deletion-options">
+                                <div class="option-card" data-action="delete_all">
+                                    <div class="option-icon">
+                                        <i class="fas fa-trash"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <h4>Delete All Farmers</h4>
+                                        <p>Permanently delete all ${response.farmers_count || 0} farmers under this lead farmer</p>
+                                    </div>
+                                </div>
+                                <div class="option-card" data-action="transfer">
+                                    <div class="option-icon">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <h4>Transfer Farmers</h4>
+                                        <p>Transfer all farmers to another lead farmer</p>
+                                        <div class="transfer-select" style="display:none; margin-top:10px;">
+                                            <select id="newLeadFarmerSelect" class="form-select">
+                                                ${leadFarmersHtml || '<option value="">No other lead farmers available</option>'}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-actions" style="margin-top:20px; display:none;" id="modalActions">
+                                <button class="btn-secondary" id="cancelAction">Cancel</button>
+                                <button class="btn-primary" id="confirmAction" disabled>Confirm</button>
+                            </div>
+                        `;
+                        
+                        $('#leadFarmerModalContent').html(modalHtml);
+                        $('#leadFarmerDeletionModal').fadeIn();
+                        
+                        let selectedAction = '';
+                        let newLeadFarmerId = '';
+                        
+                        $('.option-card').click(function() {
+                            $('.option-card').removeClass('selected');
+                            $(this).addClass('selected');
+                            selectedAction = $(this).data('action');
+                            $('#modalActions').show();
+                            $('#confirmAction').prop('disabled', true);
+                            
+                            if (selectedAction === 'transfer') {
+                                $(this).find('.transfer-select').show();
+                                $('#newLeadFarmerSelect').on('change', function() {
+                                    newLeadFarmerId = $(this).val();
+                                    $('#confirmAction').prop('disabled', !newLeadFarmerId);
+                                });
+                            } else {
+                                $('#confirmAction').prop('disabled', false);
+                            }
+                        });
+                        
+                        $('#confirmAction').click(function() {
+                            if (!selectedAction) return;
+                            
+                            const data = {
+                                action: selectedAction,
+                                _token: '{{ csrf_token() }}'
+                            };
+                            
+                            if (selectedAction === 'transfer' && newLeadFarmerId) {
+                                data.new_lead_farmer_id = newLeadFarmerId;
+                            }
+                            
+                            $.ajax({
+                                url: `/admin/users/${userId}/process-deletion`,
+                                method: 'POST',
+                                data: data,
+                                success: function(response) {
+                                    if (response.success) {
+                                        $('#leadFarmerDeletionModal').fadeOut();
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Success!',
+                                            text: response.message,
+                                            confirmButtonColor: '#10B981'
+                                        }).then(() => {
+                                            loadUsers(currentPage, searchTerm);
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: response.message,
+                                            confirmButtonColor: '#10B981'
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: xhr.responseJSON?.message || 'Failed to process deletion',
+                                        confirmButtonColor: '#10B981'
+                                    });
+                                }
+                            });
+                        });
+                        
+                        $('#cancelAction, #closeLeadFarmerModal').click(function() {
+                            $('#leadFarmerDeletionModal').fadeOut();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to load lead farmers',
+                            confirmButtonColor: '#10B981'
+                        });
+                    }
+                });
+            }
 
             $(document).on('click', '.view-photo', function(e) {
                 e.preventDefault();

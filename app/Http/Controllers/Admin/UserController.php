@@ -1059,4 +1059,327 @@ class UserController extends Controller
 
         return null;
     }
+
+    public function destroy($id)
+    {
+        $user = DB::table('users')->find($id);
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User not found'], 404);
+        }
+
+        if (in_array($user->role, ['admin', 'subadmin'])) {
+            return response()->json(['success' => false, 'message' => 'Cannot delete admin or subadmin accounts']);
+        }
+
+        if ($user->role == 'farmer') {
+            return $this->deleteFarmer($user);
+        } elseif ($user->role == 'lead_farmer') {
+            return $this->deleteLeadFarmer($user);
+        } elseif ($user->role == 'facilitator') {
+            return $this->deleteFacilitator($user);
+        } elseif ($user->role == 'buyer') {
+            return $this->deleteBuyer($user);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Unknown user role'], 400);
+    }
+
+    private function deleteFarmerUser($userId)
+    {
+        $user = DB::table('users')->find($userId);
+        if (!$user) return;
+
+        $farmer = DB::table('farmers')->where('user_id', $userId)->first();
+        if (!$farmer) return;
+
+        $this->sendSms($farmer->primary_mobile, "Your farmer account has been deleted from GreenMarket system.");
+
+        $products = DB::table('products')->where('farmer_id', $farmer->id)->get();
+        foreach ($products as $product) {
+            DB::table('wishlists')->where('product_id', $product->id)->delete();
+            DB::table('shopping_cart')->where('product_id', $product->id)->delete();
+            DB::table('products')->where('id', $product->id)->delete();
+        }
+
+        DB::table('notifications')->where('user_id', $userId)->delete();
+        DB::table('complaints')
+            ->where('complainant_user_id', $userId)
+            ->orWhere('against_user_id', $userId)
+            ->delete();
+
+        DB::table('farmers')->where('id', $farmer->id)->delete();
+        DB::table('users')->where('id', $userId)->delete();
+    }
+
+    private function deleteFarmer($user)
+    {
+        $farmer = DB::table('farmers')->where('user_id', $user->id)->first();
+
+        if (!$farmer) {
+            return response()->json(['success' => false, 'message' => 'Farmer details not found'], 400);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $this->sendSms($farmer->primary_mobile, "Your farmer account has been deleted from GreenMarket system.");
+
+            $products = DB::table('products')->where('farmer_id', $farmer->id)->get();
+            foreach ($products as $product) {
+                DB::table('wishlists')->where('product_id', $product->id)->delete();
+                DB::table('shopping_cart')->where('product_id', $product->id)->delete();
+                DB::table('products')->where('id', $product->id)->delete();
+            }
+
+            DB::table('notifications')->where('user_id', $user->id)->delete();
+            DB::table('complaints')
+                ->where('complainant_user_id', $user->id)
+                ->orWhere('against_user_id', $user->id)
+                ->delete();
+
+            DB::table('farmers')->where('id', $farmer->id)->delete();
+            DB::table('users')->where('id', $user->id)->delete();
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Farmer deleted successfully']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Failed to delete farmer: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function deleteLeadFarmer($user)
+    {
+        $leadFarmer = DB::table('lead_farmers')->where('user_id', $user->id)->first();
+
+        if (!$leadFarmer) {
+            return ['success' => false, 'message' => 'Lead farmer details not found'];
+        }
+
+        $farmersUnderLeadFarmer = DB::table('farmers')
+            ->where('lead_farmer_id', $leadFarmer->id)
+            ->count();
+
+        if ($farmersUnderLeadFarmer > 0) {
+            return [
+                'success' => false,
+                'requires_action' => true,
+                'message' => 'This lead farmer has ' . $farmersUnderLeadFarmer . ' farmers under them. Please choose an action.',
+                'lead_farmer_id' => $leadFarmer->id,
+                'farmers_count' => $farmersUnderLeadFarmer
+            ];
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $this->sendSms($leadFarmer->primary_mobile, "Your lead farmer account has been deleted from GreenMarket system.");
+
+            $products = DB::table('products')->where('lead_farmer_id', $leadFarmer->id)->get();
+            foreach ($products as $product) {
+                DB::table('wishlists')->where('product_id', $product->id)->delete();
+                DB::table('shopping_cart')->where('product_id', $product->id)->delete();
+            }
+            DB::table('products')->where('lead_farmer_id', $leadFarmer->id)->delete();
+
+            $orders = DB::table('orders')->where('lead_farmer_id', $leadFarmer->id)->get();
+            foreach ($orders as $order) {
+                DB::table('order_items')->where('order_id', $order->id)->delete();
+                DB::table('invoices')->where('order_id', $order->id)->delete();
+                DB::table('orders')->where('id', $order->id)->delete();
+            }
+
+            DB::table('notifications')->where('user_id', $user->id)->delete();
+            DB::table('complaints')
+                ->where('complainant_user_id', $user->id)
+                ->orWhere('against_user_id', $user->id)
+                ->delete();
+
+            DB::table('lead_farmers')->where('id', $leadFarmer->id)->delete();
+            DB::table('users')->where('id', $user->id)->delete();
+
+            DB::commit();
+            return ['success' => true];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ['success' => false, 'message' => 'Failed to delete lead farmer: ' . $e->getMessage()];
+        }
+    }
+
+    public function processLeadFarmerDeletion(Request $request, $id)
+    {
+        $user = DB::table('users')->find($id);
+
+        if (!$user || $user->role != 'lead_farmer') {
+            return response()->json(['success' => false, 'message' => 'Invalid lead farmer'], 400);
+        }
+
+        $leadFarmer = DB::table('lead_farmers')->where('user_id', $user->id)->first();
+        if (!$leadFarmer) {
+            return response()->json(['success' => false, 'message' => 'Lead farmer details not found'], 400);
+        }
+
+        $action = $request->input('action');
+        $newLeadFarmerId = $request->input('new_lead_farmer_id');
+
+        if ($action === 'transfer' && !$newLeadFarmerId) {
+            return response()->json(['success' => false, 'message' => 'Please select a lead farmer to transfer to'], 400);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $this->sendSms($leadFarmer->primary_mobile, "Your lead farmer account has been deleted from GreenMarket system.");
+
+            if ($action === 'delete_all') {
+                $farmers = DB::table('farmers')->where('lead_farmer_id', $leadFarmer->id)->get();
+                foreach ($farmers as $farmer) {
+                    $this->deleteFarmerUser($farmer->user_id);
+                }
+
+                $products = DB::table('products')->where('lead_farmer_id', $leadFarmer->id)->get();
+                foreach ($products as $product) {
+                    DB::table('wishlists')->where('product_id', $product->id)->delete();
+                    DB::table('shopping_cart')->where('product_id', $product->id)->delete();
+                }
+                DB::table('products')->where('lead_farmer_id', $leadFarmer->id)->delete();
+
+                $orders = DB::table('orders')->where('lead_farmer_id', $leadFarmer->id)->get();
+                foreach ($orders as $order) {
+                    DB::table('order_items')->where('order_id', $order->id)->delete();
+                    DB::table('invoices')->where('order_id', $order->id)->delete();
+                    DB::table('orders')->where('id', $order->id)->delete();
+                }
+
+            } elseif ($action === 'transfer' && $newLeadFarmerId) {
+                $newLeadFarmer = DB::table('lead_farmers')->find($newLeadFarmerId);
+                if (!$newLeadFarmer) {
+                    throw new \Exception('Selected lead farmer not found');
+                }
+
+                DB::table('farmers')
+                    ->where('lead_farmer_id', $leadFarmer->id)
+                    ->update(['lead_farmer_id' => $newLeadFarmerId]);
+                    
+                DB::table('products')
+                    ->where('lead_farmer_id', $leadFarmer->id)
+                    ->update(['lead_farmer_id' => $newLeadFarmerId]);
+                    
+                DB::table('orders')
+                    ->where('lead_farmer_id', $leadFarmer->id)
+                    ->update(['lead_farmer_id' => $newLeadFarmerId]);
+            }
+
+            DB::table('notifications')->where('user_id', $user->id)->delete();
+            DB::table('complaints')
+                ->where('complainant_user_id', $user->id)
+                ->orWhere('against_user_id', $user->id)
+                ->delete();
+
+            DB::table('lead_farmers')->where('id', $leadFarmer->id)->delete();
+            DB::table('users')->where('id', $user->id)->delete();
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Lead farmer deleted successfully']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Lead farmer process deletion error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to delete lead farmer: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function deleteFacilitator($user)
+    {
+        $facilitator = DB::table('facilitators')->where('user_id', $user->id)->first();
+
+        if (!$facilitator) {
+            return response()->json(['success' => false, 'message' => 'Facilitator details not found'], 400);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            DB::table('notifications')->where('user_id', $user->id)->delete();
+            DB::table('complaints')
+                ->where('complainant_user_id', $user->id)
+                ->orWhere('resolved_by_facilitator_id', $facilitator->id)
+                ->delete();
+
+            DB::table('facilitators')->where('id', $facilitator->id)->delete();
+            DB::table('users')->where('id', $user->id)->delete();
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Facilitator deleted successfully']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Failed to delete facilitator: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function deleteBuyer($user)
+    {
+        $buyer = DB::table('buyers')->where('user_id', $user->id)->first();
+
+        if (!$buyer) {
+            return response()->json(['success' => false, 'message' => 'Buyer details not found'], 400);
+        }
+
+        $hasPayments = DB::table('payments')
+            ->join('orders', 'payments.order_id', '=', 'orders.id')
+            ->where('orders.buyer_id', $buyer->id)
+            ->exists();
+
+        if ($hasPayments) {
+            return response()->json(['success' => false, 'message' => 'Cannot delete buyer with payment history. Reports will be affected.']);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $this->sendSms($buyer->primary_mobile, "Your buyer account has been deleted from GreenMarket system.");
+
+            DB::table('shopping_cart')->where('buyer_id', $buyer->id)->delete();
+            DB::table('wishlists')->where('buyer_id', $buyer->id)->delete();
+            DB::table('buyer_product_requests')->where('buyer_id', $buyer->id)->delete();
+            DB::table('notifications')->where('user_id', $user->id)->delete();
+            DB::table('complaints')
+                ->where('complainant_user_id', $user->id)
+                ->orWhere('against_user_id', $user->id)
+                ->delete();
+
+            $orders = DB::table('orders')->where('buyer_id', $buyer->id)->get();
+            foreach ($orders as $order) {
+                DB::table('order_items')->where('order_id', $order->id)->delete();
+                DB::table('invoices')->where('order_id', $order->id)->delete();
+                DB::table('orders')->where('id', $order->id)->delete();
+            }
+
+            DB::table('buyers')->where('id', $buyer->id)->delete();
+            DB::table('users')->where('id', $user->id)->delete();
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Buyer deleted successfully']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Failed to delete buyer: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function getLeadFarmersForTransfer()
+    {
+        $leadFarmers = DB::table('lead_farmers')
+            ->select('id', 'name', 'group_name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'leadFarmers' => $leadFarmers
+        ]);
+    }
 }
