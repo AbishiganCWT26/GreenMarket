@@ -849,9 +849,11 @@ class LeadFarmerController extends Controller
             'email' => 'nullable|email|max:100|unique:users,email,' . $user->id,
             'residential_address' => 'required|string',
             'grama_niladhari_division' => 'required|string|max:100',
-            'group_name' => 'required|string|max:100',
-            'group_number' => 'required|string|max:50|unique:lead_farmers,group_number,' . $leadFarmer->id,
-            'preferred_payment' => 'required|in:bank,ezcash,mcash,all',
+            'account_holder_name' => 'required|string|max:100',
+            'account_number' => 'required|string|max:50',
+            'bank_name' => 'required|string|max:100',
+            'bank_branch' => 'required|string|max:100',
+            'payment_details' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -874,10 +876,12 @@ class LeadFarmerController extends Controller
                 'whatsapp_number' => $request->whatsapp_number,
                 'residential_address' => $request->residential_address,
                 'grama_niladhari_division' => $request->grama_niladhari_division,
-                'group_name' => $request->group_name,
-                'group_number' => $request->group_number,
-                'preferred_payment' => $request->preferred_payment,
+                'preferred_payment' => 'bank',
                 'payment_details' => $request->payment_details,
+                'account_number' => $request->account_number,
+                'account_holder_name' => $request->account_holder_name,
+                'bank_name' => $request->bank_name,
+                'bank_branch' => $request->bank_branch,
             ]);
 
             DB::commit();
@@ -893,30 +897,111 @@ class LeadFarmerController extends Controller
         }
     }
 
-    public function updatePhoto(Request $request)
+    public function updatePassword(Request $request)
     {
-        $request->validate([
-            'profile_photo' => 'required|image|max:2048',
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required',
+            'new_password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                function ($attribute, $value, $fail) {
+                    if (!preg_match('/[A-Z]/', $value)) {
+                        $fail('Password must contain at least one uppercase letter.');
+                    }
+                    if (!preg_match('/[0-9]/', $value)) {
+                        $fail('Password must contain at least one number.');
+                    }
+                    if (!preg_match('/[!@#$%^&*(),.?":{}|<>]/', $value)) {
+                        $fail('Password must contain at least one special character.');
+                    }
+                }
+            ],
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
 
         $user = Auth::user();
 
-        try {
-            if ($user->profile_photo && $user->profile_photo != 'default-avatar.png') {
-                Storage::delete('public/profile_photos/' . $user->profile_photo);
-            }
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Current password is incorrect'
+            ], 422);
+        }
 
+        try {
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password updated successfully!'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating password: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function showPhotoForm()
+    {
+        $user = Auth::user();
+        return view('lead_farmer.profile_photo', compact('user'));
+    }
+
+    public function updatePhoto(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $user = Auth::user();
+
+        DB::beginTransaction();
+        try {
             $photo = $request->file('profile_photo');
             $filename = 'lead_farmer_' . $user->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
-            $photo->storeAs('public/profile_photos', $filename);
+            
+            $uploadPath = public_path('uploads/profile_pictures');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
 
+            if ($user->profile_photo && $user->profile_photo != 'default-avatar.png') {
+                $oldPhotoPath = public_path('uploads/profile_pictures/' . $user->profile_photo);
+                if (file_exists($oldPhotoPath)) {
+                    unlink($oldPhotoPath);
+                }
+            }
+            
+            $photo->move($uploadPath, $filename);
+            
             $user->profile_photo = $filename;
             $user->save();
+
+            DB::commit();
 
             return redirect()->back()
                 ->with('success', 'Profile photo updated successfully!');
 
         } catch (\Exception $e) {
+            DB::rollback();
             return redirect()->back()
                 ->with('error', 'Error updating profile photo: ' . $e->getMessage());
         }
@@ -1192,7 +1277,7 @@ class LeadFarmerController extends Controller
             'district' => 'required|string',
             'grama_niladhari_division' => 'required|string|max:100',
             'preferred_payment' => 'required|in:bank,ezcash,mcash,all',
-            'profile_photo' => 'nullable|image|max:2048',
+            'profile_photo' => 'nullable|image|max:5120',
         ]);
 
         if ($validator->fails()) {
