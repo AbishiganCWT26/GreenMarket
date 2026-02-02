@@ -141,7 +141,7 @@
                                 @foreach($recentOrders as $order)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('lf.order.details', $order->id) }}">
+                                        <a href="{{ route('lf.orders.view', $order->id) }}">
                                             {{ $order->order_number }}
                                         </a>
                                     </td>
