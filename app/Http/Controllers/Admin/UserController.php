@@ -20,6 +20,7 @@ class UserController extends Controller
             ->leftJoin('lead_farmers', 'users.id', '=', 'lead_farmers.user_id')
             ->leftJoin('buyers', 'users.id', '=', 'buyers.user_id')
             ->leftJoin('facilitators', 'users.id', '=', 'facilitators.user_id')
+            ->leftJoin('admins', 'users.id', '=', 'admins.user_id')
             ->select(
                 'users.*',
                 'farmers.name as farmer_name',
@@ -33,7 +34,10 @@ class UserController extends Controller
                 'buyers.primary_mobile as buyer_mobile',
                 'facilitators.name as facilitator_name',
                 'facilitators.nic_no as facilitator_nic',
-                'facilitators.primary_mobile as facilitator_mobile'
+                'facilitators.primary_mobile as facilitator_mobile',
+                'admins.full_name as admin_name',
+                'admins.nic_no as admin_nic',
+                'admins.phone_number as admin_phone'
             )
             ->orderBy('users.created_at', 'desc');
 
@@ -47,14 +51,17 @@ class UserController extends Controller
                     ->orWhere('lead_farmers.name', 'ILIKE', $search)
                     ->orWhere('buyers.name', 'ILIKE', $search)
                     ->orWhere('facilitators.name', 'ILIKE', $search)
+                    ->orWhere('admins.full_name', 'ILIKE', $search)
                     ->orWhere('farmers.nic_no', 'ILIKE', $search)
                     ->orWhere('lead_farmers.nic_no', 'ILIKE', $search)
                     ->orWhere('buyers.nic_no', 'ILIKE', $search)
                     ->orWhere('facilitators.nic_no', 'ILIKE', $search)
+                    ->orWhere('admins.nic_no', 'ILIKE', $search)
                     ->orWhere('farmers.primary_mobile', 'ILIKE', $search)
                     ->orWhere('lead_farmers.primary_mobile', 'ILIKE', $search)
                     ->orWhere('buyers.primary_mobile', 'ILIKE', $search)
-                    ->orWhere('facilitators.primary_mobile', 'ILIKE', $search);
+                    ->orWhere('facilitators.primary_mobile', 'ILIKE', $search)
+                    ->orWhere('admins.phone_number', 'ILIKE', $search);
             });
         }
 
@@ -133,9 +140,9 @@ class UserController extends Controller
 
             case 'admin':
             case 'subadmin':
-                $user->display_name = $user->username;
-                $user->contact_number = 'N/A';
-                $user->nic_number = '';
+                $user->display_name = $user->admin_name ?? $user->username;
+                $user->contact_number = $user->admin_phone ?? 'N/A';
+                $user->nic_number = $user->admin_nic ?? '';
                 break;
         }
 
@@ -191,6 +198,24 @@ class UserController extends Controller
                     'success' => false, 
                     'message' => 'Failed to create user because NIC No. "' . $nicNumber . '" already exists'
                 ], 422);
+            }
+        }
+
+        // Additional validation for admin types
+        if (in_array($validated['user_type'], ['admin', 'subadmin'])) {
+            $request->validate([
+                'phone_number' => 'required|string|max:20'
+            ]);
+            
+            // Check if NIC already exists in admins table
+            if ($request->has('nic_no') && $request->nic_no) {
+                $nicExists = DB::table('admins')->where('nic_no', $request->nic_no)->exists();
+                if ($nicExists) {
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'Failed to create user because NIC No. "' . $request->nic_no . '" already exists'
+                    ], 422);
+                }
             }
         }
 
@@ -291,13 +316,25 @@ class UserController extends Controller
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
+            } elseif ($validated['user_type'] == 'admin' || $validated['user_type'] == 'subadmin') {
+                // Insert into admins table
+                DB::table('admins')->insert([
+                    'user_id' => $userId,
+                    'full_name' => $request->name,
+                    'nic_no' => $request->nic_no ?? 'NOT_SET',
+                    'role' => $validated['user_type'],
+                    'phone_number' => $request->phone_number,
+                    'zone_assigned_area' => 'Sri Lanka',
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
             }
 
             DB::commit();
 
             $this->sendUserCreationNotification($userId, $validated['user_type'], $plainPassword);
         
-        return response()->json(['success' => true, 'message' => 'User created successfully']);
+            return response()->json(['success' => true, 'message' => 'User created successfully']);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -337,6 +374,17 @@ class UserController extends Controller
                     $errorMessage = 'Failed to create user because email "' . $email . '" already exists';
                 } else {
                     $errorMessage = 'Failed to create user because email already exists';
+                }
+            }
+            // Check for duplicate NIC in admins table
+            elseif (strpos($errorMessage, 'admins_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
+                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
+                $nicNumber = $matches[1] ?? '';
+                
+                if ($nicNumber) {
+                    $errorMessage = 'Failed to create user because NIC No. "' . $nicNumber . '" already exists';
+                } else {
+                    $errorMessage = 'Failed to create user because NIC number already exists';
                 }
             }
             
@@ -416,6 +464,8 @@ class UserController extends Controller
                 $this->updateBuyerDetails($user, $request, $id);
             } elseif ($validated['role'] == 'facilitator') {
                 $this->updateFacilitatorDetails($user, $request, $id);
+            } elseif ($validated['role'] == 'admin' || $validated['role'] == 'subadmin') {
+                $this->updateAdminDetails($user, $request, $id);
             }
 
             DB::commit();
@@ -433,6 +483,17 @@ class UserController extends Controller
             
             // Check for duplicate NIC error
             if (strpos($errorMessage, 'farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
+                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
+                $nicNumber = $matches[1] ?? '';
+                
+                if ($nicNumber) {
+                    $errorMessage = 'Failed to update user because NIC No. "' . $nicNumber . '" already exists';
+                } else {
+                    $errorMessage = 'Failed to update user because NIC number already exists';
+                }
+            }
+            // Check for duplicate NIC in admins table
+            elseif (strpos($errorMessage, 'admins_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
                 preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
                 $nicNumber = $matches[1] ?? '';
                 
@@ -609,6 +670,31 @@ class UserController extends Controller
         }
     }
 
+    private function updateAdminDetails($user, $request, $userId)
+    {
+        $admin = DB::table('admins')->where('user_id', $userId)->first();
+
+        $updateData = [
+            'full_name' => $request->name ?? ($admin->full_name ?? ''),
+            'nic_no' => $request->nic_no ?? ($admin->nic_no ?? 'NOT_SET'),
+            'phone_number' => $request->phone_number ?? ($admin->phone_number ?? ''),
+            'updated_at' => now()
+        ];
+
+        if ($admin) {
+            DB::table('admins')->where('user_id', $userId)->update($updateData);
+        } else {
+            $userRecord = DB::table('users')->find($userId);
+
+            DB::table('admins')->insert(array_merge($updateData, [
+                'user_id' => $userId,
+                'role' => $userRecord->role,
+                'zone_assigned_area' => 'Sri Lanka',
+                'created_at' => now()
+            ]));
+        }
+    }
+
     public function deactivate($id)
     {
         $user = DB::table('users')->find($id);
@@ -760,6 +846,12 @@ class UserController extends Controller
 
         if ($user->role == 'admin') {
             DB::table('users')->where('id', $id)->update([
+                'role' => 'subadmin',
+                'updated_at' => now()
+            ]);
+
+            // Update admin role in admins table
+            DB::table('admins')->where('user_id', $id)->update([
                 'role' => 'subadmin',
                 'updated_at' => now()
             ]);
@@ -1000,10 +1092,13 @@ class UserController extends Controller
                 break;
             case 'admin':
             case 'subadmin':
-                $details = (object) [
-                    'name' => $user->username,
-                    'email' => $user->email
-                ];
+                $details = DB::table('admins')->where('user_id', $user->id)->first();
+                if (!$details) {
+                    $details = (object) [
+                        'full_name' => $user->username,
+                        'email' => $user->email
+                    ];
+                }
                 break;
         }
 
@@ -1172,6 +1267,9 @@ class UserController extends Controller
         } elseif ($role == 'facilitator') {
             $facilitator = DB::table('facilitators')->where('user_id', $userId)->first();
             return $facilitator->primary_mobile ?? null;
+        } elseif ($role == 'admin' || $role == 'subadmin') {
+            $admin = DB::table('admins')->where('user_id', $userId)->first();
+            return $admin->phone_number ?? null;
         }
 
         return null;

@@ -1045,6 +1045,41 @@
                             html = `
                                 <div class="form-section">
                                     <h4>Lead Farmer Details</h4>
+
+                                    <div id="common-fields">
+                                        <div class="form-group">
+                                            <label>Full Name <span class="required">*</span></label>
+                                            <input type="text" id="name" class="form-input" placeholder="Enter full name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Username <span class="required">*</span></label>
+                                            <input type="text" id="username" class="form-input" placeholder="Enter username" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            <input type="email" id="email" class="form-input" placeholder="Enter email">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password" class="form-input" placeholder="Enter password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+                                            </div>
+                                            <small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Confirm Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Full Name <span class="required">*</span></label>
+                                        <input type="text" id="lead_name" class="form-input" placeholder="Enter full name" required>
+                                    </div>
                                     <div class="form-group">
                                         <label>NIC Number <span class="required">*</span></label>
                                         <input type="text" id="lead_nic" class="form-input" placeholder="Enter NIC" required>
@@ -1096,6 +1131,37 @@
                             html = `
                                 <div class="form-section">
                                     <h4>Buyer Details</h4>
+
+                                    <div id="common-fields">
+                                        <div class="form-group">
+                                            <label>Full Name <span class="required">*</span></label>
+                                            <input type="text" id="name" class="form-input" placeholder="Enter full name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Username <span class="required">*</span></label>
+                                            <input type="text" id="username" class="form-input" placeholder="Enter username" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            <input type="email" id="email" class="form-input" placeholder="Enter email">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password" class="form-input" placeholder="Enter password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+                                            </div>
+                                            <small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Confirm Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="form-group">
                                         <label>NIC Number</label>
                                         <input type="text" id="buyer_nic" class="form-input" placeholder="Enter NIC">
@@ -1133,6 +1199,37 @@
                             html = `
                                 <div class="form-section">
                                     <h4>Facilitator Details</h4>
+
+                                    <div id="common-fields">
+                                        <div class="form-group">
+                                            <label>Full Name <span class="required">*</span></label>
+                                            <input type="text" id="name" class="form-input" placeholder="Enter full name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Username <span class="required">*</span></label>
+                                            <input type="text" id="username" class="form-input" placeholder="Enter username" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            <input type="email" id="email" class="form-input" placeholder="Enter email">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password" class="form-input" placeholder="Enter password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+                                            </div>
+                                            <small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Confirm Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="form-group">
                                         <label>NIC Number <span class="required">*</span></label>
                                         <input type="text" id="facilitator_nic" class="form-input" placeholder="Enter NIC" required>
@@ -1157,10 +1254,37 @@
                             html = `
                                 <div class="form-section">
                                     <h4>${userType === 'admin' ? 'Administrator' : 'Sub Administrator'} Details</h4>
-                                    <div class="form-group">
-                                        <label>Full Name <span class="required">*</span></label>
-                                        <input type="text" id="admin_name" class="form-input" value="${$('#name').val()}" readonly>
+
+                                    <div id="common-fields">
+                                        <div class="form-group">
+                                            <label>Full Name <span class="required">*</span></label>
+                                            <input type="text" id="name" class="form-input" placeholder="Enter full name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Username <span class="required">*</span></label>
+                                            <input type="text" id="username" class="form-input" placeholder="Enter username" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            <input type="email" id="email" class="form-input" placeholder="Enter email">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password" class="form-input" placeholder="Enter password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+                                            </div>
+                                            <small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Confirm Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+                                            </div>
+                                        </div>
                                     </div>
+
                                     <div class="form-group">
                                         <label>NIC Number</label>
                                         <input type="text" id="admin_nic" class="form-input" placeholder="Enter NIC">

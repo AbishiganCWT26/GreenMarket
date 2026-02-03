@@ -10,7 +10,7 @@
                     : '';
                 $initials = strtoupper(substr($user->display_name, 0, 2));
                 $contactInfo = $user->contact_number ?? 'N/A';
-                $nicInfo = $user->nic_number ?? '';
+                $nicInfo = $user->nic_number ?? 'Not provied';
                 $emailInfo = $user->email ?? 'No email';
                 $createdDate = $user->created_at ? date('M d, Y', strtotime($user->created_at)) : 'N/A';
             @endphp
