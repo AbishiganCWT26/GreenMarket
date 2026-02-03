@@ -1531,7 +1531,22 @@
                                             }).then(() => {
                                                 loadUsers(currentPage, searchTerm);
                                             });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error',
+                                                text: response.message,
+                                                confirmButtonColor: '#10B981'
+                                            });
                                         }
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.message || 'Failed to promote user',
+                                            confirmButtonColor: '#10B981'
+                                        });
                                     }
                                 });
                             }

@@ -532,13 +532,16 @@ class UserController extends Controller
                 $farmer = DB::table('farmers')->where('user_id', $userId)->first();
 
                 if ($farmer) {
+                    if ($farmer->preferred_payment !== 'bank') {
+                        return response()->json(['success' => false, 'message' => 'Lead farmer is only allowed preferred payment method as the bank transfer'], 400);
+                    }
+
                     $leadFarmerId = DB::table('lead_farmers')->insertGetId([
                         'user_id' => $userId,
                         'name' => $farmer->name,
                         'nic_no' => $farmer->nic_no,
                         'primary_mobile' => $farmer->primary_mobile,
                         'whatsapp_number' => $farmer->whatsapp_number,
-                        'email' => $farmer->email,
                         'residential_address' => $farmer->residential_address,
                         'grama_niladhari_division' => $farmer->grama_niladhari_division,
                         'district' => $farmer->district ?? 'Colombo',
@@ -549,8 +552,6 @@ class UserController extends Controller
                         'account_holder_name' => $farmer->account_holder_name,
                         'bank_name' => $farmer->bank_name,
                         'bank_branch' => $farmer->bank_branch,
-                        'ezcash_mobile' => $farmer->ezcash_mobile,
-                        'mcash_mobile' => $farmer->mcash_mobile,
                         'created_at' => now(),
                         'updated_at' => now()
                     ]);
@@ -797,6 +798,10 @@ class UserController extends Controller
                 throw new \Exception('Farmer details not found');
             }
 
+            if ($farmer->preferred_payment !== 'bank') {
+                return response()->json(['success' => false, 'message' => 'Lead farmer is only allowed preferred payment method as the bank transfer'], 400);
+            }
+
             // Check if NIC already exists as lead farmer
             $nicExists = DB::table('lead_farmers')->where('nic_no', $farmer->nic_no)->exists();
             if ($nicExists) {
@@ -812,8 +817,8 @@ class UserController extends Controller
                 'nic_no' => $farmer->nic_no,
                 'primary_mobile' => $farmer->primary_mobile,
                 'whatsapp_number' => $farmer->whatsapp_number,
-                'email' => $farmer->email,
                 'residential_address' => $farmer->residential_address,
+                'district' => $farmer->district ?? 'Colombo',
                 'grama_niladhari_division' => $farmer->grama_niladhari_division,
                 'group_name' => $farmer->name . "'s Group",
                 'group_number' => 'GRP-' . strtoupper(Str::random(6)),
@@ -822,8 +827,6 @@ class UserController extends Controller
                 'account_holder_name' => $farmer->account_holder_name,
                 'bank_name' => $farmer->bank_name,
                 'bank_branch' => $farmer->bank_branch,
-                'ezcash_mobile' => $farmer->ezcash_mobile,
-                'mcash_mobile' => $farmer->mcash_mobile,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
