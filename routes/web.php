@@ -179,7 +179,8 @@ Route::prefix('lead-farmer')
     Route::get('/orders/{id}', [LeadFarmerController::class, 'viewOrder'])->name('lf.orders.view');
 
     Route::get('/profile', [LeadFarmerController::class, 'editProfile'])->name('lf.profile');
-    Route::post('/profile/update', [LeadFarmerController::class, 'updateProfile'])->name('lf.profile.update');
+    Route::put('/profile/update', [LeadFarmerController::class, 'updateProfile'])->name('lf.profile.update');
+    Route::post('/profile/update-password', [LeadFarmerController::class, 'updatePassword'])->name('lf.profile.update.password');
     Route::get('/profile/photo', [LeadFarmerController::class, 'showPhotoForm'])->name('lf.profile.photo');
     Route::post('/profile/photo', [LeadFarmerController::class, 'updatePhoto'])->name('lf.profile.photo.update');
 

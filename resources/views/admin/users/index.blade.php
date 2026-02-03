@@ -833,7 +833,9 @@
                             formData.primary_mobile = $('#lead_mobile').val() || '';
                             formData.whatsapp_number = $('#lead_whatsapp').val() || '';
                             formData.residential_address = $('#lead_address').val() || '';
+                            formData.residential_address = $('#lead_address').val() || '';
                             formData.grama_niladhari_division = $('#lead_gnd').val() || '';
+                            formData.district = $('#lead_district').val() || 'Colombo';
                             formData.group_name = $('#lead_group_name').val() || '';
                             formData.group_number = $('#lead_group_number').val() || '';
                             formData.account_number = $('#lead_account').val() || '';
@@ -992,9 +994,32 @@
                                     <div class="form-group">
                                         <label>District <span class="required">*</span></label>
                                         <select id="farmer_district" class="form-select" required>
+                                            <option value="" disabled selected>Select your district</option>
+                                            <option value="Ampara">Ampara</option>
+                                            <option value="Anuradhapura">Anuradhapura</option>
+                                            <option value="Badulla">Badulla</option>
+                                            <option value="Batticaloa">Batticaloa</option>
                                             <option value="Colombo">Colombo</option>
+                                            <option value="Galle">Galle</option>
                                             <option value="Gampaha">Gampaha</option>
+                                            <option value="Hambantota">Hambantota</option>
+                                            <option value="Jaffna">Jaffna</option>
                                             <option value="Kalutara">Kalutara</option>
+                                            <option value="Kandy">Kandy</option>
+                                            <option value="Kegalle">Kegalle</option>
+                                            <option value="Kilinochchi">Kilinochchi</option>
+                                            <option value="Kurunegala">Kurunegala</option>
+                                            <option value="Mannar">Mannar</option>
+                                            <option value="Matale">Matale</option>
+                                            <option value="Matara">Matara</option>
+                                            <option value="Moneragala">Moneragala</option>
+                                            <option value="Mullaitivu">Mullaitivu</option>
+                                            <option value="Nuwara Eliya">Nuwara Eliya</option>
+                                            <option value="Polonnaruwa">Polonnaruwa</option>
+                                            <option value="Puttalam">Puttalam</option>
+                                            <option value="Ratnapura">Ratnapura</option>
+                                            <option value="Trincomalee">Trincomalee</option>
+                                            <option value="Vavuniya">Vavuniya</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
@@ -1097,6 +1122,37 @@
                                     <div class="form-group">
                                         <label>Grama Niladhari Division</label>
                                         <input type="text" id="lead_gnd" class="form-input" placeholder="Enter GND">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>District <span class="required">*</span></label>
+                                        <select id="lead_district" class="form-select" required>
+                                            <option value="" disabled selected>Select your district</option>
+                                            <option value="Ampara">Ampara</option>
+                                            <option value="Anuradhapura">Anuradhapura</option>
+                                            <option value="Badulla">Badulla</option>
+                                            <option value="Batticaloa">Batticaloa</option>
+                                            <option value="Colombo">Colombo</option>
+                                            <option value="Galle">Galle</option>
+                                            <option value="Gampaha">Gampaha</option>
+                                            <option value="Hambantota">Hambantota</option>
+                                            <option value="Jaffna">Jaffna</option>
+                                            <option value="Kalutara">Kalutara</option>
+                                            <option value="Kandy">Kandy</option>
+                                            <option value="Kegalle">Kegalle</option>
+                                            <option value="Kilinochchi">Kilinochchi</option>
+                                            <option value="Kurunegala">Kurunegala</option>
+                                            <option value="Mannar">Mannar</option>
+                                            <option value="Matale">Matale</option>
+                                            <option value="Matara">Matara</option>
+                                            <option value="Moneragala">Moneragala</option>
+                                            <option value="Mullaitivu">Mullaitivu</option>
+                                            <option value="Nuwara Eliya">Nuwara Eliya</option>
+                                            <option value="Polonnaruwa">Polonnaruwa</option>
+                                            <option value="Puttalam">Puttalam</option>
+                                            <option value="Ratnapura">Ratnapura</option>
+                                            <option value="Trincomalee">Trincomalee</option>
+                                            <option value="Vavuniya">Vavuniya</option>
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label>Group Name <span class="required">*</span></label>

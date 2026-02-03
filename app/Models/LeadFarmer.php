@@ -19,6 +19,7 @@ class LeadFarmer extends Model
         'whatsapp_number',
         'residential_address',
         'grama_niladhari_division',
+        'district',
         'group_name',
         'group_number',
         'preferred_payment',

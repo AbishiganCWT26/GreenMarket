@@ -833,7 +833,15 @@ class LeadFarmerController extends Controller
         $user = Auth::user();
         $leadFarmer = $user->leadFarmer;
 
-        return view('lead_farmer.profile', compact('user', 'leadFarmer'));
+        $districts = [
+            'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo',
+            'Galle', 'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara',
+            'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar',
+            'Matale', 'Matara', 'Monaragala', 'Mullaitivu', 'Nuwara Eliya',
+            'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'
+        ];
+
+        return view('lead_farmer.profile', compact('user', 'leadFarmer', 'districts'));
     }
 
     public function updateProfile(Request $request)
@@ -847,8 +855,11 @@ class LeadFarmerController extends Controller
             'primary_mobile' => 'required|string|max:15',
             'whatsapp_number' => 'nullable|string|max:15',
             'email' => 'nullable|email|max:100|unique:users,email,' . $user->id,
+            'whatsapp_number' => 'nullable|string|max:15',
+            'email' => 'nullable|email|max:100|unique:users,email,' . $user->id,
             'residential_address' => 'required|string',
-            'grama_niladhari_division' => 'required|string|max:100',
+            'district' => 'required|string',
+            'grama_niladhari_division' => 'required|string|max:100', // Added comma for consistency
             'account_holder_name' => 'required|string|max:100',
             'account_number' => 'required|string|max:50',
             'bank_name' => 'required|string|max:100',
@@ -875,6 +886,7 @@ class LeadFarmerController extends Controller
                 'primary_mobile' => $request->primary_mobile,
                 'whatsapp_number' => $request->whatsapp_number,
                 'residential_address' => $request->residential_address,
+                'district' => $request->district,
                 'grama_niladhari_division' => $request->grama_niladhari_division,
                 'preferred_payment' => 'bank',
                 'payment_details' => $request->payment_details,

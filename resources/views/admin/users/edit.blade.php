@@ -127,6 +127,66 @@
 					@endphp
 
 					@if($userDetails)
+					<div class="form-section profile-section">
+						<div class="section-header">
+							<div class="section-icon">
+								<i class="fas fa-address-card"></i>
+							</div>
+							<div class="section-title">
+								<h3>Profile Information</h3>
+								<p class="section-subtitle">Personal and contact details</p>
+							</div>
+						</div>
+						<div class="form-fields">
+							<div class="form-row">
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-id-card"></i> NIC Number
+									</label>
+									<input type="text" name="nic_no" class="form-input" value="{{ $userDetails->nic_no ?? '' }}">
+								</div>
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-phone"></i> Primary Mobile
+									</label>
+									<input type="text" name="primary_mobile" class="form-input" value="{{ $userDetails->primary_mobile ?? '' }}">
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fab fa-whatsapp"></i> WhatsApp Number
+									</label>
+									<input type="text" name="whatsapp_number" class="form-input" value="{{ $userDetails->whatsapp_number ?? '' }}">
+								</div>
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-map-marker-alt"></i> District
+									</label>
+									<select name="district" class="form-select">
+										<option value="Colombo" {{ ($userDetails->district ?? '') == 'Colombo' ? 'selected' : '' }}>Colombo</option>
+										<option value="Gampaha" {{ ($userDetails->district ?? '') == 'Gampaha' ? 'selected' : '' }}>Gampaha</option>
+										<option value="Kalutara" {{ ($userDetails->district ?? '') == 'Kalutara' ? 'selected' : '' }}>Kalutara</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label">
+									<i class="fas fa-home"></i> Residential Address
+								</label>
+								<textarea name="residential_address" class="form-input" rows="2">{{ $userDetails->residential_address ?? '' }}</textarea>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label">
+									<i class="fas fa-map"></i> Grama Niladhari Division
+								</label>
+								<input type="text" name="grama_niladhari_division" class="form-input" value="{{ $userDetails->grama_niladhari_division ?? '' }}">
+							</div>
+						</div>
+					</div>
 					<div class="form-section payment-section">
 						<div class="section-header">
 							<div class="section-icon">

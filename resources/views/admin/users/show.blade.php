@@ -147,6 +147,12 @@
 						</div>
 						<div class="detail-row">
 							<div class="detail-label">
+								<i class="fas fa-map-marker-alt"></i> District
+							</div>
+							<div class="detail-value">{{ $details->district ?? 'Colombo' }}</div>
+						</div>
+						<div class="detail-row">
+							<div class="detail-label">
 								<i class="fas fa-map-marker-alt"></i> Grama Niladhari Division
 							</div>
 							<div class="detail-value">{{ $details->grama_niladhari_division }}</div>

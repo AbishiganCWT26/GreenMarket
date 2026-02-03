@@ -541,6 +541,7 @@ class UserController extends Controller
                         'email' => $farmer->email,
                         'residential_address' => $farmer->residential_address,
                         'grama_niladhari_division' => $farmer->grama_niladhari_division,
+                        'district' => $farmer->district ?? 'Colombo',
                         'group_name' => $request->group_name ?? ($farmer->name . "'s Group"),
                         'group_number' => $request->group_number ?? ('GRP-' . strtoupper(Str::random(6))),
                         'preferred_payment' => $farmer->preferred_payment,
@@ -613,6 +614,15 @@ class UserController extends Controller
 
         $paymentFields = ['preferred_payment', 'account_number', 'account_holder_name',
                         'bank_name', 'bank_branch', 'ezcash_mobile', 'mcash_mobile'];
+
+        $profileFields = ['nic_no', 'primary_mobile', 'whatsapp_number', 'residential_address', 
+                         'grama_niladhari_division', 'district', 'group_name', 'group_number'];
+
+        foreach ($profileFields as $field) {
+            if ($request->has($field)) {
+                $updateData[$field] = $request->$field;
+            }
+        }
 
         foreach ($paymentFields as $field) {
             if ($request->has($field)) {

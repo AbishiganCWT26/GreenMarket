@@ -175,6 +175,20 @@
                                     @enderror
                                 </div>
                                 <div class="form-group compact full-width">
+                                    <label><i class="fas fa-map-marker-alt"></i>District</label>
+                                    <select name="district" class="form-input @error('district') error-input @enderror" required>
+                                        <option value="" disabled selected>Select District</option>
+                                        @foreach($districts as $district)
+                                            <option value="{{ $district }}" {{ old('district', $leadFarmer->district) == $district ? 'selected' : '' }}>
+                                                {{ $district }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('district')
+                                        <div class="error-message">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="form-group compact full-width">
                                     <label><i class="fas fa-map-signs"></i>Grama Niladhari Division</label>
                                     <input type="text" name="grama_niladhari_division" class="form-input @error('grama_niladhari_division') error-input @enderror" 
                                            value="{{ old('grama_niladhari_division', $leadFarmer->grama_niladhari_division) }}" required>
