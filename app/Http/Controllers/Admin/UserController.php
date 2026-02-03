@@ -170,13 +170,39 @@ class UserController extends Controller
             'name' => 'required|string|max:100'
         ]);
 
+        // Additional validation for farmer types
+        if (in_array($validated['user_type'], ['farmer', 'lead_farmer'])) {
+            $request->validate([
+                'nic_no' => 'required|string|max:12'
+            ]);
+            
+            // Check if NIC already exists in farmers or lead_farmers table
+            $nicExists = false;
+            $nicNumber = $request->nic_no;
+            
+            if ($validated['user_type'] == 'farmer') {
+                $nicExists = DB::table('farmers')->where('nic_no', $nicNumber)->exists();
+            } else {
+                $nicExists = DB::table('lead_farmers')->where('nic_no', $nicNumber)->exists();
+            }
+            
+            if ($nicExists) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Failed to create user because NIC No. "' . $nicNumber . '" already exists'
+                ], 422);
+            }
+        }
+
         DB::beginTransaction();
 
         try {
+            $plainPassword = $validated['password']; // Store plain password
+            
             $userId = DB::table('users')->insertGetId([
                 'username' => $validated['username'],
                 'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
+                'password' => Hash::make($plainPassword), // Hash it for storage
                 'role' => $validated['user_type'],
                 'is_active' => true,
                 'created_at' => now(),
@@ -194,7 +220,7 @@ class UserController extends Controller
                     'residential_address' => $request->residential_address,
                     'grama_niladhari_division' => $request->grama_niladhari_division,
                     'preferred_payment' => $request->preferred_payment ?? 'bank',
-                    'district' => 'Colombo',
+                    'district' => $request->district ?? 'Colombo',
                     'is_active' => true,
                     'account_number' => $request->account_number,
                     'account_holder_name' => $request->account_holder_name,
@@ -269,13 +295,52 @@ class UserController extends Controller
 
             DB::commit();
 
-            $this->sendUserCreationNotification($userId, $validated['user_type']);
-
-            return response()->json(['success' => true, 'message' => 'User created successfully']);
+            $this->sendUserCreationNotification($userId, $validated['user_type'], $plainPassword);
+        
+        return response()->json(['success' => true, 'message' => 'User created successfully']);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to create user: ' . $e->getMessage()], 500);
+            
+            // Parse the exception message to provide a user-friendly error
+            $errorMessage = $e->getMessage();
+            
+            // Check for duplicate NIC error
+            if (strpos($errorMessage, 'farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
+                // Extract NIC number from error message
+                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
+                $nicNumber = $matches[1] ?? '';
+                
+                if ($nicNumber) {
+                    $errorMessage = 'Failed to create user because NIC No. "' . $nicNumber . '" already exists';
+                } else {
+                    $errorMessage = 'Failed to create user because NIC number already exists';
+                }
+            }
+            // Check for duplicate username error
+            elseif (strpos($errorMessage, 'users_username_key') !== false && strpos($errorMessage, 'already exists') !== false) {
+                preg_match('/Key \(username\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
+                $username = $matches[1] ?? '';
+                
+                if ($username) {
+                    $errorMessage = 'Failed to create user because username "' . $username . '" already exists';
+                } else {
+                    $errorMessage = 'Failed to create user because username already exists';
+                }
+            }
+            // Check for duplicate email error
+            elseif (strpos($errorMessage, 'users_email_key') !== false && strpos($errorMessage, 'already exists') !== false) {
+                preg_match('/Key \(email\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
+                $email = $matches[1] ?? '';
+                
+                if ($email) {
+                    $errorMessage = 'Failed to create user because email "' . $email . '" already exists';
+                } else {
+                    $errorMessage = 'Failed to create user because email already exists';
+                }
+            }
+            
+            return response()->json(['success' => false, 'message' => $errorMessage], 500);
         }
     }
 
@@ -362,7 +427,23 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to update user: ' . $e->getMessage()], 500);
+            
+            // Parse the exception message to provide a user-friendly error
+            $errorMessage = $e->getMessage();
+            
+            // Check for duplicate NIC error
+            if (strpos($errorMessage, 'farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
+                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
+                $nicNumber = $matches[1] ?? '';
+                
+                if ($nicNumber) {
+                    $errorMessage = 'Failed to update user because NIC No. "' . $nicNumber . '" already exists';
+                } else {
+                    $errorMessage = 'Failed to update user because NIC number already exists';
+                }
+            }
+            
+            return response()->json(['success' => false, 'message' => $errorMessage], 500);
         }
     }
 
@@ -429,7 +510,18 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to change role: ' . $e->getMessage()], 500);
+            
+            $errorMessage = $e->getMessage();
+            if (strpos($errorMessage, 'lead_farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
+                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
+                $nicNumber = $matches[1] ?? '';
+                
+                if ($nicNumber) {
+                    $errorMessage = 'Failed to change role because NIC No. "' . $nicNumber . '" already exists as a Lead Farmer';
+                }
+            }
+            
+            return response()->json(['success' => false, 'message' => $errorMessage], 500);
         }
     }
 
@@ -594,6 +686,15 @@ class UserController extends Controller
                 throw new \Exception('Farmer details not found');
             }
 
+            // Check if NIC already exists as lead farmer
+            $nicExists = DB::table('lead_farmers')->where('nic_no', $farmer->nic_no)->exists();
+            if ($nicExists) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Cannot promote because NIC No. "' . $farmer->nic_no . '" already exists as a Lead Farmer'
+                ], 400);
+            }
+
             $leadFarmerId = DB::table('lead_farmers')->insertGetId([
                 'user_id' => $id,
                 'name' => $farmer->name,
@@ -634,7 +735,18 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to promote farmer: ' . $e->getMessage()], 500);
+            
+            $errorMessage = $e->getMessage();
+            if (strpos($errorMessage, 'lead_farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
+                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
+                $nicNumber = $matches[1] ?? '';
+                
+                if ($nicNumber) {
+                    $errorMessage = 'Cannot promote because NIC No. "' . $nicNumber . '" already exists as a Lead Farmer';
+                }
+            }
+            
+            return response()->json(['success' => false, 'message' => $errorMessage], 500);
         }
     }
 
@@ -898,7 +1010,7 @@ class UserController extends Controller
         return $details;
     }
 
-    private function sendUserCreationNotification($userId, $role)
+    private function sendUserCreationNotification($userId, $role, $plainPassword = null)
     {
         $user = DB::table('users')->find($userId);
 
@@ -917,7 +1029,12 @@ class UserController extends Controller
         $mobile = $this->getUserMobile($userId, $role);
 
         if ($mobile) {
-            $this->sendSms($mobile, "Welcome to GreenMarket! Your account has been created. Username: {$user->username}");
+            // Use plain password if provided, otherwise skip password in SMS
+            $passwordText = $plainPassword ? "Password: {$plainPassword}" : "";
+            
+            $message = "Welcome to GreenMarket! Your account has been created.\nUsername: {$user->username}\n{$passwordText}";
+            
+            $this->sendSms($mobile, $message);
         }
     }
 

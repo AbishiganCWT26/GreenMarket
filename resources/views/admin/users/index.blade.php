@@ -721,37 +721,6 @@
                                     <option value="subadmin">Sub Administrator</option>
                                 </select>
                             </div>
-                            
-                            <div id="common-fields">
-                                <div class="form-group">
-                                    <label>Full Name <span class="required">*</span></label>
-                                    <input type="text" id="name" class="form-input" placeholder="Enter full name" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Username <span class="required">*</span></label>
-                                    <input type="text" id="username" class="form-input" placeholder="Enter username" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input type="email" id="email" class="form-input" placeholder="Enter email">
-                                </div>
-                                <div class="form-group">
-                                    <label>Password <span class="required">*</span></label>
-                                    <div class="password-container">
-                                        <input type="password" id="password" class="form-input" placeholder="Enter password" required>
-                                        <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
-                                    </div>
-                                    <small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
-                                </div>
-                                <div class="form-group">
-                                    <label>Confirm Password <span class="required">*</span></label>
-                                    <div class="password-container">
-                                        <input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
-                                        <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <div id="role-specific-fields" style="display:none;"></div>
                         </div>
                     `,
@@ -806,12 +775,61 @@
                             formData.grama_niladhari_division = $('#farmer_gnd').val() || '';
                             formData.district = $('#farmer_district').val() || 'Colombo';
                             formData.preferred_payment = $('#farmer_payment').val() || 'bank';
-                            formData.account_number = $('#farmer_account').val() || '';
-                            formData.account_holder_name = $('#farmer_account_name').val() || '';
-                            formData.bank_name = $('#farmer_bank').val() || '';
-                            formData.bank_branch = $('#farmer_branch').val() || '';
-                            formData.ezcash_mobile = $('#farmer_ezcash').val() || '';
-                            formData.mcash_mobile = $('#farmer_mcash').val() || '';
+                            
+                            // Get payment method
+                            const paymentMethod = $('#farmer_payment').val();
+                            
+                            // Validate based on payment method
+                            if (paymentMethod === 'bank' || paymentMethod === 'all') {
+                                const account = $('#farmer_account').val() || '';
+                                const accountName = $('#farmer_account_name').val() || '';
+                                const bankName = $('#farmer_bank').val() || '';
+                                const bankBranch = $('#farmer_branch').val() || '';
+                                
+                                if (!account) {
+                                    Swal.showValidationMessage('Account Number is required for Bank Transfer');
+                                    return false;
+                                }
+                                if (!accountName) {
+                                    Swal.showValidationMessage('Account Holder Name is required for Bank Transfer');
+                                    return false;
+                                }
+                                if (!bankName) {
+                                    Swal.showValidationMessage('Bank Name is required for Bank Transfer');
+                                    return false;
+                                }
+                                if (!bankBranch) {
+                                    Swal.showValidationMessage('Bank Branch is required for Bank Transfer');
+                                    return false;
+                                }
+                                
+                                formData.account_number = account;
+                                formData.account_holder_name = accountName;
+                                formData.bank_name = bankName;
+                                formData.bank_branch = bankBranch;
+                            }
+                            
+                            if (paymentMethod === 'ezcash' || paymentMethod === 'all') {
+                                const ezcashMobile = $('#farmer_ezcash').val() || '';
+                                if (!ezcashMobile) {
+                                    Swal.showValidationMessage('EzCash Mobile Number is required for EzCash payment');
+                                    return false;
+                                }
+                                formData.ezcash_mobile = ezcashMobile;
+                            }
+                            
+                            if (paymentMethod === 'mcash' || paymentMethod === 'all') {
+                                const mcashMobile = $('#farmer_mcash').val() || '';
+                                if (!mcashMobile) {
+                                    Swal.showValidationMessage('mCash Mobile Number is required for mCash payment');
+                                    return false;
+                                }
+                                formData.mcash_mobile = mcashMobile;
+                            }
+                            
+                            // Set optional fields if they exist
+                            if ($('#farmer_ezcash').val()) formData.ezcash_mobile = $('#farmer_ezcash').val();
+                            if ($('#farmer_mcash').val()) formData.mcash_mobile = $('#farmer_mcash').val();                   
                         } else if (userType === 'lead_farmer') {
                             formData.nic_no = $('#lead_nic').val() || '';
                             formData.primary_mobile = $('#lead_mobile').val() || '';
@@ -874,12 +892,39 @@
                                 }
                             },
                             error: function(xhr) {
-                                const error = xhr.responseJSON?.message || 'Failed to create user';
+                                let error = 'Failed to create user';
+                                
+                                if (xhr.responseJSON?.message) {
+                                    error = xhr.responseJSON.message;
+
+                                    // Parse database error messages
+                                    if (error.includes('farmers_nic_no_key') && error.includes('already exists')) {
+                                        error = error.replace(/.*ERROR:.*DETAIL: Key \(nic_no\)=\(([^)]+)\).*/s, 'NIC No. "$1" already exists')
+                                                    .replace(/.*failed to create user because nic no\. "([^"]+)" already exists.*/i, 'NIC No. "$1" already exists');
+                                    }
+                                }
+
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Error',
-                                    text: error,
-                                    confirmButtonColor: '#10B981'
+                                    title: '<span style="color: #1f2937; font-weight: 700;">Submission Failed</span>',
+                                    html: `
+                                        <div style="text-align: center; background-color: #fef2f2; border: 4px solid #ef4444; padding: 16px; border-radius: 20px;">
+                                            <p style="margin: 0; color: #b91c1c; font-size: 14px; font-weight: 600; line-height: 1.5;">
+                                                ${error}
+                                            </p>
+                                            <p style="margin: 8px 0 0 0; color: #7f1d1d; font-size: 12px; opacity: 0.8;">
+                                                Please check the details and try again.
+                                            </p>
+                                        </div>
+                                    `,
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: '#10B981',
+                                    background: '#ffffff',
+                                    width: '450px',
+                                    padding: '1.5rem',
+                                    customClass: {
+                                        popup: 'rounded-lg'
+                                    }
                                 });
                             }
                         });
@@ -895,9 +940,40 @@
                             html = `
                                 <div class="form-section">
                                     <h4>Farmer Details</h4>
+                                    <div id="common-fields">
+                                        <div class="form-group">
+                                            <label>Full Name <span class="required">*</span></label>
+                                            <input type="text" id="name" class="form-input" placeholder="Enter full name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Username <span class="required">*</span></label>
+                                            <input type="text" id="username" class="form-input" placeholder="Enter username" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            <input type="email" id="email" class="form-input" placeholder="Enter email">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password" class="form-input" placeholder="Enter password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+                                            </div>
+                                            <small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Confirm Password <span class="required">*</span></label>
+                                            <div class="password-container">
+                                                <input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+                                                <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    
                                     <div class="form-group">
-                                        <label>NIC Number</label>
-                                        <input type="text" id="farmer_nic" class="form-input" placeholder="Enter NIC">
+                                        <label>NIC Number <span class="required">*</span></label>
+                                        <input type="text" id="farmer_nic" class="form-input" placeholder="Enter NIC" required>
                                     </div>
                                     <div class="form-group">
                                         <label>Primary Mobile <span class="required">*</span></label>
@@ -912,20 +988,20 @@
                                         <textarea id="farmer_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
                                     </div>
                                     <div class="form-group">
-                                        <label>Grama Niladhari Division</label>
-                                        <input type="text" id="farmer_gnd" class="form-input" placeholder="Enter GND">
+                                        <label>Grama Niladhari Division <span class="required">*</span></label>
+                                        <input type="text" id="farmer_gnd" class="form-input" placeholder="Enter GND" required>
                                     </div>
                                     <div class="form-group">
-                                        <label>District</label>
-                                        <select id="farmer_district" class="form-select">
+                                        <label>District <span class="required">*</span></label>
+                                        <select id="farmer_district" class="form-select" required>
                                             <option value="Colombo">Colombo</option>
                                             <option value="Gampaha">Gampaha</option>
                                             <option value="Kalutara">Kalutara</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Preferred Payment</label>
-                                        <select id="farmer_payment" class="form-select">
+                                        <label>Preferred Payment <span class="required">*</span></label>
+                                        <select id="farmer_payment" class="form-select" required>
                                             <option value="bank">Bank Transfer</option>
                                             <option value="ezcash">EzCash</option>
                                             <option value="mcash">mCash</option>
@@ -934,31 +1010,31 @@
                                     </div>
                                     <div id="farmer-bank-fields">
                                         <div class="form-group">
-                                            <label>Account Number</label>
+                                            <label>Account Number <span id="account-required" class="required" style="display:none;">*</span></label>
                                             <input type="text" id="farmer_account" class="form-input" placeholder="Enter account number">
                                         </div>
                                         <div class="form-group">
-                                            <label>Account Holder Name</label>
+                                            <label>Account Holder Name <span id="account-name-required" class="required" style="display:none;">*</span></label>
                                             <input type="text" id="farmer_account_name" class="form-input" placeholder="Enter holder name">
                                         </div>
                                         <div class="form-group">
-                                            <label>Bank Name</label>
+                                            <label>Bank Name <span id="bank-required" class="required" style="display:none;">*</span></label>
                                             <input type="text" id="farmer_bank" class="form-input" placeholder="Enter bank name">
                                         </div>
                                         <div class="form-group">
-                                            <label>Bank Branch</label>
+                                            <label>Bank Branch <span id="branch-required" class="required" style="display:none;">*</span></label>
                                             <input type="text" id="farmer_branch" class="form-input" placeholder="Enter branch">
                                         </div>
                                     </div>
                                     <div id="farmer-ezcash-fields" style="display:none;">
                                         <div class="form-group">
-                                            <label>EzCash Mobile Number</label>
+                                            <label>EzCash Mobile Number <span id="ezcash-required" class="required" style="display:none;">*</span></label>
                                             <input type="tel" id="farmer_ezcash" class="form-input" placeholder="Enter EzCash mobile">
                                         </div>
                                     </div>
                                     <div id="farmer-mcash-fields" style="display:none;">
                                         <div class="form-group">
-                                            <label>mCash Mobile Number</label>
+                                            <label>mCash Mobile Number <span id="mcash-required" class="required" style="display:none;">*</span></label>
                                             <input type="tel" id="farmer_mcash" class="form-input" placeholder="Enter mCash mobile">
                                         </div>
                                     </div>
@@ -1103,16 +1179,31 @@
                     if (userType === 'farmer') {
                         $('#farmer_payment').on('change', function() {
                             const payment = $(this).val();
+                            
+                            // Reset all required indicators
+                            $('#account-required, #account-name-required, #bank-required, #branch-required, #ezcash-required, #mcash-required').hide();
+                            
+                            // Hide all fields first
                             $('#farmer-bank-fields, #farmer-ezcash-fields, #farmer-mcash-fields').hide();
                             
+                            // Show fields and set required indicators based on payment method
                             if (payment === 'bank' || payment === 'all') {
                                 $('#farmer-bank-fields').show();
+                                $('#account-required, #account-name-required, #bank-required, #branch-required').show();
                             }
                             if (payment === 'ezcash' || payment === 'all') {
                                 $('#farmer-ezcash-fields').show();
+                                $('#ezcash-required').show();
                             }
                             if (payment === 'mcash' || payment === 'all') {
                                 $('#farmer-mcash-fields').show();
+                                $('#mcash-required').show();
+                            }
+                            
+                            // For "All Methods", show all fields
+                            if (payment === 'all') {
+                                $('#farmer-bank-fields, #farmer-ezcash-fields, #farmer-mcash-fields').show();
+                                $('#account-required, #account-name-required, #bank-required, #branch-required, #ezcash-required, #mcash-required').show();
                             }
                         }).trigger('change');
                     }
