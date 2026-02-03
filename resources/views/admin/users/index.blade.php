@@ -565,17 +565,17 @@
                 </div>
                 <div class="stat-card active">
                     <i class="fas fa-user-check"></i>
-                    <span class="number">0</span>
+                    <span class="number">{{ $activeUsers }}</span>
                     <span class="label">Active</span>
                 </div>
                 <div class="stat-card inactive">
                     <i class="fas fa-user-slash"></i>
-                    <span class="number">0</span>
+                    <span class="number">{{ $inactiveUsers }}</span>
                     <span class="label">Inactive</span>
                 </div>
                 <div class="stat-card admins">
                     <i class="fas fa-user-shield"></i>
-                    <span class="number">0</span>
+                    <span class="number">{{ $adminUsers }}</span>
                     <span class="label">Admins</span>
                 </div>
             </div>
@@ -592,7 +592,7 @@
             </div>
             
             <div class="pagination-container" id="pagination-container">
-                {!! $paginator->links('vendor.pagination.simple-unique') !!}
+                {!! $paginator->links('vendor.pagination.simple-unique1') !!}
             </div>
         </div>
     </div>
@@ -625,26 +625,21 @@
             let searchTerm = '';
             let loading = false;
 
-            function updateActiveStats() {
-                const total = {{ $totalUsers }};
-                let active = 0;
-                let inactive = 0;
-                let admins = 0;
-
-                $('.user-card').each(function() {
-                    const status = $(this).data('status');
-                    const role = $(this).data('role');
-                    
-                    if (status === 'active') active++;
-                    else if (status === 'inactive') inactive++;
-                    
-                    if (role === 'admin' || role === 'subadmin') admins++;
-                });
-
-                $('.stat-card.active .number').text(active);
-                $('.stat-card.inactive .number').text(inactive);
-                $('.stat-card.admins .number').text(admins);
+            function updateStatsCards(stats) {
+                if (stats) {
+                    $('.stat-card.total .number').text(stats.total || 0);
+                    $('.stat-card.active .number').text(stats.active || 0);
+                    $('.stat-card.inactive .number').text(stats.inactive || 0);
+                    $('.stat-card.admins .number').text(stats.admins || 0);
+                }
             }
+
+            updateStatsCards({
+                total: {{ $totalUsers }},
+                active: {{ $activeUsers }},
+                inactive: {{ $inactiveUsers }},
+                admins: {{ $adminUsers }}
+            });
 
             function showLoading(show) {
                 loading = show;
@@ -681,7 +676,10 @@
                             if (response.pagination) {
                                 $('#pagination-container').html(response.pagination);
                             }
-                            updateActiveStats();
+                            // Update stats cards with response data
+                            if (response.stats) {
+                                updateStatsCards(response.stats);
+                            }
                         } else {
                             Swal.fire({
                                 icon: 'error',

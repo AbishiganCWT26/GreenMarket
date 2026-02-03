@@ -15,6 +15,12 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
+        // Get total counts for all users (not restricted by pagination)
+        $totalUsers = DB::table('users')->count();
+        $activeUsers = DB::table('users')->where('is_active', true)->count();
+        $inactiveUsers = DB::table('users')->where('is_active', false)->count();
+        $adminUsers = DB::table('users')->whereIn('role', ['admin', 'subadmin'])->count();
+
         $query = DB::table('users')
             ->leftJoin('farmers', 'users.id', '=', 'farmers.user_id')
             ->leftJoin('lead_farmers', 'users.id', '=', 'lead_farmers.user_id')
@@ -66,7 +72,7 @@ class UserController extends Controller
         }
 
         $viewType = $request->get('view', 'card');
-        $perPage = $viewType === 'table' ? 15 : 10;
+        $perPage = $viewType === 'table' ? 15 : 6 ;
         
         $usersPaginator = $query->paginate($perPage);
 
@@ -87,7 +93,13 @@ class UserController extends Controller
                         'users' => $usersPaginator->getCollection()
                     ])->render(),
                     'pagination' => $usersPaginator->links('vendor.pagination.simple-unique')->render(),
-                    'total' => $usersPaginator->total()
+                    'total' => $usersPaginator->total(),
+                    'stats' => [
+                        'active' => $activeUsers,
+                        'inactive' => $inactiveUsers,
+                        'admins' => $adminUsers,
+                        'total' => $totalUsers
+                    ]
                 ]);
             } catch (\Exception $e) {
                 \Log::error('Error loading users via AJAX: ' . $e->getMessage());
@@ -107,7 +119,10 @@ class UserController extends Controller
         return view('admin.users.index', [
             'users' => $usersWithDetails,
             'paginator' => $usersPaginator,
-            'totalUsers' => $usersPaginator->total()
+            'totalUsers' => $totalUsers,
+            'activeUsers' => $activeUsers,
+            'inactiveUsers' => $inactiveUsers,
+            'adminUsers' => $adminUsers
         ]);
     }
 

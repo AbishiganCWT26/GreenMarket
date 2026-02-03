@@ -1,180 +1,200 @@
 @if ($paginator->hasPages())
-<nav class="pagination-container" aria-label="Page navigation">
-	<ul class="pagination-list">
-		{{-- Previous Page Link --}}
-		@if ($paginator->onFirstPage())
-		<li class="pagination-item disabled" aria-disabled="true">
-			<span class="pagination-link">
-				<i class="fas fa-chevron-left"></i>
-			</span>
-		</li>
-		@else
-		<li class="pagination-item">
-			<a href="{{ $paginator->previousPageUrl() }}" class="pagination-link" rel="prev">
-				<i class="fas fa-chevron-left"></i>
-			</a>
-		</li>
-		@endif
+<nav class="pagination-wrapper" aria-label="Page navigation">
+    <ul class="pagination-group">
+        {{-- Previous Page Link --}}
+        @if ($paginator->onFirstPage())
+        <li class="page-item disabled" aria-disabled="true">
+            <span class="page-link icon">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+        </li>
+        @else
+        <li class="page-item">
+            <a href="{{ $paginator->previousPageUrl() }}" class="page-link icon" rel="prev">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </li>
+        @endif
 
-		{{-- Pagination Elements --}}
-		@foreach ($elements as $element)
-			{{-- "Three Dots" Separator --}}
-			@if (is_string($element))
-			<li class="pagination-item dots" aria-disabled="true">
-				<span class="pagination-link">{{ $element }}</span>
-			</li>
-			@endif
+        {{-- Pagination Elements --}}
+        <div class="page-numbers">
+            @foreach ($elements as $element)
+                {{-- "Three Dots" Separator --}}
+                @if (is_string($element))
+                <li class="page-item disabled" aria-disabled="true">
+                    <span class="page-link dots">{{ $element }}</span>
+                </li>
+                @endif
 
-			{{-- Array Of Links --}}
-			@if (is_array($element))
-				@foreach ($element as $page => $url)
-					@if ($page == $paginator->currentPage())
-					<li class="pagination-item active" aria-current="page">
-						<span class="pagination-link">{{ $page }}</span>
-					</li>
-					@else
-					<li class="pagination-item">
-						<a href="{{ $url }}" class="pagination-link">{{ $page }}</a>
-					</li>
-					@endif
-				@endforeach
-			@endif
-		@endforeach
+                {{-- Array Of Links --}}
+                @if (is_array($element))
+                    @foreach ($element as $page => $url)
+                        @if ($page == $paginator->currentPage())
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">{{ $page }}</span>
+                        </li>
+                        @else
+                        <li class="page-item">
+                            <a href="{{ $url }}" class="page-link">{{ $page }}</a>
+                        </li>
+                        @endif
+                    @endforeach
+                @endif
+            @endforeach
+        </div>
 
-		{{-- Next Page Link --}}
-		@if ($paginator->hasMorePages())
-		<li class="pagination-item">
-			<a href="{{ $paginator->nextPageUrl() }}" class="pagination-link" rel="next">
-				<i class="fas fa-chevron-right"></i>
-			</a>
-		</li>
-		@else
-		<li class="pagination-item disabled" aria-disabled="true">
-			<span class="pagination-link">
-				<i class="fas fa-chevron-right"></i>
-			</span>
-		</li>
-		@endif
-	</ul>
+        {{-- Next Page Link --}}
+        @if ($paginator->hasMorePages())
+        <li class="page-item">
+            <a href="{{ $paginator->nextPageUrl() }}" class="page-link icon" rel="next">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+        @else
+        <li class="page-item disabled" aria-disabled="true">
+            <span class="page-link icon">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        </li>
+        @endif
+    </ul>
 </nav>
 @endif
 
 <style>
     :root {
-        --primary-green: #10B981;
-        --dark-green: #059669;
-        --body-bg: #f6f8fa;
-        --card-bg: #ffffff;
-        --text-color: #0f1724;
-        --muted: #6b7280;
-        --shadow-sm: 0 1px 3px rgba(15,23,36,0.04);
-        --shadow-md: 0 7px 15px rgba(15,23,36,0.08);
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --pg-font: 'Inter', system-ui, -apple-system, sans-serif;
+        --pg-active-bg: #1ea534fe; /* Modern Blue */
+        --pg-active-text: #ffffff;
+        --pg-hover-bg: #f3f4f6;
+        --pg-text: #374151;
+        --pg-border: #e5e7eb;
+        --pg-bg: #ffffff;
+        --pg-size: 36px; /* Compact height */
+        --pg-radius: 8px;
     }
 
-    .pagination-container {
+    /* Wrapper to center everything */
+    .pagination-wrapper {
         display: flex;
         justify-content: center;
-        padding: 2rem 1rem;
-        background: var(--body-bg);
+        align-items: center;
+        width: 100%;
+        padding: 2rem 0;
+        font-family: var(--pg-font);
     }
 
-    .pagination-list {
-        display: flex;
+    /* The main container floating bar */
+    .pagination-group {
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px;
-        margin: 0;
+        background: var(--pg-bg);
+        border: 1px solid var(--pg-border);
+        border-radius: 12px;
+        padding: 4px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+                    0 2px 4px -1px rgba(0, 0, 0, 0.03);
         list-style: none;
-        background: var(--card-bg);
-        border-radius: 50px;
-        box-shadow: var(--shadow-md);
-        flex-wrap: wrap;
-        justify-content: center;
+        margin: 0;
+        gap: 2px;
     }
 
-    .pagination-item {
-        display: inline-block;
+    /* Grouping numbers allows us to hide them easily on mobile */
+    .page-numbers {
+        display: flex;
+        align-items: center;
+        gap: 2px;
     }
 
-    .pagination-link {
+    /* Individual Items */
+    .page-item {
+        display: flex;
+    }
+
+    /* The Link Styling */
+    .page-link {
         display: flex;
         align-items: center;
         justify-content: center;
-        min-width: 40px;
-        height: 40px;
-        padding: 0 8px;
+        min-width: var(--pg-size);
+        height: var(--pg-size);
+        padding: 0 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--pg-text);
         text-decoration: none;
-        color: var(--text-color);
-        font-weight: 600;
-        font-size: 14px;
-        border-radius: 50%;
-        transition: var(--transition);
+        border-radius: var(--pg-radius);
+        transition: all 0.2s ease;
         cursor: pointer;
-        position: relative;
-        overflow: hidden;
+        user-select: none;
     }
 
-    .pagination-item:not(.active):not(.disabled) .pagination-link:hover {
-        background-color: var(--body-bg);
-        color: var(--primary-green);
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+    /* Hover Effects */
+    .page-item:not(.active):not(.disabled) .page-link:hover {
+        background-color: var(--pg-hover-bg);
+        color: #000;
+        transform: translateY(-1px);
     }
 
-    .pagination-item.active .pagination-link {
-        background-color: var(--primary-green);
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        animation: pulse 2s infinite;
+    /* Active State (Current Page) */
+    .page-item.active .page-link {
+        background-color: var(--pg-active-bg);
+        color: var(--pg-active-text);
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
     }
 
-    .pagination-item.disabled .pagination-link {
-        color: var(--muted);
-        opacity: 0.5;
+    /* Icons (Arrows) specific styling */
+    .page-link.icon {
+        font-size: 0.75rem; /* Smaller arrows for compactness */
+        color: #6b7280;
+    }
+    
+    .page-link.icon:hover {
+        color: var(--pg-active-bg);
+    }
+
+    /* Disabled State */
+    .page-item.disabled .page-link {
+        color: #9ca3af;
         cursor: not-allowed;
+        background: transparent;
     }
 
-    .pagination-item.dots .pagination-link {
+    /* Three Dots */
+    .page-link.dots {
         cursor: default;
-        border: none;
+        letter-spacing: 2px;
+        font-size: 0.75rem;
+        color: #9ca3af;
     }
 
-    @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-        70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
+    /* --- RESPONSIVE DESIGN --- */
 
-    @media (max-width: 768px) {
-        .pagination-list {
-            gap: 4px;
-            padding: 8px;
-            border-radius: 12px;
+    @media (max-width: 640px) {
+        /* On mobile, hide the number list, keep only arrows and current page if needed */
+        .pagination-group {
+            padding: 3px;
         }
 
-        .pagination-link {
-            min-width: 35px;
-            height: 35px;
-            font-size: 13px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .pagination-item:not(.active):not(:first-child):not(:last-child):not(.dots) {
+        /* Smart hiding: Hide numbers that aren't active */
+        .page-numbers .page-item:not(.active) {
             display: none;
         }
-
-        .pagination-item.active,
-        .pagination-item:first-child,
-        .pagination-item:last-child,
-        .pagination-item.dots {
-            display: inline-block;
+        
+        /* Show dots if you want, or hide them too for ultra-compact */
+        .page-numbers .page-item:has(.dots) {
+            display: inline-flex;
+        }
+        
+        /* If active is hidden inside numbers, ensure it shows */
+        .page-numbers .page-item.active {
+            display: flex;
         }
 
-        .pagination-list {
-            width: 100%;
-            border-radius: 8px;
+        /* Adjust size for touch targets */
+        :root {
+            --pg-size: 40px; 
         }
     }
 </style>
