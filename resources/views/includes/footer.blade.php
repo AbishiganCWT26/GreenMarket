@@ -159,7 +159,7 @@
 							</div>
 							<div class="contact-details">
 								<span class="label">Fax</span>
-								<span class="value">{{ $faxNo }}</span>
+								<a href="fax:+94{{ preg_replace('/^0/', '', preg_replace('/[^0-9]/', '', $faxNo)) }}" class="value">{{ $faxNo }}</a>
 							</div>
 						</div>
 						@endif
