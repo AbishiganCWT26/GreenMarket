@@ -1384,6 +1384,76 @@
         document.getElementById('editFormContent').innerHTML = '';
     }
 
+    // Delete item function
+    function deleteItem(type, id) {
+        let url = '';
+        let title = '';
+        let text = '';
+
+        switch(type) {
+            case 'category':
+                url = '{{ route("admin.taxonomy.delete.category", ":id") }}'.replace(':id', id);
+                title = 'Delete Category?';
+                text = 'Are you sure you want to delete this category? This action cannot be undone.';
+                break;
+            case 'subcategory':
+                url = '{{ route("admin.taxonomy.delete.subcategory", ":id") }}'.replace(':id', id);
+                title = 'Delete Sub-category?';
+                text = 'Are you sure you want to delete this sub-category? This action cannot be undone.';
+                break;
+            case 'product':
+                url = '{{ route("admin.taxonomy.delete.product", ":id") }}'.replace(':id', id);
+                title = 'Delete Product?';
+                text = 'Are you sure you want to delete this product? This action cannot be undone.';
+                break;
+            default:
+                console.error('Invalid delete type');
+                return;
+        }
+
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                showLoading();
+
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => { throw new Error(data.message || 'Failed to delete item'); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        showSuccess(data.message);
+                        loadAllData(); // Reload data
+                    } else {
+                        showError(data.message || 'Failed to delete item');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error('Error:', error);
+                    showError(error.message || 'An error occurred while deleting');
+                });
+            }
+        });
+    }
+
     // Helper functions
     function showLoading() {
         Swal.showLoading();
