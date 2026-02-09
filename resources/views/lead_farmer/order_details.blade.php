@@ -79,7 +79,7 @@
 							<span class="info-value">
 								@php
 									$paymentStatus = 'Pending';
-									if($order->order_status == 'paid') {
+									if($order->order_status == 'paid' || $order->order_status == 'completed') {
 										$paymentStatus = 'Completed';
 									} elseif($order->order_status == 'cancelled') {
 										$paymentStatus = 'Cancelled';

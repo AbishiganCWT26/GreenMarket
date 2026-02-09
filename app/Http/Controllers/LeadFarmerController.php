@@ -77,9 +77,7 @@ class LeadFarmerController extends Controller
             'activeProducts',
             'totalOrders',
             'pendingOrders',
-            'recentOrders',
-            'recentNotifications',
-            'sharedCounts'
+            'recentOrders'
         ));
     }
 

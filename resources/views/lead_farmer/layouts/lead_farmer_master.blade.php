@@ -143,9 +143,9 @@
                         <div class="notif-list">
                             @if(isset($recentNotifications) && count($recentNotifications) > 0)
                                 @foreach($recentNotifications as $notification)
-                                <div class="notif-item" data-id="{{ $notification->id }}">
+                                <div class="notif-item {{ $notification->is_read ? '' : 'unread' }}" data-id="{{ $notification->id }}">
                                     <div class="notif-icon">
-                                        @if($notification->notification_type == 'order_payment')
+                                        @if($notification->notification_type == 'order_payment' || $notification->notification_type == 'payment_received' || $notification->notification_type == 'payment_confirmation')
                                             <i class="fa-solid fa-money-bill-wave text-success"></i>
                                         @elseif($notification->notification_type == 'admin_alert')
                                             <i class="fa-solid fa-triangle-exclamation text-warning"></i>
@@ -158,6 +158,13 @@
                                         <div class="notif-msg">{{ Str::limit($notification->message, 80) }}</div>
                                         <small class="notif-time">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</small>
                                     </div>
+                                    @if(!$notification->is_read)
+                                    <div class="notif-actions">
+                                        <button class="mark-read-btn" data-id="{{ $notification->id }}" title="Mark as read">
+                                            <i class="fa-solid fa-check"></i>
+                                        </button>
+                                    </div>
+                                    @endif
                                 </div>
                                 @endforeach
                             @else
@@ -234,116 +241,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const sidebarClose = document.getElementById('sidebar-close');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-
-        // Sidebar toggle functionality
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', function() {
-                sidebar.classList.add('open');
-                overlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-        }
-
-        if (sidebarClose) {
-            sidebarClose.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-        }
-
-        if (overlay) {
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-        }
-
-        // Logout functionality
-        const logoutButton = document.getElementById('logout-button');
-        const logoutTop = document.getElementById('logoutTop');
-        const logoutForm = document.getElementById('logout-form');
-        const logoutFormTop = document.getElementById('logout-form-top');
-
-        function confirmLogout(formElement) {
-            Swal.fire({
-                title: 'Logout?',
-                text: 'Are you sure you want to logout?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, logout!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    formElement.submit();
-                }
-            });
-        }
-
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                confirmLogout(logoutFormTop);
-            });
-        }
-
-        if (logoutTop) {
-            logoutTop.addEventListener('click', function(e) {
-                e.preventDefault();
-                confirmLogout(logoutFormTop);
-            });
-        }
-
-        // Notification dropdown
-        const notifBtn = document.getElementById('notifBtn');
-        const notifDropdown = document.getElementById('notifDropdown');
-
-        if (notifBtn && notifDropdown) {
-            notifBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                notifDropdown.classList.toggle('show');
-            });
-
-            const markAllReadBtn = document.getElementById('markAllRead');
-            if (markAllReadBtn) {
-                markAllReadBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    fetch('{{ route("lf.notifications.mark-all-read") }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.querySelectorAll('.notif-dot').forEach(dot => dot.remove());
-                            toastr.success('All notifications marked as read');
-                            notifDropdown.classList.remove('show');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        toastr.error('Failed to mark notifications as read');
-                    });
-                });
-            }
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
-                    notifDropdown.classList.remove('show');
-                }
-            });
-        }
+        // All initialization moved to leadFarmerMaster object below
 
         // Auto-hide alerts
         setTimeout(() => {
@@ -450,8 +348,68 @@
 
             if (notifBtn && notifDropdown) {
                 notifBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     notifDropdown.classList.toggle('show');
+                });
+
+                // Mark all notifications as read
+                const markAllReadBtn = document.getElementById('markAllRead');
+                if (markAllReadBtn) {
+                    markAllReadBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        fetch('{{ route("lf.notifications.mark-all-read") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.querySelectorAll('.notif-dot').forEach(dot => dot.remove());
+                                document.querySelectorAll('.notif-item.unread').forEach(item => item.classList.remove('unread'));
+                                document.querySelectorAll('.mark-read-btn').forEach(btn => btn.remove());
+                                toastr.success('All notifications marked as read');
+                                notifDropdown.classList.remove('show');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            toastr.error('Failed to mark notifications as read');
+                        });
+                    });
+                }
+
+                // Individual mark as read
+                document.querySelectorAll('.mark-read-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const notifId = this.dataset.id;
+                        const notifItem = this.closest('.notif-item');
+                        
+                        fetch(`/lead-farmer/notifications/${notifId}/read`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                notifItem.classList.remove('unread');
+                                this.remove();
+                                toastr.success('Notification marked as read');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            toastr.error('Failed to mark notification as read');
+                        });
+                    });
                 });
 
                 document.addEventListener('click', (e) => {

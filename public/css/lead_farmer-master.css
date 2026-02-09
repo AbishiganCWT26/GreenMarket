@@ -507,6 +507,36 @@ body {
     display: block;
 }
 
+.notif-item.unread {
+    background: rgba(16, 185, 129, 0.08);
+    border-left: 3px solid var(--primary-accent);
+}
+
+.notif-item.unread .notif-title {
+    color: var(--primary-dark);
+}
+
+.notif-actions {
+    margin-left: 8px;
+    align-self: center;
+}
+
+.mark-read-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.mark-read-btn:hover {
+    color: var(--primary-accent);
+    background: rgba(16, 185, 129, 0.1);
+}
+
 .notif-empty {
     text-align: center;
     padding: 20px;
@@ -1174,6 +1204,10 @@ body {
     box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
     transform: translateY(-4px);
     border-color: var(--primary-accent);
+}
+
+.badge-completed {
+    background-color: #08fab5;
 }
 
 .badge-success {

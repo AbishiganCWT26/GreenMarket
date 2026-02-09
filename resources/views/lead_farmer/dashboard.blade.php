@@ -116,10 +116,8 @@
         </div>
     </div>
 
-    <!-- Recent Orders & Notifications -->
-    <div class="row">
         <!-- Recent Orders -->
-        <div class="col-xl-8 col-lg-7">
+        <div class="col-xl-8">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
@@ -148,7 +146,11 @@
                                     <td>{{ $order->buyer->name }}</td>
                                     <td>LKR {{ number_format($order->total_amount, 2) }}</td>
                                     <td>
-                                        <span class="badge badge-{{ $order->order_status == 'pending' ? 'warning' : ($order->order_status == 'paid' ? 'success' : 'info') }}">
+                                        <span class="badge badge-{{ 
+                                            $order->order_status == 'pending' ? 'warning' : 
+                                            ($order->order_status == 'paid' ? 'success' : 
+                                            ($order->order_status == 'completed' ? 'completed' : 'info')) 
+                                        }}">
                                             {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
                                         </span>
                                     </td>
@@ -168,35 +170,5 @@
                 </div>
             </div>
         </div>
-
-        <!-- Recent Notifications -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Notifications</h6>
-                </div>
-                <div class="card-body">
-                    @if($recentNotifications->count() > 0)
-                    <div class="list-group">
-                        @foreach($recentNotifications as $notification)
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{{ Str::limit($notification->title, 40) }}</h6>
-                                <small>{{ $notification->created_at->diffForHumans() }}</small>
-                            </div>
-                            <p class="mb-1">{{ Str::limit($notification->message, 60) }}</p>
-                        </a>
-                        @endforeach
-                    </div>
-                    @else
-                    <div class="text-center py-4">
-                        <i class="fas fa-bell fa-3x text-gray-300 mb-3"></i>
-                        <p class="text-muted">No notifications</p>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 @endsection
