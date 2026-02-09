@@ -237,12 +237,12 @@ class UserController extends Controller
         DB::beginTransaction();
 
         try {
-            $plainPassword = $validated['password']; // Store plain password
+            $plainPassword = $validated['password'];
             
             $userId = DB::table('users')->insertGetId([
                 'username' => $validated['username'],
                 'email' => $validated['email'],
-                'password' => Hash::make($plainPassword), // Hash it for storage
+                'password' => Hash::make($plainPassword),
                 'role' => $validated['user_type'],
                 'is_active' => true,
                 'created_at' => now(),
@@ -250,38 +250,47 @@ class UserController extends Controller
             ]);
 
             if ($validated['user_type'] == 'farmer' || $validated['user_type'] == 'lead_farmer') {
-                $farmerData = [
+                $commonData = [
                     'user_id' => $userId,
                     'name' => $request->name,
                     'nic_no' => $request->nic_no,
                     'primary_mobile' => $request->primary_mobile,
                     'whatsapp_number' => $request->whatsapp_number,
-                    'email' => $validated['email'],
                     'residential_address' => $request->residential_address,
                     'grama_niladhari_division' => $request->grama_niladhari_division,
                     'preferred_payment' => $request->preferred_payment ?? 'bank',
                     'district' => $request->district ?? 'Colombo',
-                    'is_active' => true,
                     'account_number' => $request->account_number,
                     'account_holder_name' => $request->account_holder_name,
                     'bank_name' => $request->bank_name,
                     'bank_branch' => $request->bank_branch,
-                    'ezcash_mobile' => $request->ezcash_mobile,
-                    'mcash_mobile' => $request->mcash_mobile,
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
 
                 if ($validated['user_type'] == 'lead_farmer') {
-                    $leadFarmerId = DB::table('lead_farmers')->insertGetId(array_merge($farmerData, [
+                    // Lead farmer table doesn't have email, is_active, ezcash_mobile, mcash_mobile
+                    $leadFarmerId = DB::table('lead_farmers')->insertGetId(array_merge($commonData, [
                         'group_name' => $request->group_name,
                         'group_number' => $request->group_number
                     ]));
 
-                    DB::table('farmers')->insert(array_merge($farmerData, [
-                        'lead_farmer_id' => $leadFarmerId
+                    // A lead farmer is also a farmer, and the farmers table DOES have these columns
+                    DB::table('farmers')->insert(array_merge($commonData, [
+                        'lead_farmer_id' => $leadFarmerId,
+                        'email' => $validated['email'] ?? null,
+                        'is_active' => true,
+                        'ezcash_mobile' => $request->ezcash_mobile,
+                        'mcash_mobile' => $request->mcash_mobile
                     ]));
                 } else {
+                    $farmerData = array_merge($commonData, [
+                        'email' => $validated['email'] ?? null,
+                        'is_active' => true,
+                        'ezcash_mobile' => $request->ezcash_mobile,
+                        'mcash_mobile' => $request->mcash_mobile
+                    ]);
+
                     $defaultLeadFarmer = DB::table('lead_farmers')->first();
                     if ($defaultLeadFarmer) {
                         DB::table('farmers')->insert(array_merge($farmerData, [
@@ -323,9 +332,9 @@ class UserController extends Controller
                     'user_id' => $userId,
                     'name' => $request->name,
                     'nic_no' => $request->nic_no,
+                    'email' => $validated['email'] ?? null,
                     'primary_mobile' => $request->primary_mobile,
                     'whatsapp_number' => $request->whatsapp_number,
-                    'email' => $validated['email'],
                     'assigned_division' => $request->assigned_division,
                     'is_active' => true,
                     'created_at' => now(),
@@ -401,6 +410,11 @@ class UserController extends Controller
                 } else {
                     $errorMessage = 'Failed to create user because NIC number already exists';
                 }
+            }
+            // General database error handling to avoid showing raw SQL
+            elseif (strpos($errorMessage, 'SQLSTATE') !== false) {
+                \Log::error('Database Error during user creation: ' . $errorMessage);
+                $errorMessage = 'A database error occurred while creating the user. Please try again later.';
             }
             
             return response()->json(['success' => false, 'message' => $errorMessage], 500);
@@ -518,6 +532,11 @@ class UserController extends Controller
                     $errorMessage = 'Failed to update user because NIC number already exists';
                 }
             }
+            // General database error handling to avoid showing raw SQL
+            elseif (strpos($errorMessage, 'SQLSTATE') !== false) {
+                \Log::error('Database Error during user update: ' . $errorMessage);
+                $errorMessage = 'A database error occurred while updating the user. Please try again later.';
+            }
             
             return response()->json(['success' => false, 'message' => $errorMessage], 500);
         }
@@ -598,6 +617,11 @@ class UserController extends Controller
                     $errorMessage = 'Failed to change role because NIC No. "' . $nicNumber . '" already exists as a Lead Farmer';
                 }
             }
+            // General database error handling to avoid showing raw SQL
+            elseif (strpos($errorMessage, 'SQLSTATE') !== false) {
+                \Log::error('Database Error during role change: ' . $errorMessage);
+                $errorMessage = 'A database error occurred while changing the user role. Please try again later.';
+            }
             
             return response()->json(['success' => false, 'message' => $errorMessage], 500);
         }
@@ -620,12 +644,18 @@ class UserController extends Controller
                          'grama_niladhari_division', 'district', 'group_name', 'group_number'];
 
         foreach ($profileFields as $field) {
+            // Filter fields based on table schema
+            if ($table == 'lead_farmers' && in_array($field, ['email', 'is_active'])) continue;
+
             if ($request->has($field)) {
                 $updateData[$field] = $request->$field;
             }
         }
 
         foreach ($paymentFields as $field) {
+            // Filter fields based on table schema
+            if ($table == 'lead_farmers' && in_array($field, ['ezcash_mobile', 'mcash_mobile'])) continue;
+
             if ($request->has($field)) {
                 $updateData[$field] = $request->$field;
             }
@@ -641,7 +671,6 @@ class UserController extends Controller
                 'name' => $userRecord->username,
                 'nic_no' => $request->nic_no ?? '',
                 'primary_mobile' => $request->primary_mobile ?? '',
-                'email' => $userRecord->email,
                 'residential_address' => $request->residential_address ?? '',
                 'grama_niladhari_division' => $request->grama_niladhari_division ?? '',
                 'district' => 'Colombo',
@@ -688,11 +717,20 @@ class UserController extends Controller
         $facilitator = DB::table('facilitators')->where('user_id', $userId)->first();
 
         if ($facilitator) {
+            $updateData = [
+                'updated_at' => now()
+            ];
+
+            $fields = ['name', 'nic_no', 'primary_mobile', 'whatsapp_number', 'email', 'assigned_division'];
+            foreach ($fields as $field) {
+                if ($request->has($field)) {
+                    $updateData[$field] = $request->$field;
+                }
+            }
+
             DB::table('facilitators')
                 ->where('user_id', $userId)
-                ->update([
-                    'updated_at' => now()
-                ]);
+                ->update($updateData);
         }
     }
 
