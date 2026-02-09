@@ -119,8 +119,9 @@
         <!-- Recent Orders -->
         <div class="col-xl-8">
             <div class="card shadow mb-4">
-                <div class="card-header py-3">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
+                    <a href="{{ route('lf.orders') }}" class="btn btn-sm btn-primary">View All Orders</a>
                 </div>
                 <div class="card-body">
                     @if($recentOrders->count() > 0)
@@ -160,7 +161,11 @@
                             </tbody>
                         </table>
                     </div>
-                    <a href="{{ route('lf.orders') }}" class="btn btn-sm btn-primary mt-2">View All Orders</a>
+                    @if($recentOrders->count() > 0 && $totalOrders > 5)
+                    <div class="card-footer text-center">
+                        <a href="{{ route('lf.orders') }}" class="btn btn-primary">View All Orders</a>
+                    </div>
+                    @endif
                     @else
                     <div class="text-center py-4">
                         <i class="fas fa-shopping-cart fa-3x text-gray-300 mb-3"></i>
