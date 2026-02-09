@@ -1073,13 +1073,22 @@ class UserController extends Controller
             $baseurl = env('SMS_API_URL');
 
             if (!$user || !$password || !$baseurl) {
-                \Log::info("SMS OTP for {$mobile}: {$otp}");
+                \Log::info("SMS OTP for {$mobile}: {$otp} (SMS not configured)");
                 return true;
+            }
+
+            // Format mobile number: remove non-digits, remove leading '0', prepend '94'
+            $mobile = preg_replace('/[^0-9]/', '', $mobile);
+            if (strpos($mobile, '0') === 0) {
+                $mobile = '94' . substr($mobile, 1);
+            } elseif (strpos($mobile, '94') !== 0) {
+                $mobile = '94' . $mobile;
             }
 
             $text = urlencode("Your OTP for payment details update is: $otp. Valid for 5 minutes.");
 
-            $url = "$baseurl/?id=$user&pw=$password&to=$mobile&text=$text";
+            $baseurl = rtrim($baseurl, '/');
+            $url = "{$baseurl}/?id={$user}&pw={$password}&to={$mobile}&text={$text}";
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -1094,8 +1103,13 @@ class UserController extends Controller
             if ($response !== false) {
                 $result = explode(":", $response);
                 if (trim($result[0]) == "OK") {
+                    \Log::info("SMS OTP sent successfully to {$mobile}. Response: {$response}");
                     return true;
+                } else {
+                    \Log::error("SMS OTP failed for {$mobile}. Response: {$response}");
                 }
+            } else {
+                \Log::error("Curl error sending SMS OTP to {$mobile}. HTTP Code: {$httpCode}");
             }
 
             return false;
@@ -1114,13 +1128,22 @@ class UserController extends Controller
             $baseurl = env('SMS_API_URL');
 
             if (!$user || !$password || !$baseurl) {
-                \Log::info("SMS for {$mobile}: {$message}");
+                \Log::info("SMS for {$mobile}: {$message} (SMS not configured)");
                 return true;
+            }
+
+            // Format mobile number: remove non-digits, remove leading '0', prepend '94'
+            $mobile = preg_replace('/[^0-9]/', '', $mobile);
+            if (strpos($mobile, '0') === 0) {
+                $mobile = '94' . substr($mobile, 1);
+            } elseif (strpos($mobile, '94') !== 0) {
+                $mobile = '94' . $mobile;
             }
 
             $text = urlencode($message);
 
-            $url = "$baseurl/?id=$user&pw=$password&to=$mobile&text=$text";
+            $baseurl = rtrim($baseurl, '/');
+            $url = "{$baseurl}/?id={$user}&pw={$password}&to={$mobile}&text={$text}";
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -1129,9 +1152,22 @@ class UserController extends Controller
             curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
             $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
-            return $response !== false;
+            if ($response !== false) {
+                $result = explode(":", $response);
+                if (trim($result[0]) == "OK") {
+                    \Log::info("SMS sent successfully to {$mobile}. Response: {$response}");
+                    return true;
+                } else {
+                    \Log::error("SMS failed for {$mobile}. Response: {$response}");
+                }
+            } else {
+                \Log::error("Curl error sending SMS to {$mobile}. HTTP Code: {$httpCode}");
+            }
+
+            return false;
 
         } catch (\Exception $e) {
             \Log::error("SMS sending failed: " . $e->getMessage());
@@ -1193,7 +1229,7 @@ class UserController extends Controller
             // Use plain password if provided, otherwise skip password in SMS
             $passwordText = $plainPassword ? "Password: {$plainPassword}" : "";
             
-            $message = "Welcome to GreenMarket! Your account has been created.\nUsername: {$user->username}\n{$passwordText}";
+            $message = "Welcome to GreenMarket! Your account has been created.\nUsername: {$user->username}\nPassword: {$passwordText}";
             
             $this->sendSms($mobile, $message);
         }
