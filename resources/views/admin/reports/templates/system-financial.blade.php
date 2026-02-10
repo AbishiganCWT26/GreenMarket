@@ -6,6 +6,7 @@
     </div>
 
     @if(isset($data) && $data)
+        @php if(is_iterable($data)) $data = $data->first(); @endphp
         <div class="summary-stats">
             <div class="stat-card">
                 <div class="stat-value">{{ $data->total_orders ?? 0 }}</div>

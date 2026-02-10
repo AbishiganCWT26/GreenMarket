@@ -112,8 +112,8 @@
                                 <th>Role</th>
                                 <th>Total</th>
                                 <th>Active</th>
-                                <th>New (Week)</th>
-                                <th>New (Month)</th>
+                                <th>Within 7 days (Week)</th>
+                                <th>Within 30 days (Month)</th>
                             @elseif($reportType == 'group-performance')
                                 <th>Lead Farmer</th>
                                 <th>Group</th>
@@ -127,9 +127,23 @@
                                 <th>Missing</th>
                                 <th>Complete %</th>
                                 <th>Issues</th>
+                            @elseif($reportType == 'regional-performance')
+                                <th>Region</th>
+                                <th>Total Farmers</th>
+                                <th>Active Farmers</th>
+                                <th>Total Products</th>
+                                <th>Active Buyers</th>
+                                <th>Total Orders</th>
+                                <th>Total Sales</th>
+                                <th>Avg Order Value</th>
                             @else
-                                @if(is_array($data) && count($data) > 0)
-                                    @foreach(array_keys((array)$data[0]) as $key)
+                                @if(count($data) > 0)
+                                    @php
+                                        // Handle both array and collection
+                                        $firstItem = is_array($data) ? $data[0] : $data->first();
+                                        $keys = is_object($firstItem) ? array_keys((array)$firstItem) : array_keys((array)$firstItem);
+                                    @endphp
+                                    @foreach($keys as $key)
                                         <th>{{ ucwords(str_replace('_', ' ', $key)) }}</th>
                                     @endforeach
                                 @endif
@@ -221,44 +235,54 @@
                                     <td>{{ Str::limit($row->pickup_location, 30) }}</td>
                                 @elseif($reportType == 'daily-cash')
                                     <td>{{ date('M d, Y', strtotime($row->date)) }}</td>
-                                    <td>{{ $row->cod_orders }}</td>
-                                    <td class="numeric">Rs. {{ number_format($row->cash_received, 2) }}</td>
-                                    <td class="numeric">Rs. {{ number_format(($row->cod_orders * 1000) - $row->cash_received, 2) }}</td>
-                                    <td>{{ $row->cod_orders > 0 ? round(($row->cash_received / ($row->cod_orders * 1000)) * 100, 2) : 0 }}%</td>
+                                    <td>{{ $row->total_cod_orders }}</td>
+                                    <td class="numeric">Rs. {{ number_format($row->collected_amount, 2) }}</td>
+                                    <td class="numeric">Rs. {{ number_format($row->outstanding_amount, 2) }}</td>
+                                    <td>{{ $row->total_cod_orders > 0 ? round(($row->collected_amount / ($row->collected_amount + $row->outstanding_amount)) * 100, 2) : 0 }}%</td>
                                 @elseif($reportType == 'system-adoption')
                                     <td>{{ ucfirst(str_replace('_', ' ', $row->role)) }}</td>
                                     <td>{{ $row->total_users }}</td>
                                     <td>{{ $row->active_users }}</td>
-                                    <td>{{ $row->new_users_week }}</td>
-                                    <td>{{ $row->new_users_month }}</td>
+                                    <td>{{ $row->new_registrations_week }}</td>
+                                    <td>{{ $row->active_accounts }}</td>
                                 @elseif($reportType == 'group-performance')
                                     <td>{{ $row->lead_farmer_name }}</td>
                                     <td>{{ $row->group_name }}</td>
-                                    <td>{{ $row->total_farmers }}</td>
+                                    <td>{{ $row->total_farmers_managed }}</td>
                                     <td>{{ $row->active_farmers }}</td>
                                     <td>{{ $row->total_quantity_sold }}</td>
-                                    <td class="numeric">Rs. {{ number_format($row->total_sales_value, 2) }}</td>
+                                    <td class="numeric">Rs. {{ number_format($row->total_revenue, 2) }}</td>
                                 @else
                                     @if(is_object($row))
                                         @php $rowArray = (array)$row; @endphp
-                                        @foreach($rowArray as $value)
-                                            @if(is_numeric($value) && $value > 1000)
-                                                <td class="numeric">Rs. {{ number_format($value, 2) }}</td>
-                                            @elseif(is_numeric($value))
-                                                <td>{{ number_format($value, 2) }}</td>
-                                            @elseif(strtotime($value))
+                                        @foreach($rowArray as $key => $value)
+                                            @php
+                                                $isCurrency = preg_match('/revenue|amount|price|sales|total_sales|total_revenue|revenue/i', $key);
+                                            @endphp
+                                            @if(is_numeric($value))
+                                                @if($isCurrency)
+                                                    <td class="numeric">Rs. {{ number_format($value, 2) }}</td>
+                                                @else
+                                                    <td>{{ number_format($value, 2) }}</td>
+                                                @endif
+                                            @elseif(strtotime($value) && !is_numeric($value) && strlen($value) > 8)
                                                 <td>{{ date('M d, Y', strtotime($value)) }}</td>
                                             @else
                                                 <td>{{ $value ?? 'N/A' }}</td>
                                             @endif
                                         @endforeach
                                     @else
-                                        @foreach($row as $value)
-                                            @if(is_numeric($value) && $value > 1000)
-                                                <td class="numeric">Rs. {{ number_format($value, 2) }}</td>
-                                            @elseif(is_numeric($value))
-                                                <td>{{ number_format($value, 2) }}</td>
-                                            @elseif(strtotime($value))
+                                        @foreach($row as $key => $value)
+                                            @php
+                                                $isCurrency = preg_match('/revenue|amount|price|sales|total_sales|total_revenue|revenue/i', $key);
+                                            @endphp
+                                            @if(is_numeric($value))
+                                                @if($isCurrency)
+                                                    <td class="numeric">Rs. {{ number_format($value, 2) }}</td>
+                                                @else
+                                                    <td>{{ number_format($value, 2) }}</td>
+                                                @endif
+                                            @elseif(strtotime($value) && !is_numeric($value) && strlen($value) > 8)
                                                 <td>{{ date('M d, Y', strtotime($value)) }}</td>
                                             @else
                                                 <td>{{ $value ?? 'N/A' }}</td>
@@ -348,11 +372,11 @@
                             </div>
                             <div class="card-item">
                                 <span class="label">Farmers:</span>
-                                <span class="value">{{ $row->total_farmers }} ({{ $row->active_farmers }} active)</span>
+                                <span class="value">{{ $row->total_farmers_managed }} ({{ $row->active_farmers }} active)</span>
                             </div>
                             <div class="card-item">
                                 <span class="label">Sales:</span>
-                                <span class="value">Rs. {{ number_format($row->total_sales_value, 2) }}</span>
+                                <span class="value">Rs. {{ number_format($row->total_revenue, 2) }}</span>
                             </div>
                             <div class="card-item">
                                 <span class="label">Qty:</span>
@@ -366,11 +390,16 @@
                                     <div class="card-item">
                                         <span class="label">{{ ucwords(str_replace('_', ' ', $key)) }}:</span>
                                         <span class="value">
-                                            @if(is_numeric($value) && $value > 1000)
-                                                Rs. {{ number_format($value, 2) }}
-                                            @elseif(is_numeric($value))
-                                                {{ number_format($value, 2) }}
-                                            @elseif(strtotime($value))
+                                            @php
+                                                $isCurrency = preg_match('/revenue|amount|price|sales|total_sales|total_revenue|revenue/i', $key);
+                                            @endphp
+                                            @if(is_numeric($value))
+                                                @if($isCurrency)
+                                                    Rs. {{ number_format($value, 2) }}
+                                                @else
+                                                    {{ number_format($value, 2) }}
+                                                @endif
+                                            @elseif(strtotime($value) && !is_numeric($value) && strlen($value) > 8)
                                                 {{ date('M d, Y', strtotime($value)) }}
                                             @else
                                                 {{ $value ?? 'N/A' }}
@@ -385,11 +414,16 @@
                                     <div class="card-item">
                                         <span class="label">{{ ucwords(str_replace('_', ' ', $key)) }}:</span>
                                         <span class="value">
-                                            @if(is_numeric($value) && $value > 1000)
-                                                Rs. {{ number_format($value, 2) }}
-                                            @elseif(is_numeric($value))
-                                                {{ number_format($value, 2) }}
-                                            @elseif(strtotime($value))
+                                            @php
+                                                $isCurrency = preg_match('/revenue|amount|price|sales|total_sales|total_revenue|revenue/i', $key);
+                                            @endphp
+                                            @if(is_numeric($value))
+                                                @if($isCurrency)
+                                                    Rs. {{ number_format($value, 2) }}
+                                                @else
+                                                    {{ number_format($value, 2) }}
+                                                @endif
+                                            @elseif(strtotime($value) && !is_numeric($value) && strlen($value) > 8)
                                                 {{ date('M d, Y', strtotime($value)) }}
                                             @else
                                                 {{ $value ?? 'N/A' }}

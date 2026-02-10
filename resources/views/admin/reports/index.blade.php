@@ -38,62 +38,6 @@
                     'color' => 'var(--blue)'
                 ],
                 [
-                    'id' => 'pending-pickup',
-                    'title' => 'Pending Pickup',
-                    'description' => 'Orders awaiting buyer pickup',
-                    'category' => 'sales',
-                    'icon' => 'fas fa-truck-loading',
-                    'color' => 'var(--accent-amber)'
-                ],
-                [
-                    'id' => 'sales-volume',
-                    'title' => 'Sales Volume',
-                    'description' => 'Sales performance over time',
-                    'category' => 'sales',
-                    'icon' => 'fas fa-chart-line',
-                    'color' => 'var(--primary-accent)'
-                ],
-                [
-                    'id' => 'sales-payment',
-                    'title' => 'Sales Reconciliation',
-                    'description' => 'Sales vs payments reconciliation',
-                    'category' => 'financial',
-                    'icon' => 'fas fa-money-check-alt',
-                    'color' => 'var(--purple)'
-                ],
-                [
-                    'id' => 'system-financial',
-                    'title' => 'Financial Summary',
-                    'description' => 'System financial snapshot',
-                    'category' => 'financial',
-                    'icon' => 'fas fa-file-invoice-dollar',
-                    'color' => 'var(--blue)'
-                ],
-                [
-                    'id' => 'daily-cash',
-                    'title' => 'Daily Cash',
-                    'description' => 'Cash inflow and COD amounts',
-                    'category' => 'cod',
-                    'icon' => 'fas fa-cash-register',
-                    'color' => 'var(--accent-amber)'
-                ],
-                [
-                    'id' => 'cash-collection-delay',
-                    'title' => 'Collection Delay',
-                    'description' => 'Delayed cash collection tracking',
-                    'category' => 'cod',
-                    'icon' => 'fas fa-clock',
-                    'color' => 'var(--purple)'
-                ],
-                [
-                    'id' => 'cod-exception',
-                    'title' => 'COD Exception',
-                    'description' => 'Cash payment anomalies',
-                    'category' => 'cod',
-                    'icon' => 'fas fa-exclamation-triangle',
-                    'color' => '#ef4444'
-                ],
-                [
                     'id' => 'inventory-stock',
                     'title' => 'Inventory Stock',
                     'description' => 'Available products overview',
@@ -150,14 +94,6 @@
                     'color' => 'var(--accent-amber)'
                 ],
                 [
-                    'id' => 'data-quality',
-                    'title' => 'Data Quality',
-                    'description' => 'Missing fields identification',
-                    'category' => 'users',
-                    'icon' => 'fas fa-database',
-                    'color' => 'var(--purple)'
-                ],
-                [
                     'id' => 'dispute-feedback',
                     'title' => 'Dispute Log',
                     'description' => 'Complaints tracking',
@@ -166,9 +102,9 @@
                     'color' => '#ef4444'
                 ],
                 [
-                    'id' => 'regional-cod',
-                    'title' => 'Regional Performance',
-                    'description' => 'Geographical analysis',
+                    'id' => 'regional-performance',
+                    'title' => 'Regional Performance & Sales Density',
+                    'description' => 'Comprehensive geographical analysis and sales density',
                     'category' => 'sales',
                     'icon' => 'fas fa-map-marked-alt',
                     'color' => 'var(--primary-accent)'
@@ -206,44 +142,12 @@
                     'color' => 'var(--primary-accent)'
                 ],
                 [
-                    'id' => 'farmer-payment-delay',
-                    'title' => 'Payment Delay Risk',
-                    'description' => 'Farmer payment delays',
-                    'category' => 'cod',
-                    'icon' => 'fas fa-exclamation-circle',
-                    'color' => '#ef4444'
-                ],
-                [
-                    'id' => 'geographic-sales',
-                    'title' => 'Geographic Sales',
-                    'description' => 'Regional sales density',
-                    'category' => 'sales',
-                    'icon' => 'fas fa-globe-asia',
-                    'color' => 'var(--accent-amber)'
-                ],
-                [
-                    'id' => 'buyer-payment-behavior',
-                    'title' => 'Payment Behavior',
-                    'description' => 'Buyer payment patterns',
-                    'category' => 'financial',
-                    'icon' => 'fas fa-user-clock',
-                    'color' => 'var(--blue)'
-                ],
-                [
                     'id' => 'product-taxonomy',
                     'title' => 'Product Taxonomy',
                     'description' => 'Category performance',
                     'category' => 'inventory',
                     'icon' => 'fas fa-tags',
                     'color' => 'var(--purple)'
-                ],
-                [
-                    'id' => 'cod-payment',
-                    'title' => 'COD Payment',
-                    'description' => 'COD payment tracking',
-                    'category' => 'cod',
-                    'icon' => 'fas fa-file-invoice',
-                    'color' => 'var(--primary-accent)'
                 ],
                 [
                     'id' => 'cod-revenue',

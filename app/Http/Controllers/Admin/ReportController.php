@@ -47,25 +47,29 @@ class ReportController extends Controller
                 break;
 
             case 'pending-pickup':
+                $validPickupStatuses = ['paid', 'ready_for_pickup','pending','completed'];
                 $data = DB::table('orders')
                     ->select(
                         'orders.id as order_id',
                         'buyers.name as buyer_name',
                         'farmers.name as farmer_name',
-                        DB::raw("STRING_AGG(products.product_name, ', ') as product_names"),
+                        DB::raw("STRING_AGG(DISTINCT products.product_name, ', ') as product_names"),
                         'orders.total_amount',
-                        'orders.paid_date',
-                        DB::raw("DATE_PART('day', NOW() - orders.paid_date) as days_since_paid"),
-                        'farmers.residential_address as pickup_location'
+                        'orders.created_at as order_date',
+                        DB::raw("DATE_PART('day', NOW() - orders.created_at) as days_pending"),
+                        'farmers.residential_address as pickup_location',
+                        'payments.payment_status',
+                        'payments.payment_method'
                     )
                     ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
                     ->leftJoin('farmers', 'orders.farmer_id', '=', 'farmers.id')
                     ->leftJoin('order_items', 'orders.id', '=', 'order_items.order_id')
                     ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
-                    ->where('orders.order_status', 'confirmed')
+                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
+                    ->whereIn('orders.order_status', $validPickupStatuses)
                     ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy('orders.id', 'buyers.name', 'farmers.name', 'orders.total_amount', 'orders.paid_date', 'farmers.residential_address')
-                    ->orderBy('orders.paid_date')
+                    ->groupBy('orders.id', 'buyers.name', 'farmers.name', 'orders.total_amount', 'orders.created_at', 'farmers.residential_address', 'payments.payment_status', 'payments.payment_method')
+                    ->orderBy('orders.created_at', 'asc')
                     ->get();
                 break;
 
@@ -73,9 +77,9 @@ class ReportController extends Controller
                 $data = DB::table('orders')
                     ->select(
                         DB::raw("DATE(orders.created_at) as period"),
-                        DB::raw("COUNT(orders.id) as total_orders"),
+                        DB::raw("COUNT(DISTINCT orders.id) as total_orders"),
                         DB::raw("SUM(order_items.quantity_ordered) as total_quantity"),
-                        DB::raw("SUM(orders.total_amount) as total_sales"),
+                        DB::raw("SUM(order_items.item_total) as total_sales"),
                         DB::raw("AVG(orders.total_amount) as avg_order_value")
                     )
                     ->leftJoin('order_items', 'orders.id', '=', 'order_items.order_id')
@@ -87,46 +91,81 @@ class ReportController extends Controller
                 break;
 
             case 'sales-payment':
-                $data = DB::table('orders')
-                    ->select(
-                        DB::raw("COUNT(orders.id) as total_orders"),
-                        DB::raw("SUM(orders.total_amount) as total_sales_value"),
-                        DB::raw("SUM(payments.amount) as total_amount_received"),
-                        DB::raw("AVG(orders.total_amount) as avg_order_value")
-                    )
-                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
-                    ->where('orders.order_status', 'completed')
+                $validReconciliationStatuses = ['confirmed', 'paid', 'ready_for_pickup', 'completed'];
+
+                $total_orders = DB::table('orders')
+                    ->whereIn('order_status', $validReconciliationStatuses)
+                    ->whereBetween('created_at', [$fromDate, $toDate])
+                    ->count();
+
+                $total_sales_value = DB::table('orders')
+                    ->whereIn('order_status', $validReconciliationStatuses)
+                    ->whereBetween('created_at', [$fromDate, $toDate])
+                    ->sum('total_amount');
+
+                $total_amount_received = DB::table('payments')
+                    ->join('orders', 'payments.order_id', '=', 'orders.id')
+                    ->whereIn('orders.order_status', $validReconciliationStatuses)
                     ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->first();
+                    ->sum('payments.amount');
+
+                $avg_order_value = $total_orders > 0 ? $total_sales_value / $total_orders : 0;
+
+                $data = collect([
+                    (object)[
+                        'total_orders' => $total_orders,
+                        'total_sales_value' => $total_sales_value,
+                        'total_amount_received' => $total_amount_received,
+                        'avg_order_value' => $avg_order_value
+                    ]
+                ]);
                 break;
 
             case 'system-financial':
-                $data = DB::table('orders')
+                $financials = DB::table('orders')
                     ->select(
-                        DB::raw("COUNT(orders.id) as total_orders"),
-                        DB::raw("SUM(orders.total_amount) as total_revenue"),
-                        DB::raw("COUNT(DISTINCT buyers.id) as active_buyers"),
-                        DB::raw("COUNT(DISTINCT farmers.id) as active_farmers"),
-                        DB::raw("AVG(orders.total_amount) as avg_order_value")
+                        DB::raw("COUNT(id) as total_orders"),
+                        DB::raw("SUM(total_amount) as total_revenue"),
+                        DB::raw("AVG(total_amount) as avg_order_value")
                     )
-                    ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
-                    ->leftJoin('farmers', 'orders.farmer_id', '=', 'farmers.id')
-                    ->where('orders.order_status', 'completed')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
+                    ->where('order_status', 'completed')
+                    ->whereBetween('created_at', [$fromDate, $toDate])
                     ->first();
+
+                $activeBuyers = DB::table('buyers')
+                    ->join('orders', 'buyers.id', '=', 'orders.buyer_id')
+                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
+                    ->distinct()
+                    ->count('buyers.id');
+
+                $activeFarmers = DB::table('farmers')
+                    ->join('orders', 'farmers.id', '=', 'orders.farmer_id')
+                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
+                    ->distinct()
+                    ->count('farmers.id');
+
+                $data = collect([
+                    (object)[
+                        'total_orders' => $financials->total_orders ?? 0,
+                        'total_revenue' => $financials->total_revenue ?? 0,
+                        'active_buyers' => $activeBuyers,
+                        'active_farmers' => $activeFarmers,
+                        'avg_order_value' => $financials->avg_order_value ?? 0
+                    ]
+                ]);
                 break;
 
             case 'daily-cash':
                 $data = DB::table('orders')
                     ->select(
-                        DB::raw("DATE(orders.paid_date) as date"),
-                        DB::raw("COUNT(CASE WHEN payments.payment_method = 'COD' THEN orders.id END) as total_cod_orders"),
-                        DB::raw("SUM(CASE WHEN payments.payment_method = 'COD' THEN payments.amount ELSE 0 END) as collected_amount"),
-                        DB::raw("SUM(CASE WHEN orders.order_status = 'confirmed' AND payments.payment_method = 'COD' THEN orders.total_amount ELSE 0 END) as outstanding_amount")
+                        DB::raw("DATE(orders.created_at) as date"),
+                        DB::raw("COUNT(DISTINCT CASE WHEN payments.payment_method = 'COD' THEN orders.id END) as total_cod_orders"),
+                        DB::raw("COALESCE(SUM(CASE WHEN payments.payment_method = 'COD' THEN payments.amount ELSE 0 END), 0) as collected_amount"),
+                         DB::raw("COALESCE(SUM(CASE WHEN orders.order_status = 'confirmed' AND (payments.id IS NULL OR payments.payment_method = 'COD') THEN orders.total_amount ELSE 0 END), 0) as outstanding_amount")
                     )
                     ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
                     ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy(DB::raw("DATE(orders.paid_date)"))
+                    ->groupBy(DB::raw("DATE(orders.created_at)"))
                     ->orderBy('date')
                     ->get();
                 break;
@@ -171,7 +210,7 @@ class ReportController extends Controller
                     ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
                     ->where('payments.payment_method', 'COD')
                     ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->having('difference', '!=', 0)
+                    ->whereRaw("orders.total_amount - payments.amount != 0")
                     ->orderBy('difference', 'desc')
                     ->get();
                 break;
@@ -196,18 +235,31 @@ class ReportController extends Controller
                 break;
 
             case 'category-performance':
+                // Subquery to get total quantity listed per category
+                $inventorySub = DB::table('products')
+                    ->select('category_id', DB::raw("SUM(quantity) as total_qty"))
+                    ->groupBy('category_id');
+
+                // Subquery to get sales data per category in the date range
+                $salesSub = DB::table('order_items')
+                    ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                    ->join('products', 'order_items.product_id', '=', 'products.id')
+                    ->select('products.category_id', 
+                        DB::raw("SUM(order_items.quantity_ordered) as total_sold"),
+                        DB::raw("SUM(order_items.item_total) as revenue")
+                    )
+                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
+                    ->groupBy('products.category_id');
+
                 $data = DB::table('product_categories')
                     ->select(
                         'product_categories.category_name',
-                        DB::raw("COUNT(DISTINCT products.id) as total_products"),
-                        DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0) as total_sold"),
-                        DB::raw("COALESCE(SUM(orders.total_amount), 0) as revenue")
+                        DB::raw("COALESCE(inventory.total_qty, 0) as total_product_quantity"),
+                        DB::raw("COALESCE(sales.total_sold, 0) as total_sold"),
+                        DB::raw("COALESCE(sales.revenue, 0) as revenue")
                     )
-                    ->leftJoin('products', 'product_categories.id', '=', 'products.category_id')
-                    ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
-                    ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy('product_categories.id', 'product_categories.category_name')
+                    ->leftJoinSub($inventorySub, 'inventory', 'product_categories.id', '=', 'inventory.category_id')
+                    ->leftJoinSub($salesSub, 'sales', 'product_categories.id', '=', 'sales.category_id')
                     ->orderBy('revenue', 'desc')
                     ->get();
                 break;
@@ -217,13 +269,17 @@ class ReportController extends Controller
                     ->select(
                         'products.product_name',
                         DB::raw("products.quantity as ending_quantity"),
-                        DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0) as sales"),
+                        DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0) as quantity_sold"),
+                        DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0) + products.quantity as starting_quantity"),
                         DB::raw("MAX(orders.created_at) as movement_date")
                     )
                     ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
-                    ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
+                    ->leftJoin('orders', function($join) use ($fromDate, $toDate) {
+                        $join->on('order_items.order_id', '=', 'orders.id')
+                             ->whereBetween('orders.created_at', [$fromDate, $toDate]);
+                    })
                     ->groupBy('products.id', 'products.product_name', 'products.quantity')
+                    ->having(DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0)"), '>', 0)
                     ->orderBy('movement_date', 'desc')
                     ->get();
                 break;
@@ -236,7 +292,7 @@ class ReportController extends Controller
                         DB::raw("COUNT(DISTINCT farmers.id) as total_farmers_managed"),
                         DB::raw("COUNT(DISTINCT CASE WHEN products.id IS NOT NULL THEN farmers.id END) as active_farmers"),
                         DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0) as total_quantity_sold"),
-                        DB::raw("COALESCE(SUM(orders.total_amount), 0) as total_revenue")
+                        DB::raw("COALESCE(SUM(order_items.item_total), 0) as total_revenue")
                     )
                     ->leftJoin('farmers', 'lead_farmers.id', '=', 'farmers.lead_farmer_id')
                     ->leftJoin('products', 'farmers.id', '=', 'products.farmer_id')
@@ -253,16 +309,14 @@ class ReportController extends Controller
                     ->select(
                         'farmers.name',
                         'farmers.created_at as registration_date',
-                        DB::raw("CASE
-                            WHEN farmers.nic_no IS NOT NULL AND farmers.primary_mobile IS NOT NULL AND farmers.residential_address IS NOT NULL THEN 'Complete'
-                            ELSE 'Incomplete'
-                        END as profile_status"),
+                        DB::raw("MAX(users.last_login) as last_login"),
                         DB::raw("COUNT(products.id) as product_listings"),
-                        'farmers.is_active'
+                        DB::raw("CASE WHEN farmers.is_active = true THEN 'Active' ELSE 'Not Active' END as is_active")
                     )
                     ->leftJoin('products', 'farmers.id', '=', 'products.farmer_id')
+                    ->leftJoin('users', 'farmers.user_id', '=', 'users.id')
                     ->whereBetween('farmers.created_at', [$fromDate, $toDate])
-                    ->groupBy('farmers.id', 'farmers.name', 'farmers.created_at', 'farmers.nic_no', 'farmers.primary_mobile', 'farmers.residential_address', 'farmers.is_active')
+                    ->groupBy('farmers.id', 'farmers.name', 'farmers.created_at', 'farmers.is_active')
                     ->orderBy('farmers.created_at', 'desc')
                     ->get();
                 break;
@@ -288,8 +342,7 @@ class ReportController extends Controller
                         'username',
                         'role',
                         'last_login',
-                        'is_active',
-                        DB::raw("(SELECT COUNT(*) FROM sessions WHERE sessions.user_id = users.id) as login_count")
+                        DB::raw("CASE WHEN is_active = true THEN 'Active' ELSE 'Not Active' END as is_active")
                     )
                     ->whereBetween('created_at', [$fromDate, $toDate])
                     ->orderBy('last_login', 'desc')
@@ -338,19 +391,27 @@ class ReportController extends Controller
                     ->get();
                 break;
 
-            case 'regional-cod':
+            case 'regional-performance':
                 $data = DB::table('farmers')
                     ->select(
-                        'farmers.district',
+                        'farmers.district as region',
                         DB::raw("COUNT(DISTINCT farmers.id) as total_farmers"),
+                        DB::raw("COUNT(DISTINCT CASE WHEN orders.id IS NOT NULL THEN farmers.id END) as active_farmers"),
                         DB::raw("COUNT(DISTINCT products.id) as total_products"),
-                        DB::raw("COALESCE(SUM(orders.total_amount), 0) as total_sales"),
-                        DB::raw("AVG(orders.total_amount) as avg_order_value")
+                        DB::raw("COUNT(DISTINCT buyers.id) as active_buyers"),
+                        DB::raw("COUNT(DISTINCT orders.id) as total_orders"),
+                        DB::raw("COALESCE(SUM(order_items.item_total), 0) as total_sales"),
+                        DB::raw("CASE WHEN COUNT(DISTINCT orders.id) > 0 
+                                 THEN COALESCE(SUM(order_items.item_total), 0) / COUNT(DISTINCT orders.id) 
+                                 ELSE 0 END as avg_order_value")
                     )
                     ->leftJoin('products', 'farmers.id', '=', 'products.farmer_id')
                     ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
-                    ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
+                    ->leftJoin('orders', function($join) use ($fromDate, $toDate) {
+                        $join->on('order_items.order_id', '=', 'orders.id')
+                             ->whereBetween('orders.created_at', [$fromDate, $toDate]);
+                    })
+                    ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
                     ->groupBy('farmers.district')
                     ->orderBy('total_sales', 'desc')
                     ->get();
@@ -362,8 +423,7 @@ class ReportController extends Controller
                         'products.quality_grade',
                         DB::raw("COUNT(products.id) as total_products"),
                         DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0) as total_sold"),
-                        DB::raw("AVG(products.selling_price) as avg_price"),
-                        DB::raw("ROUND(COALESCE(SUM(order_items.quantity_ordered), 0) * 100.0 / COUNT(products.id), 2) as sell_through_rate")
+                        DB::raw("ROUND(COALESCE(SUM(order_items.quantity_ordered), 0) * 100.0 / NULLIF(COUNT(products.id), 0), 2) as sell_through_rate")
                     )
                     ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
                     ->whereBetween('products.created_at', [$fromDate, $toDate])
@@ -376,7 +436,7 @@ class ReportController extends Controller
                 $data = DB::table('orders')
                     ->select(
                         'orders.id as order_id',
-                        'orders.order_date',
+                        'orders.created_at as order_date',
                         'payments.payment_date',
                         'orders.paid_date as pickup_date',
                         'orders.completed_date',
@@ -397,11 +457,9 @@ class ReportController extends Controller
                         'payments.amount',
                         'payments.payment_method',
                         'payments.payment_status',
-                        'payments.payment_date',
-                        'users.username as verified_by'
+                        'payments.payment_date'
                     )
                     ->leftJoin('orders', 'payments.order_id', '=', 'orders.id')
-                    ->leftJoin('users', 'payments.id', '=', 'users.id')
                     ->whereBetween('payments.payment_date', [$fromDate, $toDate])
                     ->orderBy('payments.payment_date', 'desc')
                     ->get();
@@ -412,16 +470,15 @@ class ReportController extends Controller
                     ->select(
                         'products.product_name',
                         DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0) as quantity_sold"),
-                        DB::raw("COALESCE(SUM(order_items.quantity_ordered * order_items.unit_price_snapshot), 0) as cash_expected"),
-                        DB::raw("COALESCE(SUM(payments.amount), 0) as cash_received"),
-                        DB::raw("COALESCE(SUM(order_items.quantity_ordered * order_items.unit_price_snapshot), 0) - COALESCE(SUM(payments.amount), 0) as variance")
+                        DB::raw("COALESCE(SUM(order_items.item_total), 0) as expected_revenue"),
+                        DB::raw("COALESCE(SUM((order_items.item_total / NULLIF(orders.total_amount, 0)) * payments.amount), 0) as cash_received"),
+                        DB::raw("COALESCE(SUM(order_items.item_total), 0) - COALESCE(SUM((order_items.item_total / NULLIF(orders.total_amount, 0)) * payments.amount), 0) as variance")
                     )
                     ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
                     ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
                     ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
                     ->whereBetween('orders.created_at', [$fromDate, $toDate])
                     ->groupBy('products.id', 'products.product_name')
-                    ->having(DB::raw("COALESCE(SUM(order_items.quantity_ordered * order_items.unit_price_snapshot), 0) - COALESCE(SUM(payments.amount), 0)"), '!=', 0)
                     ->orderBy('variance', 'desc')
                     ->get();
                 break;
@@ -432,11 +489,12 @@ class ReportController extends Controller
                         'farmers.name',
                         DB::raw("COALESCE(SUM(orders.total_amount), 0) as total_sales"),
                         DB::raw("AVG(DATE_PART('day', payments.payment_date - orders.created_at)) as avg_payment_delay"),
-                        DB::raw("MAX(payments.payment_date) as last_payment_date"),
+                        DB::raw("COUNT(DISTINCT complaints.id) as complaint_count"),
                         DB::raw("SUM(CASE WHEN orders.order_status = 'confirmed' AND payments.id IS NULL THEN orders.total_amount ELSE 0 END) as outstanding_amount")
                     )
                     ->leftJoin('orders', 'farmers.id', '=', 'orders.farmer_id')
                     ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
+                    ->leftJoin('complaints', 'orders.id', '=', 'complaints.related_order_id')
                     ->whereBetween('orders.created_at', [$fromDate, $toDate])
                     ->groupBy('farmers.id', 'farmers.name')
                     ->having(DB::raw("AVG(DATE_PART('day', payments.payment_date - orders.created_at))"), '>', 7)
@@ -445,30 +503,14 @@ class ReportController extends Controller
                     ->get();
                 break;
 
-            case 'geographic-sales':
-                $data = DB::table('farmers')
-                    ->select(
-                        'farmers.district as region',
-                        DB::raw("COUNT(DISTINCT farmers.id) as active_farmers"),
-                        DB::raw("COUNT(DISTINCT buyers.id) as active_buyers"),
-                        DB::raw("COALESCE(SUM(orders.total_amount), 0) as total_sales"),
-                        DB::raw("COUNT(DISTINCT orders.id) as number_of_orders")
-                    )
-                    ->leftJoin('orders', 'farmers.id', '=', 'orders.farmer_id')
-                    ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy('farmers.district')
-                    ->orderBy('total_sales', 'desc')
-                    ->get();
-                break;
 
             case 'buyer-payment-behavior':
                 $data = DB::table('buyers')
                     ->select(
                         'buyers.name',
-                        DB::raw("COUNT(orders.id) as total_orders"),
-                        DB::raw("COUNT(CASE WHEN payments.payment_method = 'COD' THEN orders.id END) as cod_orders"),
-                        DB::raw("ROUND(COUNT(CASE WHEN orders.order_status = 'completed' AND payments.payment_method = 'COD' THEN orders.id END) * 100.0 / NULLIF(COUNT(CASE WHEN payments.payment_method = 'COD' THEN orders.id END), 0), 2) as cod_completion_rate"),
+                        DB::raw("COUNT(DISTINCT orders.id) as total_orders"),
+                        DB::raw("COUNT(DISTINCT CASE WHEN payments.payment_method = 'COD' THEN orders.id END) as cod_orders"),
+                        DB::raw("ROUND(COUNT(DISTINCT CASE WHEN orders.order_status = 'completed' AND payments.payment_method = 'COD' THEN orders.id END) * 100.0 / NULLIF(COUNT(DISTINCT CASE WHEN payments.payment_method = 'COD' THEN orders.id END), 0), 2) as cod_completion_rate"),
                         DB::raw("AVG(DATE_PART('day', payments.payment_date - orders.created_at)) as avg_payment_time")
                     )
                     ->leftJoin('orders', 'buyers.id', '=', 'orders.buyer_id')
@@ -483,9 +525,9 @@ class ReportController extends Controller
                 $data = DB::table('product_categories')
                     ->select(
                         'product_categories.category_name',
-                        'product_categories.is_active as category_active',
+                        DB::raw("CASE WHEN product_categories.is_active = true THEN 'Active' ELSE 'Not Active' END as category_active"),
                         'product_subcategories.subcategory_name',
-                        'product_subcategories.is_active as subcategory_active',
+                        DB::raw("CASE WHEN product_subcategories.is_active = true THEN 'Active' ELSE 'Not Active' END as subcategory_active"),
                         DB::raw("COUNT(DISTINCT products.id) as listings_count"),
                         DB::raw("COALESCE(SUM(orders.total_amount), 0) as total_sales")
                     )
@@ -507,30 +549,21 @@ class ReportController extends Controller
                         'buyers.name as buyer_name',
                         'farmers.name as farmer_name',
                         'orders.total_amount as order_amount',
-                        'payments.amount as recorded_payment',
-                        DB::raw("orders.total_amount - payments.amount as variance"),
-                        'payments.payment_date'
+                        DB::raw("SUM(payments.amount) as recorded_payment"),
+                        DB::raw("orders.total_amount - COALESCE(SUM(payments.amount), 0) as variance"),
+                        DB::raw("MAX(payments.payment_date) as last_payment_date")
                     )
                     ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
                     ->leftJoin('farmers', 'orders.farmer_id', '=', 'farmers.id')
                     ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
                     ->where('payments.payment_method', 'COD')
                     ->whereBetween('orders.created_at', [$fromDate, $toDate])
+                    ->groupBy('orders.id', 'buyers.name', 'farmers.name', 'orders.total_amount')
                     ->orderBy('variance', 'desc')
                     ->get();
                 break;
 
-            case 'cod-revenue':
-                $data = DB::table('orders')
-                    ->select(
-                        DB::raw("COUNT(orders.id) as pending_orders"),
-                        DB::raw("SUM(orders.total_amount) as expected_cash"),
-                        DB::raw("AVG(orders.total_amount) as avg_order_value")
-                    )
-                    ->where('orders.order_status', 'confirmed')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->first();
-                break;
+
 
             default:
                 $data = [];
@@ -562,7 +595,7 @@ class ReportController extends Controller
             'user-access' => 'User Access & Role Management Report',
             'data-quality' => 'Data Quality Report',
             'dispute-feedback' => 'Dispute & Feedback Log Report',
-            'regional-cod' => 'Regional Performance Report',
+            'regional-performance' => 'Regional Performance & Sales Density Report',
             'quality-grade' => 'Quality Grade Performance Report',
             'order-fulfillment' => 'Order Fulfillment Timeline Report',
             'financial-audit' => 'Financial Audit & Transaction Report',
@@ -572,7 +605,7 @@ class ReportController extends Controller
             'buyer-payment-behavior' => 'Buyer Payment Behavior Report',
             'product-taxonomy' => 'Product Taxonomy Report',
             'cod-payment' => 'COD Payment Reconciliation Report',
-            'cod-revenue' => 'COD Revenue Forecast Report',
+
         ];
 
         return view('admin.reports.view', [
@@ -606,7 +639,7 @@ class ReportController extends Controller
             'user-access' => 'User Access & Role Management Report',
             'data-quality' => 'Data Quality Report',
             'dispute-feedback' => 'Dispute & Feedback Log Report',
-            'regional-cod' => 'Regional Performance Report',
+            'regional-performance' => 'Regional Performance & Sales Density Report',
             'quality-grade' => 'Quality Grade Performance Report',
             'order-fulfillment' => 'Order Fulfillment Timeline Report',
             'financial-audit' => 'Financial Audit & Transaction Report',
@@ -616,7 +649,7 @@ class ReportController extends Controller
             'buyer-payment-behavior' => 'Buyer Payment Behavior Report',
             'product-taxonomy' => 'Product Taxonomy Report',
             'cod-payment' => 'COD Payment Reconciliation Report',
-            'cod-revenue' => 'COD Revenue Forecast Report',
+
         ];
 
         $pdf = PDF::loadView('admin.reports.templates.' . $reportType, [
