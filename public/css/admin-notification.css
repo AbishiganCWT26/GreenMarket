@@ -117,7 +117,7 @@
 .send-box {
 	background: var(--card-bg);
 	border-radius: var(--border-radius);
-	padding: 12px;
+	padding: 10px;
 	margin-bottom: 16px;
 	display: flex;
 	gap: 8px;
@@ -157,18 +157,18 @@
 	background: var(--body-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 8px center;
 	background-size: 10px;
 	padding-right: 26px;
-	min-width: 110px;
+	min-width: 100px;
 }
 
 .send-box input {
-	min-width: 140px;
+	min-width: 100px;
 }
 
 .send-box textarea {
 	resize: vertical;
 	min-height: 32px;
 	height: 32px;
-	min-width: 180px;
+	min-width: 130px;
 	padding: 6px 10px;
 }
 
@@ -190,7 +190,7 @@
 	font-size: 12px;
 	font-weight: 500;
 	cursor: pointer;
-	display: flex;
+
 	align-items: center;
 	justify-content: center;
 	gap: 4px;

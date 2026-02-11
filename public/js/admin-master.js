@@ -162,13 +162,13 @@ document.addEventListener("DOMContentLoaded", function () {
             this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             this.disabled = true;
 
-            fetch(markSingleUrl, {
+            fetch(`${markSingleUrl}/${id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": csrfToken,
                 },
-                body: JSON.stringify({ notification_id: id })
+                body: JSON.stringify({})
             })
                 .then((response) => {
                     if (!response.ok) {

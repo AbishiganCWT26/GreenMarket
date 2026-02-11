@@ -415,7 +415,6 @@ Route::prefix('admin')
 	Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
 	Route::get('/notifications', [NotificationAdminController::class, 'index'])->name('notifications.index');
-	Route::get('/notifications/search', [NotificationAdminController::class, 'search'])->name('notifications.search');
 	Route::post('/notifications/send', [NotificationAdminController::class, 'sendNotification'])->name('notifications.send');
 	Route::post('/notifications/mark-all-read', [NotificationAdminController::class, 'markAllAsRead'])->name('notifications.markAllRead');
 	Route::post('/notifications/mark-read/{id}', [NotificationAdminController::class, 'markAsRead'])->name('notifications.markRead');

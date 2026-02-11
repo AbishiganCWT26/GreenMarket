@@ -12,7 +12,6 @@
 	<div class="notification-header">
 		<h2>Notifications</h2>
 		<div class="header-actions">
-			<input type="text" id="searchInput" placeholder="Search notifications..." autocomplete="off">
 			<button id="markAllRead">
 				<span>Mark All Read</span>
 			</button>
@@ -49,11 +48,11 @@
 	<div id="paginationContainer" class="pagination"></div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 let currentPage = 1;
 let currentView = 'card';
-let searchTerm = '';
 
 document.addEventListener('DOMContentLoaded', function(){
 	initializeEventListeners();
@@ -61,12 +60,10 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 function initializeEventListeners(){
-	const searchInput = document.getElementById('searchInput');
 	const sendButton = document.getElementById('sendNotification');
 	const markAllReadButton = document.getElementById('markAllRead');
 	const viewButtons = document.querySelectorAll('.view-btn');
 
-	searchInput.addEventListener('input', debounce(handleSearch, 300));
 	sendButton.addEventListener('click', handleSendNotification);
 	markAllReadButton.addEventListener('click', handleMarkAllRead);
 	
@@ -81,23 +78,7 @@ function initializeEventListeners(){
 	});
 }
 
-function debounce(func, wait){
-	let timeout;
-	return function executedFunction(...args){
-		const later = () => {
-			clearTimeout(timeout);
-			func(...args);
-		};
-		clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
-	};
-}
 
-function handleSearch(e){
-	searchTerm = e.target.value;
-	currentPage = 1;
-	loadNotifications();
-}
 
 async function handleSendNotification(){
 	const userId = document.getElementById('user_id').value;
@@ -223,12 +204,32 @@ async function loadNotifications(){
 	container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="skeleton-loader">Loading notifications...</div></div>';
 	
 	try{
-		const response = await fetch(`{{ route('admin.notifications.search') }}?q=${encodeURIComponent(searchTerm)}&page=${currentPage}&view=${currentView}&per_page=${perPage}`);
+		const url = `{{ route('admin.notifications.index') }}?page=${currentPage}&view=${currentView}&per_page=${perPage}`;
+		console.log('Loading notifications:', url);
+		
+		const response = await fetch(url, {
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest'
+			}
+		});
+		
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+		
 		const html = await response.text();
+		
+		if (!html || html.trim() === '') {
+			throw new Error('Empty response received');
+		}
+		
 		container.innerHTML = html;
 		initializePagination();
+		
+		console.log('Notifications loaded successfully');
 	} catch(error){
-		container.innerHTML = '<div class="empty-state"><p>Failed to load notifications</p></div>';
+		console.error('Error loading notifications:', error);
+		container.innerHTML = '<div class="empty-state"><p>Failed to load notifications. Please try again.</p></div>';
 	}
 }
 

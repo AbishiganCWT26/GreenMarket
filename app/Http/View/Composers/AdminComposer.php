@@ -26,7 +26,8 @@ class AdminComposer
 
         $view->with([
             'unreadNotifications' => $unreadNotifications,
-            'notifications' => $notifications
+            'notifications' => $notifications,
+            'recentNotifications' => $notifications
         ]);
     }
 }

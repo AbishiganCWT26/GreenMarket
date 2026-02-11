@@ -13,47 +13,25 @@ class NotificationAdminController extends Controller
 {
 	public function index(Request $request)
 	{
+		$view = $request->get('view', 'card');
+		$perPage = $request->get('per_page', $view === 'card' ? 10 : 15);
+		
 		$notifications = Notification::with('user')
 			->orderByDesc('created_at')
-			->paginate(15);
+			->paginate($perPage);
 
 		$users = User::select('id', 'username', 'email')
 			->orderBy('username')
 			->get();
 
-		return view('admin.notifications.index', compact('notifications', 'users'));
-	}
-
-	public function search(Request $request)
-	{
-		$query = $request->get('q', '');
-		$view = $request->get('view', 'card');
-		$perPage = $request->get('per_page', $view === 'card' ? 10 : 15);
-
-		$notificationsQuery = Notification::with('user');
-
-		if(!empty($query)){
-			$searchTerm = '%' . strtolower($query) . '%';
-			$notificationsQuery->where(function($q) use ($searchTerm){
-				$q->whereRaw('LOWER(title) LIKE ?', [$searchTerm])
-					->orWhereRaw('LOWER(message) LIKE ?', [$searchTerm])
-					->orWhereRaw('LOWER(notification_type) LIKE ?', [$searchTerm])
-					->orWhereHas('user', function($userQuery) use ($searchTerm){
-						$userQuery->whereRaw('LOWER(username) LIKE ?', [$searchTerm])
-							->orWhereRaw('LOWER(email) LIKE ?', [$searchTerm]);
-					});
-			});
-		}
-
-		$notifications = $notificationsQuery->orderByDesc('created_at')
-			->paginate($perPage);
-
 		if($request->ajax()){
 			return view('admin.notifications.partials.notification-list', compact('notifications', 'view'))->render();
 		}
 
-		return view('admin.notifications.partials.notification-list', compact('notifications', 'view'));
+		return view('admin.notifications.index', compact('notifications', 'users'));
 	}
+
+
 
 	public function sendNotification(Request $request)
 	{
@@ -108,13 +86,13 @@ class NotificationAdminController extends Controller
 			DB::commit();
 			
 			return response()->json([
-				'status' => 'success',
+				'success' => true,
 				'message' => 'All notifications marked as read'
 			]);
 		} catch(\Exception $e){
 			DB::rollBack();
 			return response()->json([
-				'status' => 'error',
+				'success' => false,
 				'message' => 'Failed to mark notifications as read'
 			], 500);
 		}
@@ -134,13 +112,13 @@ class NotificationAdminController extends Controller
 			DB::commit();
 			
 			return response()->json([
-				'status' => 'success',
+				'success' => true,
 				'message' => 'Notification marked as read'
 			]);
 		} catch(\Exception $e){
 			DB::rollBack();
 			return response()->json([
-				'status' => 'error',
+				'success' => false,
 				'message' => 'Failed to mark notification as read'
 			], 500);
 		}
