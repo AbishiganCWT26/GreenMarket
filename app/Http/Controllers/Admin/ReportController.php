@@ -46,174 +46,19 @@ class ReportController extends Controller
                     ->get();
                 break;
 
-            case 'pending-pickup':
-                $validPickupStatuses = ['paid', 'ready_for_pickup','pending','completed'];
-                $data = DB::table('orders')
-                    ->select(
-                        'orders.id as order_id',
-                        'buyers.name as buyer_name',
-                        'farmers.name as farmer_name',
-                        DB::raw("STRING_AGG(DISTINCT products.product_name, ', ') as product_names"),
-                        'orders.total_amount',
-                        'orders.created_at as order_date',
-                        DB::raw("DATE_PART('day', NOW() - orders.created_at) as days_pending"),
-                        'farmers.residential_address as pickup_location',
-                        'payments.payment_status',
-                        'payments.payment_method'
-                    )
-                    ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
-                    ->leftJoin('farmers', 'orders.farmer_id', '=', 'farmers.id')
-                    ->leftJoin('order_items', 'orders.id', '=', 'order_items.order_id')
-                    ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
-                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
-                    ->whereIn('orders.order_status', $validPickupStatuses)
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy('orders.id', 'buyers.name', 'farmers.name', 'orders.total_amount', 'orders.created_at', 'farmers.residential_address', 'payments.payment_status', 'payments.payment_method')
-                    ->orderBy('orders.created_at', 'asc')
-                    ->get();
-                break;
 
-            case 'sales-volume':
-                $data = DB::table('orders')
-                    ->select(
-                        DB::raw("DATE(orders.created_at) as period"),
-                        DB::raw("COUNT(DISTINCT orders.id) as total_orders"),
-                        DB::raw("SUM(order_items.quantity_ordered) as total_quantity"),
-                        DB::raw("SUM(order_items.item_total) as total_sales"),
-                        DB::raw("AVG(orders.total_amount) as avg_order_value")
-                    )
-                    ->leftJoin('order_items', 'orders.id', '=', 'order_items.order_id')
-                    ->where('orders.order_status', 'completed')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy(DB::raw("DATE(orders.created_at)"))
-                    ->orderBy('period')
-                    ->get();
-                break;
 
-            case 'sales-payment':
-                $validReconciliationStatuses = ['confirmed', 'paid', 'ready_for_pickup', 'completed'];
 
-                $total_orders = DB::table('orders')
-                    ->whereIn('order_status', $validReconciliationStatuses)
-                    ->whereBetween('created_at', [$fromDate, $toDate])
-                    ->count();
 
-                $total_sales_value = DB::table('orders')
-                    ->whereIn('order_status', $validReconciliationStatuses)
-                    ->whereBetween('created_at', [$fromDate, $toDate])
-                    ->sum('total_amount');
 
-                $total_amount_received = DB::table('payments')
-                    ->join('orders', 'payments.order_id', '=', 'orders.id')
-                    ->whereIn('orders.order_status', $validReconciliationStatuses)
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->sum('payments.amount');
 
-                $avg_order_value = $total_orders > 0 ? $total_sales_value / $total_orders : 0;
 
-                $data = collect([
-                    (object)[
-                        'total_orders' => $total_orders,
-                        'total_sales_value' => $total_sales_value,
-                        'total_amount_received' => $total_amount_received,
-                        'avg_order_value' => $avg_order_value
-                    ]
-                ]);
-                break;
 
-            case 'system-financial':
-                $financials = DB::table('orders')
-                    ->select(
-                        DB::raw("COUNT(id) as total_orders"),
-                        DB::raw("SUM(total_amount) as total_revenue"),
-                        DB::raw("AVG(total_amount) as avg_order_value")
-                    )
-                    ->where('order_status', 'completed')
-                    ->whereBetween('created_at', [$fromDate, $toDate])
-                    ->first();
 
-                $activeBuyers = DB::table('buyers')
-                    ->join('orders', 'buyers.id', '=', 'orders.buyer_id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->distinct()
-                    ->count('buyers.id');
 
-                $activeFarmers = DB::table('farmers')
-                    ->join('orders', 'farmers.id', '=', 'orders.farmer_id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->distinct()
-                    ->count('farmers.id');
 
-                $data = collect([
-                    (object)[
-                        'total_orders' => $financials->total_orders ?? 0,
-                        'total_revenue' => $financials->total_revenue ?? 0,
-                        'active_buyers' => $activeBuyers,
-                        'active_farmers' => $activeFarmers,
-                        'avg_order_value' => $financials->avg_order_value ?? 0
-                    ]
-                ]);
-                break;
 
-            case 'daily-cash':
-                $data = DB::table('orders')
-                    ->select(
-                        DB::raw("DATE(orders.created_at) as date"),
-                        DB::raw("COUNT(DISTINCT CASE WHEN payments.payment_method = 'COD' THEN orders.id END) as total_cod_orders"),
-                        DB::raw("COALESCE(SUM(CASE WHEN payments.payment_method = 'COD' THEN payments.amount ELSE 0 END), 0) as collected_amount"),
-                         DB::raw("COALESCE(SUM(CASE WHEN orders.order_status = 'confirmed' AND (payments.id IS NULL OR payments.payment_method = 'COD') THEN orders.total_amount ELSE 0 END), 0) as outstanding_amount")
-                    )
-                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy(DB::raw("DATE(orders.created_at)"))
-                    ->orderBy('date')
-                    ->get();
-                break;
 
-            case 'cash-collection-delay':
-                $data = DB::table('orders')
-                    ->select(
-                        'orders.id as order_id',
-                        'buyers.name as buyer_name',
-                        'farmers.name as farmer_name',
-                        'orders.total_amount as cod_amount',
-                        'orders.created_at',
-                        DB::raw("DATE_PART('day', NOW() - orders.created_at) as days_delayed"),
-                        DB::raw("CASE
-                            WHEN orders.order_status = 'confirmed' AND payments.id IS NULL THEN 'No Payment Recorded'
-                            WHEN DATE_PART('day', payments.payment_date - orders.created_at) > 7 THEN 'Delayed Payment'
-                            ELSE 'On Time'
-                        END as delay_status")
-                    )
-                    ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
-                    ->leftJoin('farmers', 'orders.farmer_id', '=', 'farmers.id')
-                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
-                    ->where('orders.order_status', 'confirmed')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->orderBy('days_delayed', 'desc')
-                    ->get();
-                break;
-
-            case 'cod-exception':
-                $data = DB::table('orders')
-                    ->select(
-                        'orders.id as order_id',
-                        'buyers.name as buyer_name',
-                        'farmers.name as farmer_name',
-                        'orders.total_amount as order_amount',
-                        'payments.amount as recorded_cash',
-                        DB::raw("orders.total_amount - payments.amount as difference"),
-                        'payments.payment_date as collection_date'
-                    )
-                    ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
-                    ->leftJoin('farmers', 'orders.farmer_id', '=', 'farmers.id')
-                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
-                    ->where('payments.payment_method', 'COD')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->whereRaw("orders.total_amount - payments.amount != 0")
-                    ->orderBy('difference', 'desc')
-                    ->get();
-                break;
 
             case 'inventory-stock':
                 $data = DB::table('products')
@@ -349,29 +194,7 @@ class ReportController extends Controller
                     ->get();
                 break;
 
-            case 'data-quality':
-                $data = [
-                    'users' => DB::table('users')
-                        ->select(
-                            DB::raw("COUNT(*) as total"),
-                            DB::raw("SUM(CASE WHEN email IS NULL THEN 1 ELSE 0 END) as missing_email"),
-                            DB::raw("SUM(CASE WHEN last_login IS NULL THEN 1 ELSE 0 END) as never_logged_in")
-                        )->first(),
-                    'farmers' => DB::table('farmers')
-                        ->select(
-                            DB::raw("COUNT(*) as total"),
-                            DB::raw("SUM(CASE WHEN nic_no IS NULL THEN 1 ELSE 0 END) as missing_nic"),
-                            DB::raw("SUM(CASE WHEN address_map_link IS NULL THEN 1 ELSE 0 END) as missing_map_links"),
-                            DB::raw("SUM(CASE WHEN payment_details IS NULL THEN 1 ELSE 0 END) as missing_payment_details")
-                        )->first(),
-                    'products' => DB::table('products')
-                        ->select(
-                            DB::raw("COUNT(*) as total"),
-                            DB::raw("SUM(CASE WHEN product_photo IS NULL THEN 1 ELSE 0 END) as missing_photos"),
-                            DB::raw("SUM(CASE WHEN pickup_map_link IS NULL THEN 1 ELSE 0 END) as missing_pickup_maps")
-                        )->first()
-                ];
-                break;
+
 
             case 'dispute-feedback':
                 $data = DB::table('complaints')
@@ -483,43 +306,10 @@ class ReportController extends Controller
                     ->get();
                 break;
 
-            case 'farmer-payment-delay':
-                $data = DB::table('farmers')
-                    ->select(
-                        'farmers.name',
-                        DB::raw("COALESCE(SUM(orders.total_amount), 0) as total_sales"),
-                        DB::raw("AVG(DATE_PART('day', payments.payment_date - orders.created_at)) as avg_payment_delay"),
-                        DB::raw("COUNT(DISTINCT complaints.id) as complaint_count"),
-                        DB::raw("SUM(CASE WHEN orders.order_status = 'confirmed' AND payments.id IS NULL THEN orders.total_amount ELSE 0 END) as outstanding_amount")
-                    )
-                    ->leftJoin('orders', 'farmers.id', '=', 'orders.farmer_id')
-                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
-                    ->leftJoin('complaints', 'orders.id', '=', 'complaints.related_order_id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy('farmers.id', 'farmers.name')
-                    ->having(DB::raw("AVG(DATE_PART('day', payments.payment_date - orders.created_at))"), '>', 7)
-                    ->orHaving(DB::raw("SUM(CASE WHEN orders.order_status = 'confirmed' AND payments.id IS NULL THEN orders.total_amount ELSE 0 END)"), '>', 0)
-                    ->orderBy('avg_payment_delay', 'desc')
-                    ->get();
-                break;
 
 
-            case 'buyer-payment-behavior':
-                $data = DB::table('buyers')
-                    ->select(
-                        'buyers.name',
-                        DB::raw("COUNT(DISTINCT orders.id) as total_orders"),
-                        DB::raw("COUNT(DISTINCT CASE WHEN payments.payment_method = 'COD' THEN orders.id END) as cod_orders"),
-                        DB::raw("ROUND(COUNT(DISTINCT CASE WHEN orders.order_status = 'completed' AND payments.payment_method = 'COD' THEN orders.id END) * 100.0 / NULLIF(COUNT(DISTINCT CASE WHEN payments.payment_method = 'COD' THEN orders.id END), 0), 2) as cod_completion_rate"),
-                        DB::raw("AVG(DATE_PART('day', payments.payment_date - orders.created_at)) as avg_payment_time")
-                    )
-                    ->leftJoin('orders', 'buyers.id', '=', 'orders.buyer_id')
-                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy('buyers.id', 'buyers.name')
-                    ->orderBy('total_orders', 'desc')
-                    ->get();
-                break;
+
+
 
             case 'product-taxonomy':
                 $data = DB::table('product_categories')
@@ -542,26 +332,7 @@ class ReportController extends Controller
                     ->get();
                 break;
 
-            case 'cod-payment':
-                $data = DB::table('orders')
-                    ->select(
-                        'orders.id as order_id',
-                        'buyers.name as buyer_name',
-                        'farmers.name as farmer_name',
-                        'orders.total_amount as order_amount',
-                        DB::raw("SUM(payments.amount) as recorded_payment"),
-                        DB::raw("orders.total_amount - COALESCE(SUM(payments.amount), 0) as variance"),
-                        DB::raw("MAX(payments.payment_date) as last_payment_date")
-                    )
-                    ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
-                    ->leftJoin('farmers', 'orders.farmer_id', '=', 'farmers.id')
-                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
-                    ->where('payments.payment_method', 'COD')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy('orders.id', 'buyers.name', 'farmers.name', 'orders.total_amount')
-                    ->orderBy('variance', 'desc')
-                    ->get();
-                break;
+
 
 
 
@@ -579,13 +350,6 @@ class ReportController extends Controller
 
         $reportTitles = [
             'order-history' => 'Order History Report',
-            'pending-pickup' => 'Pending Pickup/Delivery Report',
-            'sales-volume' => 'Sales Volume & Value Report',
-            'sales-payment' => 'Sales & Payment Reconciliation Report',
-            'system-financial' => 'System Financial Summary',
-            'daily-cash' => 'Daily Cash Position Report',
-            'cash-collection-delay' => 'Cash Collection Delay Report',
-            'cod-exception' => 'COD Exception Report',
             'inventory-stock' => 'Current Inventory / Stock Report',
             'category-performance' => 'Product Category Performance Report',
             'stock-movement' => 'Stock Movement Report',
@@ -593,18 +357,13 @@ class ReportController extends Controller
             'farmer-registration' => 'Farmer Registration Status Report',
             'system-adoption' => 'System Adoption & User Count Report',
             'user-access' => 'User Access & Role Management Report',
-            'data-quality' => 'Data Quality Report',
             'dispute-feedback' => 'Dispute & Feedback Log Report',
             'regional-performance' => 'Regional Performance & Sales Density Report',
             'quality-grade' => 'Quality Grade Performance Report',
             'order-fulfillment' => 'Order Fulfillment Timeline Report',
             'financial-audit' => 'Financial Audit & Transaction Report',
             'inventory-cash-reconciliation' => 'Inventory vs Cash Reconciliation Report',
-            'farmer-payment-delay' => 'Farmer Payment Delay Risk Report',
-            'geographic-sales' => 'Geographic Sales Density Report',
-            'buyer-payment-behavior' => 'Buyer Payment Behavior Report',
             'product-taxonomy' => 'Product Taxonomy Report',
-            'cod-payment' => 'COD Payment Reconciliation Report',
 
         ];
 
@@ -623,13 +382,6 @@ class ReportController extends Controller
 
         $reportTitles = [
             'order-history' => 'Order History Report',
-            'pending-pickup' => 'Pending Pickup/Delivery Report',
-            'sales-volume' => 'Sales Volume & Value Report',
-            'sales-payment' => 'Sales & Payment Reconciliation Report',
-            'system-financial' => 'System Financial Summary',
-            'daily-cash' => 'Daily Cash Position Report',
-            'cash-collection-delay' => 'Cash Collection Delay Report',
-            'cod-exception' => 'COD Exception Report',
             'inventory-stock' => 'Current Inventory / Stock Report',
             'category-performance' => 'Product Category Performance Report',
             'stock-movement' => 'Stock Movement Report',
@@ -637,18 +389,13 @@ class ReportController extends Controller
             'farmer-registration' => 'Farmer Registration Status Report',
             'system-adoption' => 'System Adoption & User Count Report',
             'user-access' => 'User Access & Role Management Report',
-            'data-quality' => 'Data Quality Report',
             'dispute-feedback' => 'Dispute & Feedback Log Report',
             'regional-performance' => 'Regional Performance & Sales Density Report',
             'quality-grade' => 'Quality Grade Performance Report',
             'order-fulfillment' => 'Order Fulfillment Timeline Report',
             'financial-audit' => 'Financial Audit & Transaction Report',
             'inventory-cash-reconciliation' => 'Inventory vs Cash Reconciliation Report',
-            'farmer-payment-delay' => 'Farmer Payment Delay Risk Report',
-            'geographic-sales' => 'Geographic Sales Density Report',
-            'buyer-payment-behavior' => 'Buyer Payment Behavior Report',
             'product-taxonomy' => 'Product Taxonomy Report',
-            'cod-payment' => 'COD Payment Reconciliation Report',
 
         ];
 

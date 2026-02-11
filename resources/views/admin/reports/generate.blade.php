@@ -31,44 +31,27 @@
                         <select id="report_type" name="report_type" class="form-control" required>
                             <option value="">-- Select Report Type --</option>
                             <optgroup label="Sales & Orders">
-                                <option value="order-history">Order History Report</option>
-                                <option value="pending-pickup">Pending Pickup/Delivery Report</option>
-                                <option value="sales-volume">Sales Volume & Value Report</option>
-                                <option value="sales-payment">Sales & Payment Reconciliation</option>
-                                <option value="system-financial">System Financial Summary</option>
+                                <option value="order-history">Order History (Order History Report)</option>
+                                <option value="fulfillment-timeline">Fulfillment Timeline (Order Fulfillment Timeline Report)</option>
+                                <option value="regional-performance">Regional Performance (Regional Performance & Sales Density Report)</option>
                             </optgroup>
-                            <optgroup label="Cash on Delivery">
-                                <option value="daily-cash">Daily Cash Position Report</option>
-                                <option value="cash-collection-delay">Cash Collection Delay Report</option>
-                                <option value="cod-exception">COD Exception Report</option>
-                                <option value="cod-payment">COD Payment Reconciliation</option>
-                                <option value="cod-revenue">COD Revenue Forecast</option>
-                                <option value="farmer-payment-delay">Farmer Payment Delay Risk</option>
+                            <optgroup label="Inventory">
+                                <option value="inventory-stock">Inventory Stock (Current Inventory / Stock Report)</option>
+                                <option value="category-performance">Category Performance (Product Category Performance Report)</option>
+                                <option value="stock-movement">Stock Movement (Stock Movement Report)</option>
+                                <option value="quality-grade">Quality Grade (Quality Grade Performance Report)</option>
+                                <option value="product-taxonomy">Product Taxonomy (Product Taxonomy Report)</option>
                             </optgroup>
-                            <optgroup label="Inventory & Products">
-                                <option value="inventory-stock">Current Inventory / Stock Report</option>
-                                <option value="category-performance">Product Category Performance</option>
-                                <option value="stock-movement">Stock Movement Report</option>
-                                <option value="product-taxonomy">Product Taxonomy Report</option>
-                                <option value="quality-grade">Quality Grade Performance</option>
+                            <optgroup label="Users & Farmers">
+                                <option value="group-performance">Group Performance (Group Farmer Performance Report)</option>
+                                <option value="farmer-registration">Farmer Registration (Farmer Registration Status Report)</option>
+                                <option value="system-adoption">System Adoption (System Adoption & User Count Report)</option>
+                                <option value="user-access">User Access (User Access & Role Management Report)</option>
+                                <option value="dispute-feedback">Dispute Log (Dispute & Feedback Log Report)</option>
                             </optgroup>
-                            <optgroup label="Users & System">
-                                <option value="system-adoption">System Adoption & User Count</option>
-                                <option value="user-access">User Access & Role Management</option>
-                                <option value="group-performance">Group Farmer Performance</option>
-                                <option value="farmer-registration">Farmer Registration Status</option>
-                                <option value="buyer-payment-behavior">Buyer Payment Behavior</option>
-                                <option value="data-quality">Data Quality Report</option>
-                                <option value="dispute-feedback">Dispute & Feedback Log</option>
-                            </optgroup>
-                            <optgroup label="Geographic Analysis">
-                                <option value="regional-cod">Regional Performance Report</option>
-                                <option value="geographic-sales">Geographic Sales Density</option>
-                            </optgroup>
-                            <optgroup label="Financial & Audit">
-                                <option value="financial-audit">Financial Audit & Transaction</option>
-                                <option value="inventory-cash-reconciliation">Inventory vs Cash Reconciliation</option>
-                                <option value="order-fulfillment">Order Fulfillment Timeline</option>
+                            <optgroup label="Financial">
+                                <option value="financial-audit">Financial Audit (Inventory vs Cash Reconciliation Repor)</option>
+                                <option value="inventory-cash-reconciliation">Inventory vs Cash (Inventory vs Cash Reconciliation Report)</option>
                             </optgroup>
                         </select>
                     </div>
@@ -360,34 +343,21 @@ function updatePreview() {
 
 function getReportName(reportType) {
     const reportNames = {
-        'order-history': 'Order History Report',
-        'pending-pickup': 'Pending Pickup/Delivery Report',
-        'sales-volume': 'Sales Volume & Value Report',
-        'sales-payment': 'Sales & Payment Reconciliation',
-        'system-financial': 'System Financial Summary',
-        'daily-cash': 'Daily Cash Position Report',
-        'cash-collection-delay': 'Cash Collection Delay Report',
-        'cod-exception': 'COD Exception Report',
-        'inventory-stock': 'Current Inventory / Stock Report',
-        'category-performance': 'Product Category Performance',
-        'stock-movement': 'Stock Movement Report',
-        'group-performance': 'Group Farmer Performance',
-        'farmer-registration': 'Farmer Registration Status',
-        'system-adoption': 'System Adoption & User Count',
-        'user-access': 'User Access & Role Management',
-        'data-quality': 'Data Quality Report',
-        'dispute-feedback': 'Dispute & Feedback Log',
-        'regional-cod': 'Regional Performance Report',
-        'quality-grade': 'Quality Grade Performance',
-        'order-fulfillment': 'Order Fulfillment Timeline',
-        'financial-audit': 'Financial Audit & Transaction',
-        'inventory-cash-reconciliation': 'Inventory vs Cash Reconciliation',
-        'farmer-payment-delay': 'Farmer Payment Delay Risk',
-        'geographic-sales': 'Geographic Sales Density',
-        'buyer-payment-behavior': 'Buyer Payment Behavior',
-        'product-taxonomy': 'Product Taxonomy Report',
-        'cod-payment': 'COD Payment Reconciliation',
-        'cod-revenue': 'COD Revenue Forecast'
+        'order-history': 'Order History (Order History Report)',
+        'inventory-stock': 'Inventory Stock (Current Inventory / Stock Report)',
+        'category-performance': 'Category Performance (Product Category Performance Report)',
+        'stock-movement': 'Stock Movement (Stock Movement Report)',
+        'group-performance': 'Group Performance (Group Farmer Performance Report)',
+        'farmer-registration': 'Farmer Registration (Farmer Registration Status Report)',
+        'system-adoption': 'System Adoption (System Adoption & User Count Report)',
+        'user-access': 'User Access (User Access & Role Management Report)',
+        'dispute-feedback': 'Dispute Log (Dispute & Feedback Log Report)',
+        'regional-performance': 'Regional Performance (Regional Performance & Sales Density Report)',
+        'quality-grade': 'Quality Grade (Quality Grade Performance Report)',
+        'order-fulfillment': 'Fulfillment Timeline (Order Fulfillment Timeline Report)',
+        'financial-audit': 'Financial Audit (Inventory vs Cash Reconciliation Repor)',
+        'inventory-cash-reconciliation': 'Inventory vs Cash (Inventory vs Cash Reconciliation Report)',
+        'product-taxonomy': 'Product Taxonomy (Product Taxonomy Report)'
     };
 
     return reportNames[reportType] || 'Custom Report';

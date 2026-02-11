@@ -22,7 +22,7 @@
             <button class="btn-filter" data-filter="sales">Sales</button>
             <button class="btn-filter" data-filter="inventory">Inventory</button>
             <button class="btn-filter" data-filter="users">Users</button>
-            <button class="btn-filter" data-filter="cod">COD</button>
+
         </div>
     </div>
 
@@ -149,14 +149,7 @@
                     'icon' => 'fas fa-tags',
                     'color' => 'var(--purple)'
                 ],
-                [
-                    'id' => 'cod-revenue',
-                    'title' => 'COD Revenue Forecast',
-                    'description' => 'COD revenue analysis',
-                    'category' => 'cod',
-                    'icon' => 'fas fa-chart-area',
-                    'color' => 'var(--accent-amber)'
-                ]
+
             ];
         @endphp
 

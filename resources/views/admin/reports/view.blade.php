@@ -93,21 +93,7 @@
                                 <th>Price</th>
                                 <th>Avail Date</th>
                                 <th>Status</th>
-                            @elseif($reportType == 'pending-pickup')
-                                <th>Order ID</th>
-                                <th>Buyer</th>
-                                <th>Farmer</th>
-                                <th>Products</th>
-                                <th>Amount</th>
-                                <th>Paid Date</th>
-                                <th>Days</th>
-                                <th>Location</th>
-                            @elseif($reportType == 'daily-cash')
-                                <th>Date</th>
-                                <th>COD</th>
-                                <th>Cash</th>
-                                <th>Outstanding</th>
-                                <th>Rate</th>
+
                             @elseif($reportType == 'system-adoption')
                                 <th>Role</th>
                                 <th>Total</th>
@@ -121,12 +107,7 @@
                                 <th>Active</th>
                                 <th>Qty Sold</th>
                                 <th>Sales</th>
-                            @elseif($reportType == 'data-quality')
-                                <th>Entity</th>
-                                <th>Total</th>
-                                <th>Missing</th>
-                                <th>Complete %</th>
-                                <th>Issues</th>
+
                             @elseif($reportType == 'regional-performance')
                                 <th>Region</th>
                                 <th>Total Farmers</th>
@@ -135,7 +116,6 @@
                                 <th>Active Buyers</th>
                                 <th>Total Orders</th>
                                 <th>Total Sales</th>
-                                <th>Avg Order Value</th>
                             @else
                                 @if(count($data) > 0)
                                     @php
@@ -220,25 +200,7 @@
                                             {{ ucfirst($row->product_status) }}
                                         </span>
                                     </td>
-                                @elseif($reportType == 'pending-pickup')
-                                    <td>{{ $row->order_id }}</td>
-                                    <td>{{ $row->buyer_name }}</td>
-                                    <td>{{ $row->farmer_name }}</td>
-                                    <td>{{ Str::limit($row->product_names, 30) }}</td>
-                                    <td class="numeric">Rs. {{ number_format($row->total_amount, 2) }}</td>
-                                    <td>{{ date('M d, Y', strtotime($row->paid_date)) }}</td>
-                                    <td>
-                                        <span class="{{ $row->days_since_paid > 3 ? 'warning' : 'success' }}">
-                                            {{ $row->days_since_paid }} days
-                                        </span>
-                                    </td>
-                                    <td>{{ Str::limit($row->pickup_location, 30) }}</td>
-                                @elseif($reportType == 'daily-cash')
-                                    <td>{{ date('M d, Y', strtotime($row->date)) }}</td>
-                                    <td>{{ $row->total_cod_orders }}</td>
-                                    <td class="numeric">Rs. {{ number_format($row->collected_amount, 2) }}</td>
-                                    <td class="numeric">Rs. {{ number_format($row->outstanding_amount, 2) }}</td>
-                                    <td>{{ $row->total_cod_orders > 0 ? round(($row->collected_amount / ($row->collected_amount + $row->outstanding_amount)) * 100, 2) : 0 }}%</td>
+
                                 @elseif($reportType == 'system-adoption')
                                     <td>{{ ucfirst(str_replace('_', ' ', $row->role)) }}</td>
                                     <td>{{ $row->total_users }}</td>
@@ -316,8 +278,7 @@
                                 Order #{{ $row->order_number }}
                             @elseif($reportType == 'inventory-stock')
                                 {{ $row->product_name }}
-                            @elseif($reportType == 'pending-pickup')
-                                Order #{{ $row->order_id }}
+
                             @elseif($reportType == 'group-performance')
                                 {{ $row->lead_farmer_name }}
                             @else
@@ -457,7 +418,7 @@
                     <span class="label">Records</span>
                     <span class="value">{{ count($data) }}</span>
                 </div>
-                @if($reportType == 'order-history' || $reportType == 'pending-pickup' || $reportType == 'daily-cash')
+                @if($reportType == 'order-history')
                 <div class="summary-item">
                     <span class="label">Total</span>
                     <span class="value">Rs. {{ number_format(collect($data)->sum('total_amount'), 2) }}</span>
