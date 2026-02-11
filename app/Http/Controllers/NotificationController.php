@@ -27,14 +27,17 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function markAsRead(Request $request)
+    public function markAsRead(Request $request, $id = null)
     {
-        $request->validate([
-            'notification_id' => 'required|integer|exists:notifications,id'
-        ]);
+        $notificationId = $id ?? $request->notification_id ?? $request->id;
+
+        if (!$notificationId) {
+            \Log::warning('Notification markAsRead failed: No ID provided', ['request' => $request->all(), 'id_param' => $id]);
+            return response()->json(['success' => false, 'message' => 'Notification ID not provided'], 400);
+        }
 
         $notification = Notification::where('user_id', Auth::id())
-            ->where('id', $request->notification_id)
+            ->where('id', $notificationId)
             ->first();
 
         if ($notification) {
@@ -42,6 +45,10 @@ class NotificationController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return response()->json(['success' => false], 404);
+        \Log::error('Notification markAsRead failed: Notification not found or unauthorized', [
+            'user_id' => Auth::id(),
+            'notification_id' => $notificationId
+        ]);
+        return response()->json(['success' => false, 'message' => 'Notification not found or unauthorized'], 404);
     }
 }

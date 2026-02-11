@@ -4,74 +4,292 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/admin-notification.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 @endsection
 
 @section('content')
-
 <div class="notification-wrapper">
 	<div class="notification-header">
 		<h2>Notifications</h2>
-
 		<div class="header-actions">
-			<input type="text" id="searchInput" placeholder="Search notifications">
-			<button id="markAllRead">Mark All Read</button>
+			<input type="text" id="searchInput" placeholder="Search notifications..." autocomplete="off">
+			<button id="markAllRead">
+				<span>Mark All Read</span>
+			</button>
 		</div>
 	</div>
 
 	<div class="send-box">
 		<select id="user_id">
+			<option value="">Select User</option>
 			@foreach($users as $user)
 				<option value="{{ $user->id }}">{{ $user->username }} ({{ $user->email }})</option>
 			@endforeach
 		</select>
-
-		<input type="text" id="title" placeholder="Title">
-		<textarea id="message" placeholder="Message"></textarea>
-		<button id="sendNotification">Send</button>
+		<input type="text" id="title" placeholder="Notification title">
+		<textarea id="message" placeholder="Write your message..." rows="1"></textarea>
+		<button id="sendNotification">
+			<span>Send</span>
+		</button>
 	</div>
 
-	<div id="notificationList">
-		@include('admin.notifications.partials.notification-list')
+	<div class="view-toggle">
+		<button class="view-btn active" data-view="card">
+			<span>📱</span> Card View
+		</button>
+		<button class="view-btn" data-view="table">
+			<span>📋</span> Table View
+		</button>
 	</div>
+
+	<div id="notificationContainer">
+		@include('admin.notifications.partials.notification-list', ['view' => 'card'])
+	</div>
+
+	<div id="paginationContainer" class="pagination"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-document.getElementById('searchInput').addEventListener('keyup', function(){
-	fetch(`{{ route('admin.notifications.search') }}?q=${this.value}`)
-	.then(res => res.text())
-	.then(html => document.getElementById('notificationList').innerHTML = html)
-})
+let currentPage = 1;
+let currentView = 'card';
+let searchTerm = '';
 
-document.getElementById('sendNotification').onclick = function(){
-	fetch("{{ route('admin.notifications.send') }}",{
-		method:'POST',
-		headers:{
-			'X-CSRF-TOKEN':'{{ csrf_token() }}',
-			'Content-Type':'application/json'
-		},
-		body:JSON.stringify({
-			user_id:document.getElementById('user_id').value,
-			title:document.getElementById('title').value,
-			message:document.getElementById('message').value
-		})
-	}).then(res=>res.json()).then(data=>{
-		if(data.status==='success'){
-			Swal.fire('Success','Notification Sent','success').then(()=>location.reload())
-		}else{
-			Swal.fire('Error','Failed','error')
+document.addEventListener('DOMContentLoaded', function(){
+	initializeEventListeners();
+	initializePagination();
+});
+
+function initializeEventListeners(){
+	const searchInput = document.getElementById('searchInput');
+	const sendButton = document.getElementById('sendNotification');
+	const markAllReadButton = document.getElementById('markAllRead');
+	const viewButtons = document.querySelectorAll('.view-btn');
+
+	searchInput.addEventListener('input', debounce(handleSearch, 300));
+	sendButton.addEventListener('click', handleSendNotification);
+	markAllReadButton.addEventListener('click', handleMarkAllRead);
+	
+	viewButtons.forEach(btn => {
+		btn.addEventListener('click', function(){
+			viewButtons.forEach(b => b.classList.remove('active'));
+			this.classList.add('active');
+			currentView = this.dataset.view;
+			currentPage = 1;
+			loadNotifications();
+		});
+	});
+}
+
+function debounce(func, wait){
+	let timeout;
+	return function executedFunction(...args){
+		const later = () => {
+			clearTimeout(timeout);
+			func(...args);
+		};
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+	};
+}
+
+function handleSearch(e){
+	searchTerm = e.target.value;
+	currentPage = 1;
+	loadNotifications();
+}
+
+async function handleSendNotification(){
+	const userId = document.getElementById('user_id').value;
+	const title = document.getElementById('title').value;
+	const message = document.getElementById('message').value;
+
+	if(!userId || !title || !message){
+		Swal.fire({
+			icon: 'error',
+			title: 'Validation Error',
+			text: 'All fields are required!',
+			timer: 2000,
+			showConfirmButton: true
+		});
+		return;
+	}
+
+	try{
+		const response = await fetch("{{ route('admin.notifications.send') }}", {
+			method: 'POST',
+			headers: {
+				'X-CSRF-TOKEN': '{{ csrf_token() }}',
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			},
+			body: JSON.stringify({ user_id: userId, title: title, message: message })
+		});
+
+		const data = await response.json();
+
+		if(data.status === 'success'){
+			Swal.fire({
+				icon: 'success',
+				title: 'Success!',
+				text: 'Notification sent successfully',
+				showConfirmButton: false,
+				timer: 1500,
+				background: '#ffffff',
+				iconColor: '#10B981'
+			}).then(() => {
+				document.getElementById('title').value = '';
+				document.getElementById('message').value = '';
+				document.getElementById('user_id').value = '';
+				loadNotifications();
+			});
+		} else {
+			throw new Error('Failed to send');
 		}
-	})
+	} catch(error){
+		Swal.fire({
+			icon: 'error',
+			title: 'Error',
+			text: 'Failed to send notification',
+			confirmButtonColor: '#10B981'
+		});
+	}
 }
 
-document.getElementById('markAllRead').onclick = function(){
-	fetch("{{ route('admin.notifications.markAllRead') }}",{
-		method:'POST',
-		headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}
-	}).then(()=>location.reload())
+async function handleMarkAllRead(){
+	const result = await Swal.fire({
+		title: 'Mark all as read?',
+		text: 'This will mark all notifications as read',
+		icon: 'question',
+		showCancelButton: true,
+		confirmButtonColor: '#10B981',
+		cancelButtonColor: '#6b7280',
+		confirmButtonText: 'Yes, mark all',
+		cancelButtonText: 'Cancel'
+	});
+
+	if(result.isConfirmed){
+		try{
+			const response = await fetch("{{ route('admin.notifications.markAllRead') }}", {
+				method: 'POST',
+				headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+			});
+			
+			Swal.fire({
+				icon: 'success',
+				title: 'Done!',
+				text: 'All notifications marked as read',
+				showConfirmButton: false,
+				timer: 1500
+			}).then(() => loadNotifications());
+		} catch(error){
+			Swal.fire({
+				icon: 'error',
+				title: 'Error',
+				text: 'Failed to mark all as read'
+			});
+		}
+	}
 }
+
+async function handleMarkRead(id){
+	try{
+		const response = await fetch(`{{ url('admin/notifications/mark-read') }}/${id}`, {
+			method: 'POST',
+			headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+		});
+
+		Swal.fire({
+			icon: 'success',
+			title: 'Marked as read',
+			showConfirmButton: false,
+			timer: 1000,
+			toast: true,
+			position: 'top-end'
+		}).then(() => loadNotifications());
+	} catch(error){
+		Swal.fire({
+			icon: 'error',
+			title: 'Error',
+			text: 'Failed to mark as read'
+		});
+	}
+}
+
+async function loadNotifications(){
+	const container = document.getElementById('notificationContainer');
+	const perPage = calculatePerPage();
+	
+	container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="skeleton-loader">Loading notifications...</div></div>';
+	
+	try{
+		const response = await fetch(`{{ route('admin.notifications.search') }}?q=${encodeURIComponent(searchTerm)}&page=${currentPage}&view=${currentView}&per_page=${perPage}`);
+		const html = await response.text();
+		container.innerHTML = html;
+		initializePagination();
+	} catch(error){
+		container.innerHTML = '<div class="empty-state"><p>Failed to load notifications</p></div>';
+	}
+}
+
+function calculatePerPage(){
+	const width = window.innerWidth;
+	if(width <= 480) return currentView === 'card' ? 4 : 5;
+	if(width <= 767) return currentView === 'card' ? 6 : 8;
+	if(width <= 991) return currentView === 'card' ? 8 : 12;
+	return currentView === 'card' ? 10 : 15;
+}
+
+function initializePagination(){
+	const paginationContainer = document.getElementById('paginationContainer');
+	const totalItems = parseInt(document.getElementById('totalNotificationsCount')?.value || 0);
+	const perPage = calculatePerPage();
+	const totalPages = Math.ceil(totalItems / perPage);
+
+	if(totalPages <= 1){
+		paginationContainer.innerHTML = '';
+		return;
+	}
+
+	let paginationHtml = `
+		<button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+			<span>←</span> Prev
+		</button>
+		<div class="pagination-numbers">
+	`;
+
+	for(let i = 1; i <= totalPages; i++){
+		if(i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)){
+			paginationHtml += `<button class="pagination-number ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+		} else if(i === currentPage - 2 || i === currentPage + 2){
+			paginationHtml += `<span style="padding:0 4px;">...</span>`;
+		}
+	}
+
+	paginationHtml += `
+		</div>
+		<button class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+			Next <span>→</span>
+		</button>
+	`;
+
+	paginationContainer.innerHTML = paginationHtml;
+}
+
+function changePage(page){
+	currentPage = page;
+	loadNotifications();
+	window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.addEventListener('resize', debounce(function(){
+	if(document.getElementById('notificationContainer').children.length > 0){
+		loadNotifications();
+	}
+}, 250));
+
+window.markRead = function(id){
+	handleMarkRead(id);
+};
 </script>
-
 @endsection

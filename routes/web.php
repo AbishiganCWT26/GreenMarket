@@ -408,119 +408,107 @@ Route::prefix('facilitator')
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')
-    ->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
-    ->name('admin.')
-    ->group(function () {
+	->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
+	->name('admin.')
+	->group(function () {
 
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+	Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    Route::prefix('admin/notifications')->group(function () {
-        Route::get('/', [NotificationController::class, 'index'])->name('admin.notifications');
-        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('admin.notifications.markAllRead');
-        Route::post('/mark-read', [NotificationController::class, 'markAsRead'])->name('admin.notifications.markRead');
-    });
+	Route::get('/notifications', [NotificationAdminController::class, 'index'])->name('notifications.index');
+	Route::get('/notifications/search', [NotificationAdminController::class, 'search'])->name('notifications.search');
+	Route::post('/notifications/send', [NotificationAdminController::class, 'sendNotification'])->name('notifications.send');
+	Route::post('/notifications/mark-all-read', [NotificationAdminController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+	Route::post('/notifications/mark-read/{id}', [NotificationAdminController::class, 'markAsRead'])->name('notifications.markRead');
 
-    Route::get('/notifications', [NotificationAdminController::class, 'index'])->name('notifications.index');
-    Route::get('/notifications/search', [NotificationAdminController::class, 'search'])->name('notifications.search');
-    Route::post('/notifications/send', [NotificationAdminController::class, 'sendNotification'])->name('notifications.send');
-    Route::post('/notifications/mark-all-read', [NotificationAdminController::class, 'markAllAsRead'])->name('notifications.markAllRead');
-    Route::post('/notifications/mark-read/{id}', [NotificationAdminController::class, 'markAsRead'])->name('notifications.markRead');
+	Route::get('/users', [UserController::class, 'index'])->name('users.index');
+	Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+	Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+	Route::post('/users', [UserController::class, 'store'])->name('users.store');
+	Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+	Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+	Route::post('/users/{id}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
+	Route::post('/users/{id}/activate', [UserController::class, 'activate'])->name('users.activate');
+	Route::post('/users/{id}/suspend', [UserController::class, 'suspend'])->name('users.suspend');
+	Route::post('/users/{id}/promote', [UserController::class, 'promote'])->name('users.promote');
+	Route::post('/users/{id}/make-subadmin', [UserController::class, 'makeSubadmin'])->name('users.makeSubadmin');
+	Route::post('/users/send-otp', [UserController::class, 'sendOtp'])->name('users.sendOtp');
+	Route::post('/users/verify-otp', [UserController::class, 'verifyOtp'])->name('users.verifyOtp');
+	Route::post('/users/resend-otp', [UserController::class, 'resendOtp'])->name('users.resendOtp');
+	Route::post('/users/send-notification', [UserController::class, 'sendNotification'])->name('users.sendNotification');
+	Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+	Route::post('/users/{id}/process-deletion', [UserController::class, 'processLeadFarmerDeletion'])->name('users.processDeletion');
+	Route::get('/get-lead-farmers-for-transfer', [UserController::class, 'getLeadFarmersForTransfer'])->name('users.getLeadFarmersForTransfer');
 
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
-    Route::post('/users/{id}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
-    Route::post('/users/{id}/activate', [UserController::class, 'activate'])->name('users.activate');
-    Route::post('/users/{id}/suspend', [UserController::class, 'suspend'])->name('users.suspend');
-    Route::post('/users/{id}/promote', [UserController::class, 'promote'])->name('users.promote');
-    Route::post('/users/{id}/make-subadmin', [UserController::class, 'makeSubadmin'])->name('users.makeSubadmin');
-    Route::post('/users/send-otp', [UserController::class, 'sendOtp'])->name('users.sendOtp');
-    Route::post('/users/verify-otp', [UserController::class, 'verifyOtp'])->name('users.verifyOtp');
-    Route::post('/users/resend-otp', [UserController::class, 'resendOtp'])->name('users.resendOtp');
-    Route::post('/users/send-notification', [UserController::class, 'sendNotification'])->name('users.sendNotification');
-    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
-    Route::post('/users/{id}/process-deletion', [UserController::class, 'processLeadFarmerDeletion'])->name('users.processDeletion');
-    Route::get('/get-lead-farmers-for-transfer', [UserController::class, 'getLeadFarmersForTransfer'])->name('users.getLeadFarmersForTransfer');
+	Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+	Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+	Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+	Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+	Route::get('/products/filter', [ProductController::class, 'filter'])->name('products.filter');
+	Route::get('/products/paginated', [ProductController::class, 'paginatedProducts'])->name('products.paginated');
+	Route::get('/products/{product}/details', [ProductController::class, 'getProductDetails'])->name('products.details');
+	Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+	Route::get('/products/get-farmers-by-lead-farmer/{leadFarmerId}', [ProductController::class, 'getFarmersByLeadFarmer'])->name('products.get-farmers');
 
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
-    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
-    Route::get('/products/filter', [ProductController::class, 'filter'])->name('products.filter');
-    Route::get('/products/paginated', [ProductController::class, 'paginatedProducts'])->name('products.paginated');
-    Route::get('/products/{product}/details', [ProductController::class, 'getProductDetails'])->name('products.details');
-    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-    Route::get('/products/get-farmers-by-lead-farmer/{leadFarmerId}', [ProductController::class, 'getFarmersByLeadFarmer'])->name('products.get-farmers');
+	Route::get('/buyer-requests', [BuyerRequestProductsController::class, 'index'])->name('buyer-requests.index');
+	Route::delete('/buyer-requests/{id}', [BuyerRequestProductsController::class, 'destroy'])->name('buyer-requests.destroy');
 
-    Route::get('/buyer-requests', [BuyerRequestProductsController::class, 'index'])->name('buyer-requests.index');
-    Route::delete('/buyer-requests/{id}', [BuyerRequestProductsController::class, 'destroy'])->name('buyer-requests.destroy');
+	Route::get('/taxonomy', [TaxonomyController::class, 'index'])->name('taxonomy.index');
+	Route::get('/taxonomy/categories/data', [TaxonomyController::class, 'getCategories'])->name('taxonomy.categories.data');
+	Route::get('/taxonomy/subcategories/data', [TaxonomyController::class, 'getSubcategories'])->name('taxonomy.subcategories.data');
+	Route::get('/taxonomy/products/data', [TaxonomyController::class, 'getProducts'])->name('taxonomy.products.data');
+	Route::get('/taxonomy/subcategories/{categoryId}', [TaxonomyController::class, 'getSubcategoriesByCategory']);
+	Route::post('/taxonomy/save/main', [TaxonomyController::class, 'saveMainCategory'])->name('taxonomy.save.main');
+	Route::post('/taxonomy/save/subcategory', [TaxonomyController::class, 'saveSubCategory'])->name('taxonomy.save.subcategory');
+	Route::post('/taxonomy/save/product', [TaxonomyController::class, 'saveProduct'])->name('taxonomy.save.product');
+	Route::get('/taxonomy/edit/category/{id}', [TaxonomyController::class, 'editCategory'])->name('taxonomy.edit.category');
+	Route::get('/taxonomy/edit/subcategory/{id}', [TaxonomyController::class, 'editSubcategory'])->name('taxonomy.edit.subcategory');
+	Route::get('/taxonomy/edit/product/{id}', [TaxonomyController::class, 'editProduct'])->name('taxonomy.edit.product');
+	Route::post('/taxonomy/category/update', [TaxonomyController::class, 'updateCategory'])->name('taxonomy.update.category');
+	Route::post('/taxonomy/subcategory/update', [TaxonomyController::class, 'updateSubcategory'])->name('taxonomy.update.subcategory');
+	Route::post('/taxonomy/product/example/update', [TaxonomyController::class, 'updateProductExample'])->name('taxonomy.update.product.example');
+	Route::delete('/taxonomy/delete/category/{id}', [TaxonomyController::class, 'deleteCategory'])->name('taxonomy.delete.category');
+	Route::delete('/taxonomy/delete/subcategory/{id}', [TaxonomyController::class, 'deleteSubcategory'])->name('taxonomy.delete.subcategory');
+	Route::delete('/taxonomy/delete/product/{id}', [TaxonomyController::class, 'deleteProduct'])->name('taxonomy.delete.product');
 
-    // Taxonomy Routes
-    Route::get('/taxonomy', [TaxonomyController::class, 'index'])->name('taxonomy.index');
-    Route::get('/taxonomy/categories/data', [TaxonomyController::class, 'getCategories'])->name('taxonomy.categories.data');
-    Route::get('/taxonomy/subcategories/data', [TaxonomyController::class, 'getSubcategories'])->name('taxonomy.subcategories.data');
-    Route::get('/taxonomy/products/data', [TaxonomyController::class, 'getProducts'])->name('taxonomy.products.data');
-    Route::get('/taxonomy/subcategories/{categoryId}', [TaxonomyController::class, 'getSubcategoriesByCategory']);
-    Route::post('/taxonomy/save/main', [TaxonomyController::class, 'saveMainCategory'])->name('taxonomy.save.main');
-    Route::post('/taxonomy/save/subcategory', [TaxonomyController::class, 'saveSubCategory'])->name('taxonomy.save.subcategory');
-    Route::post('/taxonomy/save/product', [TaxonomyController::class, 'saveProduct'])->name('taxonomy.save.product');
-    Route::get('/taxonomy/edit/category/{id}', [TaxonomyController::class, 'editCategory'])->name('taxonomy.edit.category');
-    Route::get('/taxonomy/edit/subcategory/{id}', [TaxonomyController::class, 'editSubcategory'])->name('taxonomy.edit.subcategory');
-    Route::get('/taxonomy/edit/product/{id}', [TaxonomyController::class, 'editProduct'])->name('taxonomy.edit.product');
-    
-    // New taxonomy update routes (POST method)
-    Route::post('/taxonomy/category/update', [TaxonomyController::class, 'updateCategory'])->name('taxonomy.update.category');
-    Route::post('/taxonomy/subcategory/update', [TaxonomyController::class, 'updateSubcategory'])->name('taxonomy.update.subcategory');
-    Route::post('/taxonomy/product/example/update', [TaxonomyController::class, 'updateProductExample'])->name('taxonomy.update.product.example');
-    
-    Route::delete('/taxonomy/delete/category/{id}', [TaxonomyController::class, 'deleteCategory'])->name('taxonomy.delete.category');
-    Route::delete('/taxonomy/delete/subcategory/{id}', [TaxonomyController::class, 'deleteSubcategory'])->name('taxonomy.delete.subcategory');
-    Route::delete('/taxonomy/delete/product/{id}', [TaxonomyController::class, 'deleteProduct'])->name('taxonomy.delete.product');
+	Route::get('/standards', [TaxonomyController::class, 'standardsIndex'])->name('taxonomy.standards');
+	Route::get('/standards/data', [TaxonomyController::class, 'getStandards'])->name('taxonomy.standards.data');
+	Route::post('/standards/save', [TaxonomyController::class, 'saveStandard'])->name('taxonomy.standards.save');
+	Route::get('/standards/edit/{id}', [TaxonomyController::class, 'editStandard'])->name('taxonomy.standards.edit');
+	Route::put('/standards/update/{id}', [TaxonomyController::class, 'updateStandard'])->name('taxonomy.standards.update');
+	Route::delete('/standards/delete/{id}', [TaxonomyController::class, 'deleteStandard'])->name('taxonomy.standards.delete');
 
-    Route::get('/standards', [TaxonomyController::class, 'standardsIndex'])->name('taxonomy.standards');
-    Route::get('/standards/data', [TaxonomyController::class, 'getStandards'])->name('taxonomy.standards.data');
-    Route::post('/standards/save', [TaxonomyController::class, 'saveStandard'])->name('taxonomy.standards.save');
-    Route::get('/standards/edit/{id}', [TaxonomyController::class, 'editStandard'])->name('taxonomy.standards.edit');
-    Route::put('/standards/update/{id}', [TaxonomyController::class, 'updateStandard'])->name('taxonomy.standards.update');
-    Route::delete('/standards/delete/{id}', [TaxonomyController::class, 'deleteStandard'])->name('taxonomy.standards.delete');
+	Route::get('/sales', [ProductController::class, 'viewSales'])->name('sales.view');
+	Route::get('/sales/{id}', [ProductController::class, 'salesDetails'])->name('sales.details');
+	Route::get('/sales/export/pdf', [ProductController::class, 'exportPDF'])->name('sales.export.pdf');
 
-    Route::get('/sales', [ProductController::class, 'viewSales'])->name('sales.view');
-    Route::get('/sales/{id}', [ProductController::class, 'salesDetails'])->name('sales.details');
-    Route::get('/sales/export/pdf', [ProductController::class, 'exportPDF'])->name('sales.export.pdf');
+	Route::get('/lead-farmer-groups', [LeadfarmerControlleradmin::class, 'index'])->name('lead-farmer-groups');
 
-    Route::get('/lead-farmer-groups', [LeadfarmerControlleradmin::class, 'index'])->name('lead-farmer-groups');
+	Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
+	Route::get('/profile/details', [AdminProfileController::class, 'editDetails'])->name('profile.details');
+	Route::post('/profile/update-details', [AdminProfileController::class, 'updateDetails'])->name('profile.updateDetails');
+	Route::get('/profile/photo', [AdminProfileController::class, 'photoPage'])->name('profile.photo');
+	Route::post('/profile/update-photo', [AdminProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
+	Route::delete('/profile/delete-photo', [AdminProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
+	Route::post('/profile/update-password', [AdminProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 
-    // Profile Routes - CORRECTED
-    Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
-    Route::get('/profile/details', [AdminProfileController::class, 'editDetails'])->name('profile.details');
-    Route::post('/profile/update-details', [AdminProfileController::class, 'updateDetails'])->name('profile.updateDetails');
-    Route::get('/profile/photo', [AdminProfileController::class, 'photoPage'])->name('profile.photo');
-    Route::post('/profile/update-photo', [AdminProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
-    Route::delete('/profile/delete-photo', [AdminProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
-    Route::post('/profile/update-password', [AdminProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+	Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+	Route::get('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
+	Route::post('/reports/custom', [ReportController::class, 'customReport'])->name('reports.custom');
+	Route::get('/reports/view/{type}', [ReportController::class, 'viewReport'])->name('reports.view');
+	Route::get('/reports/pdf/{type}', [ReportController::class, 'generatePDF'])->name('reports.pdf');
 
-    // Reports Routes
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
-    Route::post('/reports/custom', [ReportController::class, 'customReport'])->name('reports.custom');
-    Route::get('/reports/view/{type}', [ReportController::class, 'viewReport'])->name('reports.view');
-    Route::get('/reports/pdf/{type}', [ReportController::class, 'generatePDF'])->name('reports.pdf');
+	Route::get('/config', [ConfigController::class, 'index'])->name('config.index');
+	Route::get('/config/manage/{group}', [ConfigController::class, 'manage'])->name('config.manage');
+	Route::post('/config/update/{group}', [ConfigController::class, 'update'])->name('config.update');
+	Route::get('/config/backup', [ConfigController::class, 'backup'])->name('config.backup');
 
-    Route::get('/config', [ConfigController::class, 'index'])->name('config.index');
-    Route::get('/config/manage/{group}', [ConfigController::class, 'manage'])->name('config.manage');
-    Route::post('/config/update/{group}', [ConfigController::class, 'update'])->name('config.update');
-    Route::get('/config/backup', [ConfigController::class, 'backup'])->name('config.backup');
+	Route::get('/content', [ConfigController::class, 'content'])->name('content.manage');
 
-    Route::get('/content', [ConfigController::class, 'content'])->name('content.manage');
-
-    Route::get('/complaints', [ComplaintController::class, 'index'])->name('complaints.index');
-    Route::get('/complaints/{id}', [ComplaintController::class, 'show'])->name('complaints.show');
-    Route::post('/complaints/{id}/update-status', [ComplaintController::class, 'updateStatus'])->name('complaints.updateStatus');
-    Route::post('/complaints/bulk-update-status', [ComplaintController::class, 'bulkUpdateStatus'])->name('complaints.bulkUpdateStatus');
-    Route::get('/complaints/{id}/details', [ComplaintController::class, 'getComplaintDetails'])->name('complaints.details');
+	Route::get('/complaints', [ComplaintController::class, 'index'])->name('complaints.index');
+	Route::get('/complaints/{id}', [ComplaintController::class, 'show'])->name('complaints.show');
+	Route::post('/complaints/{id}/update-status', [ComplaintController::class, 'updateStatus'])->name('complaints.updateStatus');
+	Route::post('/complaints/bulk-update-status', [ComplaintController::class, 'bulkUpdateStatus'])->name('complaints.bulkUpdateStatus');
+	Route::get('/complaints/{id}/details', [ComplaintController::class, 'getComplaintDetails'])->name('complaints.details');
 });
 
 /*

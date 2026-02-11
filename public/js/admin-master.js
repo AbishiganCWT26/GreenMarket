@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": csrfToken,
                 },
-                body: JSON.stringify({ id: id })
+                body: JSON.stringify({ notification_id: id })
             })
                 .then((response) => {
                     if (!response.ok) {
@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.error('Error:', error);
                     this.innerHTML = originalHTML;
                     this.disabled = false;
-                    Swal.fire("Error", "Unable to update notification", "error");
+                    Swal.fire("Error", error.message || "Unable to update notification", "error");
                 });
         });
     });
@@ -322,7 +322,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Initialize notification click handlers for entire items
     document.querySelectorAll('.notif-item').forEach(item => {
-        item.addEventListener('click', function(e) {
+        item.addEventListener('click', function (e) {
             // Don't trigger if clicking on mark button
             if (e.target.closest('.mark-single')) return;
 

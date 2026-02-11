@@ -7,6 +7,7 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class NotificationAdminController extends Controller
 {
@@ -14,65 +15,134 @@ class NotificationAdminController extends Controller
 	{
 		$notifications = Notification::with('user')
 			->orderByDesc('created_at')
-			->paginate(12);
+			->paginate(15);
 
-		$notifications->getCollection()->transform(function ($item) {
-			$item->created_at = Carbon::parse($item->created_at);
-			return $item;
-		});
-
-		$users = User::select('id', 'username', 'email')->get();
+		$users = User::select('id', 'username', 'email')
+			->orderBy('username')
+			->get();
 
 		return view('admin.notifications.index', compact('notifications', 'users'));
 	}
 
 	public function search(Request $request)
 	{
-		$query = strtolower($request->get('q'));
+		$query = $request->get('q', '');
+		$view = $request->get('view', 'card');
+		$perPage = $request->get('per_page', $view === 'card' ? 10 : 15);
 
-		$notifications = Notification::with('user')
-			->whereRaw('LOWER(title) LIKE ?', ["%{$query}%"])
-			->orWhereRaw('LOWER(message) LIKE ?', ["%{$query}%"])
-			->orderByDesc('created_at')
-			->paginate(12);
+		$notificationsQuery = Notification::with('user');
 
-		$notifications->getCollection()->transform(function ($item) {
-			$item->created_at = Carbon::parse($item->created_at);
-			return $item;
-		});
+		if(!empty($query)){
+			$searchTerm = '%' . strtolower($query) . '%';
+			$notificationsQuery->where(function($q) use ($searchTerm){
+				$q->whereRaw('LOWER(title) LIKE ?', [$searchTerm])
+					->orWhereRaw('LOWER(message) LIKE ?', [$searchTerm])
+					->orWhereRaw('LOWER(notification_type) LIKE ?', [$searchTerm])
+					->orWhereHas('user', function($userQuery) use ($searchTerm){
+						$userQuery->whereRaw('LOWER(username) LIKE ?', [$searchTerm])
+							->orWhereRaw('LOWER(email) LIKE ?', [$searchTerm]);
+					});
+			});
+		}
 
-		return view('admin.notifications.partials.notification-list', compact('notifications'))->render();
+		$notifications = $notificationsQuery->orderByDesc('created_at')
+			->paginate($perPage);
+
+		if($request->ajax()){
+			return view('admin.notifications.partials.notification-list', compact('notifications', 'view'))->render();
+		}
+
+		return view('admin.notifications.partials.notification-list', compact('notifications', 'view'));
 	}
 
 	public function sendNotification(Request $request)
 	{
-		$request->validate([
-			'user_id' => 'required|exists:users,id',
-			'title' => 'required|string|max:255',
-			'message' => 'required|string'
-		]);
+		try{
+			$request->validate([
+				'user_id' => 'required|exists:users,id',
+				'title' => 'required|string|max:255',
+				'message' => 'required|string'
+			]);
 
-		Notification::create([
-			'user_id' => $request->user_id,
-			'recipient_type' => 'user',
-			'title' => $request->title,
-			'message' => $request->message,
-			'notification_type' => 'admin_alert',
-			'is_read' => false
-		]);
+			DB::beginTransaction();
 
-		return response()->json(['status' => 'success']);
+			$notification = Notification::create([
+				'user_id' => $request->user_id,
+				'recipient_type' => 'user',
+				'recipient_address' => null,
+				'title' => $request->title,
+				'message' => $request->message,
+				'notification_type' => 'admin_alert',
+				'is_read' => false,
+				'related_id' => null,
+				'created_at' => now(),
+				'updated_at' => now()
+			]);
+
+			DB::commit();
+
+			return response()->json([
+				'status' => 'success',
+				'message' => 'Notification sent successfully',
+				'data' => $notification
+			]);
+		} catch(\Exception $e){
+			DB::rollBack();
+			return response()->json([
+				'status' => 'error',
+				'message' => 'Failed to send notification: ' . $e->getMessage()
+			], 500);
+		}
 	}
 
 	public function markAllAsRead()
 	{
-		Notification::where('is_read', false)->update(['is_read' => true]);
-		return response()->json(['status' => 'success']);
+		try{
+			DB::beginTransaction();
+			
+			Notification::where('is_read', false)->update([
+				'is_read' => true,
+				'updated_at' => now()
+			]);
+			
+			DB::commit();
+			
+			return response()->json([
+				'status' => 'success',
+				'message' => 'All notifications marked as read'
+			]);
+		} catch(\Exception $e){
+			DB::rollBack();
+			return response()->json([
+				'status' => 'error',
+				'message' => 'Failed to mark notifications as read'
+			], 500);
+		}
 	}
 
 	public function markAsRead($id)
 	{
-		Notification::where('id', $id)->update(['is_read' => true]);
-		return response()->json(['status' => 'success']);
+		try{
+			DB::beginTransaction();
+			
+			$notification = Notification::findOrFail($id);
+			$notification->update([
+				'is_read' => true,
+				'updated_at' => now()
+			]);
+			
+			DB::commit();
+			
+			return response()->json([
+				'status' => 'success',
+				'message' => 'Notification marked as read'
+			]);
+		} catch(\Exception $e){
+			DB::rollBack();
+			return response()->json([
+				'status' => 'error',
+				'message' => 'Failed to mark notification as read'
+			], 500);
+		}
 	}
 }

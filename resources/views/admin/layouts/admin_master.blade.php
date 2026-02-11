@@ -100,13 +100,13 @@
                             @endif
                         </div>
                         <div class="notif-list">
-                            @if(!isset($notifications) || count($notifications) == 0)
+                            @if(!isset($recentNotifications) || count($recentNotifications) == 0)
                                 <div class="notif-empty">
                                     <i class="fa-regular fa-bell-slash"></i>
                                     <span>No notifications</span>
                                 </div>
                             @else
-                                @foreach($notifications as $n)
+                                @foreach($recentNotifications as $n)
                                     <div class="notif-item {{ $n->is_read ? 'read' : 'unread' }}" data-id="{{ $n->id }}">
                                         <div class="notif-icon">
                                             @if(str_contains(strtolower($n->title), 'urgent'))
@@ -118,7 +118,7 @@
                                             @elseif(str_contains(strtolower($n->title), 'info'))
                                                 <i class="fa-solid fa-info-circle info-icon"></i>
                                             @else
-                                                <i class="fa-solid fa-envelope default-icon"></i>
+                                                <i class="fa-solid fa-envelope default-icon1"></i>
                                             @endif
                                         </div>
                                         <div class="notif-content">
@@ -179,178 +179,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @yield('scripts')
-<script src="{{ asset('js/admin-master.js') }}"></script>
+<script src="{{ asset('js/admin-master.js') }}?v={{ time() }}"></script>
 
 <script>
     document.body.dataset.urlMarkAllRead = "{{ url('/admin/notifications/mark-all-read') }}";
     document.body.dataset.urlMarkSingleRead = "{{ url('/admin/notifications/mark-read') }}";
     document.body.dataset.urlAlertFacilitator = "{{ url('/admin/complaints/alert') }}";
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- Sidebar Logic ---
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const sidebarClose = document.getElementById('sidebar-close');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
+    // The logic has been moved to admin-master.js
 
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', function() {
-                sidebar.classList.add('open');
-                overlay.classList.add('active');
-            });
-        }
-
-        if (sidebarClose) {
-            sidebarClose.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-            });
-        }
-
-        if (overlay) {
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-            });
-        }
-
-        // --- Logout Logic ---
-        const logoutButton = document.getElementById('logout-button');
-        const logoutTop = document.getElementById('logoutTop');
-        const logoutForm = document.getElementById('logout-form');
-        const logoutFormTop = document.getElementById('logout-form-top');
-
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                logoutForm.submit();
-            });
-        }
-
-        if (logoutTop) {
-            logoutTop.addEventListener('click', function(e) {
-                e.preventDefault();
-                logoutFormTop.submit();
-            });
-        }
-
-        // --- Notification Dropdown Logic ---
-        const notifBtn = document.getElementById('notifBtn');
-        const notifDropdown = document.getElementById('notifDropdown');
-
-        if (notifBtn && notifDropdown) {
-            // Remove any existing event listeners
-            notifBtn.replaceWith(notifBtn.cloneNode(true));
-            const newNotifBtn = document.getElementById('notifBtn');
-
-            newNotifBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-
-                // Toggle dropdown visibility
-                const isHidden = notifDropdown.getAttribute('aria-hidden');
-                const isVisible = isHidden === 'false';
-
-                if (isVisible) {
-                    notifDropdown.classList.remove('show');
-                    notifDropdown.setAttribute('aria-hidden', 'true');
-                } else {
-                    notifDropdown.classList.add('show');
-                    notifDropdown.setAttribute('aria-hidden', 'false');
-                }
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (notifDropdown && notifBtn &&
-                    !notifDropdown.contains(e.target) &&
-                    !newNotifBtn.contains(e.target)) {
-                    notifDropdown.classList.remove('show');
-                    notifDropdown.setAttribute('aria-hidden', 'true');
-                }
-            });
-
-            // Prevent dropdown from closing when clicking inside it
-            notifDropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
-
-        // --- Mark as Read Functionality ---
-        const markAllReadBtn = document.getElementById('markAllRead');
-        const markSingleBtns = document.querySelectorAll('.mark-single');
-
-        if (markAllReadBtn) {
-            markAllReadBtn.addEventListener('click', function() {
-                const url = document.body.dataset.urlMarkAllRead;
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Remove unread styling and dot
-                        document.querySelectorAll('.notif-item.unread').forEach(item => {
-                            item.classList.remove('unread');
-                            item.classList.add('read');
-                        });
-
-                        const notifDot = document.querySelector('.notif-dot');
-                        if (notifDot) {
-                            notifDot.remove();
-                        }
-
-                        markAllReadBtn.remove();
-
-                        toastr.success('All notifications marked as read');
-                    }
-                });
-            });
-        }
-
-        markSingleBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const notificationId = this.getAttribute('data-id');
-                const url = document.body.dataset.urlMarkSingleRead;
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({ notification_id: notificationId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Remove unread styling from this item
-                        const notifItem = this.closest('.notif-item');
-                        if (notifItem) {
-                            notifItem.classList.remove('unread');
-                            notifItem.classList.add('read');
-                            this.remove();
-                        }
-
-                        // Update unread count in dot
-                        const unreadCount = document.querySelectorAll('.notif-item.unread').length;
-                        if (unreadCount === 0) {
-                            const notifDot = document.querySelector('.notif-dot');
-                            if (notifDot) {
-                                notifDot.remove();
-                            }
-                        }
-                    }
-                });
-            });
-        });
-    });
 </script>
 
 </body>

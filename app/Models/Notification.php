@@ -17,8 +17,20 @@ class Notification extends Model
         'updated_at' => 'datetime'
     ];
 
+    // Ensure timestamps are enabled
+    public $timestamps = true;
+
+    // Explicit date attributes
+    protected $dates = ['created_at', 'updated_at'];
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Accessor to ensure created_at is always a Carbon instance
+    public function getCreatedAtAttribute($value)
+    {
+        return \Carbon\Carbon::parse($value);
     }
 }
