@@ -113,7 +113,7 @@
                                 <div style="margin-top: 10px; text-align: left;">
                                     <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
                                         <input type="checkbox" id="sendSms" checked>
-                                        <span style="font-size: 13px;">Send OTP via SMS (if mobile number registered)</span>
+                                        <span style="font-size: 09px;">Send OTP via SMS (if mobile number registered)</span>
                                     </label>
                                 </div>
                             </div>
@@ -306,21 +306,18 @@
 
                     Swal.fire({
                         icon: 'success',
-                        title: 'Welcome Back! 👋',
+                        title: 'Welcome to GreenMarket',
                         html: `
                             <div style="text-align: center;">
-                                <p style="font-size: 18px; margin-bottom: 15px;">Welcome <b>{{ addslashes(session('name') ?? 'User') }}</b></p>
-                                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1)); padding: 15px; border-radius: 10px; margin: 15px 0;">
-                                    <p style="margin: 5px 0;"><i class="fas fa-user-tag" style="color: #10B981;"></i> Role: <span style="text-transform: capitalize; font-weight: bold;">${role.replace('_', ' ')}</span></p>
-                                    <p style="margin: 5px 0;"><i class="fas fa-clock" style="color: #3b82f6;"></i> Last Login: Just Now</p>
-                                </div>
-                                <p style="color: #6b7280; font-size: 14px; margin-top: 15px;">Redirecting to your dashboard...</p>
+                                <p style="font-size: 18px; margin-bottom: 4px;"> <b> Hi {{ addslashes(session('name') ?? 'User') }} </b></p>
+                                <p style="color: #6b7280; font-size: 12px; margin-top: 0px;">Redirecting to ${role.replace('_', ' ')} dashboard...</p>
+                                <p style="font-size: 10px; margin-bottom: 0px; color: #cf5c54ff">Wait a Minute</p>
                             </div>
                         `,
                         background: '#ffffff',
                         color: '#0f1724',
                         confirmButtonColor: '#10B981',
-                        timer: 2500,
+                        timer: 10000,
                         showConfirmButton: false,
                         timerProgressBar: true,
                         width: window.innerWidth <= 480 ? '90%' : '500px',
