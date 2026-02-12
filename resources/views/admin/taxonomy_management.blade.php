@@ -799,8 +799,16 @@
             data.append('image', imageFile);
         }
 
-        data.append('subcategories', JSON.stringify(subcategories));
-        data.append('products', JSON.stringify(products));
+        // Append subcategories as array
+        subcategories.forEach((subcat, index) => {
+            data.append(`subcategories[${index}]`, subcat);
+        });
+
+        // Append products as array with nested structure
+        products.forEach((product, index) => {
+            data.append(`products[${index}][name]`, product.name);
+            data.append(`products[${index}][subcategory_index]`, product.subcategory_index);
+        });
 
         try {
             const response = await fetch('{{ route("admin.taxonomy.save.main") }}', {
