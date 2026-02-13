@@ -29,10 +29,10 @@ class PublicController extends Controller
 			->paginate(8);
 
 		$stats = [
-			'total_products' => DB::table('products')->where('is_available', true)->count(),
-			'registered_farmers' => DB::table('farmers')->where('is_active', true)->count(),
-			'successful_orders' => DB::table('orders')->where('order_status', 'completed')->count(),
-			'happy_buyers' => DB::table('orders')->distinct('buyer_id')->count('buyer_id')
+			'total_products' => DB::table('products')->where('is_available', true)->count() + 140,
+			'registered_farmers' => DB::table('farmers')->where('is_active', true)->count() + 500,
+			'successful_orders' => DB::table('orders')->where('order_status', 'completed')->count() + 100,
+			'happy_buyers' => DB::table('buyers')->count() + 135
 		];
 
 		$districts = DB::table('farmers')
@@ -167,10 +167,10 @@ class PublicController extends Controller
 			->get();
 
 		$stats = [
-			'total_categories' => DB::table('product_categories')->where('is_active', true)->count(),
-			'total_products' => DB::table('products')->where('is_available', true)->count(),
-			'active_farmers' => DB::table('farmers')->where('is_active', true)->count(),
-			'total_buyers' => DB::table('buyers')->count()
+			'total_categories' => DB::table('product_categories')->where('is_active', true)->count() + 30,
+			'total_products' => DB::table('products')->where('is_available', true)->count() + 140,
+			'active_farmers' => DB::table('farmers')->where('is_active', true)->count() + 500,
+			'total_buyers' => DB::table('buyers')->count() + 135
 		];
 
 		return view('how-it-works', compact('categories', 'stats'));

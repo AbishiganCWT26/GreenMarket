@@ -16,8 +16,8 @@
 		}
 
 		.otp-input {
-			width: 45px;
-			height: 45px;
+			width: 35px;
+			height: 35px;
 			text-align: center;
 			font-size: 18px;
 			font-weight: bold;
@@ -103,7 +103,7 @@
 
 				<div class="otp-info">
 					<i class="fas fa-info-circle"></i>
-					OTP sent to {{ session('reset_username') }}. Valid for 10 minutes.
+					OTP sent to {{ session('reset_username') }}.
 				</div>
 
 				<form id="otpForm" method="POST" action="{{ route('password.verify.otp.submit') }}" class="login-form">

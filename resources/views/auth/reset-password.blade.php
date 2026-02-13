@@ -9,35 +9,34 @@
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<style>
 		.password-strength {
-			margin-top: 8px;
-			height: 4px;
+			margin-top: 2px;
+			height: 1.5px;
 			background: #e5e7eb;
-			border-radius: 2px;
+			border-radius: 1px;
 			overflow: hidden;
-			position: relative;
 		}
 
 		.strength-meter {
 			height: 100%;
 			width: 0;
-			border-radius: 2px;
-			transition: all 0.3s ease;
+			border-radius: 1px;
+			transition: width 0.25s ease;
 		}
 
 		.strength-text {
-			font-size: 12px;
+			font-size: 9px;
 			color: #6b7280;
-			margin-top: 4px;
+			margin-top: 1px;
 			text-align: right;
 		}
 
 		.password-rules {
-			background: rgba(16, 185, 129, 0.05);
-			border: 1px solid rgba(16, 185, 129, 0.1);
-			border-radius: 10px;
-			padding: 12px;
-			margin: 15px 0;
-			font-size: 13px;
+			background: rgba(16, 185, 129, 0.04);
+			border: 1px solid rgba(16, 185, 129, 0.08);
+			border-radius: 5px;
+			padding: 3px 5px;
+			margin: 3px 0 10px 0;
+			font-size: 12px;
 		}
 
 		.password-rules ul {
@@ -47,15 +46,16 @@
 		}
 
 		.password-rules li {
-			margin-bottom: 5px;
+			margin-bottom: 1px;
 			display: flex;
 			align-items: center;
-			gap: 8px;
+			gap: 2px;
+			line-height: 1.2;
 		}
 
 		.password-rules i {
-			font-size: 12px;
-			width: 16px;
+			font-size: 7px;
+			width: 10px;
 		}
 
 		.rule-valid {
@@ -67,20 +67,24 @@
 		}
 
 		.info-box {
-			background: rgba(59, 130, 246, 0.05);
-			border: 1px solid rgba(59, 130, 246, 0.1);
-			border-radius: 10px;
-			padding: 12px;
-			margin-bottom: 20px;
+			background: rgba(59, 130, 246, 0.04);
+			border: 1px solid rgba(59, 130, 246, 0.08);
+			border-radius: 5px;
+			padding: 4px 6px;
+			margin-bottom: 6px;
 			text-align: center;
-			font-size: 14px;
+			font-size: 15px;
 		}
 
 		.info-box i {
 			color: #3b82f6;
-			margin-right: 5px;
+			margin-right: 2px;
+			font-size: 15px;
 		}
 	</style>
+
+	
+
 </head>
 <body>
 	<div class="container">

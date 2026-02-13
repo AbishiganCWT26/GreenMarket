@@ -40,12 +40,12 @@
 							<div class="stat-label">Local Farmers</div>
 						</div>
 						<div class="stat-item">
-							<div class="stat-number">2000+</div>
+							<div class="stat-number">200+</div>
 							<div class="stat-label">Products Listed</div>
 						</div>
 						<div class="stat-item">
-							<div class="stat-number">100%</div>
-							<div class="stat-label">Secure Payments</div>
+							<div class="stat-number">100+</div>
+							<div class="stat-label">Successful Orders</div>
 						</div>
 					</div>
 				</div>
