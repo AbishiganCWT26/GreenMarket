@@ -317,7 +317,7 @@
                         background: '#ffffff',
                         color: '#0f1724',
                         confirmButtonColor: '#10B981',
-                        timer: 10000,
+                        timer: 5000,
                         showConfirmButton: false,
                         timerProgressBar: true,
                         width: window.innerWidth <= 480 ? '90%' : '500px',
