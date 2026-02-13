@@ -65,7 +65,7 @@
 @section('content')
 <div class="taxonomy-manager">
     <div class="taxonomy-header">
-        <h1><i class="fas fa-sitemap"></i> Product Taxonomy Management</h1>
+        <h1><i class="fas fa-sitemap"></i> Product Category Management</h1>
         <p>Manage the complete hierarchical structure of product categories</p>
     </div>
 

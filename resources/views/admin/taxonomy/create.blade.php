@@ -4,7 +4,7 @@
 
 @section('content')
 
-<h2>Create New Taxonomy Item</h2>
+<h2>Create New Category Item</h2>
 
 <div class="card">
     <div class="card-body">

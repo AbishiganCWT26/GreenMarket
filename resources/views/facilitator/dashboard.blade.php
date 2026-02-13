@@ -97,7 +97,7 @@
 								<i class="fa-solid fa-layer-group" style="color: #10B981;"></i>
 							</div>
 							<div class="action-content">
-								<h5>Manage Taxonomy</h5>
+								<h5>Manage Category</h5>
 								<p>Add/edit product categories and subcategories</p>
 							</div>
 							<div class="action-arrow">

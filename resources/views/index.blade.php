@@ -60,7 +60,7 @@
 
             <div class="hero-slides fade">
 				<img src="{{ asset('assets/images/hero-bg-16.jpg') }}" alt="Quality Guarantee" style="width:100%">
-				<div class="slide-text">Smart Taxonomy Search - Find products easily</div>
+				<div class="slide-text">Smart Category Search - Find products easily</div>
 			</div>
 
             <div class="hero-slides fade">

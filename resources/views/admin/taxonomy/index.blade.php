@@ -4,7 +4,6 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/taxonomy-manager.css') }}">
-{{-- Assuming category manager styles are minimal or included in taxonomy-manager.css --}}
 @endsection
 
 @section('content')
@@ -19,7 +18,7 @@
 <div class="flex-row">
     {{-- Taxonomy Structure Panel (From original file 1) --}}
     <div class="card-panel taxonomy-structure-panel">
-        <h3><i class="fas fa-sitemap"></i> Current Taxonomy Tree (Hierarchical View)</h3>
+        <h3><i class="fas fa-sitemap"></i> Current Category Tree (Hierarchical View)</h3>
         <p class="text-secondary">Main Category > Sub-Category > Specific Product</p>
         <ul class="taxonomy-tree">
             {{-- Main Category Example 1 --}}
@@ -67,7 +66,7 @@
 
     {{-- Add/Edit Form (From original file 1) --}}
     <div class="card-panel taxonomy-form-panel">
-        <h3><i class="fas fa-plus"></i> Add New Taxonomy Item</h3>
+        <h3><i class="fas fa-plus"></i> Add New Category Item</h3>
         <form action="{{ route('admin.taxonomy.create') }}" method="POST">
             @csrf
             <div class="form-group">
@@ -95,7 +94,7 @@
                 <input type="text" id="item_name" name="item_name" placeholder="e.g., Leafy Greens, Organic Tomatoes" required>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save Taxonomy Item</button>
+            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save Category Item</button>
         </form>
     </div>
 </div>

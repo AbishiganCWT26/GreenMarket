@@ -44,8 +44,8 @@
 
                 <li class="menu-heading">SYSTEM TAXONOMY</li>
 
-                <li><a href="{{ url('/admin/taxonomy') }}" class="menu-link {{ request()->is('admin/taxonomy*') ? 'active' : '' }}"><i class="fa-solid fa-seedling"></i><span>Taxonomy</span></a></li>
-                <li><a href="{{ url('/admin/standards') }}" class="menu-link {{ request()->is('admin/standards*') ? 'active' : '' }}"><i class="fa-solid fa-ruler-combined"></i><span>Standards</span></a></li>
+                <li><a href="{{ url('/admin/taxonomy') }}" class="menu-link {{ request()->is('admin/taxonomy*') ? 'active' : '' }}"><i class="fa-solid fa-seedling"></i><span>Product Category</span></a></li>
+                <li><a href="{{ url('/admin/standards') }}" class="menu-link {{ request()->is('admin/standards*') ? 'active' : '' }}"><i class="fa-solid fa-ruler-combined"></i><span>Product Standards</span></a></li>
 
                 <li class="menu-heading">REPORTS & ANALYTICS</li>
 

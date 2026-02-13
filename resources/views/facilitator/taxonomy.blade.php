@@ -1,7 +1,7 @@
 @extends('facilitator.layouts.facilitator_master')
 
 @section('title', 'Taxonomy Management')
-@section('page-title', 'Taxonomy & Standards Management')
+@section('page-title', 'Category & Standards Management')
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/Facilitator/taxonomy.css') }}">
@@ -14,7 +14,7 @@
     <div class="col-12">
         <div class="page-header-card">
             <div class="header-content">
-                <h4><i class="fa-solid fa-layer-group me-2"></i> Product Taxonomy</h4>
+                <h4><i class="fa-solid fa-layer-group me-2"></i> Product Category</h4>
                 <p class="text-muted mb-0">Manage product categories, subcategories, and product examples</p>
             </div>
             <button class="btn-add-new" data-bs-toggle="modal" data-bs-target="#addCategoryFullModal">

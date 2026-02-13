@@ -2,7 +2,7 @@
 
 @section('report-content')
     <div class="section-header">
-        <i class="fas fa-tags"></i> Product Taxonomy & Hierarchy Analysis
+        <i class="fas fa-tags"></i> Product Category & Hierarchy Analysis
     </div>
 
     @if(count($data) > 0)
@@ -60,7 +60,7 @@
                     <th>Sales Value</th>
                     <th>Avg Listing Value</th>
                     <th>Depth Utilization</th>
-                    <th>Taxonomy Health</th>
+                    <th>Category Health</th>
                 </tr>
             </thead>
             <tbody>
@@ -153,7 +153,7 @@
                 <div class="grid-value">{{ number_format($avgListingsPerSubcategory, 1) }}</div>
             </div>
             <div class="grid-item">
-                <div class="grid-label">Taxonomy Coverage</div>
+                <div class="grid-label">Category Coverage</div>
                 <div class="grid-value">
                     @php
                         $categoriesWithSales = collect($data)->groupBy('category_name')->filter(function($cat) {
@@ -168,20 +168,20 @@
 
         <div class="note info">
             <i class="fas fa-sitemap"></i>
-            <p><strong>📋 Taxonomy Optimization Recommendations:</strong></p>
+            <p><strong>📋 Category Optimization Recommendations:</strong></p>
             <ol>
                 <li><strong>High-Performance Categories (Sales > Rs. 50,000):</strong> Expand subcategory depth and product variety</li>
                 <li><strong>Underutilized Categories (Active but low sales):</strong> Review pricing, marketing, and product quality</li>
                 <li><strong>Inactive Categories/Subcategories:</strong> Consider reactivation or consolidation</li>
                 <li><strong>Categories with No Listings:</strong> Prioritize farmer onboarding in these areas</li>
-                <li><strong>Emerging Opportunities:</strong> Identify gaps in taxonomy for new product introductions</li>
+                <li><strong>Emerging Opportunities:</strong> Identify gaps in category for new product introductions</li>
             </ol>
         </div>
 
         <div class="note">
             <i class="fas fa-lightbulb"></i>
-            <p><strong>Taxonomy Management:</strong>
-                1. Regular review of inactive taxonomy elements<br>
+            <p><strong>Category Management:</strong>
+                1. Regular review of inactive category elements<br>
                 2. Prune categories with no activity for 6+ months<br>
                 3. Add new categories based on market demand<br>
                 4. Ensure each category has sufficient product examples<br>
@@ -191,7 +191,7 @@
 
         <div class="charts-section">
             <div class="chart-container">
-                <div class="chart-title">Taxonomy Hierarchy & Performance Mapping</div>
+                <div class="chart-title">Category Hierarchy & Performance Mapping</div>
                 <div class="chart-placeholder">
                     Chart: Category/Subcategory Performance Tree
                 </div>
@@ -200,8 +200,8 @@
     @else
         <div class="no-data">
             <i class="fas fa-tags"></i>
-            <h3>No Taxonomy Data</h3>
-            <p>No product taxonomy data available for analysis</p>
+            <h3>No Category Data</h3>
+            <p>No product category data available for analysis</p>
         </div>
     @endif
 @endsection

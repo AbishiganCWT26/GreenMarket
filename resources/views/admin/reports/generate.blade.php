@@ -40,7 +40,7 @@
                                 <option value="category-performance">Category Performance (Product Category Performance Report)</option>
                                 <option value="stock-movement">Stock Movement (Stock Movement Report)</option>
                                 <option value="quality-grade">Quality Grade (Quality Grade Performance Report)</option>
-                                <option value="product-taxonomy">Product Taxonomy (Product Taxonomy Report)</option>
+                                <option value="product-taxonomy">Product Category (Product Category Report)</option>
                             </optgroup>
                             <optgroup label="Users & Farmers">
                                 <option value="group-performance">Group Performance (Group Farmer Performance Report)</option>
@@ -357,7 +357,7 @@ function getReportName(reportType) {
         'order-fulfillment': 'Fulfillment Timeline (Order Fulfillment Timeline Report)',
         'financial-audit': 'Financial Audit (Inventory vs Cash Reconciliation Repor)',
         'inventory-cash-reconciliation': 'Inventory vs Cash (Inventory vs Cash Reconciliation Report)',
-        'product-taxonomy': 'Product Taxonomy (Product Taxonomy Report)'
+        'product-taxonomy': 'Product Category (Product Category Report)'
     };
 
     return reportNames[reportType] || 'Custom Report';
