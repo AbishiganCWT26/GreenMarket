@@ -420,7 +420,14 @@
 
 .address {
     font-size: 0.75rem;
-    white-space: normal;
+    white-space: pre-line;
+    line-height: 1.5;
+    display: block;
+}
+
+.contact-value.address {
+    white-space: pre-line;
+    word-break: break-word;
 }
 
 .footer-bottom {
@@ -727,7 +734,7 @@
 
     .partner-item {
         flex: 0 0 calc(33.333% - 6px);
-        min-width: 80px;
+        min-width: 75px;
     }
 
     .partner-img {
