@@ -181,13 +181,13 @@ return $configs[$key] ?? '';
             <h3><i class="fas fa-headset"></i> Need Help Getting Started?</h3>
             <p>Our support team is here to help you! Contact us for assistance.</p>
             <div class="hw-action-group">
-                <a href="{{ route('contact.form') }}" class="hw-button hw-button-primary pulse-animation">
-                    <i class="fas fa-headset"></i> Support
+                <a href="{{ route('contact.form') }}" class="hw-button button-secondary">
+                    <i class="fas fa-headset"></i> Contact Us
                 </a>
-                <a href="#" class="hw-button hw-button-secondary" id="registerTrigger">
+                <a href="#" class="hw-button button-secondary" id="registerTrigger">
                     <i class="fas fa-user-plus"></i> Register
                 </a>
-                <a href="{{ route('login') }}" class="hw-button hw-button-secondary">
+                <a href="{{ route('login') }}" class="hw-button button-secondary">
                     <i class="fas fa-sign-in-alt"></i> Login
                 </a>
             </div>
