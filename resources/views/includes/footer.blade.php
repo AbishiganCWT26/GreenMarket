@@ -218,6 +218,7 @@
 	--border-radius: 10px;
 }
 
+
 .site-footer {
 	background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
 	border-top: 1px solid #e2e8f0;
