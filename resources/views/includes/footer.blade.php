@@ -27,44 +27,48 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 			<div class="footer-grid">
 				<div class="footer-col brand-col">
 					<div class="brand-card">
-						<a href="{{ url('/') }}" class="brand-link">
-							<img src="{{ asset('assets/images/Logo-4.png') }}" alt="GreenMarket" class="brand-logo" oncontextmenu="return false;">
-							<div class="brand-info">
-								<h3>GreenMarket</h3>
-								<span>Fresh & Simple</span>
-							</div>
-						</a>
+						<div class="brand-header">
+							<a href="{{ url('/') }}" class="brand-link">
+								<img src="{{ asset('assets/images/Logo-4.png') }}" alt="GreenMarket" class="brand-logo" oncontextmenu="return false;">
+								<div class="brand-info">
+									<h3>GreenMarket</h3>
+									<span>Fresh & Simple</span>
+								</div>
+							</a>
+						</div>
 						@if($smallPara)
 						<p class="brand-desc">{{ $smallPara }}</p>
 						@endif
-						<div class="social-row">
-							<a href="{{ $socialLinks['facebook'] }}" class="social-btn facebook" data-platform="Facebook">
-								<i class="fab fa-facebook-f"></i>
-							</a>
-							<a href="{{ $socialLinks['youtube'] }}" class="social-btn youtube" data-platform="YouTube">
-								<i class="fab fa-youtube"></i>
-							</a>
-							<a href="{{ $socialLinks['twitter'] }}" class="social-btn twitter" data-platform="Twitter">
-								<i class="fab fa-twitter"></i>
-							</a>
-							<a href="{{ $socialLinks['blogspot'] }}" class="social-btn blog" data-platform="Blog">
-								<i class="fas fa-blog"></i>
-							</a>
+						<div class="social-wrapper">
+							<div class="social-row">
+								<a href="{{ $socialLinks['facebook'] }}" class="social-btn facebook" data-platform="Facebook">
+									<i class="fab fa-facebook-f"></i>
+								</a>
+								<a href="{{ $socialLinks['youtube'] }}" class="social-btn youtube" data-platform="YouTube">
+									<i class="fab fa-youtube"></i>
+								</a>
+								<a href="{{ $socialLinks['twitter'] }}" class="social-btn twitter" data-platform="Twitter">
+									<i class="fab fa-twitter"></i>
+								</a>
+								<a href="{{ $socialLinks['blogspot'] }}" class="social-btn blog" data-platform="Blog">
+									<i class="fas fa-blog"></i>
+								</a>
+							</div>
 						</div>
 						<div class="partner-strip">
 							<div class="partner-item">
 								<a href="https://csiap.lk/" target="_blank">
-									<img src="{{ asset('assets/images/CSIAP Logo.png') }}" alt="CSIAP" class="partner-img square">
+									<img src="{{ asset('assets/images/CSIAP Logo.png') }}" alt="CSIAP" class="partner-img vertical">
 								</a>
 							</div>
 							<div class="partner-item">
 								<a href="https://doa.gov.lk/home-page/" target="_blank">
-									<img src="{{ asset('assets/images/Sri Lank logo.png') }}" alt="Sri Lanka" class="partner-img square">
+									<img src="{{ asset('assets/images/Sri Lank logo.png') }}" alt="Sri Lanka" class="partner-img vertical">
 								</a>
 							</div>
 							<div class="partner-item">
 								<a href="https://www.worldbank.org/" target="_blank">
-									<img src="{{ asset('assets/images/world bank logo.png') }}" alt="World Bank" class="partner-img rect">
+									<img src="{{ asset('assets/images/world bank logo.png') }}" alt="World Bank" class="partner-img horizontal">
 								</a>
 							</div>
 						</div>
@@ -76,12 +80,12 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 						<h4>Quick Links</h4>
 					</div>
 					<ul class="footer-links">
-						<li><a href="{{ url('/') }}"><i class="fas fa-home"></i><span>Home</span><i class="fas fa-arrow-right"></i></a></li>
-						<li><a href="{{ url('/about-us') }}"><i class="fas fa-info-circle"></i><span>About Us</span><i class="fas fa-arrow-right"></i></a></li>
-						<li><a href="{{ url('/how-it-works') }}"><i class="fas fa-cogs"></i><span>How It Works</span><i class="fas fa-arrow-right"></i></a></li>
-						<li><a href="{{ url('/contact-us') }}"><i class="fas fa-envelope"></i><span>Contact</span><i class="fas fa-arrow-right"></i></a></li>
-						<li><a href="{{ url('/register/buyer') }}"><i class="fas fa-user-plus"></i><span>Register</span><i class="fas fa-arrow-right"></i></a></li>
-						<li><a href="{{ url('/login') }}"><i class="fas fa-sign-in-alt"></i><span>Login</span><i class="fas fa-arrow-right"></i></a></li>
+						<li><a href="{{ url('/') }}"><i class="fas fa-home"></i><span>Home</span></a></li>
+						<li><a href="{{ url('/about-us') }}"><i class="fas fa-info-circle"></i><span>About Us</span></a></li>
+						<li><a href="{{ url('/how-it-works') }}"><i class="fas fa-cogs"></i><span>How It Works</span></a></li>
+						<li><a href="{{ url('/contact-us') }}"><i class="fas fa-envelope"></i><span>Contact</span></a></li>
+						<li><a href="{{ url('/register/buyer') }}"><i class="fas fa-user-plus"></i><span>Register</span></a></li>
+						<li><a href="{{ url('/login') }}"><i class="fas fa-sign-in-alt"></i><span>Login</span></a></li>
 					</ul>
 				</div>
 				<div class="footer-col">
@@ -90,14 +94,14 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 						<h4>Contact Info</h4>
 					</div>
 					<div class="contact-cards">
-						<div class="contact-card">
+						<div class="contact-item">
 							<div class="contact-icon"><i class="fas fa-envelope"></i></div>
 							<div class="contact-content">
 								<span class="contact-label">Email</span>
 								<a href="mailto:{{ $email }}" class="contact-value">{{ $email }}</a>
 							</div>
 						</div>
-						<div class="contact-card">
+						<div class="contact-item">
 							<div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
 							<div class="contact-content">
 								<span class="contact-label">Phone</span>
@@ -105,7 +109,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 							</div>
 						</div>
 						@if($faxNo)
-						<div class="contact-card">
+						<div class="contact-item">
 							<div class="contact-icon"><i class="fas fa-fax"></i></div>
 							<div class="contact-content">
 								<span class="contact-label">Fax</span>
@@ -113,7 +117,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 							</div>
 						</div>
 						@endif
-						<div class="contact-card">
+						<div class="contact-item">
 							<div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
 							<div class="contact-content">
 								<span class="contact-label">Address</span>
@@ -127,14 +131,14 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 	</div>
 	<div class="footer-bottom">
 		<div class="container">
-			<div class="bottom-bar">
-				<div class="copyright-text">{!! $copyright !!}</div>
-				<div class="legal-group">
+			<div class="bottom-content">
+				<div class="copyright">{!! $copyright !!}</div>
+				<div class="legal-links">
 					<a href="{{ asset('uploads/Legal Documents/' . $privacyPolicy) }}" class="legal-link">Privacy</a>
-					<span class="dot">•</span>
+					<span class="separator">•</span>
 					<a href="{{ asset('uploads/Legal Documents/' . $termsOfService) }}" class="legal-link">Terms</a>
-					<span class="dot">•</span>
-					<span class="version-badge">v1.0.0</span>
+					<span class="separator">•</span>
+					<span class="version">v1.0.0</span>
 				</div>
 			</div>
 		</div>
