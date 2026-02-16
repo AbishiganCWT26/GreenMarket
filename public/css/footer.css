@@ -102,15 +102,12 @@
     width: 60px;
     height: 60px;
     object-fit: contain;
-    border-radius: var(--radius-full);
-    background: white;
     padding: 4px;
-    box-shadow: var(--shadow-sm);
     transition: var(--transition);
 }
 
 .brand-link:hover .brand-logo {
-    transform: scale(1.05) rotate(2deg);
+    transform: scale(1.3) rotate(360deg);
 }
 
 .brand-info h3 {

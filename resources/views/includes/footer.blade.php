@@ -53,13 +53,19 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 						</div>
 						<div class="partner-strip">
 							<div class="partner-item">
-								<img src="{{ asset('assets/images/CSIAP Logo.png') }}" alt="CSIAP" class="partner-img square">
+								<a href="https://csiap.lk/" target="_blank">
+									<img src="{{ asset('assets/images/CSIAP Logo.png') }}" alt="CSIAP" class="partner-img square">
+								</a>
 							</div>
 							<div class="partner-item">
-								<img src="{{ asset('assets/images/Sri Lank logo.png') }}" alt="Sri Lanka" class="partner-img square">
+								<a href="https://doa.gov.lk/home-page/" target="_blank">
+									<img src="{{ asset('assets/images/Sri Lank logo.png') }}" alt="Sri Lanka" class="partner-img square">
+								</a>
 							</div>
 							<div class="partner-item">
-								<img src="{{ asset('assets/images/world bank logo.png') }}" alt="World Bank" class="partner-img rect">
+								<a href="https://www.worldbank.org/" target="_blank">
+									<img src="{{ asset('assets/images/world bank logo.png') }}" alt="World Bank" class="partner-img rect">
+								</a>
 							</div>
 						</div>
 					</div>
