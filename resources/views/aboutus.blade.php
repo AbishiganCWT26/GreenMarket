@@ -319,9 +319,12 @@
 					<a href="{{ url('/contact-us') }}" class="btn btn-primary btn-cta">
 						<i class="fas fa-envelope"></i> Contact Us
 					</a>
-					<button class="btn btn-secondary btn-cta" id="learnMoreBtn">
-						<i class="fas fa-info-circle"></i> Learn More
-					</button>
+					<a href="{{ route('buyer.register') }}" class="btn btn-primary btn-cta" id="registerTrigger">
+						<i class="fas fa-user-plus"></i> Register
+					</a>
+					<a href="{{ route('login') }}" class="btn btn-primary btn-cta">
+						<i class="fas fa-sign-in-alt"></i> Login
+					</a>
 				</div>
 			</div>
 		</div>
@@ -334,41 +337,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-	const learnMoreBtn = document.getElementById('learnMoreBtn');
 
-	if (learnMoreBtn) {
-		learnMoreBtn.addEventListener('click', function() {
-			Swal.fire({
-				title: 'About GreenMarket',
-				html: `
-					<div style="text-align: left;">
-						<p><strong>🌱 Our Platform Features:</strong></p>
-						<ul style="text-align: left; margin-left: 20px;">
-							<li>Direct farmer-to-buyer connections</li>
-							<li>Secure payment processing</li>
-							<li>Real-time inventory management</li>
-							<li>Quality assurance standards</li>
-							<li>Mobile-responsive design</li>
-							<li>Multi-language support</li>
-						</ul>
-						<p style="margin-top: 15px;"><strong>📞 Get Started:</strong></p>
-						<p>Register today to experience fresh, local produce delivered with transparency and trust.</p>
-					</div>
-				`,
-				icon: 'info',
-				confirmButtonText: 'Get Started',
-				confirmButtonColor: '#10B981',
-				showCancelButton: true,
-				cancelButtonText: 'Close',
-				cancelButtonColor: '#6b7280',
-				width: '600px'
-			}).then((result) => {
-				if (result.isConfirmed) {
-					window.location.href = '/login';
-				}
-			});
-		});
-	}
 
 	const teamCards = document.querySelectorAll('.team-card');
 	teamCards.forEach(card => {

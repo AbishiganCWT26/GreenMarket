@@ -247,63 +247,46 @@
 
 .vm-card {
     background: var(--card-bg);
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.03);
     position: relative;
-    overflow: hidden;
 }
 
 .vm-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    border-color: transparent;
 }
 
-.vm-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
+.vision-card {
+    border-left: 3px solid var(--primary-green);
 }
 
-.vision-card::before {
-    background: var(--primary-green);
-}
-
-.mission-card::before {
-    background: var(--accent-amber);
+.mission-card {
+    border-left: 3px solid var(--accent-amber);
 }
 
 .vm-icon-container {
-    width: 40px;
-    height: 40px;
-    background: rgba(16, 185, 129, 0.05);
-    border-radius: 50%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
     margin-bottom: 8px;
 }
 
-.mission-card .vm-icon-container {
-    background: rgba(245, 158, 11, 0.05);
-}
-
 .vm-icon {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     object-fit: cover;
 }
 
 .vm-title {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.9rem;
+    font-weight: 600;
     color: var(--text-color);
-    margin-bottom: 5px;
+    letter-spacing: -0.01em;
 }
 
 .vm-description {
@@ -311,23 +294,33 @@
     line-height: 1.4;
     color: var(--muted);
     margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .vm-features {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 6px 8px;
 }
 
 .vm-feature {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
+    background: rgba(0, 0, 0, 0.02);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .feature-icon {
+    font-size: 0.6rem;
+}
+
+.vision-card .feature-icon {
     color: var(--primary-green);
-    font-size: 0.65rem;
 }
 
 .mission-card .feature-icon {
@@ -335,8 +328,31 @@
 }
 
 .vm-feature span {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
+    font-weight: 400;
     color: var(--text-color);
+    line-height: 1.2;
+}
+
+/* Optional: Add subtle badge for card type */
+.vm-card::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.3;
+}
+
+.vision-card::after {
+    color: var(--primary-green);
+}
+
+.mission-card::after {
+    color: var(--accent-amber);
 }
 
 .what-we-offer-section {
@@ -615,10 +631,6 @@
     animation: fadeIn 0.4s ease-out;
 }
 
-.animate-float {
-    animation: float 2s ease-in-out infinite;
-}
-
 @media screen and (min-width: 2560px) {
     .container {
         max-width: 2000px;
@@ -676,10 +688,25 @@
 @media screen and (max-width: 1000px) {
 
     .hero-content,
-    .about-content,
-    .vm-grid {
+    .about-content {
         grid-template-columns: 1fr;
         gap: 12px;
+    }
+
+    .vm-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .vm-feature span {
+        font-size: 0.5rem;
+        font-weight: 300;
+    }
+
+    .vm-description {
+        font-size: 0.6rem;
+        line-height: 1.2;
+        -webkit-line-clamp: 6;
     }
 
     .hero-img {
@@ -753,6 +780,10 @@
 
     .details-img {
         height: 180px;
+    }
+
+    .vm-description {
+        -webkit-line-clamp: 8;
     }
 }
 
@@ -912,7 +943,7 @@
 
     .offerings-grid,
     .values-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
     }
 
     .hero-img {
@@ -963,5 +994,10 @@
         justify-content: center;
         padding: 4px 10px;
         font-size: 0.7rem;
+    }
+
+    .vm-description {
+        -webkit-line-clamp: 8;
+        text-align: unset;
     }
 }

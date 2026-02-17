@@ -584,36 +584,25 @@
     }
 }
 
+
+
 @media screen and (min-width: 768px) and (max-width: 991px) {
-    .footer-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
-
-    .brand-col {
-        grid-column: 1 / -1;
-    }
-
-    .footer-links {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-    }
-
-    .contact-cards {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
+    .container {
+        max-width: 720px;
+        padding: 0 16px;
     }
 }
 
 @media screen and (min-width: 576px) and (max-width: 767px) {
+    .container {
+        max-width: 540px;
+        padding: 0 12px;
+    }
+}
+
+@media screen and (max-width: 767px) {
     .footer-main {
         padding: 20px 0 12px;
-    }
-
-    .container {
-        padding: 0 12px;
     }
 
     .footer-grid {
@@ -640,12 +629,13 @@
 }
 
 @media screen and (min-width: 481px) and (max-width: 575px) {
-    .footer-main {
-        padding: 16px 0 10px;
+    .container {
+        max-width: 100%;
+        padding: 0 10px;
     }
 
-    .container {
-        padding: 0 10px;
+    .footer-main {
+        padding: 16px 0 10px;
     }
 
     .footer-grid {
@@ -712,12 +702,13 @@
 }
 
 @media screen and (min-width: 380px) and (max-width: 480px) {
-    .footer-main {
-        padding: 14px 0 8px;
+    .container {
+        max-width: 100%;
+        padding: 0 8px;
     }
 
-    .container {
-        padding: 0 8px;
+    .footer-main {
+        padding: 14px 0 8px;
     }
 
     .footer-grid {
@@ -814,12 +805,13 @@
 }
 
 @media screen and (max-width: 379px) {
-    .footer-main {
-        padding: 12px 0 6px;
+    .container {
+        max-width: 100%;
+        padding: 0 6px;
     }
 
-    .container {
-        padding: 0 6px;
+    .footer-main {
+        padding: 12px 0 6px;
     }
 
     .footer-grid {

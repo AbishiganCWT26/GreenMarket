@@ -137,13 +137,13 @@ class PublicController extends Controller
             \Log::info('From address: ' . config('mail.from.address'));
 
             Mail::to($adminEmail)
-                ->send(new ContactFormMail($request->all()));
+                ->queue(new ContactFormMail($request->all()));
 
             \Log::info('Email sent successfully to: ' . $adminEmail);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Your message has been sent successfully! We will respond within 24 hours.'
+                'message' => 'Your message has been sent successfully!<br>We will respond within 24 hours.'
             ]);
 
         } catch (\Exception $e) {
