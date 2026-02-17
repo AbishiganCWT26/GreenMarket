@@ -370,7 +370,7 @@ class AuthController extends Controller
                 return false;
             }
 
-            $text = urlencode("Your GreenMarket password reset OTP is: $otp. Valid for 10 minutes.");
+            $text = urlencode("Your GreenMarket password reset OTP is: $otp.");
             $to = preg_replace('/[^0-9]/', '', $phone);
 
             if (strlen($to) !== 10 || !preg_match('/^[0-9]{10}$/', $to)) {
