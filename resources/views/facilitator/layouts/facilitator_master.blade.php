@@ -106,8 +106,7 @@
         </nav>
 
         <div class="sidebar-footer">
-            <form id="logout-form-top" action="{{ route('logout') }}" method="POST" style="display:none;">
-            <a href="#" id="logout-button" class="logout-link">
+            <a href="{{ route('logout.confirmation') }}" id="nav-logout-link" class="logout-link">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 <span>Logout</span>
             </a>
@@ -183,13 +182,9 @@
                          onerror="this.src='{{ asset('assets/icons/facilitator-icon.svg') }}'">
                 </a>
 
-                <form id="logout-form-top" action="{{ url('/logout') }}" method="POST" style="display:none;">
-                    @csrf
-                </form>
-
-                <div class="logout-icon" id="logoutTop" title="Logout">
+                <a href="{{ route('logout.confirmation') }}" class="logout-icon" id="header-logout-link" title="Logout">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </div>
+                </a>
             </div>
         </header>
 
