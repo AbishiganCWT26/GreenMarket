@@ -105,7 +105,7 @@
 </a>
 </div>
 
-@if($recentOrders->take(5)->count() > 0)
+@if($recentOrders->count() > 0)
 <div class="table-responsive">
 <table class="orders-table">
 <thead>
@@ -118,7 +118,7 @@
 </tr>
 </thead>
 <tbody>
-@foreach($recentOrders->take(5) as $order)
+@foreach($recentOrders as $order)
 <tr onclick="window.location='{{ route('lf.orders.view', $order->id) }}'">
 <td>
 <a href="{{ route('lf.orders.view', $order->id) }}" class="order-number">
@@ -137,6 +137,10 @@
 @endforeach
 </tbody>
 </table>
+</div>
+
+<div class="pagination-container">
+{{ $recentOrders->links('vendor.pagination.compact') }}
 </div>
 @else
 <div class="empty-state">

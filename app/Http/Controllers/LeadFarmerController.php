@@ -44,8 +44,7 @@ class LeadFarmerController extends Controller
         $recentOrders = Order::with(['buyer', 'farmer'])
             ->where('lead_farmer_id', $leadFarmerId)
             ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+            ->paginate(10);
 
         $recentNotifications = Notification::where('user_id', Auth::id())
             ->orWhere(function($query) use ($leadFarmerId) {
