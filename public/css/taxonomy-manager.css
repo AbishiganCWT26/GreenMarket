@@ -32,7 +32,7 @@ body {
     height: 100%;
     background: var(--body-bg);
     color: var(--text-dark);
-    font-size: 12px;
+
 }
 
 .dashboard-wrapper {
@@ -62,12 +62,7 @@ body.no-scroll {
     overflow: hidden;
 }
 
-.main-content {
-    width: 100%;
-    margin-left: 0;
-    padding: 2px;
-    transition: all .3s ease;
-}
+
 
 /* Taxonomy Manager Specific Styles */
 .taxonomy-manager {

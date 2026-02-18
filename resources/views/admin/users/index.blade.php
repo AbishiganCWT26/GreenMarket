@@ -500,10 +500,6 @@
                 width:100%;
             }
             
-            .stats-cards{
-                grid-template-columns:repeat(2, 1fr);
-            }
-            
             .modal-dialog{
                 max-width:90%;
                 margin:auto;
@@ -512,7 +508,7 @@
 
         @media (max-width:480px){
             .stats-cards{
-                grid-template-columns:1fr;
+                grid-template-columns:1fr 1fr;
             }
             
             .container{

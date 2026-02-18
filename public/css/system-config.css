@@ -7,9 +7,9 @@
     --muted: #6b7280;
     --sidebar-width: 240px;
     --sidebar-width-collapsed: 60px;
-    --shadow-xs: 0 1px 3px rgba(15,23,36,0.04);
-    --shadow-sm: 0 4px 10px rgba(15,23,36,0.06);
-    --shadow-md: 0 7px 15px rgba(15,23,36,0.08);
+    --shadow-xs: 0 1px 3px rgba(15, 23, 36, 0.04);
+    --shadow-sm: 0 4px 10px rgba(15, 23, 36, 0.06);
+    --shadow-md: 0 7px 15px rgba(15, 23, 36, 0.08);
     --accent-amber: #f59e0b;
     --blue: #3b82f6;
     --purple: #8b5cf6;
@@ -24,15 +24,17 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+
 }
 
-html, body {
+html,
+body {
     height: 100%;
     background: var(--body-bg);
     color: var(--text-dark);
-    font-size: 12px;
+
 }
+
 
 .dashboard-wrapper {
     display: flex;
@@ -40,7 +42,7 @@ html, body {
     position: relative;
 }
 
-.main-content {
+.main-content1 {
     width: 100%;
     margin-left: 0;
     padding: 20px;
@@ -416,6 +418,7 @@ textarea.config-input {
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -426,6 +429,7 @@ textarea.config-input {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -436,6 +440,7 @@ textarea.config-input {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -446,135 +451,19 @@ textarea.config-input {
     0% {
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
     }
+
     70% {
         box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
     }
+
     100% {
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
     }
 }
 
-@media (max-width: 1199px) {
-    .main-content {
-        padding: 15px;
-    }
-
-    .config-sections-grid {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    }
-}
-
-@media (max-width: 991px) {
-    .content-header {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .header-right {
-        align-self: flex-start;
-    }
-
-    .config-header-card {
-        flex-direction: column;
-        text-align: center;
-        padding: 20px;
-    }
-
-    .header-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-    }
-
-    .config-sections-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 767px) {
-    .main-content {
-        padding: 10px;
-    }
-
-    .content-header {
-        padding: 15px;
-    }
-
-    .header-left h1 {
-        font-size: 1.5rem;
-    }
-
-    .config-header-card {
-        padding: 15px;
-    }
-
-    .section-body {
-        padding: 20px;
-    }
-
-    .btn-save, .btn-back {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .image-upload-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .vision-points,
-    .mission-points {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    html, body {
-        font-size: 11px;
-    }
-
-    .main-content {
-        padding: 8px;
-    }
-
-    .content-header {
-        margin-bottom: 20px;
-        padding: 12px;
-    }
-
-    .header-left h1 {
-        font-size: 1.3rem;
-    }
-
-    .config-input {
-        padding: 10px 12px;
-        font-size: 0.85rem;
-    }
-
-    .section-header {
-        padding: 15px;
-    }
-
-    .section-body {
-        padding: 15px;
-    }
-
-    .image-preview-container {
-        height: 150px;
-    }
-
-    .btn-upload, .btn-remove {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-    }
-}
-
 .config-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 25px;
     animation: fadeIn 0.6s ease;
 }
@@ -627,7 +516,7 @@ textarea.config-input {
 }
 
 .card-content h3 {
-    font-size: 1.3rem;
+    font-size: 1.3rem !important;
     color: var(--text-dark);
     margin-bottom: 10px;
     font-weight: 600;
@@ -638,32 +527,6 @@ textarea.config-input {
     font-size: 0.9rem;
     line-height: 1.6;
     margin-bottom: 20px;
-}
-
-.card-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-}
-
-.badge {
-    padding: 6px 12px;
-    background: var(--primary-accent);
-    color: white;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.card-actions i {
-    color: var(--primary-accent);
-    font-size: 1rem;
-    transition: transform 0.3s ease;
-}
-
-.config-card:not(.backup-card):hover .card-actions i {
-    transform: translateX(5px);
 }
 
 .backup-card {
@@ -715,59 +578,6 @@ textarea.config-input {
 .btn-backup i {
     font-size: 1rem;
 }
-
-@media (max-width: 1199px) {
-    .config-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-}
-
-@media (max-width: 991px) {
-    .config-grid {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-
-    .config-card {
-        padding: 20px;
-    }
-
-    .card-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-    }
-}
-
-@media (max-width: 767px) {
-    .config-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .backup-options {
-        flex-direction: column;
-    }
-
-    .btn-backup {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .config-card {
-        padding: 15px;
-    }
-
-    .card-content h3 {
-        font-size: 1.1rem;
-    }
-
-    .card-content p {
-        font-size: 0.85rem;
-    }
-}
-
-
 
 .legal-documents-grid {
     display: grid;
@@ -925,9 +735,371 @@ textarea.config-input {
     color: var(--text-dark);
 }
 
-@media (max-width: 767px) {
+@media screen and (min-width: 2560px) {
+    .config-manage-container {
+        max-width: 2000px;
+    }
+
+    .config-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+    }
+
+    .config-sections-grid {
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 30px;
+    }
+
+    .legal-documents-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+    }
+
+    .header-left h1 {
+        font-size: 2.2rem;
+    }
+
+    .config-card {
+        padding: 30px;
+    }
+
+    .card-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+    }
+
+    .card-content h3 {
+        font-size: 1.5rem !important;
+    }
+
+    .card-content p {
+        font-size: 1rem;
+    }
+}
+
+@media screen and (min-width: 1501px) and (max-width: 2559px) {
+    .config-manage-container {
+        max-width: 1600px;
+    }
+
+    .config-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 28px;
+    }
+}
+
+@media screen and (min-width: 1400px) and (max-width: 1500px) {
+    .config-manage-container {
+        max-width: 1400px;
+    }
+
+    .config-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+    }
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1399px) {
+    .config-manage-container {
+        max-width: 1200px;
+    }
+
+    .config-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 22px;
+    }
+}
+
+@media screen and (min-width: 1001px) and (max-width: 1199px) {
+    .config-manage-container {
+        max-width: 1000px;
+    }
+
+    .config-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .config-sections-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .legal-documents-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+}
+
+@media screen and (min-width: 992px) and (max-width: 1000px) {
+    .config-manage-container {
+        max-width: 950px;
+        padding: 0 15px;
+    }
+
+    .config-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+
+    .config-sections-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+    }
+
+    .legal-documents-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .card-content h3 {
+        font-size: 1.2rem !important;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .config-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .config-sections-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .legal-documents-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .backup-card {
+        grid-column: 1 / -1;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+    .config-manage-container {
+        max-width: 720px;
+        padding: 0 15px;
+    }
+
+    .config-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+
+    .config-sections-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 18px;
+    }
+
+    .legal-documents-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+    .content-header {
+        padding: 18px;
+    }
+
+    .header-left h1 {
+        font-size: 1.6rem;
+    }
+}
+
+@media screen and (min-width: 576px) and (max-width: 767px) {
+    .config-manage-container {
+        max-width: 540px;
+        padding: 0 12px;
+    }
+
+    .config-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .config-sections-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
     .legal-documents-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .content-header {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .header-left h1 {
+        font-size: 1.5rem;
+    }
+
+    .config-header-card {
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .header-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .header-content h2 {
+        font-size: 1.3rem;
+    }
+
+    .config-card {
+        padding: 20px;
+    }
+
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .backup-options {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-backup {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
+@media screen and (min-width: 481px) and (max-width: 575px) {
+    .main-content1 {
+        padding: 12px;
+    }
+
+    .config-manage-container {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .config-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .config-sections-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .legal-documents-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .content-header {
+        padding: 12px;
+        margin-bottom: 18px;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .header-left h1 {
+        font-size: 1.3rem;
+    }
+
+    .breadcrumb {
+        font-size: 0.75rem;
+    }
+
+    .btn-back {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 16px;
+    }
+
+    .config-header-card {
+        padding: 15px;
+        gap: 12px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .header-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+
+    .header-content h2 {
+        font-size: 1.2rem;
+    }
+
+    .header-content p {
+        font-size: 0.8rem;
+    }
+
+    .btn-save {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 20px;
+    }
+
+    .config-card {
+        padding: 18px;
+    }
+
+    .card-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+
+    .card-content h3 {
+        font-size: 1.1rem !important;
+    }
+
+    .card-content p {
+        font-size: 0.8rem;
+        margin-bottom: 15px;
+    }
+
+    .section-header {
+        padding: 15px;
+    }
+
+    .section-header h3 {
+        font-size: 1rem;
+    }
+
+    .section-body {
+        padding: 18px;
+    }
+
+    .form-group label {
+        font-size: 0.8rem;
+    }
+
+    .config-input {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+    }
+
+    .image-upload-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .image-preview-container {
+        height: 160px;
     }
 
     .legal-document-card {
@@ -939,5 +1111,411 @@ textarea.config-input {
     .document-info {
         flex-direction: column;
         text-align: center;
+        gap: 10px;
+    }
+
+    .document-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .document-details h4 {
+        font-size: 1rem;
+    }
+
+    .current-file {
+        font-size: 0.75rem;
+    }
+
+    .btn-upload-legal {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 16px;
+    }
+
+    .legal-notes p {
+        font-size: 0.75rem;
+    }
+}
+
+@media screen and (min-width: 380px) and (max-width: 480px) {
+    .main-content1 {
+        padding: 10px;
+    }
+
+    .config-manage-container {
+        padding: 0 8px;
+    }
+
+    .config-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .config-sections-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .legal-documents-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .content-header {
+        padding: 10px;
+        margin-bottom: 15px;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .header-left h1 {
+        font-size: 1.2rem;
+        gap: 6px;
+    }
+
+    .breadcrumb {
+        font-size: 0.7rem;
+    }
+
+    .btn-back {
+        width: 100%;
+        justify-content: center;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .config-header-card {
+        padding: 12px;
+        gap: 10px;
+        flex-direction: column;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .header-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .header-content h2 {
+        font-size: 1.1rem;
+    }
+
+    .header-content p {
+        font-size: 0.75rem;
+    }
+
+    .btn-save {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+
+    .config-card {
+        padding: 15px;
+    }
+
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+    }
+
+    .card-content h3 {
+        font-size: 1rem !important;
+    }
+
+    .card-content p {
+        font-size: 0.75rem;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .section-header {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .section-header i {
+        font-size: 1rem;
+    }
+
+    .section-header h3 {
+        font-size: 0.9rem;
+    }
+
+    .section-body {
+        padding: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-size: 0.75rem;
+        gap: 5px;
+    }
+
+    .form-group label i {
+        font-size: 0.8rem;
+    }
+
+    .config-input {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+
+    textarea.config-input {
+        min-height: 80px;
+    }
+
+    .image-upload-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .image-upload-card {
+        padding: 15px;
+    }
+
+    .image-preview-container {
+        height: 140px;
+    }
+
+    .image-placeholder i {
+        font-size: 2rem;
+    }
+
+    .image-placeholder span {
+        font-size: 0.75rem;
+    }
+
+    .image-controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-upload,
+    .btn-remove {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 0.75rem;
+    }
+
+    .legal-document-card {
+        padding: 15px;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .document-info {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .document-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .document-details h4 {
+        font-size: 0.9rem;
+    }
+
+    .current-file {
+        font-size: 0.7rem;
+    }
+
+    .btn-upload-legal {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 0.75rem;
+    }
+
+    .file-info {
+        padding: 4px 8px;
+    }
+
+    .file-info .name {
+        font-size: 0.7rem;
+    }
+
+    .file-info .size {
+        font-size: 0.65rem;
+    }
+
+    .legal-notes {
+        padding: 12px;
+    }
+
+    .legal-notes p {
+        font-size: 0.7rem;
+    }
+
+    .legal-notes code {
+        font-size: 0.7rem;
+    }
+}
+
+@media screen and (max-width: 379px) {
+    .main-content1 {
+        padding: 8px;
+    }
+
+    .config-manage-container {
+        padding: 0 5px;
+    }
+
+    .config-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .config-sections-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .legal-documents-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .content-header {
+        padding: 8px;
+        margin-bottom: 12px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .header-left h1 {
+        font-size: 1rem;
+        gap: 4px;
+    }
+
+    .header-left h1 i {
+        font-size: 1rem;
+    }
+
+    .breadcrumb {
+        font-size: 0.65rem;
+    }
+
+    .btn-back {
+        width: 100%;
+        justify-content: center;
+        padding: 5px 10px;
+        font-size: 0.7rem;
+        gap: 5px;
+    }
+
+    .config-header-card {
+        padding: 10px;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .header-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+
+    .header-content h2 {
+        font-size: 1rem;
+    }
+
+    .header-content p {
+        font-size: 0.7rem;
+    }
+
+    .btn-save {
+        width: 100%;
+        padding: 6px 12px;
+        font-size: 0.7rem;
+        gap: 5px;
+    }
+
+    .config-card {
+        padding: 12px;
+    }
+
+    .card-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    .card-content h3 {
+        font-size: 0.9rem !important;
+    }
+
+    .card-content p {
+        font-size: 0.7rem;
+        margin-bottom: 10px;
+    }
+
+    .section-header {
+        padding: 10px;
+    }
+
+    .section-header h3 {
+        font-size: 0.85rem;
+    }
+
+    .section-body {
+        padding: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group label {
+        font-size: 0.7rem;
+    }
+
+    .config-input {
+        padding: 6px 8px;
+        font-size: 0.7rem;
+    }
+
+    .image-preview-container {
+        height: 120px;
+    }
+
+    .btn-upload,
+    .btn-remove {
+        padding: 6px 10px;
+        font-size: 0.7rem;
+    }
+
+    .legal-document-card {
+        padding: 12px;
+    }
+
+    .document-details h4 {
+        font-size: 0.85rem;
+    }
+
+    .btn-upload-legal {
+        padding: 6px 10px;
+        font-size: 0.7rem;
+    }
+
+    .legal-notes {
+        padding: 10px;
+    }
+
+    .legal-notes p {
+        font-size: 0.65rem;
     }
 }

@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .btn-view {
-    background: var(--primary-accent);
+    background: var(--primary-green);
     color: white;
 }
 

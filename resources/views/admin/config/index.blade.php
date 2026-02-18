@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="dashboard-wrapper">
-    <div class="main-content">
+    <div class="main-content1">
         <div class="content-header">
             <div class="header-left">
                 <h1><i class="fas fa-cogs"></i> System Configuration & Content Management</h1>
@@ -30,10 +30,6 @@
                         <h3>Footer Content</h3>
                         <p>Manage copyright, contact info, social links, and legal documents</p>
                     </div>
-                    <div class="card-actions">
-                        <span class="badge">Edit</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
                 </div>
 
                 <div class="config-card" onclick="window.location.href='{{ route('admin.config.manage', 'about_us') }}'">
@@ -43,10 +39,6 @@
                     <div class="card-content">
                         <h3>About Us Page</h3>
                         <p>Edit text, images, vision, mission, and story content</p>
-                    </div>
-                    <div class="card-actions">
-                        <span class="badge">Edit</span>
-                        <i class="fas fa-arrow-right"></i>
                     </div>
                 </div>
 
@@ -58,10 +50,6 @@
                         <h3>How It Works</h3>
                         <p>Manage buyer and farmer instructions with images</p>
                     </div>
-                    <div class="card-actions">
-                        <span class="badge">Edit</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
                 </div>
 
                 <div class="config-card" onclick="window.location.href='{{ route('admin.config.manage', 'general') }}'">
@@ -71,10 +59,6 @@
                     <div class="card-content">
                         <h3>Admin Email</h3>
                         <p>Update system administrator email address</p>
-                    </div>
-                    <div class="card-actions">
-                        <span class="badge">Edit</span>
-                        <i class="fas fa-arrow-right"></i>
                     </div>
                 </div>
 

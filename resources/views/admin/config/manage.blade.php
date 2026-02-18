@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="dashboard-wrapper">
-    <div class="main-content">
+    <div class="main-content1">
         <div class="content-header">
             <div class="header-left">
                 <h1><i class="fas fa-cogs"></i> Manage {{ ucfirst(str_replace('_', ' ', $group)) }}</h1>
