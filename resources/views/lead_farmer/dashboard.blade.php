@@ -4,176 +4,197 @@
 
 @section('page-title', 'Dashboard')
 
+@section('styles')
+<link rel="stylesheet" href="{{ asset('css/lead_farmer/dashboard.css') }}">
+@endsection
+
 @section('content')
 <div class="container-fluid">
-    <!-- Dashboard Statistics -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Farmers</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalFarmers }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Active Products</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeProducts }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-boxes fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalOrders }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Pending Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pendingOrders }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clock fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="m-0 font-weight-bold">Quick Actions</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('lf.registerFarmer') }}" class="btn btn-success btn-block">
-                                <i class="fas fa-user-plus fa-2x mb-2"></i><br>
-                                Register Farmer
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('lf.addProduct') }}" class="btn btn-info btn-block">
-                                <i class="fas fa-plus-circle fa-2x mb-2"></i><br>
-                                Add Product
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('lf.orders') }}" class="btn btn-warning btn-block">
-                                <i class="fas fa-shopping-cart fa-2x mb-2"></i><br>
-                                View Orders
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('lf.manageProducts') }}" class="btn btn-secondary btn-block">
-                                <i class="fas fa-box-open fa-2x mb-2"></i><br>
-                                Manage Products
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-        <!-- Recent Orders -->
-        <div class="col-xl-8">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
-                    <a href="{{ route('lf.orders') }}" class="btn btn-sm btn-primary">View All Orders</a>
-                </div>
-                <div class="card-body">
-                    @if($recentOrders->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>Order #</th>
-                                    <th>Buyer</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($recentOrders as $order)
-                                <tr>
-                                    <td>
-                                        <a href="{{ route('lf.orders.view', $order->id) }}">
-                                            {{ $order->order_number }}
-                                        </a>
-                                    </td>
-                                    <td>{{ $order->buyer->name }}</td>
-                                    <td>LKR {{ number_format($order->total_amount, 2) }}</td>
-                                    <td>
-                                        <span class="badge badge-{{ 
-                                            $order->order_status == 'pending' ? 'warning' : 
-                                            ($order->order_status == 'paid' ? 'success' : 
-                                            ($order->order_status == 'completed' ? 'completed' : 'info')) 
-                                        }}">
-                                            {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @if($recentOrders->count() > 0 && $totalOrders > 5)
-                    <div class="card-footer text-center">
-                        <a href="{{ route('lf.orders') }}" class="btn btn-primary">View All Orders</a>
-                    </div>
-                    @endif
-                    @else
-                    <div class="text-center py-4">
-                        <i class="fas fa-shopping-cart fa-3x text-gray-300 mb-3"></i>
-                        <p class="text-muted">No orders yet</p>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
+<div class="dashboard-stats">
+<div class="stat-card">
+<div class="stat-icon farmers">
+<i class="fa-solid fa-users"></i>
 </div>
+<div class="stat-content">
+<div class="stat-label">Total Farmers</div>
+<div class="stat-value">{{ $totalFarmers }}</div>
+<div class="stat-trend">
+<i class="fa-solid fa-arrow-up"></i>
+<span>Active farmers</span>
+</div>
+</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon products">
+<i class="fa-solid fa-boxes"></i>
+</div>
+<div class="stat-content">
+<div class="stat-label">Active Products</div>
+<div class="stat-value">{{ $activeProducts }}</div>
+<div class="stat-trend">
+<i class="fa-solid fa-box"></i>
+<span>In inventory</span>
+</div>
+</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon orders">
+<i class="fa-solid fa-shopping-cart"></i>
+</div>
+<div class="stat-content">
+<div class="stat-label">Total Orders</div>
+<div class="stat-value">{{ $totalOrders }}</div>
+<div class="stat-trend">
+<i class="fa-solid fa-clock"></i>
+<span>All time</span>
+</div>
+</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon pending">
+<i class="fa-solid fa-clock"></i>
+</div>
+<div class="stat-content">
+<div class="stat-label">Pending Orders</div>
+<div class="stat-value">{{ $pendingOrders }}</div>
+<div class="stat-trend">
+<i class="fa-solid fa-hourglass-half"></i>
+<span>Awaiting action</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="quick-actions">
+<div class="quick-actions-header">
+<i class="fa-solid fa-bolt"></i>
+<h3>Quick Actions</h3>
+</div>
+<div class="quick-actions-grid">
+<a href="{{ route('lf.registerFarmer') }}" class="quick-action-item">
+<i class="fa-solid fa-user-plus"></i>
+<span>Register Farmer</span>
+</a>
+<a href="{{ route('lf.addProduct') }}" class="quick-action-item">
+<i class="fa-solid fa-plus-circle"></i>
+<span>Add Product</span>
+</a>
+<a href="{{ route('lf.orders') }}" class="quick-action-item">
+<i class="fa-solid fa-shopping-cart"></i>
+<span>View Orders</span>
+</a>
+<a href="{{ route('lf.manageProducts') }}" class="quick-action-item">
+<i class="fa-solid fa-box-open"></i>
+<span>Manage Products</span>
+</a>
+</div>
+</div>
+
+<div class="recent-orders">
+<div class="recent-orders-header">
+<div class="recent-orders-header-left">
+<i class="fa-solid fa-clock-rotate-left"></i>
+<h3>Recent Orders</h3>
+</div>
+<a href="{{ route('lf.orders') }}" class="view-all-link">
+<span>View All</span>
+<i class="fa-solid fa-arrow-right"></i>
+</a>
+</div>
+
+@if($recentOrders->take(5)->count() > 0)
+<div class="table-responsive">
+<table class="orders-table">
+<thead>
+<tr>
+<th>Order #</th>
+<th>Buyer</th>
+<th>Amount</th>
+<th>Status</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody>
+@foreach($recentOrders->take(5) as $order)
+<tr onclick="window.location='{{ route('lf.orders.view', $order->id) }}'">
+<td>
+<a href="{{ route('lf.orders.view', $order->id) }}" class="order-number">
+{{ $order->order_number }}
+</a>
+</td>
+<td>{{ $order->buyer->name ?? 'N/A' }}</td>
+<td>LKR {{ number_format($order->total_amount, 2) }}</td>
+<td>
+<span class="badge-status badge-{{ $order->order_status == 'pending' ? 'pending' : ($order->order_status == 'paid' ? 'paid' : ($order->order_status == 'completed' ? 'completed' : 'info')) }}">
+{{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
+</span>
+</td>
+<td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
+</tr>
+@endforeach
+</tbody>
+</table>
+</div>
+@else
+<div class="empty-state">
+<i class="fa-solid fa-shopping-cart"></i>
+<p>No orders yet</p>
+</div>
+@endif
+</div>
+</div>
+
+@if(session('success'))
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+Swal.fire({
+icon: 'success',
+title: 'Success!',
+text: '{{ session('success') }}',
+confirmButtonColor: '#10B981',
+timer: 3000,
+showConfirmButton: true,
+background: '#ffffff',
+color: '#0f1724'
+});
+});
+</script>
+@endif
+
+@if(session('error'))
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+Swal.fire({
+icon: 'error',
+title: 'Error!',
+text: '{{ session('error') }}',
+confirmButtonColor: '#ef4444',
+timer: 3000,
+showConfirmButton: true,
+background: '#ffffff',
+color: '#0f1724'
+});
+});
+</script>
+@endif
+
+@if($errors->any())
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+Swal.fire({
+icon: 'error',
+title: 'Validation Error',
+text: '{{ $errors->first() }}',
+confirmButtonColor: '#ef4444',
+timer: 3000,
+showConfirmButton: true,
+background: '#ffffff',
+color: '#0f1724'
+});
+});
+</script>
+@endif
 @endsection

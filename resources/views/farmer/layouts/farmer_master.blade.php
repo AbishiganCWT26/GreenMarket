@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>👩‍🌾 Farmer Hub | @yield('title')</title>
-
     <link rel="stylesheet" href="{{ asset('css/farmer-master.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     @yield('styles')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
@@ -19,7 +17,7 @@
 <div class="dashboard-wrapper">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="{{ asset('assets/images/Logo-4.png') }}" class="logo">
+            <img src="{{ asset('assets/images/Logo-4.png') }}" class="logo" alt="Greenmarket">
             <h3>Farmer Panel</h3>
             <button id="sidebar-close" class="sidebar-toggle">
                 <i class="fa-solid fa-times"></i>
@@ -39,7 +37,6 @@
                 <li>
                     <a href="{{ route('farmer.products.my-products') }}" class="menu-link {{ request()->routeIs('farmer.products.my-products') ? 'active' : '' }}">
                         <i class="fa-solid fa-seedling"></i><span>My Products</span>
-                        {{-- Updated to check the shared array --}}
                         @if(isset($sharedCounts['productCount']) && $sharedCounts['productCount'] > 0)
                             <span class="badge bg-success">{{ $sharedCounts['productCount'] }}</span>
                         @endif
@@ -65,7 +62,6 @@
                 <li>
                     <a href="{{ route('farmer.orders.active') }}" class="menu-link {{ request()->routeIs('farmer.orders.active') ? 'active' : '' }}">
                         <i class="fa-solid fa-clipboard-list"></i><span>Active Orders</span>
-                        {{-- Updated to check the shared array --}}
                         @if(isset($sharedCounts['pendingOrders']) && $sharedCounts['pendingOrders'] > 0)
                             <span class="badge bg-warning">{{ $sharedCounts['pendingOrders'] }}</span>
                         @endif
@@ -89,7 +85,6 @@
                 <li>
                     <a href="{{ route('farmer.complaints.list') }}" class="menu-link {{ request()->routeIs('farmer.complaints.list') ? 'active' : '' }}">
                         <i class="fa-solid fa-list-check"></i><span>My Complaints</span>
-                        {{-- Updated to check the shared array --}}
                         @if(isset($sharedCounts['openComplaints']) && $sharedCounts['openComplaints'] > 0)
                             <span class="badge bg-danger">{{ $sharedCounts['openComplaints'] }}</span>
                         @endif
@@ -155,13 +150,12 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <h1 class="page-title">
-                    <i class="fa-solid fa-tractor accent"></i>
+                    <i class="fa-solid fa-tractor"></i>
                     @yield('page-title', 'Farmer Dashboard')
                 </h1>
             </div>
 
             <div class="header-right-group">
-                <!-- Order Status Alert -->
                 @if(isset($pendingPickups) && $pendingPickups > 0)
                 <div class="alert-badge" id="pendingPickupAlert">
                     <i class="fa-solid fa-truck-fast"></i>
@@ -219,11 +213,6 @@
                     <span class="username">
                         {{ Auth::user()->farmer->name ?? Auth::user()->username ?? 'Farmer' }}
                     </span>
-                    @if(Auth::user()->farmer && Auth::user()->farmer->lead_farmer_id)
-                    <small class="text-muted">
-                        Group: {{ Auth::user()->farmer->leadFarmer->group_name ?? 'No Group' }}
-                    </small>
-                    @endif
                 </div>
 
                 <a href="{{ route('farmer.profile.photo') }}" class="profile-photo-link">
@@ -239,7 +228,6 @@
         </header>
 
         <section class="dashboard-body">
-            <!-- Flash Messages -->
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fa-solid fa-circle-check me-2"></i>
@@ -264,7 +252,6 @@
                 </div>
             @endif
 
-            <!-- Main Content -->
             @yield('content')
         </section>
     </main>
@@ -272,18 +259,19 @@
 
 <div class="overlay" id="overlay"></div>
 
-<!-- Bootstrap & Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 @yield('scripts')
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const sidebarClose = document.getElementById('sidebar-close');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
+        const notifBtn = document.getElementById('notifBtn');
+        const notifDropdown = document.getElementById('notifDropdown');
+        const pendingPickupAlert = document.getElementById('pendingPickupAlert');
 
         if (mobileMenuBtn) {
             mobileMenuBtn.addEventListener('click', function() {
@@ -306,50 +294,154 @@
             });
         }
 
-        const logoutButton = document.getElementById('logout-button');
-        const logoutTop = document.getElementById('logoutTop');
-        const logoutForm = document.getElementById('logout-form');
-        const logoutFormTop = document.getElementById('logout-form-top');
+        if (notifBtn && notifDropdown) {
+            notifBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                notifDropdown.classList.toggle('show');
+            });
 
-        function showLogoutConfirmation(form) {
+            document.addEventListener('click', function(e) {
+                if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
+                    notifDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        const logoutButtons = document.querySelectorAll('#nav-logout-link, #header-logout-link');
+        logoutButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Ready to leave?',
+                    text: 'You are about to log out of your account',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10B981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, logout',
+                    cancelButtonText: 'Stay',
+                    background: '#ffffff',
+                    backdrop: 'rgba(15, 23, 36, 0.3)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ route("logout") }}';
+                        form.innerHTML = '@csrf';
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        const markAllReadBtn = document.getElementById('markAllRead');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', function() {
+                fetch('{{ route("farmer.notifications.mark-all-read") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelectorAll('.notif-item.unread').forEach(item => {
+                            item.classList.remove('unread');
+                            item.classList.add('read');
+                        });
+                        const notifDot = document.querySelector('.notif-dot');
+                        if (notifDot) notifDot.remove();
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'All notifications marked as read',
+                            timer: 1500,
+                            showConfirmButton: false,
+                            background: '#ffffff'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to mark notifications as read',
+                        confirmButtonColor: '#10B981',
+                        background: '#ffffff'
+                    });
+                });
+            });
+        }
+
+        if (pendingPickupAlert) {
+            pendingPickupAlert.addEventListener('click', function() {
+                window.location.href = '{{ route("farmer.orders.active") }}';
+            });
+        }
+
+        @if(session('success'))
             Swal.fire({
-                title: 'Ready to leave?',
-                text: 'Are you sure you want to logout?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#10B981',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, logout!',
-                cancelButtonText: 'Cancel',
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session("success") }}',
+                timer: 3000,
+                showConfirmButton: false,
                 background: '#ffffff',
-                color: '#0f1724',
-                backdrop: 'rgba(15, 23, 36, 0.4)',
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
+                backdrop: 'rgba(16, 185, 129, 0.1)',
+                toast: true,
+                position: 'top-end'
             });
-        }
+        @endif
 
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                showLogoutConfirmation(logoutForm);
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session("error") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                background: '#ffffff',
+                backdrop: 'rgba(239, 68, 68, 0.1)',
+                toast: true,
+                position: 'top-end'
             });
-        }
+        @endif
 
-        if (logoutTop) {
-            logoutTop.addEventListener('click', function(e) {
-                e.preventDefault();
-                showLogoutConfirmation(logoutFormTop);
+        @if(session('warning'))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning!',
+                text: '{{ session("warning") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                background: '#ffffff',
+                backdrop: 'rgba(245, 158, 11, 0.1)',
+                toast: true,
+                position: 'top-end'
             });
-        }
+        @endif
+
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: '{!! implode("<br>", $errors->all()) !!}',
+                timer: 4000,
+                background: '#ffffff'
+            });
+        @endif
+
+        setTimeout(() => {
+            document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
 
         const profilePhotoInput = document.getElementById('profile_photo');
         if (profilePhotoInput) {
@@ -363,8 +455,7 @@
                             title: 'Invalid File Type',
                             text: 'Please upload only JPEG, PNG, JPG or GIF images.',
                             confirmButtonColor: '#10B981',
-                            background: '#ffffff',
-                            color: '#0f1724'
+                            background: '#ffffff'
                         });
                         this.value = '';
                         return;
@@ -376,197 +467,20 @@
                             title: 'File Too Large',
                             text: 'Image size should be less than 2MB.',
                             confirmButtonColor: '#10B981',
-                            background: '#ffffff',
-                            color: '#0f1724'
+                            background: '#ffffff'
                         });
                         this.value = '';
                         return;
                     }
-
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const preview = document.getElementById('photo-preview');
-                        if (preview) {
-                            preview.src = e.target.result;
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Image Loaded',
-                                text: 'Profile photo preview updated!',
-                                timer: 1500,
-                                showConfirmButton: false,
-                                background: '#ffffff',
-                                color: '#0f1724'
-                            });
-                        }
-                    }
-                    reader.readAsDataURL(file);
                 }
             });
         }
-
-        const notifBtn = document.getElementById('notifBtn');
-        const notifDropdown = document.getElementById('notifDropdown');
-
-        if (notifBtn && notifDropdown) {
-            notifBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-
-                notifDropdown.classList.toggle('show');
-                const isHidden = notifDropdown.classList.contains('show') ? 'false' : 'true';
-                notifDropdown.setAttribute('aria-hidden', isHidden);
-            });
-
-            const markAllReadBtn = document.getElementById('markAllRead');
-            if (markAllReadBtn) {
-                markAllReadBtn.addEventListener('click', function() {
-                    fetch('{{ route("farmer.notifications.mark-all-read") }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.querySelectorAll('.notif-item.unread').forEach(item => {
-                                item.classList.remove('unread');
-                                item.classList.add('read');
-                            });
-                            const notifDot = document.querySelector('.notif-dot');
-                            if (notifDot) notifDot.remove();
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Notifications Read',
-                                text: 'All notifications marked as read',
-                                timer: 1500,
-                                showConfirmButton: false,
-                                background: '#ffffff',
-                                color: '#0f1724'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Failed',
-                                text: 'Could not mark notifications as read',
-                                confirmButtonColor: '#10B981',
-                                background: '#ffffff',
-                                color: '#0f1724'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Network error occurred',
-                            confirmButtonColor: '#10B981',
-                            background: '#ffffff',
-                            color: '#0f1724'
-                        });
-                    });
-                });
-            }
-
-            document.querySelectorAll('.notif-item.unread').forEach(item => {
-                item.addEventListener('click', function() {
-                    const notifId = this.getAttribute('data-id');
-                    if (notifId) {
-                        fetch('{{ route("farmer.notifications.mark-read") }}', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ id: notifId })
-                        })
-                        .then(() => {
-                            this.classList.remove('unread');
-                            this.classList.add('read');
-                        })
-                        .catch(error => {
-                            console.error('Error marking notification as read:', error);
-                        });
-                    }
-                });
-            });
-
-            document.addEventListener('click', function(e) {
-                if (notifDropdown && notifBtn && !notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
-                    notifDropdown.classList.remove('show');
-                    notifDropdown.setAttribute('aria-hidden', 'true');
-                }
-            });
-        }
-
-        const pendingPickupAlert = document.getElementById('pendingPickupAlert');
-        if (pendingPickupAlert) {
-            pendingPickupAlert.addEventListener('click', function() {
-                window.location.href = '{{ route("farmer.orders.active") }}';
-            });
-        }
-
-        setTimeout(() => {
-            document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
 
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-
-        const successMessage = "{{ session('success') }}";
-        const errorMessage = "{{ session('error') }}";
-        const warningMessage = "{{ session('warning') }}";
-
-        if (successMessage) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: successMessage,
-                timer: 3000,
-                showConfirmButton: false,
-                background: '#ffffff',
-                color: '#0f1724',
-                toast: true,
-                position: 'top-end'
-            });
-        }
-
-        if (errorMessage) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: errorMessage,
-                timer: 3000,
-                showConfirmButton: false,
-                background: '#ffffff',
-                color: '#0f1724',
-                toast: true,
-                position: 'top-end'
-            });
-        }
-
-        if (warningMessage) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning!',
-                text: warningMessage,
-                timer: 3000,
-                showConfirmButton: false,
-                background: '#ffffff',
-                color: '#0f1724',
-                toast: true,
-                position: 'top-end'
-            });
-        }
     });
 </script>
-
 </body>
 </html>

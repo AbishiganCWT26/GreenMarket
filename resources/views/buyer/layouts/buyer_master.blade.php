@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🛒 Buyer Hub | @yield('title')</title>
-
     <link rel="stylesheet" href="{{ asset('css/buyer-master.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     @yield('styles')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
@@ -18,8 +17,8 @@
 <div class="dashboard-wrapper">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="{{ asset('assets/images/Logo-4.png') }}" class="logo">
-            <h3>Buyer Panel</h3>
+            <img src="{{ asset('assets/images/Logo-4.png') }}" class="logo" alt="Greenmarket">
+            <h3>GreenMarket</h3>
             <button id="sidebar-close" class="sidebar-toggle">
                 <i class="fa-solid fa-times"></i>
             </button>
@@ -61,6 +60,7 @@
                         <i class="fa-solid fa-clock-rotate-left"></i><span>Order History</span>
                     </a>
                 </li>
+                
                 <li>
                     <a href="{{ route('buyer.productRequest.create') }}" class="menu-link {{ request()->routeIs('buyer.productRequest.create') ? 'active' : '' }}">
                         <i class="fa-solid fa-plus-circle"></i><span>Request Product</span>
@@ -115,7 +115,6 @@
                         @endif
                     </a>
                 </li>
-
             </ul>
         </nav>
 
@@ -134,7 +133,7 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <h1 class="page-title">
-                    <i class="fa-solid fa-gauge-high accent"></i>
+                    <i class="fa-solid fa-gauge-high"></i>
                     @yield('page-title', 'Dashboard')
                 </h1>
             </div>
@@ -155,7 +154,7 @@
 
                         <div class="notif-list">
                             @if(!isset($notifications) || count($notifications) == 0)
-                                <div class="notif-empty">No notifications</div>
+                                <div class="notif-item">No notifications</div>
                             @else
                                 @foreach($notifications as $n)
                                 <div class="notif-item {{ $n->is_read ? 'read' : 'unread' }}">
@@ -206,18 +205,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @yield('scripts')
-<script src="{{ asset('js/admin-master.js') }}"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- Sidebar Logic ---
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const sidebarClose = document.getElementById('sidebar-close');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
+        const notifBtn = document.getElementById('notifBtn');
+        const notifDropdown = document.getElementById('notifDropdown');
 
         if (mobileMenuBtn) {
             mobileMenuBtn.addEventListener('click', function() {
@@ -240,48 +237,82 @@
             });
         }
 
-        // --- Logout Logic ---
-        const logoutButton = document.getElementById('logout-button');
-        const logoutTop = document.getElementById('logoutTop');
-        const logoutForm = document.getElementById('logout-form');
-        const logoutFormTop = document.getElementById('logout-form-top');
-
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                logoutForm.submit();
-            });
-        }
-
-        if (logoutTop) {
-            logoutTop.addEventListener('click', function(e) {
-                e.preventDefault();
-                logoutFormTop.submit();
-            });
-        }
-
-        // --- Notification Dropdown Logic ---
-        const notifBtn = document.getElementById('notifBtn');
-        const notifDropdown = document.getElementById('notifDropdown');
-
         if (notifBtn && notifDropdown) {
             notifBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 e.preventDefault();
                 notifDropdown.classList.toggle('show');
-                const isHidden = notifDropdown.classList.contains('show') ? 'false' : 'true';
-                notifDropdown.setAttribute('aria-hidden', isHidden);
             });
 
             document.addEventListener('click', function(e) {
                 if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
                     notifDropdown.classList.remove('show');
-                    notifDropdown.setAttribute('aria-hidden', 'true');
                 }
             });
         }
+
+        const logoutButtons = document.querySelectorAll('#nav-logout-link, #header-logout-link');
+        logoutButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Ready to leave?',
+                    text: 'You are about to log out of your account',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10B981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, logout',
+                    cancelButtonText: 'Stay',
+                    background: '#ffffff',
+                    backdrop: 'rgba(15, 23, 36, 0.3)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ route("logout") }}';
+                        form.innerHTML = '@csrf';
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session("success") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                background: '#ffffff',
+                backdrop: 'rgba(16, 185, 129, 0.1)'
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '{{ session("error") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                background: '#ffffff',
+                backdrop: 'rgba(239, 68, 68, 0.1)'
+            });
+        @endif
+
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: '{!! implode("<br>", $errors->all()) !!}',
+                timer: 4000,
+                background: '#ffffff'
+            });
+        @endif
     });
 </script>
-
 </body>
 </html>

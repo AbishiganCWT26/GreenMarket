@@ -8,8 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     @yield('styles')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
@@ -17,7 +16,7 @@
 <div class="dashboard-wrapper">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="{{ asset('assets/images/Logo-4.png') }}" class="logo">
+            <img src="{{ asset('assets/images/Logo-4.png') }}" class="logo" alt="Greenmarket">
             <h3>Lead Farmer Panel</h3>
             <button id="sidebar-close" class="sidebar-toggle">
                 <i class="fa-solid fa-times"></i>
@@ -120,7 +119,7 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <h1 class="page-title">
-                    <i class="fa-solid fa-seedling accent"></i>
+                    <i class="fa-solid fa-seedling"></i>
                     @yield('page-title', 'Lead Farmer Dashboard')
                 </h1>
             </div>
@@ -229,296 +228,217 @@
 
 <div class="overlay" id="overlay"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 @yield('scripts')
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // All initialization moved to leadFarmerMaster object below
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const notifBtn = document.getElementById('notifBtn');
+        const notifDropdown = document.getElementById('notifDropdown');
 
-        // Auto-hide alerts
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', function() {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+            });
+        }
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        }
+
+        if (notifBtn && notifDropdown) {
+            notifBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                notifDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
+                    notifDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        const logoutButtons = document.querySelectorAll('#nav-logout-link, #header-logout-link');
+        logoutButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Ready to leave?',
+                    text: 'You are about to log out of your account',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10B981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, logout',
+                    cancelButtonText: 'Stay',
+                    background: '#ffffff',
+                    backdrop: 'rgba(15, 23, 36, 0.3)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ route("logout") }}';
+                        form.innerHTML = '@csrf';
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        const markAllReadBtn = document.getElementById('markAllRead');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', function() {
+                fetch('{{ route("lf.notifications.mark-all-read") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelectorAll('.notif-item.unread').forEach(item => {
+                            item.classList.remove('unread');
+                        });
+                        document.querySelectorAll('.mark-read-btn').forEach(btn => btn.remove());
+                        const notifDot = document.querySelector('.notif-dot');
+                        if (notifDot) notifDot.remove();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'All notifications marked as read',
+                            timer: 1500,
+                            showConfirmButton: false,
+                            background: '#ffffff'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to mark notifications as read',
+                        confirmButtonColor: '#10B981',
+                        background: '#ffffff'
+                    });
+                });
+            });
+        }
+
+        document.querySelectorAll('.mark-read-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const notifId = this.dataset.id;
+                const notifItem = this.closest('.notif-item');
+                
+                fetch(`/lead-farmer/notifications/${notifId}/read`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        notifItem.classList.remove('unread');
+                        this.remove();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Marked as read',
+                            timer: 1000,
+                            showConfirmButton: false,
+                            background: '#ffffff'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session("success") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                background: '#ffffff',
+                backdrop: 'rgba(16, 185, 129, 0.1)',
+                toast: true,
+                position: 'top-end'
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session("error") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                background: '#ffffff',
+                backdrop: 'rgba(239, 68, 68, 0.1)',
+                toast: true,
+                position: 'top-end'
+            });
+        @endif
+
+        @if(session('warning'))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning!',
+                text: '{{ session("warning") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                background: '#ffffff',
+                backdrop: 'rgba(245, 158, 11, 0.1)',
+                toast: true,
+                position: 'top-end'
+            });
+        @endif
+
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: '{!! implode("<br>", $errors->all()) !!}',
+                timer: 4000,
+                background: '#ffffff'
+            });
+        @endif
+
         setTimeout(() => {
             document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             });
         }, 5000);
-
-        // Responsive sidebar
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 992) {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-    });
-
-    // Enhanced lead farmer master functionality
-    const leadFarmerMaster = {
-        init: function() {
-            this.bindEvents();
-            this.initTooltips();
-            this.autoHideAlerts();
-            this.initCounters();
-        },
-
-        bindEvents: function() {
-            this.bindSidebarToggle();
-            this.bindLogout();
-            this.bindNotificationDropdown();
-            this.bindMenuHoverEffects();
-            this.bindCardHoverEffects();
-            this.bindQuickActions();
-        },
-
-        bindSidebarToggle: function() {
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const sidebarClose = document.getElementById('sidebar-close');
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-
-            if (mobileMenuBtn && sidebar) {
-                mobileMenuBtn.addEventListener('click', () => {
-                    sidebar.classList.add('open');
-                    overlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-
-            if (sidebarClose && sidebar) {
-                sidebarClose.addEventListener('click', () => {
-                    sidebar.classList.remove('open');
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-
-            if (overlay) {
-                overlay.addEventListener('click', () => {
-                    sidebar.classList.remove('open');
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-        },
-
-        bindLogout: function() {
-            const logoutButtons = ['logout-button', 'logoutTop'];
-
-            logoutButtons.forEach(buttonId => {
-                const button = document.getElementById(buttonId);
-                if (button) {
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        Swal.fire({
-                            title: 'Logout?',
-                            text: 'Are you sure you want to logout?',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, logout!',
-                            cancelButtonText: 'Cancel',
-                            reverseButtons: true,
-                            background: '#ffffff',
-                            color: '#0f1724',
-                            width: '400px'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                const formId = buttonId === 'logout-button' ? 'logout-form' : 'logout-form-top';
-                                document.getElementById(formId).submit();
-                            }
-                        });
-                    });
-                }
-            });
-        },
-
-        bindNotificationDropdown: function() {
-            const notifBtn = document.getElementById('notifBtn');
-            const notifDropdown = document.getElementById('notifDropdown');
-
-            if (notifBtn && notifDropdown) {
-                notifBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    notifDropdown.classList.toggle('show');
-                });
-
-                // Mark all notifications as read
-                const markAllReadBtn = document.getElementById('markAllRead');
-                if (markAllReadBtn) {
-                    markAllReadBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        fetch('{{ route("lf.notifications.mark-all-read") }}', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                document.querySelectorAll('.notif-dot').forEach(dot => dot.remove());
-                                document.querySelectorAll('.notif-item.unread').forEach(item => item.classList.remove('unread'));
-                                document.querySelectorAll('.mark-read-btn').forEach(btn => btn.remove());
-                                toastr.success('All notifications marked as read');
-                                notifDropdown.classList.remove('show');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            toastr.error('Failed to mark notifications as read');
-                        });
-                    });
-                }
-
-                // Individual mark as read
-                document.querySelectorAll('.mark-read-btn').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const notifId = this.dataset.id;
-                        const notifItem = this.closest('.notif-item');
-                        
-                        fetch(`/lead-farmer/notifications/${notifId}/read`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                notifItem.classList.remove('unread');
-                                this.remove();
-                                toastr.success('Notification marked as read');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            toastr.error('Failed to mark notification as read');
-                        });
-                    });
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
-                        notifDropdown.classList.remove('show');
-                    }
-                });
-            }
-        },
-
-        bindMenuHoverEffects: function() {
-            const menuLinks = document.querySelectorAll('.menu-link');
-            menuLinks.forEach(link => {
-                link.addEventListener('mouseenter', () => {
-                    link.style.transform = 'translateX(5px)';
-                    const icon = link.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = 'rotate(10deg) scale(1.2)';
-                    }
-                });
-
-                link.addEventListener('mouseleave', () => {
-                    link.style.transform = '';
-                    const icon = link.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = '';
-                    }
-                });
-            });
-        },
-
-        bindCardHoverEffects: function() {
-            const cards = document.querySelectorAll('.dashboard-card, .stat-card');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', () => {
-                    card.style.transform = 'translateY(-8px) scale(1.02)';
-                    card.style.boxShadow = '0 15px 30px rgba(15,23,36,0.15)';
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = '';
-                    card.style.boxShadow = '';
-                });
-            });
-        },
-
-        bindQuickActions: function() {
-            // Quick action buttons for lead farmer
-            const quickAddProduct = document.getElementById('quickAddProduct');
-            const quickViewOrders = document.getElementById('quickViewOrders');
-            const quickRegisterFarmer = document.getElementById('quickRegisterFarmer');
-
-            if (quickAddProduct) {
-                quickAddProduct.addEventListener('click', () => {
-                    window.location.href = '{{ route("lf.addProduct") }}';
-                });
-            }
-
-            if (quickViewOrders) {
-                quickViewOrders.addEventListener('click', () => {
-                    window.location.href = '{{ route("lf.orders") }}';
-                });
-            }
-
-            if (quickRegisterFarmer) {
-                quickRegisterFarmer.addEventListener('click', () => {
-                    window.location.href = '{{ route("lf.registerFarmer") }}';
-                });
-            }
-        },
-
-        initTooltips: function() {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map((tooltipTriggerEl) => {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        },
-
-        autoHideAlerts: function() {
-            setTimeout(() => {
-                document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                });
-            }, 5000);
-        },
-
-        initCounters: function() {
-            // Animate counter values if present
-            const counters = document.querySelectorAll('.counter-value');
-            counters.forEach(counter => {
-                const target = parseInt(counter.getAttribute('data-count'));
-                const duration = 2000;
-                const increment = target / (duration / 16);
-                let current = 0;
-
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= target) {
-                        current = target;
-                        clearInterval(timer);
-                    }
-                    counter.textContent = Math.round(current);
-                }, 16);
-            });
-        }
-    };
-
-    // Initialize lead farmer master
-    document.addEventListener('DOMContentLoaded', () => {
-        leadFarmerMaster.init();
     });
 </script>
-
 </body>
 </html>
