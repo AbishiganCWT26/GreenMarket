@@ -29,7 +29,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 					<div class="brand-card">
 						<div class="brand-header">
 							<a href="{{ url('/') }}" class="brand-link">
-								<img src="{{ asset('assets/images/Logo-4.png') }}" alt="GreenMarket" class="brand-logo" oncontextmenu="return false;">
+								<img src="{{ asset('assets/images/Logo Green Market.png') }}" alt="GreenMarket" class="brand-logo" oncontextmenu="return false;">
 								<div class="brand-info">
 									<h3>GreenMarket</h3>
 									<span>Fresh & Simple</span>

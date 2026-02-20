@@ -43,7 +43,7 @@
                     'description' => 'Available products overview',
                     'category' => 'inventory',
                     'icon' => 'fas fa-boxes',
-                    'color' => 'var(--primary-accent)'
+                    'color' => 'var(--primary-green)'
                 ],
                 [
                     'id' => 'category-performance',
@@ -75,7 +75,7 @@
                     'description' => 'New farmers tracking',
                     'category' => 'users',
                     'icon' => 'fas fa-user-plus',
-                    'color' => 'var(--primary-accent)'
+                    'color' => 'var(--primary-green)'
                 ],
                 [
                     'id' => 'system-adoption',
@@ -107,7 +107,7 @@
                     'description' => 'Comprehensive geographical analysis and sales density',
                     'category' => 'sales',
                     'icon' => 'fas fa-map-marked-alt',
-                    'color' => 'var(--primary-accent)'
+                    'color' => 'var(--primary-green)'
                 ],
                 [
                     'id' => 'quality-grade',
@@ -139,7 +139,7 @@
                     'description' => 'Inventory-cash reconciliation',
                     'category' => 'financial',
                     'icon' => 'fas fa-balance-scale',
-                    'color' => 'var(--primary-accent)'
+                    'color' => 'var(--primary-green)'
                 ],
                 [
                     'id' => 'product-taxonomy',
@@ -266,7 +266,7 @@ function generateReport() {
             text: 'Please select a report',
             confirmButtonColor: '#10B981',
             background: 'var(--card-bg)',
-            color: 'var(--text-dark)'
+            color: 'var(--text-color)'
         });
         return;
     }
@@ -278,7 +278,7 @@ function generateReport() {
             text: 'Please select both date ranges',
             confirmButtonColor: '#10B981',
             background: 'var(--card-bg)',
-            color: 'var(--text-dark)'
+            color: 'var(--text-color)'
         });
         return;
     }
@@ -290,7 +290,7 @@ function generateReport() {
             text: 'From date cannot be after to date',
             confirmButtonColor: '#10B981',
             background: 'var(--card-bg)',
-            color: 'var(--text-dark)'
+            color: 'var(--text-color)'
         });
         return;
     }
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 text: 'To date cannot be before from date',
                 confirmButtonColor: '#10B981',
                 background: 'var(--card-bg)',
-                color: 'var(--text-dark)'
+                color: 'var(--text-color)'
             });
             this.value = fromDateInput.value;
         }
@@ -413,6 +413,22 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+:root {
+    --primary-green: #10B981;
+    --dark-green: #059669;
+    --body-bg: #f6f8fa;
+    --card-bg: #ffffff;
+    --text-color: #0f1724;
+    --muted: #6b7280;
+    --accent-amber: #f59e0b;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --shadow-sm: 0 2px 4px rgba(15, 23, 36, 0.04);
+    --shadow-md: 0 4px 8px rgba(15, 23, 36, 0.06);
+    --shadow-lg: 0 8px 16px rgba(15, 23, 36, 0.08);
+    --shadow-hover: 0 12px 24px -8px rgba(16, 185, 129, 0.2);
+}
+
 .reports-container {
     padding: 12px;
     animation: fadeIn 0.3s ease;
@@ -424,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
     border-radius: 8px;
     margin-bottom: 16px;
     box-shadow: var(--shadow-sm);
-    border-left: 3px solid var(--primary-accent);
+    border-left: 3px solid var(--primary-green);
     transition: transform 0.3s ease;
 }
 
@@ -434,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .header-content h2 {
-    color: var(--text-dark);
+    color: var(--text-color);
     font-size: 18px;
     margin-bottom: 6px;
     display: flex;
@@ -478,12 +494,12 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 13px;
     transition: all 0.3s ease;
     background: var(--card-bg);
-    color: var(--text-dark);
+    color: var(--text-color);
 }
 
 .search-box input:focus {
     outline: none;
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
@@ -497,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function() {
     padding: 6px 12px;
     border: 1px solid #e5e7eb;
     background: var(--card-bg);
-    color: var(--text-dark);
+    color: var(--text-color);
     border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
@@ -506,16 +522,16 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .btn-filter:hover {
-    background: var(--primary-accent);
+    background: var(--primary-green);
     color: white;
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
     transform: translateY(-1px);
 }
 
 .btn-filter.active {
-    background: var(--primary-accent);
+    background: var(--primary-green);
     color: white;
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
 }
 
 .reports-grid {
@@ -540,7 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
 .report-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
 }
 
 .report-card:nth-child(odd) {
@@ -568,14 +584,14 @@ document.addEventListener('DOMContentLoaded', function() {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--shadow-sm);
     flex-shrink: 0;
 }
 
 .card-header h3 {
     flex: 1;
     font-size: 14px;
-    color: var(--text-dark);
+    color: var(--text-color);
     margin: 0;
     line-height: 1.4;
     font-weight: 600;
@@ -620,7 +636,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .stat i {
-    color: var(--primary-accent);
+    color: var(--primary-green);
     font-size: 12px;
 }
 
@@ -653,20 +669,20 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .btn-view:hover {
-    background: var(--primary-dark);
+    background: var(--dark-green);
     transform: translateY(-1px);
 }
 
 .btn-download {
     background: var(--card-bg);
-    color: var(--text-dark);
+    color: var(--text-color);
     border: 1px solid #e5e7eb;
 }
 
 .btn-download:hover {
-    background: var(--primary-accent);
+    background: var(--primary-green);
     color: white;
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
     transform: translateY(-1px);
 }
 
@@ -690,7 +706,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .no-results h3 {
-    color: var(--text-dark);
+    color: var(--text-color);
     margin-bottom: 8px;
     font-size: 16px;
     font-weight: 600;
@@ -737,7 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .modal-header h3 {
-    color: var(--text-dark);
+    color: var(--text-color);
     font-size: 16px;
     display: flex;
     align-items: center;
@@ -761,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .close-modal:hover {
-    color: var(--text-dark);
+    color: var(--text-color);
     background: #f3f4f6;
 }
 
@@ -776,7 +792,7 @@ document.addEventListener('DOMContentLoaded', function() {
 .form-group label {
     display: block;
     margin-bottom: 6px;
-    color: var(--text-dark);
+    color: var(--text-color);
     font-weight: 500;
     font-size: 13px;
     display: flex;
@@ -792,12 +808,12 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 13px;
     transition: all 0.3s ease;
     background: var(--card-bg);
-    color: var(--text-dark);
+    color: var(--text-color);
 }
 
 .form-control:focus {
     outline: none;
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
@@ -815,7 +831,7 @@ document.addEventListener('DOMContentLoaded', function() {
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    color: var(--text-dark);
+    color: var(--text-color);
     font-size: 13px;
 }
 
@@ -843,7 +859,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .btn-cancel {
     background: var(--card-bg);
-    color: var(--text-dark);
+    color: var(--text-color);
     border: 1px solid #e5e7eb;
 }
 
@@ -853,7 +869,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .btn-generate {
-    background: var(--primary-accent);
+    background: var(--primary-green);
     color: white;
     display: flex;
     align-items: center;
@@ -861,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .btn-generate:hover {
-    background: var(--primary-dark);
+    background: var(--dark-green);
     transform: translateY(-1px);
 }
 

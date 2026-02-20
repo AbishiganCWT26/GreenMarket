@@ -12,11 +12,10 @@
 	@include('includes.loader')
 	<div class="auth-container">
 		<div class="auth-card">
-			<div class="auth-header" onclick="window.location.href='/'" role="button">
-				<img src="{{ asset('assets/images/Logo-4.png') }}" alt="GreenMarket" class="auth-logo">
+			<div class="auth-header" role="button">
+				<img src="{{ asset('assets/images/Logo Green Market.png') }}" alt="GreenMarket" class="auth-logo">
 				<div class="auth-brand">
 					<h1>GreenMarket</h1>
-					<p>fresh from farm to table</p>
 				</div>
 			</div>
 

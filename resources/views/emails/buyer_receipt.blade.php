@@ -10,7 +10,7 @@
 <!-- Logo Section -->
 <div style="text-align: center; background: #10B981; padding: 20px; margin-bottom: 20px;">
     @php
-        $logoPngPath = public_path('assets/images/Logo-4.png');
+        $logoPngPath = public_path('assets/images/Logo Green Market.png');
         $logoSvgPath = public_path('assets/images/Logo-4.svg');
     @endphp
 

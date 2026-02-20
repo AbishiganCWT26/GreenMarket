@@ -46,7 +46,7 @@ Route::get('/how-it-works', [PublicController::class, 'howItWorks'])->name('how.
 Route::get('/test-email', function() {
     try {
         // 1. Define the logo path
-        $logoPath = public_path('assets/images/Logo-4.png');
+        $logoPath = public_path('assets/images/Logo Green Market.png');
 
         // 2. Fallback check for SVG if PNG doesn't exist
         if (!File::exists($logoPath)) {

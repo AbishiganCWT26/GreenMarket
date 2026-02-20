@@ -17,7 +17,7 @@
 <div class="dashboard-wrapper">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="{{ asset('assets/images/Logo-4.png') }}" class="logo" alt="Greenmarket">
+            <img src="{{ asset('assets/images/Logo Green Market.png') }}" class="logo" alt="Greenmarket">
             <h3>Farmer Panel</h3>
             <button id="sidebar-close" class="sidebar-toggle">
                 <i class="fa-solid fa-times"></i>

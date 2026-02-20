@@ -10,7 +10,7 @@ class LogoController extends Controller
     public function getLogoPath()
     {
         $svgPath = public_path('assets/images/Logo-4.svg');
-        $pngPath = public_path('assets/images/Logo-4.png');
+        $pngPath = public_path('assets/images/Logo Green Market.png');
 
         if (file_exists($svgPath)) {
             return $svgPath;

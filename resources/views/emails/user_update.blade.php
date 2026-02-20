@@ -14,7 +14,7 @@
         <div class="header">
             <!-- Logo Section -->
             @php
-                $logoPngPath = public_path('assets/images/Logo-4.png');
+                $logoPngPath = public_path('assets/images/Logo Green Market.png');
                 $logoSvgPath = public_path('assets/images/Logo-4.svg');
             @endphp
 

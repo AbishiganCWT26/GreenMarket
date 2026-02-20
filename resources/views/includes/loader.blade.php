@@ -16,7 +16,7 @@
         <div class="logo-wrapper1">
             <div class="logo-spinner">
                 <div class="logo-image-container">
-                    <img src="{{ asset('assets/images/Logo-4-loader.png') }}"
+                    <img src="{{ asset('assets/images/Logo Green Market.png') }}"
                          class="logo-image"
                          alt="GreenMarket Logo">
                 </div>

@@ -179,7 +179,7 @@
         <div class="header-left">
             <div class="logo">
                 @php
-                    $path = public_path('assets/images/Logo-4.png');
+                    $path = public_path('assets/images/Logo Green Market.png');
                     $type = pathinfo($path, PATHINFO_EXTENSION);
                     $data = file_get_contents($path);
                     $logo = 'data:image/' . $type . ';base64,' . base64_encode($data);

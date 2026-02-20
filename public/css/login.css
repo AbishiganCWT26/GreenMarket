@@ -83,11 +83,11 @@ body::before {
 
 .auth-header {
 	background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-	padding: 12px 10px;
+	padding: 6px 5px;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: 8px;
 	cursor: pointer;
 	transition: var(--transition);
 	position: relative;
@@ -110,15 +110,15 @@ body::before {
 }
 
 .auth-logo {
-	width: 28px;
-	height: 28px;
+	width: 60px;
+	height: 60px;
 	object-fit: contain;
 	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 	transition: var(--transition);
 }
 
 .auth-header:hover .auth-logo {
-	transform: rotate(3deg) scale(1.02);
+	transform: rotate(360deg) scale(1.5);
 }
 
 .auth-brand h1 {
@@ -473,8 +473,8 @@ body::before {
 	}
 
 	.auth-logo {
-		width: 24px;
-		height: 24px;
+		width: 40px;
+		height: 40px;
 	}
 
 	.auth-brand h1 {
@@ -501,8 +501,8 @@ body::before {
 	}
 
 	.auth-logo {
-		width: 22px;
-		height: 22px;
+		width: 35px;
+		height: 35px;
 	}
 
 	.auth-brand h1 {
@@ -549,8 +549,8 @@ body::before {
 	}
 
 	.auth-logo {
-		width: 20px;
-		height: 20px;
+		width: 30px;
+		height: 30px;
 	}
 
 	.auth-brand h1 {

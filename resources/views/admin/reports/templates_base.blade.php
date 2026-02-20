@@ -59,7 +59,6 @@
             display: table-cell;
             width: 140px;
             height: 80px;
-            background-color: #4d7c32;
             border-radius: 40px;
             text-align: center;
             vertical-align: middle;
@@ -72,7 +71,7 @@
 
         .brand-name {
             display: table-cell;
-            padding-left: 18px;
+            padding-left: 8px;
             font-size: 28px;
             font-weight: 900;
             color: #3e7033;
@@ -82,7 +81,7 @@
 
         .header-divider {
             height: 5px;
-            background-color: #4d7c32;
+            background-color: #10B981;
             margin-bottom: 25px;
         }
 
@@ -103,7 +102,7 @@
         }
 
         .filter-value {
-            background: #4d7c32;
+            background: #10B981;
             color: #fff;
             padding: 3px 10px;
             border-radius: 12px;
@@ -154,7 +153,7 @@
         }
 
         .report-table th {
-            background: #4d7c32;
+            background: #10B981;
             color: #fff;
             padding: 12px;
             border: 1px solid #e2e8f0;
@@ -196,7 +195,7 @@
             padding-top: 15px;
             margin-top: 20px;
             font-size: 10px;
-            color: #4d7c32;
+            color: #10B981;
             display: table;
             width: 100%;
         }
@@ -218,7 +217,7 @@
             <td class="header-left">
                 <div class="logo-wrapper">
                     @php
-                        $logoPath = public_path('assets/images/Logo-4.png');
+                        $logoPath = public_path('assets/images/Logo Green Market.png');
                         $logoSvgPath = public_path('assets/images/Logo-4.svg');
                     @endphp
 

@@ -2,7 +2,7 @@
     <div class="container">
         <div class="footer-grid">
             <div>
-                <img src="{{ asset('assets/images/Logo-4.png') }}" height="34" alt="HGH">
+                <img src="{{ asset('assets/images/Logo Green Market.png') }}" height="34" alt="HGH">
                 <p class="muted">Fresh from farms. Direct to you.</p>
             </div>
 

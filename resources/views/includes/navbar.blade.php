@@ -8,6 +8,15 @@
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+	<style>
+		.swal2-image {
+			margin: 0.5rem auto !important;
+			width: 100px !important;
+			height: 100px !important;
+			object-fit: contain !important;
+		}
+	</style>
+
 </head>
 <body>
 	@include('includes.loader')
@@ -16,7 +25,7 @@
 			<div class="logo-wrapper">
 				<a href="{{ url('/') }}" class="logo-link" oncontextmenu="return false;">
 					<div class="logo-image-wrapper">
-						<img src="{{ asset('assets/images/Logo-4.png') }}" alt="GreenMarket" class="logo-img" draggable="false">
+						<img src="{{ asset('assets/images/Logo Green Market.png') }}" alt="GreenMarket" class="logo-img" draggable="false">
 					</div>
 					<span class="logo-text">GreenMarket</span>
 				</a>
@@ -54,6 +63,39 @@
 						</a>
 					</div>
 				@else
+					@php
+						$user = auth()->user();
+						$dashboardUrl = '/';
+						$ProfileUrl = '/';
+						$SettingsUrl = '/';
+						switch($user->role) {
+							case 'admin':
+								$dashboardUrl = '/admin/dashboard';
+								$ProfileUrl = '/admin/profile';
+								$SettingsUrl = '/admin/profile';
+								break;
+							case 'facilitator':
+								$dashboardUrl = '/facilitator/dashboard';
+								$ProfileUrl = '/facilitator/profile';
+								$SettingsUrl = '/facilitator/account/settings';
+								break;
+							case 'lead_farmer':
+								$dashboardUrl = '/lead-farmer/dashboard';
+								$ProfileUrl = '/lead-farmer/profile';
+								$SettingsUrl = '/lead-farmer/profile';
+								break;
+							case 'farmer':
+								$dashboardUrl = '/farmer/dashboard';
+								$ProfileUrl = '/farmer/profile';
+								$SettingsUrl = '/farmer/profile/settings';
+								break;
+							case 'buyer':
+								$dashboardUrl = '/buyer/dashboard';
+								$ProfileUrl = '/buyer/profile';
+								$SettingsUrl = '/buyer/password';
+								break;
+						}
+					@endphp
 					<div class="user-dropdown">
 						<button class="user-toggle" id="userToggle">
 							<div class="user-avatar">
@@ -67,15 +109,15 @@
 							<i class="fas fa-chevron-down"></i>
 						</button>
 						<div class="dropdown-menu" id="dropdownMenu">
-							<a href="{{ $dashboardUrl ?? '#' }}" class="dropdown-item">
+							<a href="{{ url($dashboardUrl) }}" class="dropdown-item">
 								<i class="fas fa-tachometer-alt"></i>
 								<span>Dashboard</span>
 							</a>
-							<a href="{{ url('/profile') }}" class="dropdown-item">
+							<a href="{{ url($ProfileUrl) }}" class="dropdown-item">
 								<i class="fas fa-user-circle"></i>
 								<span>Profile</span>
 							</a>
-							<a href="{{ url('/settings') }}" class="dropdown-item">
+							<a href="{{ url($SettingsUrl) }}" class="dropdown-item">
 								<i class="fas fa-cog"></i>
 								<span>Settings</span>
 							</a>
@@ -137,15 +179,15 @@
 							<span class="mobile-user-email">{{ Auth::user()->email ?? '' }}</span>
 						</div>
 					</div>
-					<a href="{{ $dashboardUrl ?? '#' }}" class="mobile-nav-item">
+					<a href="{{ url($dashboardUrl) }}" class="mobile-nav-item">
 						<i class="fas fa-tachometer-alt"></i>
 						<span>Dashboard</span>
 					</a>
-					<a href="{{ url('/profile') }}" class="mobile-nav-item">
+					<a href="{{ url($ProfileUrl) }}" class="mobile-nav-item">
 						<i class="fas fa-user-circle"></i>
 						<span>Profile</span>
 					</a>
-					<a href="{{ url('/settings') }}" class="mobile-nav-item">
+					<a href="{{ url($SettingsUrl) }}" class="mobile-nav-item">
 						<i class="fas fa-cog"></i>
 						<span>Settings</span>
 					</a>
@@ -259,7 +301,10 @@
 			Swal.fire({
 				title: 'Logout?',
 				text: 'Are you sure you want to logout?',
-				icon: 'question',
+				imageUrl: '{{ asset("assets/images/logout btn.png") }}',
+				imageWidth: 64,	
+				imageHeight: 64,
+				imageAlt: 'Logout',
 				showCancelButton: true,
 				confirmButtonColor: '#10B981',
 				cancelButtonColor: '#6b7280',

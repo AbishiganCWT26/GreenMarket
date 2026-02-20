@@ -512,7 +512,7 @@ function exportToCSV() {
             text: 'No data available to export',
             confirmButtonColor: '#10B981',
             background: 'var(--card-bg)',
-            color: 'var(--text-dark)'
+            color: 'var(--text-color)'
         });
         return;
     }
@@ -544,7 +544,7 @@ function exportToCSV() {
         text: 'CSV file has been downloaded',
         confirmButtonColor: '#10B981',
         background: 'var(--card-bg)',
-        color: 'var(--text-dark)',
+        color: 'var(--text-color)',
         timer: 1500
     });
 }
@@ -556,7 +556,7 @@ function exportToExcel() {
         icon: 'info',
         confirmButtonColor: '#10B981',
         background: 'var(--card-bg)',
-        color: 'var(--text-dark)',
+        color: 'var(--text-color)',
         showCancelButton: true,
         confirmButtonText: 'OK',
         cancelButtonText: 'Export as CSV'
@@ -569,6 +569,22 @@ function exportToExcel() {
 </script>
 
 <style>
+:root {
+    --primary-green: #10B981;
+    --dark-green: #059669;
+    --body-bg: #f6f8fa;
+    --card-bg: #ffffff;
+    --text-color: #0f1724;
+    --muted: #6b7280;
+    --accent-amber: #f59e0b;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --shadow-sm: 0 2px 4px rgba(15, 23, 36, 0.04);
+    --shadow-md: 0 4px 8px rgba(15, 23, 36, 0.06);
+    --shadow-lg: 0 8px 16px rgba(15, 23, 36, 0.08);
+    --shadow-hover: 0 12px 24px -8px rgba(16, 185, 129, 0.2);
+}
+
 .report-view-container {
     padding: 12px;
     animation: fadeIn 0.3s ease;
@@ -580,7 +596,7 @@ function exportToExcel() {
     border-radius: 8px;
     margin-bottom: 16px;
     box-shadow: var(--shadow-sm);
-    border-left: 3px solid var(--primary-accent);
+    border-left: 3px solid var(--primary-green);
     transition: transform 0.3s ease;
 }
 
@@ -599,7 +615,7 @@ function exportToExcel() {
 }
 
 .header-content h2 {
-    color: var(--text-dark);
+    color: var(--text-color);
     font-size: 18px;
     margin: 0;
     display: flex;
@@ -629,18 +645,18 @@ function exportToExcel() {
 }
 
 .btn-export {
-    background: var(--primary-accent);
+    background: var(--primary-green);
     color: white;
 }
 
 .btn-export:hover {
-    background: var(--primary-dark);
+    background: var(--dark-green);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
 }
 
 .btn-print {
-    background:#5683e4;
+    background: var(--blue);
     color: white;
 }
 
@@ -650,14 +666,14 @@ function exportToExcel() {
 
 .btn-back {
     background: var(--card-bg);
-    color: var(--text-dark);
+    color: var(--text-color);
     border: 1px solid #e5e7eb;
 }
 
 .btn-back:hover {
     background: #f3f4f6;
     transform: translateY(-1px);
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
 }
 
 .filter-display {
@@ -673,7 +689,7 @@ function exportToExcel() {
 }
 
 .filter-tag {
-    background: linear-gradient(135deg, var(--primary-accent), var(--primary-dark));
+    background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
     color: white;
     padding: 4px 8px;
     border-radius: 4px;
@@ -731,12 +747,12 @@ function exportToExcel() {
     width: 180px;
     transition: all 0.3s ease;
     background: var(--card-bg);
-    color: var(--text-dark);
+    color: var(--text-color);
 }
 
 .search-box input:focus {
     outline: none;
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     width: 220px;
 }
@@ -753,7 +769,7 @@ function exportToExcel() {
     padding: 6px 12px;
     border: none;
     background: none;
-    color: var(--text-dark);
+    color: var(--text-color);
     border-radius: 4px;
     font-size: 12px;
     cursor: pointer;
@@ -769,7 +785,7 @@ function exportToExcel() {
 }
 
 .btn-view.active {
-    background: var(--primary-accent);
+    background: var(--primary-green);
     color: white;
     box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 }
@@ -783,7 +799,7 @@ function exportToExcel() {
     padding: 6px 12px;
     border: 1px solid #e5e7eb;
     background: var(--card-bg);
-    color: var(--text-dark);
+    color: var(--text-color);
     border-radius: 4px;
     font-size: 12px;
     cursor: pointer;
@@ -794,16 +810,16 @@ function exportToExcel() {
 }
 
 .btn-export-csv:hover {
-    background: var(--primary-accent);
+    background: var(--primary-green);
     color: white;
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
     transform: translateY(-1px);
 }
 
 .btn-export-excel:hover {
-    background: #059669;
+    background: var(--dark-green);
     color: white;
-    border-color: #059669;
+    border-color: var(--dark-green);
     transform: translateY(-1px);
 }
 
@@ -831,7 +847,7 @@ function exportToExcel() {
 
 .report-data-table th {
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    color: var(--text-dark);
+    color: var(--text-color);
     font-weight: 600;
     text-align: left;
     padding: 10px 12px;
@@ -846,7 +862,7 @@ function exportToExcel() {
 .report-data-table td {
     padding: 10px 12px;
     border-bottom: 1px solid #f3f4f6;
-    color: var(--text-dark);
+    color: var(--text-color);
     transition: background-color 0.2s ease;
     font-size: 12px;
 }
@@ -863,7 +879,7 @@ function exportToExcel() {
     text-align: right;
     font-family: 'Courier New', monospace;
     font-weight: 500;
-    color: #059669;
+    color: var(--dark-green);
 }
 
 .status-badge {
@@ -902,7 +918,7 @@ function exportToExcel() {
 }
 
 .success {
-    color: #059669;
+    color: var(--dark-green);
     background: linear-gradient(135deg, #d1fae5, #a7f3d0);
     padding: 2px 6px;
     border-radius: 3px;
@@ -925,7 +941,7 @@ function exportToExcel() {
 }
 
 .no-data h3 {
-    color: var(--text-dark);
+    color: var(--text-color);
     margin-bottom: 8px;
     font-size: 16px;
     font-weight: 600;
@@ -957,7 +973,7 @@ function exportToExcel() {
 .data-card:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
 }
 
 .data-card:nth-child(odd) {
@@ -978,7 +994,7 @@ function exportToExcel() {
 }
 
 .card-header h4 {
-    color: var(--text-dark);
+    color: var(--text-color);
     font-size: 12px;
     margin: 0;
     font-weight: 600;
@@ -1015,7 +1031,7 @@ function exportToExcel() {
 }
 
 .card-item .value {
-    color: var(--text-dark);
+    color: var(--text-color);
     font-size: 12px;
     font-weight: 600;
     text-align: right;
@@ -1030,7 +1046,7 @@ function exportToExcel() {
 }
 
 .summary-card h4 {
-    color: var(--text-dark);
+    color: var(--text-color);
     font-size: 14px;
     margin-bottom: 12px;
     display: flex;
@@ -1056,7 +1072,7 @@ function exportToExcel() {
 .summary-item:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
-    border-color: var(--primary-accent);
+    border-color: var(--primary-green);
 }
 
 .summary-item .label {
@@ -1070,7 +1086,7 @@ function exportToExcel() {
 
 .summary-item .value {
     display: block;
-    color: var(--text-dark);
+    color: var(--text-color);
     font-size: 16px;
     font-weight: 700;
 }
