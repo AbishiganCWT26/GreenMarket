@@ -228,8 +228,6 @@
                             <img src="{{ $logoSvgPath }}" alt="GreenMarket Logo">
                         @endif
                     </div>
-
-                    <span class="brand-name">GreenMarket</span>
                 </div>
             </td>
 

@@ -56,6 +56,13 @@ class DashboardComposer
             ->limit(20)
             ->get();
 
+        // FACILITATORS LIST FOR DROPDOWN
+        $facilitatorsList = DB::table('facilitators')
+            ->join('users', 'facilitators.user_id', '=', 'users.id')
+            ->where('users.is_active', true)
+            ->select('facilitators.user_id', 'facilitators.name', 'facilitators.assigned_division')
+            ->get();
+
         $view->with([
             'totalUsers' => $totalUsers,
             'admins' => $admins,
@@ -66,7 +73,8 @@ class DashboardComposer
             'products' => $products,
             'sales' => $sales,
             'groups' => $groups,
-            'complaints' => $complaints
+            'complaints' => $complaints,
+            'facilitatorsList' => $facilitatorsList
         ]);
     }
 }

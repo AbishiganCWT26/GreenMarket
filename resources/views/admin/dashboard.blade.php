@@ -176,44 +176,79 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        // Pass the facilitators list from PHP to JS
+        const facilitators = @json($facilitatorsList);
 
         document.querySelectorAll('.alert-facilitator').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                const id = this.dataset.id;
-                fetch('{{ url("/admin/complaints/alert") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
+                const complaintId = this.dataset.id;
+                
+                // Create options for the select dropdown
+                let options = {};
+                facilitators.forEach(f => {
+                    options[f.user_id] = `${f.name} (${f.assigned_division || 'No Division'})`;
+                });
+
+                Swal.fire({
+                    title: 'Select Facilitator',
+                    text: 'Choose a facilitator to alert regarding this complaint:',
+                    input: 'select',
+                    inputOptions: options,
+                    inputPlaceholder: 'Select a facilitator',
+                    showCancelButton: true,
+                    confirmButtonText: 'Send Alert',
+                    confirmButtonColor: '#10B981',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (facilitatorId) => {
+                        if (!facilitatorId) {
+                            Swal.showValidationMessage('Please select a facilitator');
+                            return false;
+                        }
+                        
+                        return fetch('{{ url("/admin/complaints/alert") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({ 
+                                id: complaintId,
+                                facilitator_id: facilitatorId
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(response.statusText);
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            Swal.showValidationMessage(
+                                `Request failed: ${error}`
+                            );
+                        });
                     },
-                    body: JSON.stringify({ id: id })
-                })
-                .then(response => response.json())
-                .then(res => {
-                    if (res.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Alert sent',
-                            text: 'Facilitator alerted successfully',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Unable to alert facilitator',
-                            confirmButtonColor: '#10B981'
-                        });
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (result.value.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Alert Sent',
+                                text: result.value.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: result.value.message || 'Unable to alert facilitator',
+                                confirmButtonColor: '#10B981'
+                            });
+                        }
                     }
-                })
-                .catch(() => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Unable to alert facilitator',
-                        confirmButtonColor: '#10B981'
-                    });
                 });
             });
         });

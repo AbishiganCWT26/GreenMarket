@@ -1047,7 +1047,7 @@ class FacilitatorController extends Controller
 
     public function complaints()
     {
-        $complaints = Complaint::with(['complainantUser', 'againstUser', 'resolvedByFacilitator'])
+        $complaints = Complaint::with(['complainant', 'againstUser', 'resolvedBy'])
             ->orderBy('created_at', 'desc')
             ->get();
 

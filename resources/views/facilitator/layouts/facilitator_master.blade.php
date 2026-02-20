@@ -8,8 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     @yield('styles')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
@@ -17,7 +16,7 @@
 <div class="dashboard-wrapper">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="{{ asset('assets/images/Logo Green Market.png') }}" class="logo">
+            <img src="{{ asset('assets/images/Logo Green Market.png') }}" class="logo" alt="Greenmarket">
             <h3>Facilitator Panel</h3>
             <button id="sidebar-close" class="sidebar-toggle">
                 <i class="fa-solid fa-times"></i>
@@ -120,7 +119,7 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <h1 class="page-title">
-                    <i class="fa-solid fa-hands-helping accent"></i>
+                    <i class="fa-solid fa-hands-helping"></i>
                     @yield('page-title', 'Facilitator Dashboard')
                 </h1>
             </div>
@@ -164,7 +163,7 @@
                         </div>
 
                         <div class="notif-footer">
-                            <a href="{{ route('facilitator.notifications') }}" id="viewAllNotifications">View all notifications</a>
+                            <a href="{{ route('facilitator.notifications') }}" id="viewAllNotifications">View all</a>
                         </div>
                     </div>
                 </div>
@@ -222,8 +221,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 @yield('scripts')
 
 <script>
@@ -232,13 +229,14 @@
         const sidebarClose = document.getElementById('sidebar-close');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
+        const notifBtn = document.getElementById('notifBtn');
+        const notifDropdown = document.getElementById('notifDropdown');
+        const pendingComplaintsAlert = document.getElementById('pendingComplaintsAlert');
 
-        // Sidebar toggle functionality
         if (mobileMenuBtn) {
             mobileMenuBtn.addEventListener('click', function() {
                 sidebar.classList.add('open');
                 overlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
             });
         }
 
@@ -246,7 +244,6 @@
             sidebarClose.addEventListener('click', function() {
                 sidebar.classList.remove('open');
                 overlay.classList.remove('active');
-                document.body.style.overflow = '';
             });
         }
 
@@ -254,49 +251,8 @@
             overlay.addEventListener('click', function() {
                 sidebar.classList.remove('open');
                 overlay.classList.remove('active');
-                document.body.style.overflow = '';
             });
         }
-
-        // Logout functionality
-        const logoutButton = document.getElementById('logout-button');
-        const logoutTop = document.getElementById('logoutTop');
-        const logoutForm = document.getElementById('logout-form');
-        const logoutFormTop = document.getElementById('logout-form-top');
-
-        function confirmLogout(formElement) {
-            Swal.fire({
-                title: 'Logout?',
-                text: 'Are you sure you want to logout?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, logout!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    formElement.submit();
-                }
-            });
-        }
-
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                confirmLogout(logoutForm);
-            });
-        }
-
-        if (logoutTop) {
-            logoutTop.addEventListener('click', function(e) {
-                e.preventDefault();
-                confirmLogout(logoutFormTop);
-            });
-        }
-
-        // Notification dropdown
-        const notifBtn = document.getElementById('notifBtn');
-        const notifDropdown = document.getElementById('notifDropdown');
 
         if (notifBtn && notifDropdown) {
             notifBtn.addEventListener('click', function(e) {
@@ -305,33 +261,6 @@
                 notifDropdown.classList.toggle('show');
             });
 
-            const markAllReadBtn = document.getElementById('markAllRead');
-            if (markAllReadBtn) {
-                markAllReadBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    fetch('{{ route("facilitator.notifications.mark-all-read") }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.querySelectorAll('.notif-dot').forEach(dot => dot.remove());
-                            toastr.success('All notifications marked as read');
-                            notifDropdown.classList.remove('show');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        toastr.error('Failed to mark notifications as read');
-                    });
-                });
-            }
-
-            // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
                     notifDropdown.classList.remove('show');
@@ -339,8 +268,68 @@
             });
         }
 
-        // Pending complaints alert
-        const pendingComplaintsAlert = document.getElementById('pendingComplaintsAlert');
+        const logoutButtons = document.querySelectorAll('#nav-logout-link, #header-logout-link');
+        logoutButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Ready to leave?',
+                    text: 'You are about to log out of your account',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10B981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, logout',
+                    cancelButtonText: 'Stay',
+                    background: '#ffffff'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ route("logout") }}';
+                        form.innerHTML = '@csrf';
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        const markAllReadBtn = document.getElementById('markAllRead');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', function() {
+                fetch('{{ route("facilitator.notifications.mark-all-read") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelectorAll('.notif-dot').forEach(dot => dot.remove());
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'All notifications marked as read',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        notifDropdown.classList.remove('show');
+                    }
+                })
+                .catch(() => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to mark notifications as read',
+                        confirmButtonColor: '#10B981'
+                    });
+                });
+            });
+        }
+
         if (pendingComplaintsAlert) {
             pendingComplaintsAlert.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -348,179 +337,58 @@
             });
         }
 
-        // Auto-hide alerts
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session("success") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session("error") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        @endif
+
+        @if(session('warning'))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning!',
+                text: '{{ session("warning") }}',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        @endif
+
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: '{!! implode("<br>", $errors->all()) !!}',
+                timer: 4000
+            });
+        @endif
+
         setTimeout(() => {
             document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             });
         }, 5000);
-
-        // Responsive sidebar
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 992) {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-    });
-
-    // Enhanced facilitator master functionality
-    const facilitatorMaster = {
-        init: function() {
-            this.bindEvents();
-            this.initTooltips();
-            this.autoHideAlerts();
-        },
-
-        bindEvents: function() {
-            this.bindSidebarToggle();
-            this.bindLogout();
-            this.bindNotificationDropdown();
-            this.bindMenuHoverEffects();
-            this.bindCardHoverEffects();
-        },
-
-        bindSidebarToggle: function() {
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const sidebarClose = document.getElementById('sidebar-close');
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-
-            if (mobileMenuBtn && sidebar) {
-                mobileMenuBtn.addEventListener('click', () => {
-                    sidebar.classList.add('open');
-                    overlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-
-            if (sidebarClose && sidebar) {
-                sidebarClose.addEventListener('click', () => {
-                    sidebar.classList.remove('open');
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-
-            if (overlay) {
-                overlay.addEventListener('click', () => {
-                    sidebar.classList.remove('open');
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-        },
-
-        bindLogout: function() {
-            const logoutButtons = ['logout-button', 'logoutTop'];
-
-            logoutButtons.forEach(buttonId => {
-                const button = document.getElementById(buttonId);
-                if (button) {
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        Swal.fire({
-                            title: 'Logout?',
-                            text: 'Are you sure you want to logout?',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, logout!',
-                            cancelButtonText: 'Cancel',
-                            reverseButtons: true,
-                            background: '#ffffff',
-                            color: '#0f1724',
-                            width: '400px'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                const formId = buttonId === 'logout-button' ? 'logout-form' : 'logout-form-top';
-                                document.getElementById(formId).submit();
-                            }
-                        });
-                    });
-                }
-            });
-        },
-
-        bindNotificationDropdown: function() {
-            const notifBtn = document.getElementById('notifBtn');
-            const notifDropdown = document.getElementById('notifDropdown');
-
-            if (notifBtn && notifDropdown) {
-                notifBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    notifDropdown.classList.toggle('show');
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
-                        notifDropdown.classList.remove('show');
-                    }
-                });
-            }
-        },
-
-        bindMenuHoverEffects: function() {
-            const menuLinks = document.querySelectorAll('.menu-link');
-            menuLinks.forEach(link => {
-                link.addEventListener('mouseenter', () => {
-                    link.style.transform = 'translateX(5px)';
-                    const icon = link.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = 'rotate(10deg) scale(1.2)';
-                    }
-                });
-
-                link.addEventListener('mouseleave', () => {
-                    link.style.transform = '';
-                    const icon = link.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = '';
-                    }
-                });
-            });
-        },
-
-        bindCardHoverEffects: function() {
-            const cards = document.querySelectorAll('.dashboard-card, .stat-card');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', () => {
-                    card.style.transform = 'translateY(-8px) scale(1.02)';
-                    card.style.boxShadow = '0 15px 30px rgba(15,23,36,0.15)';
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = '';
-                    card.style.boxShadow = '';
-                });
-            });
-        },
-
-        initTooltips: function() {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map((tooltipTriggerEl) => {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        },
-
-        autoHideAlerts: function() {
-            setTimeout(() => {
-                document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                });
-            }, 5000);
-        }
-    };
-
-    // Initialize facilitator master
-    document.addEventListener('DOMContentLoaded', () => {
-        facilitatorMaster.init();
     });
 </script>
-
 </body>
 </html>

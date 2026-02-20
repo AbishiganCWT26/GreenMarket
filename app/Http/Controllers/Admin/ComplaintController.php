@@ -47,6 +47,40 @@ class ComplaintController extends Controller
         return view('admin.complaints.index', compact('complaints'));
     }
 
+    public function alert(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:complaints,id',
+            'facilitator_id' => 'required|exists:users,id'
+        ]);
+
+        try {
+            $complaint = Complaint::findOrFail($request->id);
+            $facilitatorId = $request->facilitator_id;
+
+            // Create notification for the facilitator
+            \App\Models\Notification::create([
+                'user_id' => $facilitatorId, // The selected facilitator
+                'type' => 'complaint_alert', // You might want to add this type to your system
+                'title' => 'New Complaint Alert',
+                'message' => "You have been alerted regarding complaint #{$complaint->id}. Please review it.",
+                'is_read' => false,
+                'link' => route('facilitator.complaints') // Assuming this route exists for them to view complaints
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Facilitator alerted successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to alert facilitator: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
