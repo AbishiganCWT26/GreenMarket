@@ -91,7 +91,7 @@
 						</a>
 					@else
 						<a href="{{ url('/login') }}" class="btn btn-primary btn-hero">
-							<i class="fas fa-sign-in-alt"></i> Sign In
+							<i class="fas fa-sign-in-alt"></i> login
 						</a>
 					@endif
 				</div>
