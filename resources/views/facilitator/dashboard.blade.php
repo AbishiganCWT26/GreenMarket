@@ -82,9 +82,6 @@
                 <i class="fa-solid fa-bolt"></i>
                 Quick Actions
             </h4>
-            <button class="btn-refresh" id="refreshStats">
-                <i class="fa-solid fa-rotate"></i>
-            </button>
         </div>
         <div class="card-body">
             <div class="quick-actions-grid">
@@ -114,26 +111,52 @@
                     </div>
                 </div>
 
-                <div class="quick-action-card" onclick="showComingSoon('System Standards')">
-                    <div class="action-icon" style="background: rgba(139,92,246,0.1);">
-                        <i class="fa-solid fa-ruler-combined" style="color: var(--purple);"></i>
+                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.complaints') }}'">
+                    <div class="action-icon" style="background: rgba(245,158,11,0.1);">
+                        <i class="fa-solid fa-flag" style="color: var(--accent-amber);"></i>
                     </div>
                     <div class="action-content">
-                        <h5>System Standards</h5>
-                        <p>Manage units and grades</p>
+                        <h5>View Complaints</h5>
+                        <p>Manage system complaints</p>
                     </div>
                     <div class="action-arrow">
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </div>
 
-                <div class="quick-action-card" onclick="showComingSoon('Reports')">
-                    <div class="action-icon" style="background: rgba(245,158,11,0.1);">
-                        <i class="fa-solid fa-file-chart-column" style="color: var(--accent-amber);"></i>
+                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.quality-grades') }}'">
+                    <div class="action-icon" style="background: rgba(139,92,246,0.1);">
+                        <i class="fa-solid fa-award" style="color: var(--purple);"></i>
                     </div>
                     <div class="action-content">
-                        <h5>Generate Reports</h5>
-                        <p>View performance reports</p>
+                        <h5>Manage Quality Grades</h5>
+                        <p>Set product quality standards</p>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.unit-of-measures') }}'">
+                    <div class="action-icon" style="background: rgba(6,182,212,0.1);">
+                        <i class="fa-solid fa-ruler-combined" style="color: #06b6d4;"></i>
+                    </div>
+                    <div class="action-content">
+                        <h5>Manage Standards</h5>
+                        <p>Units of Measures</p>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.profile') }}'">
+                    <div class="action-icon" style="background: rgba(236,72,153,0.1);">
+                        <i class="fa-solid fa-user-circle" style="color: #ec4899;"></i>
+                    </div>
+                    <div class="action-content">
+                        <h5>My Profile</h5>
+                        <p>View and edit profile</p>
                     </div>
                     <div class="action-arrow">
                         <i class="fa-solid fa-arrow-right"></i>

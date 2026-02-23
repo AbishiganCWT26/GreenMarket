@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB; // Add this import
 use App\Http\View\Composers\AdminComposer;
 use App\Http\View\Composers\DashboardComposer;
 use App\Http\View\Composers\LeadFarmerComposer;
+use App\Http\View\Composers\FacilitatorComposer;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -41,6 +42,12 @@ class ViewServiceProvider extends ServiceProvider
         View::composer(
             ['lead_farmer.*'],
             LeadFarmerComposer::class
+        );
+
+        // Facilitator shared data
+        View::composer(
+            ['facilitator.*'],
+            FacilitatorComposer::class
         );
 
         // Share $unread variable with buyer_nav for all buyer views

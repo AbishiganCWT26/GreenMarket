@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        .notif-meta { margin-top: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .mark-single-read { background: none; border: none; color: #10B981; cursor: pointer; padding: 2px 5px; border-radius: 4px; transition: all 0.2s; }
+        .mark-single-read:hover { background: #ecfdf5; color: #059669; transform: scale(1.1); }
+    </style>
 </head>
 <body>
 @include('includes.loader')
@@ -82,18 +87,6 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('facilitator.profile.photo') }}" class="menu-link {{ request()->routeIs('facilitator.profile.photo') ? 'active' : '' }}">
-                        <i class="fa-solid fa-camera"></i><span>Profile Photo</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('facilitator.account.settings') }}" class="menu-link {{ request()->routeIs('facilitator.account.settings') ? 'active' : '' }}">
-                        <i class="fa-solid fa-gear"></i><span>Account Settings</span>
-                    </a>
-                </li>
-
-                <li>
                     <a href="{{ route('facilitator.notifications') }}" class="menu-link {{ request()->routeIs('facilitator.notifications') ? 'active' : '' }}">
                         <i class="fa-solid fa-bell"></i><span>Notifications</span>
                         @if(isset($sharedCounts['totalNotifications']) && $sharedCounts['totalNotifications'] > 0)
@@ -153,7 +146,12 @@
                                     <div class="notif-content">
                                         <div class="notif-title">{{ $notification->title }}</div>
                                         <div class="notif-msg">{{ Str::limit($notification->message, 80) }}</div>
-                                        <small class="notif-time">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</small>
+                                        <div class="notif-meta">
+                                            <small class="notif-time">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</small>
+                                            <button class="mark-single-read" data-id="{{ $notification->id }}" title="Mark as read">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 @endforeach
@@ -301,25 +299,31 @@
                 fetch('{{ route("facilitator.notifications.mark-all-read") }}', {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     }
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        document.querySelectorAll('.notif-dot').forEach(dot => dot.remove());
+                        $('.notif-dot').remove();
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
                             text: 'All notifications marked as read',
                             timer: 1500,
-                            showConfirmButton: false
+                            showConfirmButton: false,
+                            toast: true,
+                            position: 'top-end'
                         });
-                        notifDropdown.classList.remove('show');
+                        
+                        $('.notif-item').css('opacity', '0.6');
+                        $('#notifDropdown').removeClass('show');
                     }
                 })
-                .catch(() => {
+                .catch(error => {
+                    console.error('Error:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -329,6 +333,60 @@
                 });
             });
         }
+
+        // Single mark as read
+        $(document).on('click', '.mark-single-read', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const btn = $(this);
+            const notifId = btn.data('id');
+            const notifItem = btn.closest('.notif-item');
+            
+            // Use route helper with a placeholder to get correct base URL
+            let url = "{{ route('facilitator.notifications.mark-read', ':id') }}";
+            url = url.replace(':id', notifId);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    notifItem.css({
+                        'transition': 'all 0.3s ease',
+                        'opacity': '0.4',
+                        'background-color': '#f9fafb'
+                    });
+                    btn.fadeOut();
+
+                    // Check if there are any unread notifications left in the list
+                    // (This is an approximation since we only show 5 in dropdown)
+                    const remainingUnread = $('.notif-item').filter(function() {
+                        return $(this).css('opacity') !== '0.4';
+                    }).length;
+                    
+                    if (remainingUnread === 0) {
+                        $('.notif-dot').remove();
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Marked as read',
+                        timer: 1000,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
 
         if (pendingComplaintsAlert) {
             pendingComplaintsAlert.addEventListener('click', function(e) {

@@ -32,28 +32,12 @@ class FacilitatorController extends Controller
             'grades' => SystemStandard::where('standard_type', 'quality_grade')->where('is_active', true)->count()
         ];
 
-        $recentActivities = Notification::whereIn('notification_type', ['system', 'admin_alert'])
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
-
-        $totalNotifications = Notification::where('user_id', $user->id)
-            ->where('is_read', false)
-            ->count();
-
-        $sharedCounts = [
-            'pendingComplaints' => $pendingComplaints,
-            'totalNotifications' => $totalNotifications
-        ];
-
         return view('facilitator.dashboard', compact(
             'facilitator',
             'totalCategories',
             'totalUsers',
             'pendingComplaints',
-            'systemStandards',
-            'recentActivities',
-            'sharedCounts'
+            'systemStandards'
         ));
     }
 
@@ -1154,6 +1138,23 @@ class FacilitatorController extends Controller
             ->count();
 
         return view('facilitator.notifications', compact('notifications', 'unreadCount'));
+    }
+
+    public function markNotificationRead($id)
+    {
+        $user = Auth::user();
+        
+        $notification = Notification::where('user_id', $user->id)
+            ->where('id', $id)
+            ->first();
+
+        if ($notification) {
+            $notification->is_read = true;
+            $notification->save();
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
     }
 
     public function markAllNotificationsAsRead()

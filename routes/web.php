@@ -399,6 +399,7 @@ Route::prefix('facilitator')
 
     // Notifications
     Route::get('/notifications', [FacilitatorController::class, 'notifications'])->name('facilitator.notifications');
+    Route::post('/notifications/mark-read/{id}', [FacilitatorController::class, 'markNotificationRead'])->name('facilitator.notifications.mark-read');
     Route::post('/notifications/mark-all-read', [FacilitatorController::class, 'markAllNotificationsAsRead'])->name('facilitator.notifications.mark-all-read');
 });
 
