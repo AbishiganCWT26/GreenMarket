@@ -22,7 +22,7 @@
 </div>
 
 <div class="stat-cards-row">
-    <div class="stat-card" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-green));">
+    <div class="stat-card" style="background: linear-gradient(135deg, var(--primary-green), var(--dark-green));" onclick="window.location.href='{{ route('facilitator.taxonomy') }}'">
         <div class="stat-icon">
             <i class="fa-solid fa-layer-group"></i>
         </div>
@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <div class="stat-card" style="background: linear-gradient(135deg, var(--blue), #1e40af);">
+    <div class="stat-card" style="background: linear-gradient(135deg, var(--blue), #1e40af);"  onclick="window.location.href='{{ route('facilitator.users') }}'">
         <div class="stat-icon">
             <i class="fa-solid fa-users"></i>
         </div>
@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <div class="stat-card" style="background: linear-gradient(135deg, var(--accent-amber), #b45309);">
+    <div class="stat-card" style="background: linear-gradient(135deg, var(--accent-amber), #b45309);" onclick="window.location.href='{{ route('facilitator.complaints') }}'">
         <div class="stat-icon">
             <i class="fa-solid fa-flag"></i>
         </div>
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <div class="stat-card" style="background: linear-gradient(135deg, var(--purple), #6d28d9);">
+    <div class="stat-card" style="background: linear-gradient(135deg, var(--purple), #6d28d9);" onclick="window.location.href='{{ route('facilitator.quality-grades') }}'">
         <div class="stat-icon">
             <i class="fa-solid fa-ruler-combined"></i>
         </div>
@@ -75,133 +75,96 @@
     </div>
 </div>
 
-<div class="dashboard-grid">
-    <div class="dashboard-card">
-        <div class="card-header">
-            <h4>
-                <i class="fa-solid fa-bolt"></i>
-                Quick Actions
-            </h4>
-        </div>
-        <div class="card-body">
-            <div class="quick-actions-grid">
-                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.taxonomy') }}'">
-                    <div class="action-icon" style="background: rgba(16,185,129,0.1);">
-                        <i class="fa-solid fa-layer-group" style="color: var(--primary-green);"></i>
-                    </div>
-                    <div class="action-content">
-                        <h5>Manage Category</h5>
-                        <p>Add/edit product categories</p>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
+<div class="dashboard-card">
+    <div class="card-header">
+        <h4>
+            <i class="fa-solid fa-bolt"></i>
+            Quick Actions
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="quick-actions-grid">
+            <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.taxonomy') }}'">
+                <div class="action-icon" style="background: rgba(16,185,129,0.1);">
+                    <i class="fa-solid fa-layer-group" style="color: var(--primary-green);"></i>
                 </div>
-
-                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.users') }}'">
-                    <div class="action-icon" style="background: rgba(59,130,246,0.1);">
-                        <i class="fa-solid fa-user-gear" style="color: var(--blue);"></i>
-                    </div>
-                    <div class="action-content">
-                        <h5>Manage Users</h5>
-                        <p>View and manage users</p>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
+                <div class="action-content">
+                    <h5>Manage Category</h5>
+                    <p>Add/edit product categories</p>
                 </div>
-
-                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.complaints') }}'">
-                    <div class="action-icon" style="background: rgba(245,158,11,0.1);">
-                        <i class="fa-solid fa-flag" style="color: var(--accent-amber);"></i>
-                    </div>
-                    <div class="action-content">
-                        <h5>View Complaints</h5>
-                        <p>Manage system complaints</p>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
-                </div>
-
-                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.quality-grades') }}'">
-                    <div class="action-icon" style="background: rgba(139,92,246,0.1);">
-                        <i class="fa-solid fa-award" style="color: var(--purple);"></i>
-                    </div>
-                    <div class="action-content">
-                        <h5>Manage Quality Grades</h5>
-                        <p>Set product quality standards</p>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
-                </div>
-
-                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.unit-of-measures') }}'">
-                    <div class="action-icon" style="background: rgba(6,182,212,0.1);">
-                        <i class="fa-solid fa-ruler-combined" style="color: #06b6d4;"></i>
-                    </div>
-                    <div class="action-content">
-                        <h5>Manage Standards</h5>
-                        <p>Units of Measures</p>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
-                </div>
-
-                <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.profile') }}'">
-                    <div class="action-icon" style="background: rgba(236,72,153,0.1);">
-                        <i class="fa-solid fa-user-circle" style="color: #ec4899;"></i>
-                    </div>
-                    <div class="action-content">
-                        <h5>My Profile</h5>
-                        <p>View and edit profile</p>
-                    </div>
-                    <div class="action-arrow">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
+                <div class="action-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="dashboard-card">
-        <div class="card-header">
-            <h4>
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                Recent Activities
-            </h4>
-        </div>
-        <div class="card-body">
-            <div class="activity-list">
-                @if(isset($recentActivities) && count($recentActivities) > 0)
-                    @foreach($recentActivities as $activity)
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            @if($activity->notification_type == 'admin_alert')
-                                <i class="fa-solid fa-triangle-exclamation text-warning"></i>
-                            @else
-                                <i class="fa-solid fa-info-circle text-info"></i>
-                            @endif
-                        </div>
-                        <div class="activity-content">
-                            <h6>{{ $activity->title }}</h6>
-                            <p>{{ Str::limit($activity->message, 60) }}</p>
-                            <small>{{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}</small>
-                        </div>
-                    </div>
-                    @endforeach
-                @else
-                    <div class="text-center py-4">
-                        <i class="fa-solid fa-inbox fa-2x text-muted mb-2"></i>
-                        <p class="text-muted" style="font-size: 0.8rem;">No recent activities</p>
-                    </div>
-                @endif
+            <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.users') }}'">
+                <div class="action-icon" style="background: rgba(59,130,246,0.1);">
+                    <i class="fa-solid fa-user-gear" style="color: var(--blue);"></i>
+                </div>
+                <div class="action-content">
+                    <h5>Manage Users</h5>
+                    <p>View and manage users</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.complaints') }}'">
+                <div class="action-icon" style="background: rgba(245,158,11,0.1);">
+                    <i class="fa-solid fa-flag" style="color: var(--accent-amber);"></i>
+                </div>
+                <div class="action-content">
+                    <h5>View Complaints</h5>
+                    <p>Manage system complaints</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.quality-grades') }}'">
+                <div class="action-icon" style="background: rgba(139,92,246,0.1);">
+                    <i class="fa-solid fa-award" style="color: var(--purple);"></i>
+                </div>
+                <div class="action-content">
+                    <h5>Manage Quality Grades</h5>
+                    <p>Set product quality standards</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.unit-of-measures') }}'">
+                <div class="action-icon" style="background: rgba(6,182,212,0.1);">
+                    <i class="fa-solid fa-ruler-combined" style="color: #06b6d4;"></i>
+                </div>
+                <div class="action-content">
+                    <h5>Manage Standards</h5>
+                    <p>Units of Measures</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="quick-action-card" onclick="window.location.href='{{ route('facilitator.profile') }}'">
+                <div class="action-icon" style="background: rgba(236,72,153,0.1);">
+                    <i class="fa-solid fa-user-circle" style="color: #ec4899;"></i>
+                </div>
+                <div class="action-content">
+                    <h5>My Profile</h5>
+                    <p>View and edit profile</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 
 <script>
 function showComingSoon(feature) {
@@ -238,20 +201,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         });
     }
-
-    const statCards = document.querySelectorAll('.stat-card');
-    statCards.forEach((card, index) => {
-        card.addEventListener('click', function() {
-            const titles = ['Categories', 'Users', 'Complaints', 'Standards'];
-            Swal.fire({
-                title: titles[index],
-                text: `View detailed ${titles[index].toLowerCase()} information`,
-                icon: 'info',
-                confirmButtonColor: '#10B981',
-                background: '#ffffff'
-            });
-        });
-    });
 });
 </script>
 @endsection

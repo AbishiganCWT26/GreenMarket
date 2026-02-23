@@ -326,7 +326,7 @@
                     </span></td>
                     <td>
                         <div class="action-buttons">
-                            <button class="action-btn btn-edit" onclick="editCategory(${cat.id}, '${cat.category_name.replace(/'/g, "\\'")}', '${(cat.description || '').replace(/'/g, "\\'")}')" title="Edit">
+                            <button class="action-btn btn-edit" onclick="editCategory(${cat.id}, '${cat.category_name.replace(/'/g, "\\'")}', '${(cat.description || '').replace(/'/g, "\\'")}', '${cat.icon_filename || ''}')" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="action-btn btn-delete" onclick="deleteItem('category', ${cat.id})"
@@ -1134,7 +1134,9 @@
     }
 
     // Edit category using new method
-    function editCategory(id, name, description) {
+    function editCategory(id, name, description, iconFilename) {
+        const iconUrl = iconFilename ? `/assets/images/taxonomy-icons/${iconFilename}` : null;
+        
         Swal.fire({
             title: 'Edit Category',
             html: `
@@ -1147,6 +1149,33 @@
                         <label class="form-label">Description</label>
                         <textarea class="form-control swal2-textarea" id="editCategoryDesc" rows="3">${description || ''}</textarea>
                     </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Category Icon Image (PNG only, max 2MB)</label>
+                        <div class="image-upload-area" id="editImageUploadArea" onclick="document.getElementById('editCategoryImage').click()">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">Click to change icon</div>
+                            <div class="upload-text" style="font-size: 0.8rem; color: #9ca3af;">
+                                PNG format only, max 2MB
+                            </div>
+                        </div>
+                        <input type="file" id="editCategoryImage" name="image" accept=".png" style="display: none;"
+                               onchange="previewEditImage(this, 'editCategoryPreview')">
+                        
+                        <div id="editCategoryPreview" class="image-preview-container" style="${iconUrl ? 'display: flex;' : 'display: none;'}">
+                            <img class="preview-image" id="previewEditCategoryImage" src="${iconUrl || ''}" alt="Preview">
+                            <div class="preview-info">
+                                <div style="font-weight: 500; font-size: 0.9rem;" id="previewEditFileName">${iconFilename || ''}</div>
+                                <div style="font-size: 0.8rem; color: var(--muted);" id="previewEditFileSize"></div>
+                            </div>
+                            <div class="remove-image" onclick="removeImage('editCategoryImage', 'editCategoryPreview')">
+                                <i class="fas fa-times"></i> Remove
+                            </div>
+                        </div>
+                    </div>
+                    
                     <input type="hidden" id="categoryId" value="${id}">
                 </div>
             `,
@@ -1157,37 +1186,61 @@
             background: '#ffffff',
             color: '#0f1724',
             width: '500px',
+            didOpen: () => {
+                // Initialize drag and drop for edit modal
+                const editArea = document.getElementById('editImageUploadArea');
+                if (editArea) {
+                    editArea.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        this.classList.add('dragover');
+                    });
+                    editArea.addEventListener('dragleave', function(e) {
+                        e.preventDefault();
+                        this.classList.remove('dragover');
+                    });
+                    editArea.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        this.classList.remove('dragover');
+                        const fileInput = document.getElementById('editCategoryImage');
+                        if (e.dataTransfer.files.length > 0) {
+                            fileInput.files = e.dataTransfer.files;
+                            fileInput.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+            },
             preConfirm: () => {
                 const name = document.getElementById('editCategoryName').value;
                 if (!name) {
                     Swal.showValidationMessage('Category name is required');
                     return false;
                 }
-                return {
-                    id: document.getElementById('categoryId').value,
-                    name: name,
-                    description: document.getElementById('editCategoryDesc').value
-                };
+                
+                const formData = new FormData();
+                formData.append('id', document.getElementById('categoryId').value);
+                formData.append('name', name);
+                formData.append('description', document.getElementById('editCategoryDesc').value);
+                
+                const imageFile = document.getElementById('editCategoryImage').files[0];
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+                
+                return formData;
             }
         }).then(result => {
             if (result.isConfirmed) {
-                const data = result.value;
+                const formData = result.value;
                 showLoading();
 
                 fetch('{{ route("admin.taxonomy.update.category") }}', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify(data)
+                    body: formData
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     hideLoading();
                     if (data.success) {

@@ -390,6 +390,7 @@ Route::prefix('facilitator')
     // Profile Management
     Route::get('/profile', [FacilitatorController::class, 'editProfile'])->name('facilitator.profile');
     Route::post('/profile/update', [FacilitatorController::class, 'updateProfile'])->name('facilitator.profile.update');
+    Route::post('/profile/update-password', [FacilitatorController::class, 'updatePassword'])->name('facilitator.profile.update.password');
     Route::get('/profile/photo', [FacilitatorController::class, 'profilePhoto'])->name('facilitator.profile.photo');
     Route::post('/profile/photo', [FacilitatorController::class, 'updatePhoto'])->name('facilitator.profile.photo.update');
 

@@ -318,7 +318,8 @@ class TaxonomyController extends Controller
             $validator = Validator::make($request->all(), [
                 'id' => 'required|exists:product_categories,id',
                 'name' => 'required|string|max:100|unique:product_categories,category_name,' . $request->id,
-                'description' => 'nullable|string'
+                'description' => 'nullable|string',
+                'image' => 'nullable|image|mimes:png|max:5120'
             ]);
 
             if ($validator->fails()) {
@@ -329,14 +330,31 @@ class TaxonomyController extends Controller
                 ], 422);
             }
 
+            $category = DB::table('product_categories')->find($request->id);
+
+            $updateData = [
+                'category_name' => $request->name,
+                'description' => $request->description ?? null,
+                'updated_at' => now()
+            ];
+
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $file = $request->file('image');
+                $filename = 'category_' . time() . '_' . uniqid() . '.png';
+                $path = $request->file('image')->storeAs('taxonomy-icons', $filename, 'public_assets');
+
+                if ($path) {
+                    if ($category->icon_filename) {
+                        Storage::disk('public_assets')->delete('taxonomy-icons/' . $category->icon_filename);
+                    }
+                    $updateData['icon_filename'] = $filename;
+                }
+            }
+
             // Update the category
             $updated = DB::table('product_categories')
                 ->where('id', $request->id)
-                ->update([
-                    'category_name' => $request->name,
-                    'description' => $request->description ?? null,
-                    'updated_at' => now()
-                ]);
+                ->update($updateData);
 
             if ($updated) {
                 return response()->json([

@@ -6,1035 +6,955 @@
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/Facilitator/taxonomy.css') }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 @endsection
 
 @section('content')
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="page-header-card">
-            <div class="header-content">
-                <h4><i class="fa-solid fa-layer-group me-2"></i> Product Category</h4>
-                <p class="text-muted mb-0">Manage product categories, subcategories, and product examples</p>
-            </div>
-            <button class="btn-add-new" data-bs-toggle="modal" data-bs-target="#addCategoryFullModal">
-                <i class="fa-solid fa-plus"></i> Add Category
-            </button>
-        </div>
-    </div>
-</div>
+<div class="taxo-container">
+	<div class="header-bar">
+		<div class="header-left">
+			<h1 class="page-title">
+				<i class="fas fa-diagram-project"></i>
+				Category Structure
+			</h1>
+			<p class="page-desc">Manage product categories, subcategories, and product examples</p>
+		</div>
+		<div class="header-right">
+			<button class="btn-add" data-bs-toggle="modal" data-bs-target="#addCategoryFullModal">
+				<i class="fas fa-plus"></i>
+				<span>Add Category</span>
+			</button>
+		</div>
+	</div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5><i class="fa-solid fa-sitemap me-2"></i> Category Structure</h5>
-                <div class="header-actions">
-                    <button class="btn-action" title="Collapse All" id="collapseAll">
-                        <i class="fa-solid fa-compress"></i>
-                    </button>
-                    <button class="btn-action" title="Expand All" id="expandAll">
-                        <i class="fa-solid fa-expand"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                @if($categories->isEmpty())
-                <div class="empty-state">
-                    <i class="fa-solid fa-layer-group fa-3x text-muted mb-3"></i>
-                    <h5>No Categories Yet</h5>
-                    <p class="text-muted">Start by adding your first product category</p>
-                    <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                        <i class="fa-solid fa-plus"></i> Add First Category
-                    </button>
-                </div>
-                @else
-                <div class="taxonomy-tree" id="taxonomyTree">
-                    @foreach($categories as $category)
-                    <div class="taxonomy-item level-0" data-id="{{ $category->id }}">
-                        <div class="item-header" onclick="toggleItem(this)">
-                            <div class="item-info">
-                                <div class="item-icon">
-                                    <i class="fa-solid fa-folder"></i>
-                                </div>
-                                <div class="item-content">
-                                    <h6 class="item-title">{{ $category->category_name }}
-                                        <span class="badge bg-secondary">Order: {{ $category->display_order }}</span>
-                                        @if(!$category->is_active)
-                                        <span class="badge bg-danger">Inactive</span>
-                                        @endif
-                                    </h6>
-                                    @if($category->description)
-                                    <p class="item-desc">{{ $category->description }}</p>
-                                    @endif
-                                    <div class="item-meta">
-                                        <span class="badge bg-light text-dark">
-                                            <i class="fa-solid fa-list me-1"></i>
-                                            {{ $category->subcategories->count() }} Subcategories
-                                        </span>
-                                        <span class="badge bg-light text-dark">
-                                            <i class="fa-solid fa-box me-1"></i>
-                                            @php
-                                                $totalProducts = 0;
-                                                foreach($category->subcategories as $sub) {
-                                                    $totalProducts += $sub->productExamples->count();
-                                                }
-                                            @endphp
-                                            {{ $totalProducts }} Products
-                                        </span>
-                                        <span class="badge bg-info">
-                                            <i class="fa-solid fa-sort-numeric-up me-1"></i>
-                                            Display Order: {{ $category->display_order }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item-actions">
-                                <button class="btn-action" title="Add Subcategory" onclick="event.stopPropagation(); addSubcategory({{ $category->id }})">
-                                    <i class="fa-solid fa-plus-circle"></i>
-                                </button>
-                                <button class="btn-action" title="Edit" onclick="event.stopPropagation(); editCategory({{ $category->id }}, '{{ addslashes($category->category_name) }}', '{{ addslashes($category->description) }}')">
-                                    <i class="fa-solid fa-edit"></i>
-                                </button>
-                                <span class="toggle-icon">
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </span>
-                            </div>
-                        </div>
+	<div class="search-section">
+		<div class="search-box">
+			<i class="fas fa-search search-icon"></i>
+			<input type="text" id="taxonomySearch" class="search-input" placeholder="Search categories, subcategories, products...">
+			<button class="search-clear" id="clearSearch">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+	</div>
 
-                        <div class="item-children">
-                            @foreach($category->subcategories as $subcategory)
-                            <div class="taxonomy-item level-1" data-id="{{ $subcategory->id }}">
-                                <div class="item-header" onclick="toggleItem(this)">
-                                    <div class="item-info">
-                                        <div class="item-icon">
-                                            <i class="fa-solid fa-folder-open"></i>
-                                        </div>
-                                        <div class="item-content">
-                                            <h6 class="item-title">{{ $subcategory->subcategory_name }}
-                                                <span class="badge bg-secondary">Order: {{ $subcategory->display_order }}</span>
-                                                @if(!$subcategory->is_active)
-                                                <span class="badge bg-danger">Inactive</span>
-                                                @endif
-                                            </h6>
-                                            @if($subcategory->description)
-                                            <p class="item-desc">{{ $subcategory->description }}</p>
-                                            @endif
-                                            <div class="item-meta">
-                                                <span class="badge bg-light text-dark">
-                                                    <i class="fa-solid fa-box me-1"></i>
-                                                    {{ $subcategory->productExamples->count() }} Products
-                                                </span>
-                                                <span class="badge bg-info">
-                                                    <i class="fa-solid fa-sort-numeric-up me-1"></i>
-                                                    Display Order: {{ $subcategory->display_order }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="item-actions">
-                                        <button class="btn-action" title="Add Product" onclick="event.stopPropagation(); addProduct({{ $subcategory->id }})">
-                                            <i class="fa-solid fa-plus-circle"></i>
-                                        </button>
-                                        <button class="btn-action" title="Edit" onclick="event.stopPropagation(); editSubcategory({{ $subcategory->id }}, '{{ addslashes($subcategory->subcategory_name) }}', '{{ addslashes($subcategory->description) }}', {{ $subcategory->category_id }})">
-                                            <i class="fa-solid fa-edit"></i>
-                                        </button>
-                                        <span class="toggle-icon">
-                                            <i class="fa-solid fa-chevron-down"></i>
-                                        </span>
-                                    </div>
-                                </div>
+	<div class="action-bar">
+		<div class="item-counter" id="itemsCount">Loading items...</div>
+		<div class="action-group">
+			<button class="action-btn" id="collapseAll" title="Collapse All">
+				<i class="fas fa-compress-alt"></i>
+			</button>
+			<button class="action-btn" id="expandAll" title="Expand All">
+				<i class="fas fa-expand-alt"></i>
+			</button>
+		</div>
+	</div>
 
-                                <div class="item-children">
-                                    @foreach($subcategory->productExamples as $product)
-                                    <div class="taxonomy-item level-2" data-id="{{ $product->id }}">
-                                        <div class="item-header">
-                                            <div class="item-info">
-                                                <div class="item-icon">
-                                                    <i class="fa-solid fa-box"></i>
-                                                </div>
-                                                <div class="item-content">
-                                                    <h6 class="item-title">{{ $product->product_name }}
-                                                        <span class="badge bg-secondary">Order: {{ $product->display_order }}</span>
-                                                        @if(!$product->is_active)
-                                                        <span class="badge bg-danger">Inactive</span>
-                                                        @endif
-                                                    </h6>
-                                                    @if($product->description)
-                                                    <p class="item-desc">{{ $product->description }}</p>
-                                                    @endif
-                                                    <div class="item-meta">
-                                                        <span class="badge bg-light text-dark">
-                                                            <i class="fa-solid fa-hashtag me-1"></i>
-                                                            ID: {{ $product->id }}
-                                                        </span>
-                                                        <span class="badge bg-info">
-                                                            <i class="fa-solid fa-sort-numeric-up me-1"></i>
-                                                            Display Order: {{ $product->display_order }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="item-actions">
-                                                <button class="btn-action" title="Edit" onclick="editProduct({{ $product->id }}, '{{ addslashes($product->product_name) }}', '{{ addslashes($product->description) }}', {{ $product->subcategory_id }})">
-                                                    <i class="fa-solid fa-edit"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
+	<div class="tree-view" id="taxonomyTree">
+		@forelse($categories as $category)
+		<div class="tree-item level-0" data-id="{{ $category->id }}" data-name="{{ strtolower($category->category_name) }}" data-description="{{ strtolower($category->description ?? '') }}">
+			<div class="item-header" onclick="toggleItem(this)">
+				<div class="item-info">
+					<div class="item-icon">
+						@if($category->icon_filename)
+						<img src="{{ asset('assets/images/taxonomy-icons/' . $category->icon_filename) }}" alt="{{ $category->category_name }}">
+						@else
+						<i class="fas fa-folder"></i>
+						@endif
+					</div>
+					<div class="item-content">
+						<div class="item-title">
+							<span class="item-name">{{ $category->category_name }}</span>
+							@if(!$category->is_active)
+							<span class="status-badge inactive">Inactive</span>
+							@endif
+						</div>
+						@if($category->description)
+						<div class="item-desc">{{ $category->description }}</div>
+						@endif
+						<div class="item-stats">
+							<span class="stat">
+								<i class="fas fa-list"></i>
+								{{ $category->subcategories->count() }} sub
+							</span>
+							<span class="stat">
+								<i class="fas fa-box"></i>
+								@php
+									$total = 0;
+									foreach($category->subcategories as $sub) {
+										$total += $sub->productExamples->count();
+									}
+								@endphp
+								{{ $total }} prod
+							</span>
+							<span class="stat">
+								<i class="fas fa-sort-numeric-up"></i>
+								{{ $category->display_order }}
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="item-actions">
+					<button class="action-icon" onclick="event.stopPropagation(); addSubcategory({{ $category->id }})" title="Add Subcategory">
+						<i class="fas fa-plus"></i>
+					</button>
+					<button class="action-icon" onclick="event.stopPropagation(); editCategory({{ $category->id }}, '{{ addslashes($category->category_name) }}', '{{ addslashes($category->description) }}')" title="Edit">
+						<i class="fas fa-edit"></i>
+					</button>
+					<i class="fas fa-chevron-down toggle-icon"></i>
+				</div>
+			</div>
+
+			<div class="item-children">
+				@foreach($category->subcategories as $subcategory)
+				<div class="tree-item level-1" data-id="{{ $subcategory->id }}" data-name="{{ strtolower($subcategory->subcategory_name) }}" data-description="{{ strtolower($subcategory->description ?? '') }}" data-parent="{{ $category->category_name }}">
+					<div class="item-header" onclick="toggleItem(this)">
+						<div class="item-info">
+							<div class="item-icon">
+								<i class="fas fa-folder-open"></i>
+							</div>
+							<div class="item-content">
+								<div class="item-title">
+									<span class="item-name">{{ $subcategory->subcategory_name }}</span>
+									@if(!$subcategory->is_active)
+									<span class="status-badge inactive">Inactive</span>
+									@endif
+								</div>
+								@if($subcategory->description)
+								<div class="item-desc">{{ $subcategory->description }}</div>
+								@endif
+								<div class="item-stats">
+									<span class="stat">
+										<i class="fas fa-box"></i>
+										{{ $subcategory->productExamples->count() }} prod
+									</span>
+									<span class="stat">
+										<i class="fas fa-sort-numeric-up"></i>
+										{{ $subcategory->display_order }}
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="item-actions">
+							<button class="action-icon" onclick="event.stopPropagation(); addProduct({{ $subcategory->id }})" title="Add Product">
+								<i class="fas fa-plus"></i>
+							</button>
+							<button class="action-icon" onclick="event.stopPropagation(); editSubcategory({{ $subcategory->id }}, '{{ addslashes($subcategory->subcategory_name) }}', '{{ addslashes($subcategory->description) }}', {{ $subcategory->category_id }})" title="Edit">
+								<i class="fas fa-edit"></i>
+							</button>
+							<i class="fas fa-chevron-down toggle-icon"></i>
+						</div>
+					</div>
+
+					<div class="item-children">
+						@foreach($subcategory->productExamples as $product)
+						<div class="tree-item level-2" data-id="{{ $product->id }}" data-name="{{ strtolower($product->product_name) }}" data-description="{{ strtolower($product->description ?? '') }}" data-parent="{{ $subcategory->subcategory_name }}">
+							<div class="item-header">
+								<div class="item-info">
+									<div class="item-icon">
+										<i class="fas fa-cube"></i>
+									</div>
+									<div class="item-content">
+										<div class="item-title">
+											<span class="item-name">{{ $product->product_name }}</span>
+											@if(!$product->is_active)
+											<span class="status-badge inactive">Inactive</span>
+											@endif
+										</div>
+										@if($product->description)
+										<div class="item-desc">{{ $product->description }}</div>
+										@endif
+										<div class="item-stats">
+											<span class="stat">
+												<i class="fas fa-hashtag"></i>
+												{{ $product->id }}
+											</span>
+											<span class="stat">
+												<i class="fas fa-sort-numeric-up"></i>
+												{{ $product->display_order }}
+											</span>
+										</div>
+									</div>
+								</div>
+								<div class="item-actions">
+									<button class="action-icon" onclick="event.stopPropagation(); editProduct({{ $product->id }}, '{{ addslashes($product->product_name) }}', '{{ addslashes($product->description) }}', {{ $product->subcategory_id }})" title="Edit">
+										<i class="fas fa-edit"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						@endforeach
+					</div>
+				</div>
+				@endforeach
+			</div>
+		</div>
+		@empty
+		<div class="empty-view">
+			<i class="fas fa-folder-open"></i>
+			<h3>No Categories Yet</h3>
+			<p>Start by adding your first product category</p>
+			<button class="btn-add" data-bs-toggle="modal" data-bs-target="#addCategoryFullModal">
+				<i class="fas fa-plus"></i>
+				Add First Category
+			</button>
+		</div>
+		@endforelse
+	</div>
 </div>
 
 <!-- Add Category Modal -->
-<!-- Add Category with Subcategories and Products Modal -->
 <div class="modal fade" id="addCategoryFullModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fa-solid fa-plus-circle me-2"></i>Add New Category</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="addCategoryFullForm" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-12 mb-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6>Main Category Details</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Category Name *</label>
-                                        <input type="text" class="form-control" name="category_name" id="full_category_name" required placeholder="e.g., Fresh Fruits">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Description</label>
-                                        <textarea class="form-control" name="description" id="full_description" rows="2" placeholder="Brief description of this category"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+	<div class="modal-dialog modal-dialog-centered modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">
+					<i class="fas fa-plus-circle"></i>
+					Add New Category
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<form id="addCategoryFullForm" method="POST" action="{{ route('facilitator.taxonomy.category.store') }}" enctype="multipart/form-data">
+				@csrf
+				<div class="modal-body">
+					<div class="form-card">
+						<div class="form-title">
+							<i class="fas fa-folder"></i>
+							<span>Main Category Details</span>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label class="form-label">
+									Category Name <span class="required">*</span>
+								</label>
+								<input type="text" class="form-control" name="category_name" id="full_category_name" required placeholder="e.g., Fresh Fruits">
+							</div>
+							<div class="form-group">
+								<label class="form-label">Description</label>
+								<input type="text" class="form-control" name="description" id="full_description" rows="2" placeholder="Brief description">
+							</div>
+							<div class="form-group">
+								<label class="form-label">
+									Category Icon <span class="required">*</span>
+									<small>(PNG only, max 5MB)</small>
+								</label>
+								<input type="file" class="form-control" name="category_icon" id="full_category_icon" accept=".png" required>
+								<div id="iconPreview" class="icon-preview" style="display:none;">
+									<img id="iconPreviewImg" src="" alt="Icon Preview">
+								</div>
+							</div>
+						</div>
+					</div>
 
-                        <div class="col-12 mb-4">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h6>Sub-Category Examples *</h6>
-                                    <button type="button" class="btn btn-sm btn-primary" onclick="addSubcategoryField()">
-                                        <i class="fa-solid fa-plus"></i> Add Subcategory
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div id="subcategories-container">
-                                        <!-- Subcategory fields will be added here -->
-                                        <div class="subcategory-item mb-4 p-3 border rounded">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <h6 class="mb-0">Subcategory #1</h6>
-                                                <button type="button" class="btn btn-sm btn-danger" onclick="removeSubcategory(this)" data-index="0">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Subcategory Name *</label>
-                                                    <input type="text" class="form-control subcategory-name" name="subcategories[0][name]" required placeholder="e.g., Tropical Fruits">
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Description</label>
-                                                    <textarea class="form-control subcategory-desc" name="subcategories[0][description]" rows="1" placeholder="Description"></textarea>
-                                                </div>
-                                            </div>
-
-                                            <div class="products-section">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <h6 class="mb-0">Specific Products * (Minimum 2 required)</h6>
-                                                    <button type="button" class="btn btn-sm btn-success" onclick="addProductField(this, 0)">
-                                                        <i class="fa-solid fa-plus"></i> Add Product
-                                                    </button>
-                                                </div>
-                                                <div class="products-container" data-index="0">
-                                                    <div class="product-item mb-3 p-2 border">
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <label class="form-label">Product Name *</label>
-                                                                <input type="text" class="form-control product-name" name="subcategories[0][products][0][name]" required placeholder="e.g., TJC Mango">
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="form-label">Description</label>
-                                                                <textarea class="form-control product-desc" name="subcategories[0][products][0][description]" rows="1" placeholder="Product description"></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="product-item mb-3 p-2 border">
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <label class="form-label">Product Name *</label>
-                                                                <input type="text" class="form-control product-name" name="subcategories[0][products][1][name]" required placeholder="e.g., Ambarella">
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="form-label">Description</label>
-                                                                <textarea class="form-control product-desc" name="subcategories[0][products][1][description]" rows="1" placeholder="Product description"></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-primary">
-                        <i class="fa-solid fa-save me-2"></i>Save Category
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+					<div class="form-card">
+						<div class="form-title">
+							<i class="fas fa-list"></i>
+							<span>Sub-Category Examples</span>
+							<button type="button" class="btn-add-mini" onclick="addSubcategoryField()">
+								<i class="fas fa-plus"></i> Add
+							</button>
+						</div>
+						<div id="subcategories-container"></div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn-primary">
+						<i class="fas fa-save"></i>
+						Save Category
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>
 
-<!-- Loading overlay -->
-<div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+	<div class="spinner"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
-// Toastr configuration
-toastr.options = {
-    "closeButton": true,
-    "progressBar": true,
-    "positionClass": "toast-top-right",
-    "timeOut": "3000"
-};
+let subcategoryCount = 0;
+let productCounts = {};
 
-// Show loading
+function toggleItem(header) {
+	const item = header.closest('.tree-item');
+	const children = item.querySelector('.item-children');
+	const icon = header.querySelector('.toggle-icon');
+
+	if (children) {
+		children.classList.toggle('show');
+		icon.classList.toggle('fa-chevron-down');
+		icon.classList.toggle('fa-chevron-up');
+	}
+}
+
+document.getElementById('collapseAll')?.addEventListener('click', function() {
+	document.querySelectorAll('.item-children.show').forEach(child => {
+		child.classList.remove('show');
+		const icon = child.closest('.tree-item')?.querySelector('.toggle-icon');
+		if (icon) {
+			icon.classList.remove('fa-chevron-up');
+			icon.classList.add('fa-chevron-down');
+		}
+	});
+});
+
+document.getElementById('expandAll')?.addEventListener('click', function() {
+	document.querySelectorAll('.item-children:not(.show)').forEach(child => {
+		child.classList.add('show');
+		const icon = child.closest('.tree-item')?.querySelector('.toggle-icon');
+		if (icon) {
+			icon.classList.remove('fa-chevron-down');
+			icon.classList.add('fa-chevron-up');
+		}
+	});
+});
+
 function showLoading() {
-    document.getElementById('loadingOverlay').style.display = 'flex';
+	document.getElementById('loadingOverlay').style.display = 'flex';
 }
 
-// Hide loading
 function hideLoading() {
-    document.getElementById('loadingOverlay').style.display = 'none';
+	document.getElementById('loadingOverlay').style.display = 'none';
 }
 
-// Toggle item function
-function toggleItem(element) {
-    const parent = element.closest('.taxonomy-item');
-    const children = parent.querySelector('.item-children');
-    const toggleIcon = parent.querySelector('.toggle-icon i');
-
-    if (children) {
-        children.classList.toggle('show');
-        toggleIcon.classList.toggle('fa-chevron-down');
-        toggleIcon.classList.toggle('fa-chevron-up');
-
-        if (children.classList.contains('show')) {
-            parent.style.marginBottom = '1rem';
-        } else {
-            parent.style.marginBottom = '0.5rem';
-        }
-    }
+function showSuccess(msg) {
+	Swal.fire({
+		icon: 'success',
+		title: 'Success',
+		text: msg,
+		confirmButtonColor: '#10B981',
+		timer: 1500,
+		showConfirmButton: false
+	});
 }
 
-// Collapse all
-document.getElementById('collapseAll').addEventListener('click', function() {
-    document.querySelectorAll('.item-children.show').forEach(child => {
-        child.classList.remove('show');
-        const toggleIcon = child.closest('.taxonomy-item').querySelector('.toggle-icon i');
-        if (toggleIcon) {
-            toggleIcon.classList.remove('fa-chevron-up');
-            toggleIcon.classList.add('fa-chevron-down');
-        }
-    });
-});
+function showError(msg) {
+	Swal.fire({
+		icon: 'error',
+		title: 'Error',
+		text: msg,
+		confirmButtonColor: '#10B981'
+	});
+}
 
-// Expand all
-document.getElementById('expandAll').addEventListener('click', function() {
-    document.querySelectorAll('.item-children:not(.show)').forEach(child => {
-        child.classList.add('show');
-        const toggleIcon = child.closest('.taxonomy-item').querySelector('.toggle-icon i');
-        if (toggleIcon) {
-            toggleIcon.classList.remove('fa-chevron-down');
-            toggleIcon.classList.add('fa-chevron-up');
-        }
-    });
-});
-
-// Add subcategory
 function addSubcategory(categoryId) {
-    Swal.fire({
-        title: 'Add Subcategory',
-        html: `
-            <div class="text-start">
-                <div class="mb-3">
-                    <label class="form-label">Subcategory Name *</label>
-                    <input type="text" class="form-control swal2-input" id="subcategoryName" placeholder="e.g., Tropical Fruits" required>
-                    <div class="form-text">Display order will be automatically assigned.</div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control swal2-textarea" id="subcategoryDesc" rows="3" placeholder="Description of this subcategory"></textarea>
-                </div>
-                <input type="hidden" id="categoryId" value="${categoryId}">
-            </div>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Add Subcategory',
-        confirmButtonColor: '#10B981',
-        cancelButtonColor: '#6b7280',
-        background: '#ffffff',
-        color: '#0f1724',
-        width: '500px',
-        preConfirm: () => {
-            const name = document.getElementById('subcategoryName').value;
-            if (!name) {
-                Swal.showValidationMessage('Subcategory name is required');
-                return false;
-            }
-            return {
-                name: name,
-                description: document.getElementById('subcategoryDesc').value,
-                categoryId: document.getElementById('categoryId').value
-            };
-        }
-    }).then(result => {
-        if (result.isConfirmed) {
-            const data = result.value;
-            showLoading();
-
-            fetch('{{ route("facilitator.taxonomy.subcategory.store") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                hideLoading();
-                if (data.success) {
-                    showSuccess(data.message);
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showError(data.message || 'Failed to add subcategory');
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                showError('Error adding subcategory: ' + error.message);
-            });
-        }
-    });
+	Swal.fire({
+		title: 'Add Subcategory',
+		width: '550px',
+		html: `
+			<div class="text-start">
+				<div class="mb-2">
+					<label class="form-label">Subcategory Name *</label>
+					<input type="text" class="form-control" id="subcategoryName" placeholder="e.g., Tropical Fruits">
+				</div>
+				<div class="mb-2">
+					<label class="form-label">Description</label>
+					<input type="text" class="form-control" id="subcategoryDesc" rows="2" placeholder="Description">
+				</div>
+				<div class="mb-2 d-flex justify-content-between align-items-center">
+					<label class="form-label mb-0">Products * (min 2)</label>
+					<button type="button" class="btn btn-sm btn-primary" onclick="addSwalProductField()">
+						<i class="fas fa-plus"></i> Add
+					</button>
+				</div>
+				<div id="swalProductsContainer">
+					<div class="swal-product-item mb-2">
+						<input type="text" class="form-control mb-1 swal-product-name" placeholder="Product Name 1 *" required>
+						<input type="text" class="form-control swal-product-desc" rows="1" placeholder="Product Description 1">
+					</div>
+					<div class="swal-product-item mb-2">
+						<input type="text" class="form-control mb-1 swal-product-name" placeholder="Product Name 2 *" required>
+						<input type="text" class="form-control swal-product-desc" rows="1" placeholder="Product Description 2">
+					</div>
+				</div>
+			</div>
+		`,
+		showCancelButton: true,
+		confirmButtonText: 'Add',
+		confirmButtonColor: '#10B981',
+		cancelButtonColor: '#6b7280',
+		didOpen: () => {
+			window.addSwalProductField = () => {
+				const container = document.getElementById('swalProductsContainer');
+				const div = document.createElement('div');
+				div.className = 'swal-product-item mb-2 d-flex gap-2 align-items-start';
+				div.innerHTML = `
+					<div class="flex-grow-1">
+						<input type="text" class="form-control mb-1 swal-product-name" placeholder="Product Name *">
+						<input type="text" class="form-control swal-product-desc" rows="1" placeholder="Product Description">
+					</div>
+					<button type="button" class="btn btn-sm btn-outline-danger" onclick="this.parentElement.remove()">
+						<i class="fas fa-times"></i>
+					</button>
+				`;
+				container.appendChild(div);
+			};
+		},
+		preConfirm: () => {
+			const name = document.getElementById('subcategoryName').value;
+			if (!name) {
+				Swal.showValidationMessage('Subcategory name required');
+				return false;
+			}
+			const productItems = document.querySelectorAll('.swal-product-item');
+			const products = [];
+			let allNamesProvided = true;
+			productItems.forEach(item => {
+				const pName = item.querySelector('.swal-product-name').value;
+				const pDesc = item.querySelector('.swal-product-desc').value;
+				if (pName) {
+					products.push({ name: pName, description: pDesc });
+				} else {
+					allNamesProvided = false;
+				}
+			});
+			if (products.length < 2) {
+				Swal.showValidationMessage('At least 2 products required');
+				return false;
+			}
+			if (!allNamesProvided) {
+				Swal.showValidationMessage('All products must have a name');
+				return false;
+			}
+			return {
+				name: name,
+				description: document.getElementById('subcategoryDesc').value,
+				categoryId: categoryId,
+				products: products
+			};
+		}
+	}).then(result => {
+		if (result.isConfirmed) {
+			showLoading();
+			fetch('{{ route("facilitator.taxonomy.subcategory.store") }}', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRF-TOKEN': '{{ csrf_token() }}'
+				},
+				body: JSON.stringify(result.value)
+			})
+			.then(res => res.json())
+			.then(data => {
+				hideLoading();
+				if (data.success) {
+					showSuccess(data.message);
+					setTimeout(() => location.reload(), 1500);
+				} else {
+					showError(data.message || 'Failed');
+				}
+			})
+			.catch(() => {
+				hideLoading();
+				showError('Error adding subcategory');
+			});
+		}
+	});
 }
 
-// Add product
 function addProduct(subcategoryId) {
-    Swal.fire({
-        title: 'Add Product Example',
-        html: `
-            <div class="text-start">
-                <div class="mb-3">
-                    <label class="form-label">Product Name *</label>
-                    <input type="text" class="form-control swal2-input" id="productName" placeholder="e.g., TJC Mango" required>
-                    <div class="form-text">Display order will be automatically assigned.</div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control swal2-textarea" id="productDesc" rows="3" placeholder="Description of this product"></textarea>
-                </div>
-                <input type="hidden" id="subcategoryId" value="${subcategoryId}">
-            </div>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Add Product',
-        confirmButtonColor: '#10B981',
-        cancelButtonColor: '#6b7280',
-        background: '#ffffff',
-        color: '#0f1724',
-        width: '500px',
-        preConfirm: () => {
-            const name = document.getElementById('productName').value;
-            if (!name) {
-                Swal.showValidationMessage('Product name is required');
-                return false;
-            }
-            return {
-                name: name,
-                description: document.getElementById('productDesc').value,
-                subcategoryId: document.getElementById('subcategoryId').value
-            };
-        }
-    }).then(result => {
-        if (result.isConfirmed) {
-            const data = result.value;
-            showLoading();
-
-            fetch('{{ route("facilitator.taxonomy.product.store") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                hideLoading();
-                if (data.success) {
-                    showSuccess(data.message);
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showError(data.message || 'Failed to add product');
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                showError('Error adding product: ' + error.message);
-            });
-        }
-    });
+	Swal.fire({
+		title: 'Add Product',
+		html: `
+			<div class="text-start">
+				<div class="mb-2">
+					<label class="form-label">Product Name *</label>
+					<input type="text" class="form-control" id="productName" placeholder="e.g., TJC Mango">
+				</div>
+				<div class="mb-2">
+					<label class="form-label">Description</label>
+					<textarea class="form-control" id="productDesc" rows="2" placeholder="Description">
+				</div>
+			</div>
+		`,
+		showCancelButton: true,
+		confirmButtonText: 'Add',
+		confirmButtonColor: '#10B981',
+		cancelButtonColor: '#6b7280',
+		preConfirm: () => {
+			const name = document.getElementById('productName').value;
+			if (!name) {
+				Swal.showValidationMessage('Product name required');
+				return false;
+			}
+			return {
+				name: name,
+				description: document.getElementById('productDesc').value,
+				subcategoryId: subcategoryId
+			};
+		}
+	}).then(result => {
+		if (result.isConfirmed) {
+			showLoading();
+			fetch('{{ route("facilitator.taxonomy.product.store") }}', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRF-TOKEN': '{{ csrf_token() }}'
+				},
+				body: JSON.stringify(result.value)
+			})
+			.then(res => res.json())
+			.then(data => {
+				hideLoading();
+				if (data.success) {
+					showSuccess(data.message);
+					setTimeout(() => location.reload(), 1500);
+				} else {
+					showError(data.message || 'Failed');
+				}
+			})
+			.catch(() => {
+				hideLoading();
+				showError('Error adding product');
+			});
+		}
+	});
 }
 
-// Edit category
-function editCategory(id, name, description) {
-    Swal.fire({
-        title: 'Edit Category',
-        html: `
-            <div class="text-start">
-                <div class="mb-3">
-                    <label class="form-label">Category Name *</label>
-                    <input type="text" class="form-control swal2-input" id="editCategoryName" value="${name}" required>
-                    <div class="form-text">Only name and description can be edited.</div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control swal2-textarea" id="editCategoryDesc" rows="3">${description || ''}</textarea>
-                </div>
-                <input type="hidden" id="categoryId" value="${id}">
-            </div>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Update Category',
-        confirmButtonColor: '#10B981',
-        cancelButtonColor: '#6b7280',
-        background: '#ffffff',
-        color: '#0f1724',
-        width: '500px',
-        preConfirm: () => {
-            const name = document.getElementById('editCategoryName').value;
-            if (!name) {
-                Swal.showValidationMessage('Category name is required');
-                return false;
-            }
-            return {
-                id: document.getElementById('categoryId').value,
-                name: name,
-                description: document.getElementById('editCategoryDesc').value
-            };
-        }
-    }).then(result => {
-        if (result.isConfirmed) {
-            const data = result.value;
-            showLoading();
-
-            fetch('{{ route("facilitator.taxonomy.category.update") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                hideLoading();
-                if (data.success) {
-                    showSuccess(data.message);
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showError(data.message || 'Failed to update category');
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                showError('Error updating category: ' + error.message);
-            });
-        }
-    });
+function editCategory(id, name, desc) {
+	Swal.fire({
+		title: 'Edit Category',
+		width: '500px',
+		html: `
+			<div class="text-start">
+				<div class="mb-2">
+					<label class="form-label">Category Name *</label>
+					<input type="text" class="form-control" id="editCatName" value="${name}">
+				</div>
+				<div class="mb-2">
+					<label class="form-label">Description</label>
+					<input type="text" class="form-control" id="editCatDesc" value="${desc || ''}">
+				</div>
+				<div class="mb-2">
+					<label class="form-label">
+						Category Icon <small>(Optional, PNG only, max 5MB)</small>
+					</label>
+					<input type="file" class="form-control" id="editCatIcon" accept=".png">
+					<div id="editIconPreview" class="icon-preview mt-2" style="display:none;">
+						<img id="editIconPreviewImg" src="" alt="Icon Preview" style="max-width: 50px;">
+					</div>
+				</div>
+			</div>
+		`,
+		showCancelButton: true,
+		confirmButtonText: 'Update',
+		confirmButtonColor: '#10B981',
+		cancelButtonColor: '#6b7280',
+		didOpen: () => {
+			document.getElementById('editCatIcon').onchange = function(e) {
+				const file = e.target.files[0];
+				const preview = document.getElementById('editIconPreview');
+				const img = document.getElementById('editIconPreviewImg');
+				if (file) {
+					if (file.type !== 'image/png') {
+						showError('Only PNG allowed');
+						this.value = '';
+						return;
+					}
+					const reader = new FileReader();
+					reader.onload = e => {
+						img.src = e.target.result;
+						preview.style.display = 'block';
+					};
+					reader.readAsDataURL(file);
+				}
+			};
+		},
+		preConfirm: () => {
+			const newName = document.getElementById('editCatName').value;
+			if (!newName) {
+				Swal.showValidationMessage('Category name required');
+				return false;
+			}
+			
+			const formData = new FormData();
+			formData.append('id', id);
+			formData.append('name', newName);
+			formData.append('description', document.getElementById('editCatDesc').value);
+			
+			const iconFile = document.getElementById('editCatIcon').files[0];
+			if (iconFile) {
+				formData.append('category_icon', iconFile);
+			}
+			
+			return formData;
+		}
+	}).then(result => {
+		if (result.isConfirmed) {
+			showLoading();
+			fetch('{{ route("facilitator.taxonomy.category.update") }}', {
+				method: 'POST',
+				headers: {
+					'X-CSRF-TOKEN': '{{ csrf_token() }}'
+				},
+				body: result.value
+			})
+			.then(res => res.json())
+			.then(data => {
+				hideLoading();
+				if (data.success) {
+					showSuccess(data.message);
+					setTimeout(() => location.reload(), 1500);
+				} else {
+					showError(data.message || 'Failed');
+				}
+			})
+			.catch(() => {
+				hideLoading();
+				showError('Error updating category');
+			});
+		}
+	});
 }
 
-// Edit subcategory
-function editSubcategory(id, name, description, categoryId) {
-    Swal.fire({
-        title: 'Edit Subcategory',
-        html: `
-            <div class="text-start">
-                <div class="mb-3">
-                    <label class="form-label">Subcategory Name *</label>
-                    <input type="text" class="form-control swal2-input" id="editSubcategoryName" value="${name}" required>
-                    <div class="form-text">Only name and description can be edited.</div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control swal2-textarea" id="editSubcategoryDesc" rows="3">${description || ''}</textarea>
-                </div>
-                <input type="hidden" id="subcategoryId" value="${id}">
-                <input type="hidden" id="editCategoryId" value="${categoryId}">
-            </div>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Update Subcategory',
-        confirmButtonColor: '#10B981',
-        cancelButtonColor: '#6b7280',
-        background: '#ffffff',
-        color: '#0f1724',
-        width: '500px',
-        preConfirm: () => {
-            const name = document.getElementById('editSubcategoryName').value;
-            if (!name) {
-                Swal.showValidationMessage('Subcategory name is required');
-                return false;
-            }
-            return {
-                id: document.getElementById('subcategoryId').value,
-                name: name,
-                description: document.getElementById('editSubcategoryDesc').value,
-                category_id: document.getElementById('editCategoryId').value
-            };
-        }
-    }).then(result => {
-        if (result.isConfirmed) {
-            const data = result.value;
-            showLoading();
-
-            fetch('{{ route("facilitator.taxonomy.subcategory.update") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                hideLoading();
-                if (data.success) {
-                    showSuccess(data.message);
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showError(data.message || 'Failed to update subcategory');
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                showError('Error updating subcategory: ' + error.message);
-            });
-        }
-    });
+function editSubcategory(id, name, desc, catId) {
+	Swal.fire({
+		title: 'Edit Subcategory',
+		html: `
+			<div class="text-start">
+				<div class="mb-2">
+					<label class="form-label">Subcategory Name *</label>
+					<input type="text" class="form-control" id="editName" value="${name}">
+				</div>
+				<div class="mb-2">
+					<label class="form-label">Description</label>
+					<input type="text" class="form-control" id="editDesc" rows="2">${desc || ''}
+				</div>
+			</div>
+		`,
+		showCancelButton: true,
+		confirmButtonText: 'Update',
+		confirmButtonColor: '#10B981',
+		cancelButtonColor: '#6b7280',
+		preConfirm: () => {
+			const newName = document.getElementById('editName').value;
+			if (!newName) {
+				Swal.showValidationMessage('Subcategory name required');
+				return false;
+			}
+			return {
+				id: id,
+				name: newName,
+				description: document.getElementById('editDesc').value,
+				category_id: catId
+			};
+		}
+	}).then(result => {
+		if (result.isConfirmed) {
+			showLoading();
+			fetch('{{ route("facilitator.taxonomy.subcategory.update") }}', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRF-TOKEN': '{{ csrf_token() }}'
+				},
+				body: JSON.stringify(result.value)
+			})
+			.then(res => res.json())
+			.then(data => {
+				hideLoading();
+				if (data.success) {
+					showSuccess(data.message);
+					setTimeout(() => location.reload(), 1500);
+				} else {
+					showError(data.message || 'Failed');
+				}
+			})
+			.catch(() => {
+				hideLoading();
+				showError('Error updating subcategory');
+			});
+		}
+	});
 }
 
-// Edit product
-function editProduct(id, name, description, subcategoryId) {
-    Swal.fire({
-        title: 'Edit Product',
-        html: `
-            <div class="text-start">
-                <div class="mb-3">
-                    <label class="form-label">Product Name *</label>
-                    <input type="text" class="form-control swal2-input" id="editProductName" value="${name}" required>
-                    <div class="form-text">Only name and description can be edited.</div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control swal2-textarea" id="editProductDesc" rows="3">${description || ''}</textarea>
-                </div>
-                <input type="hidden" id="productId" value="${id}">
-                <input type="hidden" id="editSubcategoryId" value="${subcategoryId}">
-            </div>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Update Product',
-        confirmButtonColor: '#10B981',
-        cancelButtonColor: '#6b7280',
-        background: '#ffffff',
-        color: '#0f1724',
-        width: '500px',
-        preConfirm: () => {
-            const name = document.getElementById('editProductName').value;
-            if (!name) {
-                Swal.showValidationMessage('Product name is required');
-                return false;
-            }
-            return {
-                id: document.getElementById('productId').value,
-                name: name,
-                description: document.getElementById('editProductDesc').value,
-                subcategory_id: document.getElementById('editSubcategoryId').value
-            };
-        }
-    }).then(result => {
-        if (result.isConfirmed) {
-            const data = result.value;
-            showLoading();
-
-            fetch('{{ route("facilitator.taxonomy.product.update") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                hideLoading();
-                if (data.success) {
-                    showSuccess(data.message);
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showError(data.message || 'Failed to update product');
-                }
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error:', error);
-                showError('Error updating product: ' + error.message);
-            });
-        }
-    });
+function editProduct(id, name, desc, subId) {
+	Swal.fire({
+		title: 'Edit Product',
+		html: `
+			<div class="text-start">
+				<div class="mb-2">
+					<label class="form-label">Product Name *</label>
+					<input type="text" class="form-control" id="editName" value="${name}">
+				</div>
+				<div class="mb-2">
+					<label class="form-label">Description</label>
+					<input type="text" class="form-control" id="editDesc" rows="2">${desc || ''}
+				</div>
+			</div>
+		`,
+		showCancelButton: true,
+		confirmButtonText: 'Update',
+		confirmButtonColor: '#10B981',
+		cancelButtonColor: '#6b7280',
+		preConfirm: () => {
+			const newName = document.getElementById('editName').value;
+			if (!newName) {
+				Swal.showValidationMessage('Product name required');
+				return false;
+			}
+			return {
+				id: id,
+				name: newName,
+				description: document.getElementById('editDesc').value,
+				subcategory_id: subId
+			};
+		}
+	}).then(result => {
+		if (result.isConfirmed) {
+			showLoading();
+			fetch('{{ route("facilitator.taxonomy.product.update") }}', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRF-TOKEN': '{{ csrf_token() }}'
+				},
+				body: JSON.stringify(result.value)
+			})
+			.then(res => res.json())
+			.then(data => {
+				hideLoading();
+				if (data.success) {
+					showSuccess(data.message);
+					setTimeout(() => location.reload(), 1500);
+				} else {
+					showError(data.message || 'Failed');
+				}
+			})
+			.catch(() => {
+				hideLoading();
+				showError('Error updating product');
+			});
+		}
+	});
 }
-
-// Utility functions
-function showSuccess(message) {
-    toastr.success(message);
-}
-
-function showError(message) {
-    toastr.error(message);
-}
-
-// Handle form submissions - FIXED
-document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const formData = new FormData(this);
-    const data = Object.fromEntries(formData.entries());
-
-    showLoading();
-
-    fetch(this.action, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        hideLoading();
-        if (data.success) {
-            showSuccess(data.message);
-            // Close modal
-            var modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
-            if (modal) {
-                modal.hide();
-            }
-
-            // Clear form
-            document.getElementById('addCategoryForm').reset();
-
-            // Reload page after delay
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showError(data.message || 'Failed to add category');
-        }
-    })
-    .catch(error => {
-        hideLoading();
-        console.error('Error:', error);
-        showError('Error adding category: ' + error.message);
-    });
-});
-
-// ========== DYNAMIC FIELDS FUNCTIONS ==========
-
-let subcategoryCount = 1;
-let productCounts = {0: 2}; // Track product counts per subcategory
 
 function addSubcategoryField() {
-    const container = document.getElementById('subcategories-container');
-    const newIndex = subcategoryCount++;
-    productCounts[newIndex] = 0; // Initialize product count for this subcategory
+	const container = document.getElementById('subcategories-container');
+	const index = subcategoryCount++;
+	productCounts[index] = 0;
 
-    const subcategoryHTML = `
-        <div class="subcategory-item mb-4 p-3 border rounded">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="mb-0">Subcategory #${newIndex + 1}</h6>
-                <button type="button" class="btn btn-sm btn-danger" onclick="removeSubcategory(this)" data-index="${newIndex}">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Subcategory Name *</label>
-                    <input type="text" class="form-control subcategory-name" name="subcategories[${newIndex}][name]" required placeholder="e.g., Tropical Fruits">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control subcategory-desc" name="subcategories[${newIndex}][description]" rows="1" placeholder="Description"></textarea>
-                </div>
-            </div>
+	const html = `
+		<div class="subcategory-card" data-index="${index}">
+			<div class="subcategory-header">
+				<span class="subcategory-title">Subcategory #${index + 1}</span>
+				<button type="button" class="btn-remove" onclick="removeSubcategory(this, ${index})">
+					<i class="fas fa-trash"></i>
+				</button>
+			</div>
+			<div class="subcategory-body">
+				<div class="form-row">
+					<div class="form-group">
+						<label class="form-label">Name *</label>
+						<input type="text" class="form-control" name="subcategories[${index}][name]" required>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Description</label>
+						<input type="text" class="form-control" name="subcategories[${index}][description]" rows="1">
+					</div>
+				</div>
+				<div class="products-header">
+					<span>Products <small>(min 2)</small></span>
+					<button type="button" class="btn-add-mini" onclick="addProductField(${index})">
+						<i class="fas fa-plus"></i> Add
+					</button>
+				</div>
+				<div class="products-list" id="products-${index}"></div>
+			</div>
+		</div>
+	`;
 
-            <div class="products-section">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="mb-0">Specific Products * (Minimum 2 required)</h6>
-                    <button type="button" class="btn btn-sm btn-success" onclick="addProductField(this, ${newIndex})">
-                        <i class="fa-solid fa-plus"></i> Add Product
-                    </button>
-                </div>
-                <div class="products-container" data-index="${newIndex}">
-                    <!-- Products will be added here -->
-                </div>
-            </div>
-        </div>
-    `;
+	container.insertAdjacentHTML('beforeend', html);
 
-    container.insertAdjacentHTML('beforeend', subcategoryHTML);
-
-    // Add two initial products for the new subcategory
-    const productsContainer = container.querySelector(`.products-container[data-index="${newIndex}"]`);
-    addProductField({closest: () => productsContainer}, newIndex);
-    addProductField({closest: () => productsContainer}, newIndex);
+	for (let i = 0; i < 2; i++) {
+		addProductField(index);
+	}
 }
 
-function addProductField(button, subcategoryIndex) {
-    const productsContainer = button.closest('.products-section').querySelector('.products-container');
-    const productIndex = productCounts[subcategoryIndex] || 0;
-    productCounts[subcategoryIndex] = productIndex + 1;
+function addProductField(subIdx) {
+	const container = document.getElementById(`products-${subIdx}`);
+	const prodIdx = productCounts[subIdx]++;
 
-    const productHTML = `
-        <div class="product-item mb-3 p-2 border">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <label class="form-label">Product Name *</label>
-                    <input type="text" class="form-control product-name" name="subcategories[${subcategoryIndex}][products][${productIndex}][name]" required placeholder="e.g., Product Name">
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control product-desc" name="subcategories[${subcategoryIndex}][products][${productIndex}][description]" rows="1" placeholder="Product description"></textarea>
-                </div>
-                <div class="col-md-1">
-                    <button type="button" class="btn btn-sm btn-danger mt-3" onclick="removeProduct(this)">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
+	const html = `
+		<div class="product-card">
+			<div class="form-row">
+				<div class="form-group">
+					<label class="form-label">Name *</label>
+					<input type="text" class="form-control" name="subcategories[${subIdx}][products][${prodIdx}][name]" required>
+				</div>
+				<div class="form-group">
+					<label class="form-label">Description</label>
+					<input type="text" class="form-control" name="subcategories[${subIdx}][products][${prodIdx}][description]" rows="1">
+				</div>
+				<button type="button" class="btn-remove-mini" onclick="removeProductField(this, ${subIdx})">
+					<i class="fas fa-times"></i>
+				</button>
+			</div>
+		</div>
+	`;
 
-    productsContainer.insertAdjacentHTML('beforeend', productHTML);
+	container.insertAdjacentHTML('beforeend', html);
 }
 
-function removeSubcategory(button) {
-    const subcategoryItem = button.closest('.subcategory-item');
-    const index = parseInt(button.getAttribute('data-index'));
-
-    if (document.querySelectorAll('.subcategory-item').length <= 1) {
-        Swal.fire('Error', 'At least one subcategory is required!', 'error');
-        return;
-    }
-
-    subcategoryItem.remove();
-    delete productCounts[index];
-
-    // Renumber remaining subcategories
-    const subcategories = document.querySelectorAll('.subcategory-item');
-    subcategories.forEach((item, idx) => {
-        const header = item.querySelector('h6');
-        header.textContent = `Subcategory #${idx + 1}`;
-    });
+function removeSubcategory(btn, idx) {
+	const cards = document.querySelectorAll('.subcategory-card');
+	if (cards.length <= 1) {
+		Swal.fire('Error', 'At least one subcategory required', 'error');
+		return;
+	}
+	btn.closest('.subcategory-card').remove();
+	delete productCounts[idx];
 }
 
-function removeProduct(button) {
-    const productItem = button.closest('.product-item');
-    const productsContainer = productItem.closest('.products-container');
-    const subcategoryIndex = parseInt(productsContainer.getAttribute('data-index'));
-
-    if (productsContainer.querySelectorAll('.product-item').length <= 2) {
-        Swal.fire('Error', 'At least two products are required for each subcategory!', 'error');
-        return;
-    }
-
-    productItem.remove();
+function removeProductField(btn, subIdx) {
+	const container = document.getElementById(`products-${subIdx}`);
+	if (container.children.length <= 2) {
+		Swal.fire('Error', 'At least 2 products required', 'error');
+		return;
+	}
+	btn.closest('.product-card').remove();
 }
 
-// Form submission handler for full form
-document.getElementById('addCategoryFullForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+document.getElementById('full_category_icon')?.addEventListener('change', function(e) {
+	const file = e.target.files[0];
+	const preview = document.getElementById('iconPreview');
+	const img = document.getElementById('iconPreviewImg');
 
-    // Validate at least one subcategory
-    const subcategoryItems = document.querySelectorAll('.subcategory-item');
-    if (subcategoryItems.length === 0) {
-        Swal.fire('Error', 'At least one subcategory is required!', 'error');
-        return;
-    }
-
-    // Validate each subcategory has at least 2 products
-    let isValid = true;
-    subcategoryItems.forEach((item, index) => {
-        const productCount = item.querySelectorAll('.product-item').length;
-        if (productCount < 2) {
-            isValid = false;
-            Swal.fire('Error', `Subcategory #${index + 1} must have at least 2 products!`, 'error');
-            return;
-        }
-    });
-
-    if (!isValid) return;
-
-    // Collect form data
-    const formData = new FormData(this);
-    const data = {};
-
-    // Convert FormData to JSON
-    for (let [key, value] of formData.entries()) {
-        // Handle nested arrays
-        if (key.includes('[') && key.includes(']')) {
-            const keys = key.split(/\[|\]/).filter(k => k);
-            let current = data;
-
-            for (let i = 0; i < keys.length - 1; i++) {
-                const k = keys[i];
-                const nextKey = keys[i + 1];
-
-                if (!current[k]) {
-                    current[k] = isNaN(parseInt(nextKey)) ? {} : [];
-                }
-                current = current[k];
-            }
-
-            current[keys[keys.length - 1]] = value;
-        } else {
-            data[key] = value;
-        }
-    }
-
-    // Send request
-    showLoading();
-
-    fetch('{{ route("facilitator.taxonomy.category.store") }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        hideLoading();
-        if (data.success) {
-            showSuccess(data.message);
-            // Close modal
-            var modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryFullModal'));
-            if (modal) {
-                modal.hide();
-            }
-
-            // Clear form
-            document.getElementById('addCategoryFullForm').reset();
-            document.getElementById('subcategories-container').innerHTML = '';
-
-            // Reset counters
-            subcategoryCount = 1;
-            productCounts = {0: 2};
-
-            // Reload page after delay
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showError(data.message || 'Failed to add category');
-        }
-    })
-    .catch(error => {
-        hideLoading();
-        console.error('Error:', error);
-        showError('Error adding category: ' + error.message);
-    });
+	if (file) {
+		if (file.type !== 'image/png') {
+			Swal.fire('Invalid', 'Only PNG allowed', 'error');
+			this.value = '';
+			preview.style.display = 'none';
+			return;
+		}
+		if (file.size > 5 * 1024 * 1024) {
+			Swal.fire('Too Large', 'Max 5MB', 'error');
+			this.value = '';
+			preview.style.display = 'none';
+			return;
+		}
+		const reader = new FileReader();
+		reader.onload = e => {
+			img.src = e.target.result;
+			preview.style.display = 'block';
+		};
+		reader.readAsDataURL(file);
+	} else {
+		preview.style.display = 'none';
+	}
 });
 
-// Initialize first subcategory and products when modal opens
-document.getElementById('addCategoryFullModal').addEventListener('show.bs.modal', function() {
-    // Clear any existing content
-    document.getElementById('subcategories-container').innerHTML = '';
+document.getElementById('addCategoryFullForm')?.addEventListener('submit', function(e) {
+	e.preventDefault();
 
-    // Reset counters
-    subcategoryCount = 1;
-    productCounts = {0: 2};
+	if (!document.getElementById('full_category_icon').files.length) {
+		Swal.fire('Error', 'Category icon required', 'error');
+		return;
+	}
 
-    // Add first subcategory
-    addSubcategoryField();
+	const subCards = document.querySelectorAll('.subcategory-card');
+	if (!subCards.length) {
+		Swal.fire('Error', 'At least one subcategory required', 'error');
+		return;
+	}
+
+	let valid = true;
+	subCards.forEach((card, i) => {
+		const products = card.querySelectorAll('.product-card');
+		if (products.length < 2) {
+			valid = false;
+			Swal.fire('Error', `Subcategory #${i+1} needs at least 2 products`, 'error');
+		}
+	});
+
+	if (!valid) return;
+
+	showLoading();
+	fetch(this.action, {
+		method: 'POST',
+		headers: {
+			'X-CSRF-TOKEN': '{{ csrf_token() }}',
+			'Accept': 'application/json'
+		},
+		body: new FormData(this)
+	})
+	.then(res => res.json())
+	.then(data => {
+		hideLoading();
+		if (data.success) {
+			showSuccess(data.message);
+			bootstrap.Modal.getInstance(document.getElementById('addCategoryFullModal')).hide();
+			setTimeout(() => location.reload(), 1500);
+		} else {
+			showError(data.message || 'Failed');
+		}
+	})
+	.catch(() => {
+		hideLoading();
+		showError('Error adding category');
+	});
 });
+
+document.getElementById('addCategoryFullModal')?.addEventListener('show.bs.modal', function() {
+	document.getElementById('subcategories-container').innerHTML = '';
+	subcategoryCount = 0;
+	productCounts = {};
+	addSubcategoryField();
+});
+
+const searchInput = document.getElementById('taxonomySearch');
+const clearBtn = document.getElementById('clearSearch');
+const itemsCount = document.getElementById('itemsCount');
+
+function updateItemsCount() {
+	const visible = document.querySelectorAll('.tree-item[style*="display: block"], .tree-item:not([style*="display: none"])').length;
+	itemsCount.textContent = `Showing ${visible} items`;
+}
+
+function performSearch() {
+	const term = searchInput.value.toLowerCase().trim();
+	const items = document.querySelectorAll('.tree-item');
+
+	if (!term) {
+		items.forEach(i => i.style.display = 'block');
+		document.querySelectorAll('.item-children').forEach(c => c.classList.remove('show'));
+		updateItemsCount();
+		return;
+	}
+
+	items.forEach(item => {
+		const name = item.dataset.name || '';
+		const desc = item.dataset.description || '';
+		const parent = item.dataset.parent || '';
+
+		if (name.includes(term) || desc.includes(term) || parent.includes(term)) {
+			item.style.display = 'block';
+			
+			// Show all parents of the matching item
+			let parentItem = item.parentElement ? item.parentElement.closest('.tree-item') : null;
+			while (parentItem) {
+				parentItem.style.display = 'block';
+				const children = parentItem.querySelector('.item-children');
+				if (children) children.classList.add('show');
+				parentItem = parentItem.parentElement ? parentItem.parentElement.closest('.tree-item') : null;
+			}
+		} else {
+			item.style.display = 'none';
+		}
+	});
+
+	updateItemsCount();
+}
+
+searchInput?.addEventListener('input', performSearch);
+clearBtn?.addEventListener('click', function() {
+	searchInput.value = '';
+	performSearch();
+});
+
+updateItemsCount();
 </script>
 @endsection

@@ -71,26 +71,84 @@ class FacilitatorController extends Controller
         try {
             $validated = $request->validate([
                 'category_name' => 'required|string|max:100|unique:product_categories,category_name',
-                'description' => 'nullable|string'
+                'description' => 'nullable|string',
+                'category_icon' => 'required|file|mimes:png|max:5120', // PNG only, max 5MB
+                'subcategories' => 'required|array|min:1',
+                'subcategories.*.name' => 'required|string|max:100',
+                'subcategories.*.description' => 'nullable|string',
+                'subcategories.*.products' => 'required|array|min:2',
+                'subcategories.*.products.*.name' => 'required|string|max:200',
+                'subcategories.*.products.*.description' => 'nullable|string',
+            ], [
+                'subcategories.required' => 'At least one sub-category is required.',
+                'subcategories.min' => 'At least one sub-category is required.',
+                'subcategories.*.products.required' => 'Each sub-category needs at least 2 product examples.',
+                'subcategories.*.products.min' => 'Each sub-category needs at least 2 product examples.',
             ]);
 
-            // Get the next display order
-            $maxOrder = ProductCategory::max('display_order') ?? 0;
+            return DB::transaction(function () use ($request, $validated) {
+                // Handle icon upload
+                $iconFilename = null;
+                if ($request->hasFile('category_icon')) {
+                    $file = $request->file('category_icon');
+                    $iconFilename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file->getClientOriginalName());
 
-            $category = ProductCategory::create([
-                'category_name' => $validated['category_name'],
-                'description' => $validated['description'] ?? null,
-                'display_order' => $maxOrder + 1,
-                'is_active' => true,
-                'created_at' => now(),
-                'created_by_user_id' => Auth::id()
-            ]);
+                    // Ensure the upload directory exists
+                    $uploadPath = public_path('assets/images/taxonomy-icons');
+                    if (!file_exists($uploadPath)) {
+                        mkdir($uploadPath, 0755, true);
+                    }
 
+                    $file->move($uploadPath, $iconFilename);
+                }
+
+                // Get the next display order
+                $maxOrder = ProductCategory::max('display_order') ?? 0;
+
+                $category = ProductCategory::create([
+                    'category_name' => $validated['category_name'],
+                    'description' => $validated['description'] ?? null,
+                    'icon_filename' => $iconFilename,
+                    'display_order' => $maxOrder + 1,
+                    'is_active' => true,
+                    'created_at' => now(),
+                    'created_by_user_id' => Auth::id()
+                ]);
+
+                // Create Subcategories and Products
+                foreach ($validated['subcategories'] as $subIdx => $subData) {
+                    $subcategory = ProductSubcategory::create([
+                        'category_id' => $category->id,
+                        'subcategory_name' => $subData['name'],
+                        'description' => $subData['description'] ?? null,
+                        'display_order' => $subIdx + 1,
+                        'is_active' => true,
+                        'created_at' => now()
+                    ]);
+
+                    foreach ($subData['products'] as $prodIdx => $prodData) {
+                        ProductExample::create([
+                            'subcategory_id' => $subcategory->id,
+                            'product_name' => $prodData['name'],
+                            'description' => $prodData['description'] ?? null,
+                            'display_order' => $prodIdx + 1,
+                            'is_active' => true,
+                            'created_at' => now()
+                        ]);
+                    }
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Category, sub-categories, and products created successfully!',
+                    'category' => $category
+                ]);
+            });
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
-                'success' => true,
-                'message' => 'Category created successfully!',
-                'category' => $category
-            ]);
+                'success' => false,
+                'message' => 'Validation failed: ' . implode(' ', array_flatten($e->errors()))
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -106,20 +164,50 @@ class FacilitatorController extends Controller
             $validated = $request->validate([
                 'id' => 'required|exists:product_categories,id',
                 'name' => 'required|string|max:100|unique:product_categories,category_name,' . $request->id,
-                'description' => 'nullable|string'
+                'description' => 'nullable|string',
+                'category_icon' => 'nullable|file|mimes:png|max:5120'
             ]);
 
             $category = ProductCategory::find($request->id);
-            $category->update([
+            $data = [
                 'category_name' => $validated['name'],
                 'description' => $validated['description'] ?? null,
                 'updated_at' => now()
-            ]);
+            ];
+
+            // Handle icon upload if provided
+            if ($request->hasFile('category_icon')) {
+                $file = $request->file('category_icon');
+                $iconFilename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file->getClientOriginalName());
+
+                $uploadPath = public_path('assets/images/taxonomy-icons');
+                if (!file_exists($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+
+                // Delete old icon if it exists
+                if ($category->icon_filename) {
+                    $oldPath = $uploadPath . '/' . $category->icon_filename;
+                    if (file_exists($oldPath)) {
+                        @unlink($oldPath);
+                    }
+                }
+
+                $file->move($uploadPath, $iconFilename);
+                $data['icon_filename'] = $iconFilename;
+            }
+
+            $category->update($data);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Category updated successfully!'
             ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed: ' . implode(' ', array_flatten($e->errors()))
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -135,7 +223,13 @@ class FacilitatorController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string|max:100',
                 'description' => 'nullable|string',
-                'categoryId' => 'required|exists:product_categories,id'
+                'categoryId' => 'required|exists:product_categories,id',
+                'products' => 'required|array|min:2',
+                'products.*.name' => 'required|string|max:200',
+                'products.*.description' => 'nullable|string',
+            ], [
+                'products.required' => 'At least 2 product examples are required for a sub-category.',
+                'products.min' => 'At least 2 product examples are required for a sub-category.',
             ]);
 
             // Check for duplicate subcategory name in the same category
@@ -150,23 +244,42 @@ class FacilitatorController extends Controller
                 ], 400);
             }
 
-            // Get the next display order for this category
-            $maxOrder = ProductSubcategory::where('category_id', $validated['categoryId'])->max('display_order') ?? 0;
+            return DB::transaction(function () use ($validated) {
+                // Get the next display order for this category
+                $maxOrder = ProductSubcategory::where('category_id', $validated['categoryId'])->max('display_order') ?? 0;
 
-            $subcategory = ProductSubcategory::create([
-                'category_id' => $validated['categoryId'],
-                'subcategory_name' => $validated['name'],
-                'description' => $validated['description'] ?? null,
-                'display_order' => $maxOrder + 1,
-                'is_active' => true,
-                'created_at' => now()
-            ]);
+                $subcategory = ProductSubcategory::create([
+                    'category_id' => $validated['categoryId'],
+                    'subcategory_name' => $validated['name'],
+                    'description' => $validated['description'] ?? null,
+                    'display_order' => $maxOrder + 1,
+                    'is_active' => true,
+                    'created_at' => now()
+                ]);
 
+                // Create Products
+                foreach ($validated['products'] as $prodIdx => $prodData) {
+                    ProductExample::create([
+                        'subcategory_id' => $subcategory->id,
+                        'product_name' => $prodData['name'],
+                        'description' => $prodData['description'] ?? null,
+                        'display_order' => $prodIdx + 1,
+                        'is_active' => true,
+                        'created_at' => now()
+                    ]);
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Subcategory and product examples created successfully!',
+                    'subcategory' => $subcategory
+                ]);
+            });
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
-                'success' => true,
-                'message' => 'Subcategory created successfully!',
-                'subcategory' => $subcategory
-            ]);
+                'success' => false,
+                'message' => 'Validation failed: ' . implode(' ', array_flatten($e->errors()))
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -1055,20 +1168,45 @@ class FacilitatorController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $user = Auth::user();
-        $facilitator = $user->facilitator;
+        try {
+            $user = Auth::user();
+            $facilitator = $user->facilitator;
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|max:100',
-            'primary_mobile' => 'required|string|max:15',
-            'whatsapp_number' => 'nullable|string|max:15',
-            'assigned_division' => 'required|string|max:100'
-        ]);
+            $validated = $request->validate([
+                'name' => 'required|string|max:100',
+                'email' => 'required|email|max:100',
+                'primary_mobile' => 'required|string|max:15',
+                'whatsapp_number' => 'nullable|string|max:15',
+                'assigned_division' => 'required|string|max:100'
+            ]);
 
-        $facilitator->update($validated);
+            $facilitator->update($validated);
 
-        return redirect()->route('facilitator.profile')->with('success', 'Profile updated successfully!');
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Profile updated successfully!'
+                ]);
+            }
+
+            return redirect()->route('facilitator.profile')->with('success', 'Profile updated successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->validator->errors()->first()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while updating the profile.'
+                ], 500);
+            }
+            return redirect()->back()->with('error', 'An error occurred while updating the profile.');
+        }
     }
 
     public function profilePhoto()
@@ -1079,22 +1217,47 @@ class FacilitatorController extends Controller
 
     public function updatePhoto(Request $request)
     {
-        $request->validate([
-            'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
+        try {
+            $request->validate([
+                'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            ]);
 
-        $user = Auth::user();
+            $user = Auth::user();
 
-        if ($request->hasFile('profile_photo')) {
-            $image = $request->file('profile_photo');
-            $imageName = time() . '_' . $user->id . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/profile_pictures'), $imageName);
+            if ($request->hasFile('profile_photo')) {
+                $image = $request->file('profile_photo');
+                $imageName = time() . '_' . $user->id . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/profile_pictures'), $imageName);
 
-            $user->profile_photo = $imageName;
-            $user->save();
+                $user->profile_photo = $imageName;
+                $user->save();
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Profile photo updated successfully!'
+                ]);
+            }
+
+            return redirect()->route('facilitator.profile.photo')->with('success', 'Profile photo updated successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->validator->errors()->first()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while updating the photo.'
+                ], 500);
+            }
+            return redirect()->back()->with('error', 'An error occurred while updating the photo.');
         }
-
-        return redirect()->route('facilitator.profile.photo')->with('success', 'Profile photo updated successfully!');
     }
 
     public function accountSettings()
@@ -1166,5 +1329,36 @@ class FacilitatorController extends Controller
             ->update(['is_read' => true]);
 
         return response()->json(['success' => true]);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            $request->validate([
+                'new_password' => 'required|min:8',
+            ]);
+
+            // Update password
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password updated successfully!'
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->validator->errors()->first()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the password.'
+            ], 500);
+        }
     }
 }
