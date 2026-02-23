@@ -1,0 +1,211 @@
+.notif-page-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.notif-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.notif-card-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(16, 185, 129, 0.02);
+}
+
+.notif-card-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notif-card-header h2 i {
+    color: var(--primary-green);
+}
+
+.notif-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-mark-all {
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-mark-all:hover {
+    background: var(--dark-green);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.notif-list-full {
+    display: flex;
+    flex-direction: column;
+}
+
+.notif-full-item {
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.05);
+    display: flex;
+    gap: 20px;
+    transition: var(--transition);
+    position: relative;
+}
+
+.notif-full-item:last-child {
+    border-bottom: none;
+}
+
+.notif-full-item:hover {
+    background: rgba(16, 185, 129, 0.02);
+}
+
+.notif-full-item.unread {
+    background: rgba(16, 185, 129, 0.04);
+}
+
+.notif-full-item.unread::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: var(--primary-green);
+}
+
+.notif-full-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.notif-full-icon.admin-alert {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.notif-full-icon.info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.notif-full-body {
+    flex: 1;
+}
+
+.notif-full-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 5px;
+}
+
+.notif-full-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.notif-full-time {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.notif-full-message {
+    color: #4b5563;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.notif-full-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-mark-single {
+    background: none;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--primary-green);
+    padding: 4px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-mark-single:hover {
+    background: var(--primary-green);
+    color: white;
+    border-color: var(--primary-green);
+}
+
+.notif-empty-state {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.notif-empty-state i {
+    font-size: 4rem;
+    color: #e5e7eb;
+    margin-bottom: 20px;
+}
+
+.notif-empty-state h3 {
+    font-size: 1.25rem;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.notif-empty-state p {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .notif-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .btn-mark-all {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .notif-full-title-row {
+        flex-direction: column;
+        gap: 2px;
+    }
+}

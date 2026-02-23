@@ -12,8 +12,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         .notif-meta { margin-top: 5px; display: flex; justify-content: space-between; align-items: center; }
-        .mark-single-read { background: none; border: none; color: #10B981; cursor: pointer; padding: 2px 5px; border-radius: 4px; transition: all 0.2s; }
-        .mark-single-read:hover { background: #ecfdf5; color: #059669; transform: scale(1.1); }
+        .mark-single-read { background: none; border: none; color: #10B981; cursor: pointer; padding: 2px 5px; border-radius: 4px; transition: all 0.2s; font-size: 0.75rem; font-weight: 500; }
+        .mark-single-read:hover { background: #ecfdf5; color: #059669; text-decoration: underline; }
+        .notif-item.read { opacity: 0.6; background-color: #f9fafb; }
+        .read-status { font-size: 0.75rem; color: #6b7280; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -40,13 +42,13 @@
 
                 <li>
                     <a href="{{ route('facilitator.taxonomy') }}" class="menu-link {{ request()->routeIs('facilitator.taxonomy') ? 'active' : '' }}">
-                        <i class="fa-solid fa-layer-group"></i><span>Taxonomy / Categories</span>
+                        <i class="fa-solid fa-layer-group"></i><span> Categories</span>
                     </a>
                 </li>
 
                 <li>
                     <a href="{{ route('facilitator.unit-of-measures') }}" class="menu-link {{ request()->routeIs('facilitator.unit-of-measures') ? 'active' : '' }}">
-                        <i class="fa-solid fa-ruler-combined"></i><span>Standards / Unit of Measures</span>
+                        <i class="fa-solid fa-ruler-combined"></i><span> Unit of Measures</span>
                     </a>
                 </li>
 
@@ -135,7 +137,7 @@
                         <div class="notif-list">
                             @if(isset($recentActivities) && count($recentActivities) > 0)
                                 @foreach($recentActivities as $notification)
-                                <div class="notif-item" data-id="{{ $notification->id }}">
+                                <div class="notif-item {{ $notification->is_read ? 'read' : '' }}" data-id="{{ $notification->id }}">
                                     <div class="notif-icon">
                                         @if($notification->notification_type == 'admin_alert')
                                             <i class="fa-solid fa-triangle-exclamation text-warning"></i>
@@ -148,9 +150,13 @@
                                         <div class="notif-msg">{{ Str::limit($notification->message, 80) }}</div>
                                         <div class="notif-meta">
                                             <small class="notif-time">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</small>
-                                            <button class="mark-single-read" data-id="{{ $notification->id }}" title="Mark as read">
-                                                <i class="fa-solid fa-check"></i>
-                                            </button>
+                                            @if($notification->is_read)
+                                                <span class="read-status">Read</span>
+                                            @else
+                                                <button class="mark-single-read" data-id="{{ $notification->id }}">
+                                                    Mark as read
+                                                </button>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -318,7 +324,8 @@
                             position: 'top-end'
                         });
                         
-                        $('.notif-item').css('opacity', '0.6');
+                        $('.notif-item').addClass('read');
+                        $('.mark-single-read').replaceWith('<span class="read-status">Read</span>');
                         $('#notifDropdown').removeClass('show');
                     }
                 })
@@ -358,12 +365,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    notifItem.css({
-                        'transition': 'all 0.3s ease',
-                        'opacity': '0.4',
-                        'background-color': '#f9fafb'
-                    });
-                    btn.fadeOut();
+                    notifItem.addClass('read');
+                    btn.replaceWith('<span class="read-status">Read</span>');
 
                     // Check if there are any unread notifications left in the list
                     // (This is an approximation since we only show 5 in dropdown)

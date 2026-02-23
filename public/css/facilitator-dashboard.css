@@ -549,7 +549,7 @@
     }
 
     .quick-actions-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
     }
 
     .quick-action-card {
@@ -635,7 +635,7 @@
     }
 
     .stat-cards-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .stat-card {
