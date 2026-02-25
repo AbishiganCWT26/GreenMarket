@@ -51,7 +51,7 @@ class FarmerController extends Controller
                 ->whereIn('order_status', ['paid', 'ready_for_pickup'])
                 ->count(),
             'openComplaints' => Complaint::where('complainant_user_id', $user->id)
-                ->whereIn('status', ['new', 'in_progress'])
+                ->where('status', 'new')
                 ->count()
         ];
     }
@@ -976,12 +976,26 @@ class FarmerController extends Controller
             ->paginate(10);
 
         $openComplaints = Complaint::where('complainant_user_id', $user->id)
-            ->whereIn('status', ['new', 'in_progress'])
+            ->where('status', 'new')
+            ->count();
+
+        $inProgressComplaints = Complaint::where('complainant_user_id', $user->id)
+            ->where('status', 'in_progress')
+            ->count();
+
+        $resolvedComplaints = Complaint::where('complainant_user_id', $user->id)
+            ->where('status', 'resolved')
             ->count();
 
         $totalComplaints = $complaints->total();
 
-        return view('farmer.complaints.list', compact('complaints', 'openComplaints', 'totalComplaints'));
+        return view('farmer.complaints.list', compact(
+            'complaints', 
+            'openComplaints', 
+            'inProgressComplaints', 
+            'resolvedComplaints', 
+            'totalComplaints'
+        ));
     }
 
     public function viewComplaint($id)

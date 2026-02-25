@@ -44,4 +44,19 @@ class Complaint extends Model
     {
         return $this->belongsTo(User::class, 'resolved_by_facilitator_id');
     }
+
+    public function againstUserInfo()
+    {
+        return $this->againstUser();
+    }
+
+    public function relatedOrder()
+    {
+        return $this->order();
+    }
+
+    public function resolvedByFacilitator()
+    {
+        return $this->resolvedBy();
+    }
 }
