@@ -4,7 +4,7 @@
 @section('page-title', 'Payment Settings')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/farmer/payment.css') }}">
+<link rel="stylesheet" href="{{ asset('css/farmer/Payment.css') }}">
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 @endsection
 
