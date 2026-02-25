@@ -266,6 +266,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="editGradeForm">
+                @csrf
+                @method('PUT')
                 <div class="modal-body">
                     <input type="hidden" id="edit_grade_id" name="id">
                     <div class="mb-3">

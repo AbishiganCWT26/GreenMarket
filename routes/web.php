@@ -325,8 +325,8 @@ Route::prefix('facilitator')
     // Store new unit
     Route::post('/unit-of-measures/store', [FacilitatorController::class, 'storeUnitOfMeasure'])->name('facilitator.unit-of-measures.store');
 
-    // Update unit - using POST with method override for PUT
-    Route::post('/unit-of-measures/{id}/update', [FacilitatorController::class, 'updateUnitOfMeasure'])->name('facilitator.unit-of-measures.update');
+    // Update unit - using PUT with method override for PUT in frontend
+    Route::put('/unit-of-measures/{id}/update', [FacilitatorController::class, 'updateUnitOfMeasure'])->name('facilitator.unit-of-measures.update');
 
     // Deactivate/Activate routes (kept for reference but not used in UI)
     Route::post('/unit-of-measures/{id}/deactivate', [FacilitatorController::class, 'deactivateUnitOfMeasure'])->name('facilitator.unit-of-measures.deactivate');
@@ -335,7 +335,7 @@ Route::prefix('facilitator')
     // Quality Grades Routes
     Route::get('/quality-grades', [FacilitatorController::class, 'qualityGrades'])->name('facilitator.quality-grades');
     Route::post('/quality-grades/store', [FacilitatorController::class, 'storeQualityGrade'])->name('facilitator.quality-grades.store');
-    Route::post('/quality-grades/{id}/update', [FacilitatorController::class, 'updateQualityGrade'])->name('facilitator.quality-grades.update');
+    Route::put('/quality-grades/{id}/update', [FacilitatorController::class, 'updateQualityGrade'])->name('facilitator.quality-grades.update');
     Route::post('/quality-grades/{id}/activate', [FacilitatorController::class, 'activateQualityGrade'])->name('facilitator.quality-grades.activate');
 
     // User Management

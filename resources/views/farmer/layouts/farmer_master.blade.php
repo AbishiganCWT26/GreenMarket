@@ -49,14 +49,6 @@
                     </a>
                 </li>
 
-                @if(Auth::user()->farmer && Auth::user()->farmer->lead_farmer_id)
-                <li>
-                    <a href="{{ route('farmer.products.add') }}" class="menu-link {{ request()->routeIs('farmer.products.add') ? 'active' : '' }}">
-                        <i class="fa-solid fa-plus-circle"></i><span>Add Product Directly</span>
-                    </a>
-                </li>
-                @endif
-
                 <li class="menu-heading">ORDERS</li>
 
                 <li>

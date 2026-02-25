@@ -9,84 +9,132 @@
 @endsection
 
 @section('content')
-<div class="uom-app">
-	<div class="uom-bar">
-		<div class="bar-section">
-			<h2 class="bar-title">
-				<i class="fas fa-ruler"></i>
-				Units
-			</h2>
-			<span class="bar-count">{{ $units->count() }}</span>
+<div class="unit-dashboard">
+	<div class="unit-header">
+		<div class="header-info">
+			<div class="header-icon">
+				<i class="fas fa-scale-balanced"></i>
+			</div>
+			<div class="header-text">
+				<h2 class="header-title">Unit of Measures</h2>
+				<p class="header-subtitle">Manage measurement standards</p>
+			</div>
 		</div>
-		<div class="bar-section">
-			<button class="btn-add" data-bs-toggle="modal" data-bs-target="#addUomModal">
+		<div class="header-actions">
+			<button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addUomModal">
 				<i class="fas fa-plus"></i>
+				<span>New Unit</span>
 			</button>
 		</div>
 	</div>
 
-	<div class="uom-search">
-		<i class="fas fa-search search-icon"></i>
-		<input type="text" id="uomSearch" class="search-field" placeholder="Search units...">
-		<button class="search-clear" id="clearSearch">
-			<i class="fas fa-times"></i>
-		</button>
+	<div class="unit-stats">
+		<div class="stat-item">
+			<div class="stat-value">{{ $units->count() }}</div>
+			<div class="stat-label">Total Units</div>
+		</div>
+		<div class="stat-item">
+			<div class="stat-value">{{ $units->where('is_active', true)->count() }}</div>
+			<div class="stat-label">Active</div>
+		</div>
+		<div class="stat-item">
+			<div class="stat-value">{{ $units->max('display_order') ?? 0 }}</div>
+			<div class="stat-label">Max Order</div>
+		</div>
 	</div>
 
-	<div class="uom-grid" id="uomGrid">
+	<div class="unit-search-section">
+		<div class="search-wrapper">
+			<i class="fas fa-search search-icon"></i>
+			<input type="text" id="uomSearch" class="search-input" placeholder="Search by name or description...">
+			<button class="search-clear" id="clearSearch">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+	</div>
+
+	<div class="unit-grid" id="uomGrid">
 		@forelse($units as $unit)
-		<div class="grid-unit" data-id="{{ $unit->id }}" data-name="{{ strtolower($unit->standard_value) }}" data-desc="{{ strtolower($unit->description ?? '') }}">
-			<div class="unit-head">
-				<div class="unit-badge"></div>
-				<button class="unit-edit" onclick="editUnit({{ $unit->id }}, '{{ addslashes($unit->standard_value) }}', '{{ addslashes($unit->description) }}', {{ $unit->display_order }})">
-					<i class="fas fa-pen"></i>
-				</button>
-			</div>
-			<div class="unit-body">
-				<h3 class="unit-name">{{ $unit->standard_value }}</h3>
-				<p class="unit-desc">{{ Str::limit($unit->description, 30) ?? '—' }}</p>
-				<div class="unit-meta">
-					<span><i class="fas fa-sort"></i> {{ $unit->display_order }}</span>
-					<span><i class="fas fa-calendar"></i> {{ \Carbon\Carbon::parse($unit->created_at)->format('d/m/y') }}</span>
+		<div class="unit-card" data-id="{{ $unit->id }}" data-name="{{ strtolower($unit->standard_value) }}" data-desc="{{ strtolower($unit->description ?? '') }}">
+			<div class="card-header">
+				<div class="card-icon">
+					<i class="fas fa-weight-hanging"></i>
 				</div>
+				<div class="card-status">
+					<span class="status-dot"></span>
+					<span class="status-text">Active</span>
+				</div>
+			</div>
+			<div class="card-body">
+				<h3 class="card-title">{{ $unit->standard_value }}</h3>
+				<p class="card-desc">{{ $unit->description ? Str::limit($unit->description, 40) : 'No description' }}</p>
+				<div class="card-meta">
+					<div class="meta-item">
+						<i class="fas fa-sort-numeric-up"></i>
+						<span>Order {{ $unit->display_order }}</span>
+					</div>
+					<div class="meta-item">
+						<i class="fas fa-calendar-alt"></i>
+						<span>{{ \Carbon\Carbon::parse($unit->created_at)->format('d M, Y') }}</span>
+					</div>
+				</div>
+			</div>
+			<div class="card-footer">
+				<button class="btn-edit" onclick="editUnit({{ $unit->id }}, '{{ addslashes($unit->standard_value) }}', '{{ addslashes($unit->description) }}', {{ $unit->display_order }})">
+					<i class="fas fa-pen"></i>
+					<span>Edit</span>
+				</button>
 			</div>
 		</div>
 		@empty
-		<div class="empty-box">
-			<i class="fas fa-ruler"></i>
-			<p>No units</p>
-			<button class="btn-add sm" data-bs-toggle="modal" data-bs-target="#addUomModal">Add</button>
+		<div class="empty-state">
+			<div class="empty-icon">
+				<i class="fas fa-ruler"></i>
+			</div>
+			<h3 class="empty-title">No Units Found</h3>
+			<p class="empty-desc">Get started by creating your first unit of measure</p>
+			<button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addUomModal">
+				<i class="fas fa-plus"></i>
+				Create Unit
+			</button>
 		</div>
 		@endforelse
 	</div>
 
-	<div class="uom-pager" id="pagination"></div>
+	<div class="unit-pagination" id="pagination"></div>
 </div>
 
 <!-- Add Modal -->
 <div class="modal fade" id="addUomModal" tabindex="-1">
-	<div class="modal-dialog modal-sm modal-dialog-centered">
+	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
-			<div class="modal-head">
-				<h5 class="modal-heading">New Unit</h5>
-				<button type="button" class="modal-close" data-bs-dismiss="modal"><i class="fas fa-times"></i></button>
+			<div class="modal-header">
+				<h5 class="modal-title">
+					<i class="fas fa-plus-circle"></i>
+					Add New Unit
+				</h5>
+				<button type="button" class="modal-close" data-bs-dismiss="modal">
+					<i class="fas fa-times"></i>
+				</button>
 			</div>
 			<form id="addUomForm" action="{{ route('facilitator.unit-of-measures.store') }}" method="POST">
 				@csrf
 				<div class="modal-body">
-					<div class="field">
-						<label class="field-label">Name <span class="required">*</span></label>
-						<input type="text" class="field-input" name="standard_value" required placeholder="e.g., kg">
+					<div class="form-group">
+						<label class="form-label">
+							Unit Name <span class="required">*</span>
+						</label>
+						<input type="text" class="form-control" name="standard_value" required placeholder="e.g., Kilogram, Liter">
 					</div>
-					<div class="field">
-						<label class="field-label">Description</label>
-						<textarea class="field-input" name="description" rows="2" placeholder="Optional"></textarea>
+					<div class="form-group">
+						<label class="form-label">Description</label>
+						<textarea class="form-control" name="description" rows="2" placeholder="Optional description"></textarea>
 					</div>
 					<input type="hidden" name="standard_type" value="unit_of_measure">
 				</div>
-				<div class="modal-foot">
+				<div class="modal-footer">
 					<button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
-					<button type="submit" class="btn-save">Save</button>
+					<button type="submit" class="btn-save">Create Unit</button>
 				</div>
 			</form>
 		</div>
@@ -95,33 +143,40 @@
 
 <!-- Edit Modal -->
 <div class="modal fade" id="editUomModal" tabindex="-1">
-	<div class="modal-dialog modal-sm modal-dialog-centered">
+	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
-			<div class="modal-head">
-				<h5 class="modal-heading">Edit Unit</h5>
-				<button type="button" class="modal-close" data-bs-dismiss="modal"><i class="fas fa-times"></i></button>
+			<div class="modal-header">
+				<h5 class="modal-title">
+					<i class="fas fa-edit"></i>
+					Edit Unit
+				</h5>
+				<button type="button" class="modal-close" data-bs-dismiss="modal">
+					<i class="fas fa-times"></i>
+				</button>
 			</div>
 			<form id="editUomForm" method="POST">
 				@csrf
 				@method('PUT')
 				<div class="modal-body">
 					<input type="hidden" name="id" id="edit_id">
-					<div class="field">
-						<label class="field-label">Name <span class="required">*</span></label>
-						<input type="text" class="field-input" name="standard_value" id="edit_standard_value" required>
+					<div class="form-group">
+						<label class="form-label">
+							Unit Name <span class="required">*</span>
+						</label>
+						<input type="text" class="form-control" name="standard_value" id="edit_standard_value" required>
 					</div>
-					<div class="field">
-						<label class="field-label">Description</label>
-						<textarea class="field-input" name="description" id="edit_description" rows="2"></textarea>
+					<div class="form-group">
+						<label class="form-label">Description</label>
+						<textarea class="form-control" name="description" id="edit_description" rows="2"></textarea>
 					</div>
-					<div class="field">
-						<label class="field-label">Order</label>
-						<input type="number" class="field-input" name="display_order" id="edit_display_order" min="1">
+					<div class="form-group">
+						<label class="form-label">Display Order</label>
+						<input type="number" class="form-control" name="display_order" id="edit_display_order" min="1">
 					</div>
 				</div>
-				<div class="modal-foot">
+				<div class="modal-footer">
 					<button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
-					<button type="submit" class="btn-save">Update</button>
+					<button type="submit" class="btn-save">Update Unit</button>
 				</div>
 			</form>
 		</div>
@@ -129,15 +184,15 @@
 </div>
 
 <!-- Loader -->
-<div class="loader" id="loadingOverlay">
-	<div class="spinner"></div>
+<div class="loader-overlay" id="loadingOverlay">
+	<div class="loader-spinner"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 let currentPage = 1;
-let perPage = 12;
-let items = [];
+let itemsPerPage = 12;
+let allItems = [];
 let filteredItems = [];
 
 function showLoader() {
@@ -151,21 +206,24 @@ function hideLoader() {
 function showSuccess(msg) {
 	Swal.fire({
 		icon: 'success',
+		title: 'Success',
 		text: msg,
+		confirmButtonColor: '#10B981',
+		timer: 1500,
 		showConfirmButton: false,
-		timer: 1200,
-		width: '280px',
-		padding: '1em'
+		background: '#ffffff',
+		color: '#0f1724'
 	});
 }
 
 function showError(msg) {
 	Swal.fire({
 		icon: 'error',
+		title: 'Error',
 		text: msg,
 		confirmButtonColor: '#10B981',
-		width: '280px',
-		padding: '1em'
+		background: '#ffffff',
+		color: '#0f1724'
 	});
 }
 
@@ -178,19 +236,20 @@ function editUnit(id, name, desc, order) {
 	new bootstrap.Modal(document.getElementById('editUomModal')).show();
 }
 
-function getPerPage() {
-	const w = window.innerWidth;
-	if (w >= 1500) return 16;
-	if (w >= 1200) return 16;
-	if (w >= 992) return 8;
-	if (w >= 768) return 8;
-	if (w >= 576) return 4;
-	return 4;
+function getItemsPerPage() {
+	const width = window.innerWidth;
+	if (width >= 2560) return 20;
+	if (width >= 1500) return 18;
+	if (width >= 1200) return 16;
+	if (width >= 992) return 12;
+	if (width >= 768) return 10;
+	if (width >= 576) return 8;
+	return 6;
 }
 
 function renderPagination() {
-	const total = (filteredItems.length || items.length);
-	const pages = Math.ceil(total / perPage);
+	const total = filteredItems.length || allItems.length;
+	const pages = Math.ceil(total / itemsPerPage);
 	const pager = document.getElementById('pagination');
 	
 	if (pages <= 1) {
@@ -198,37 +257,37 @@ function renderPagination() {
 		return;
 	}
 
-	let html = '<div class="pager-list">';
+	let html = '<div class="pagination">';
 	
 	if (currentPage > 1) {
-		html += `<button class="pager-btn" onclick="goToPage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
+		html += `<button class="page-btn prev" onclick="changePage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
 	}
 	
 	for (let i = 1; i <= pages; i++) {
 		if (i === 1 || i === pages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-			html += `<button class="pager-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+			html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
 		} else if (i === currentPage - 2 || i === currentPage + 2) {
-			html += '<span class="pager-dots">...</span>';
+			html += '<span class="page-dots">...</span>';
 		}
 	}
 	
 	if (currentPage < pages) {
-		html += `<button class="pager-btn" onclick="goToPage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
+		html += `<button class="page-btn next" onclick="changePage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
 	}
 	
 	html += '</div>';
 	pager.innerHTML = html;
 }
 
-function goToPage(page) {
+function changePage(page) {
 	currentPage = page;
 	renderItems();
 }
 
 function renderItems() {
-	const start = (currentPage - 1) * perPage;
-	const end = start + perPage;
-	const data = filteredItems.length ? filteredItems : items;
+	const start = (currentPage - 1) * itemsPerPage;
+	const end = start + itemsPerPage;
+	const data = filteredItems.length ? filteredItems : allItems;
 	const pageItems = data.slice(start, end);
 	const grid = document.getElementById('uomGrid');
 	
@@ -236,9 +295,12 @@ function renderItems() {
 
 	if (pageItems.length === 0) {
 		grid.innerHTML = `
-			<div class="empty-box">
-				<i class="fas fa-ruler"></i>
-				<p>No results</p>
+			<div class="empty-state">
+				<div class="empty-icon">
+					<i class="fas fa-ruler"></i>
+				</div>
+				<h3 class="empty-title">No Results Found</h3>
+				<p class="empty-desc">Try adjusting your search criteria</p>
 			</div>
 		`;
 		document.getElementById('pagination').innerHTML = '';
@@ -246,58 +308,73 @@ function renderItems() {
 	}
 
 	pageItems.forEach(item => {
-		const div = document.createElement('div');
-		div.className = 'grid-unit';
-		div.dataset.id = item.id;
-		div.dataset.name = item.name;
-		div.dataset.desc = item.desc;
+		const card = document.createElement('div');
+		card.className = 'unit-card';
+		card.dataset.id = item.id;
+		card.dataset.name = item.name;
+		card.dataset.desc = item.desc;
 
 		const date = new Date(item.created_at).toLocaleDateString('en-GB', { 
 			day: '2-digit', 
-			month: '2-digit', 
-			year: '2-digit' 
+			month: 'short', 
+			year: 'numeric' 
 		});
 
-		div.innerHTML = `
-			<div class="unit-head">
-				<div class="unit-badge"></div>
-				<button class="unit-edit" onclick="editUnit(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${(item.desc || '').replace(/'/g, "\\'")}', ${item.order})">
-					<i class="fas fa-pen"></i>
-				</button>
-			</div>
-			<div class="unit-body">
-				<h3 class="unit-name">${item.name}</h3>
-				<p class="unit-desc">${item.desc ? (item.desc.length > 30 ? item.desc.substring(0,30)+'...' : item.desc) : '—'}</p>
-				<div class="unit-meta">
-					<span><i class="fas fa-sort"></i> ${item.order}</span>
-					<span><i class="fas fa-calendar"></i> ${date}</span>
+		card.innerHTML = `
+			<div class="card-header">
+				<div class="card-icon">
+					<i class="fas fa-weight-hanging"></i>
+				</div>
+				<div class="card-status">
+					<span class="status-dot"></span>
+					<span class="status-text">Active</span>
 				</div>
 			</div>
+			<div class="card-body">
+				<h3 class="card-title">${item.name}</h3>
+				<p class="card-desc">${item.desc ? (item.desc.length > 40 ? item.desc.substring(0,40)+'...' : item.desc) : 'No description'}</p>
+				<div class="card-meta">
+					<div class="meta-item">
+						<i class="fas fa-sort-numeric-up"></i>
+						<span>Order ${item.order}</span>
+					</div>
+					<div class="meta-item">
+						<i class="fas fa-calendar-alt"></i>
+						<span>${date}</span>
+					</div>
+				</div>
+			</div>
+			<div class="card-footer">
+				<button class="btn-edit" onclick="editUnit(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${(item.desc || '').replace(/'/g, "\\'")}', ${item.order})">
+					<i class="fas fa-pen"></i>
+					<span>Edit</span>
+				</button>
+			</div>
 		`;
-		grid.appendChild(div);
+		grid.appendChild(card);
 	});
 
 	renderPagination();
 }
 
 function loadItems() {
-	const cards = document.querySelectorAll('.grid-unit');
-	items = Array.from(cards).map(card => ({
+	const cards = document.querySelectorAll('.unit-card');
+	allItems = Array.from(cards).map(card => ({
 		id: card.dataset.id,
 		name: card.dataset.name,
 		desc: card.dataset.desc,
-		order: card.querySelector('.unit-meta span:first-child').textContent.replace('Order:', '').trim(),
-		created_at: card.querySelector('.unit-meta span:last-child').textContent
+		order: card.querySelector('.meta-item:first-child span').textContent.replace('Order', '').trim(),
+		created_at: card.querySelector('.meta-item:last-child span').textContent
 	}));
-	perPage = getPerPage();
+	itemsPerPage = getItemsPerPage();
 	renderItems();
 }
 
-const search = document.getElementById('uomSearch');
-const clear = document.getElementById('clearSearch');
+const searchInput = document.getElementById('uomSearch');
+const clearBtn = document.getElementById('clearSearch');
 
-function doSearch() {
-	const term = search.value.toLowerCase().trim();
+function performSearch() {
+	const term = searchInput.value.toLowerCase().trim();
 	
 	if (!term) {
 		filteredItems = [];
@@ -306,7 +383,7 @@ function doSearch() {
 		return;
 	}
 
-	filteredItems = items.filter(item => 
+	filteredItems = allItems.filter(item => 
 		item.name.includes(term) || 
 		(item.desc && item.desc.includes(term))
 	);
@@ -314,18 +391,18 @@ function doSearch() {
 	renderItems();
 }
 
-search?.addEventListener('input', doSearch);
-clear?.addEventListener('click', () => {
-	search.value = '';
+searchInput?.addEventListener('input', performSearch);
+clearBtn?.addEventListener('click', () => {
+	searchInput.value = '';
 	filteredItems = [];
 	currentPage = 1;
 	renderItems();
 });
 
 window.addEventListener('resize', () => {
-	const newPerPage = getPerPage();
-	if (newPerPage !== perPage) {
-		perPage = newPerPage;
+	const newItemsPerPage = getItemsPerPage();
+	if (newItemsPerPage !== itemsPerPage) {
+		itemsPerPage = newItemsPerPage;
 		currentPage = 1;
 		renderItems();
 	}
@@ -352,14 +429,14 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (data.success) {
 				showSuccess(data.message);
 				bootstrap.Modal.getInstance(document.getElementById('addUomModal')).hide();
-				setTimeout(() => location.reload(), 1200);
+				setTimeout(() => location.reload(), 1500);
 			} else {
-				showError(data.message || 'Failed');
+				showError(data.message || 'Failed to add unit');
 			}
 		})
 		.catch(() => {
 			hideLoader();
-			showError('Error');
+			showError('An error occurred');
 		});
 	});
 
@@ -382,14 +459,14 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (data.success) {
 				showSuccess(data.message);
 				bootstrap.Modal.getInstance(document.getElementById('editUomModal')).hide();
-				setTimeout(() => location.reload(), 1200);
+				setTimeout(() => location.reload(), 1500);
 			} else {
-				showError(data.message || 'Failed');
+				showError(data.message || 'Failed to update unit');
 			}
 		})
 		.catch(() => {
 			hideLoader();
-			showError('Error');
+			showError('An error occurred');
 		});
 	});
 });
