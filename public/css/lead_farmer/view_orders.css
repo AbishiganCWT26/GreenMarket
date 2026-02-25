@@ -330,12 +330,12 @@
 }
 
 .btn-primary {
-    background: var(--primary-accent);
+    background: var(--primary-green);
     color: white;
 }
 
 .btn-primary:hover {
-    background: var(--primary-dark);
+    background: var(--dark-green);
     transform: translateY(-1px);
 }
 
