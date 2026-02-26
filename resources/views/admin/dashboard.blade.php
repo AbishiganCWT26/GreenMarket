@@ -116,6 +116,10 @@
             </tbody>
         </table>
     </div>
+    
+    <div class="pagination-wrapper mt-3">
+        {{ $groups->appends(['complaints_page' => request('complaints_page')])->links('vendor.pagination.compact') }}
+    </div>
 </div>
 
 <div class="table-container">
@@ -168,6 +172,10 @@
                 @endif
             </tbody>
         </table>
+    </div>
+    
+    <div class="pagination-wrapper mt-3">
+        {{ $complaints->appends(['groups_page' => request('groups_page')])->links('vendor.pagination.compact') }}
     </div>
 </div>
 @endsection

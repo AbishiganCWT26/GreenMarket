@@ -511,6 +511,7 @@ Route::prefix('admin')
 	Route::post('/complaints/{id}/update-status', [ComplaintController::class, 'updateStatus'])->name('complaints.updateStatus');
 	Route::post('/complaints/bulk-update-status', [ComplaintController::class, 'bulkUpdateStatus'])->name('complaints.bulkUpdateStatus');
 	Route::get('/complaints/{id}/details', [ComplaintController::class, 'getComplaintDetails'])->name('complaints.details');
+	Route::post('/complaints/alert', [ComplaintController::class, 'alert'])->name('complaints.alert');
 });
 
 /*

@@ -92,6 +92,32 @@
 							<i class="fas fa-chevron-down"></i>
 						</div>
 					</div>
+
+					<div class="form-group full">
+						<label class="form-label">
+							<i class="fas fa-user-shield"></i>
+							Complaint Against
+						</label>
+						<div class="recipient-selection">
+							@if($leadFarmerUser)
+								<label class="recipient-card">
+									<input type="checkbox" name="against_user_id" value="{{ $leadFarmerUser->id }}">
+									<div class="recipient-content">
+										<div class="recipient-info">
+											<span class="recipient-name">{{ $leadFarmerUser->name }}</span>
+											<span class="recipient-role">Your Lead Farmer</span>
+										</div>
+										<i class="fas fa-check-circle"></i>
+									</div>
+								</label>
+							@else
+								<div class="no-recipient">
+									<i class="fas fa-info-circle"></i>
+									<span>No lead farmer assigned to your profile.</span>
+								</div>
+							@endif
+						</div>
+					</div>
 				</div>
 			</div>
 

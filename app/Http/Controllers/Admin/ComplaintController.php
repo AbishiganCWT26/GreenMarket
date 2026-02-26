@@ -42,9 +42,16 @@ class ComplaintController extends Controller
             });
         }
 
-        $complaints = $query->paginate(10);
+        $complaints = $query->paginate(4);
 
-        return view('admin.complaints.index', compact('complaints'));
+        // Fetch facilitators for the alert feature
+        $facilitatorsList = DB::table('facilitators')
+            ->join('users', 'facilitators.user_id', '=', 'users.id')
+            ->where('users.is_active', true)
+            ->select('facilitators.user_id', 'facilitators.name', 'facilitators.assigned_division')
+            ->get();
+
+        return view('admin.complaints.index', compact('complaints', 'facilitatorsList'));
     }
 
     public function alert(Request $request)
@@ -60,12 +67,14 @@ class ComplaintController extends Controller
 
             // Create notification for the facilitator
             \App\Models\Notification::create([
-                'user_id' => $facilitatorId, // The selected facilitator
-                'type' => 'complaint_alert', // You might want to add this type to your system
+                'user_id' => $facilitatorId,
+                'recipient_type' => 'user',
+                'recipient_address' => null,
+                'notification_type' => 'admin_alert',
                 'title' => 'New Complaint Alert',
                 'message' => "You have been alerted regarding complaint #{$complaint->id}. Please review it.",
                 'is_read' => false,
-                'link' => route('facilitator.complaints') // Assuming this route exists for them to view complaints
+                'related_id' => $complaint->id
             ]);
             
             return response()->json([
@@ -74,6 +83,10 @@ class ComplaintController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            \Log::error('Facilitator Alert failed: ' . $e->getMessage(), [
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to alert facilitator: ' . $e->getMessage()

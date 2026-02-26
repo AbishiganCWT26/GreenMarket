@@ -40,8 +40,7 @@ class DashboardComposer
             )
             ->groupBy('lead_farmers.id', 'lead_farmers.group_name')
             ->orderBy('total_sales', 'DESC')
-            ->limit(10)
-            ->get();
+            ->paginate(5, ['*'], 'groups_page');
 
         // RECENT COMPLAINTS
         $complaints = DB::table('complaints')
@@ -53,8 +52,7 @@ class DashboardComposer
                 'against.username as against_name'
             )
             ->orderBy('complaints.created_at', 'desc')
-            ->limit(20)
-            ->get();
+            ->paginate(5, ['*'], 'complaints_page');
 
         // FACILITATORS LIST FOR DROPDOWN
         $facilitatorsList = DB::table('facilitators')

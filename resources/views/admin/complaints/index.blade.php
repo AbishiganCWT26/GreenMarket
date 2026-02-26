@@ -1,1385 +1,1060 @@
 @extends('admin.layouts.admin_master')
 
-@section('title', 'User Complaints')
-@section('page-title', 'User Complaints Management')
+@section('title', 'Complaints Management')
+@section('page-title', 'Complaints Dashboard')
+
 @section('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<style>
-:root {
-	--primary-green: #10B981;
-	--dark-green: #059669;
-	--body-bg: #f6f8fa;
-	--card-bg: #ffffff;
-	--text-color: #0f1724;
-	--muted: #6b7280;
-	--accent-amber: #f59e0b;
-	--blue: #3b82f6;
-	--purple: #8b5cf6;
-	--yellow: #f59e0b;
-	--shadow-sm: 0 1px 3px rgba(15,23,36,0.04);
-	--shadow-md: 0 7px 15px rgba(15,23,36,0.08);
-}
-
-.complaints-container {
-    padding: 25px;
-    background: var(--body-bg);
-    min-height: calc(100vh - 80px);
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.header-section h1 {
-    font-size: 28px;
-    color: var(--text-color);
-    margin: 0;
-    font-weight: 700;
-}
-
-.header-section h1 i {
-    color: var(--primary-green);
-    margin-right: 12px;
-}
-
-.controls-section {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-.bulk-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.filter-section {
-    background: linear-gradient(135deg, var(--card-bg) 0%, #f8fafc 100%);
-    border-radius: 16px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: var(--shadow-md);
-    border: 1px solid #e5e7eb;
-    position: relative;
-    overflow: hidden;
-}
-
-.filter-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(to bottom, var(--primary-green), var(--dark-green));
-}
-
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.filter-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-color);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.filter-title i {
-    color: var(--primary-green);
-}
-
-.filter-controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.filter-item {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.filter-item label {
-    font-size: 13px;
-    color: var(--muted);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.filter-item select, .filter-item input {
-    padding: 12px 15px;
-    border: 2px solid #e5e7eb;
-    border-radius: 10px;
-    font-size: 14px;
-    background: white;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 100%;
-}
-
-.filter-item select:focus, .filter-item input:focus {
-    outline: none;
-    border-color: var(--primary-green);
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
-    transform: translateY(-2px);
-}
-
-.filter-item select:hover, .filter-item input:hover {
-    border-color: #cbd5e1;
-}
-
-.filter-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    grid-column: 1 / -1;
-}
-
-.filter-btn {
-    padding: 10px 20px;
-    background: var(--primary-green);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.filter-btn:hover {
-    background: var(--dark-green);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-.clear-btn {
-    padding: 10px 20px;
-    background: #f1f5f9;
-    color: var(--muted);
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.clear-btn:hover {
-    background: #e5e7eb;
-    transform: translateY(-2px);
-}
-
-.complaints-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
-    margin-top: 20px;
-}
-
-.complaint-card {
-    background: var(--card-bg);
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid transparent;
-    position: relative;
-    overflow: hidden;
-    animation: slideUp 0.6s ease;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.complaint-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-green);
-}
-
-.complaint-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--primary-green);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.complaint-card:hover::before {
-    opacity: 1;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.complaint-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.complaint-id {
-    font-size: 12px;
-    color: var(--muted);
-    font-weight: 500;
-}
-
-.complaint-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-color);
-    margin: 0;
-    line-height: 1.4;
-}
-
-.status-badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.status-new { background: #dbeafe; color: #1d4ed8; }
-.status-in_progress { background: #fef3c7; color: #92400e; }
-.status-resolved { background: #d1fae5; color: #065f46; }
-.status-rejected { background: #fee2e2; color: #991b1b; }
-
-.status-badge:hover {
-    transform: scale(1.05);
-}
-
-.complaint-details {
-    margin: 20px 0;
-}
-
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    padding: 10px;
-    background: #f8fafc;
-    border-radius: 8px;
-    transition: background 0.3s ease;
-}
-
-.detail-row:hover {
-    background: #f1f5f9;
-}
-
-.detail-label {
-    font-weight: 600;
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.detail-value {
-    color: var(--text-color);
-    font-weight: 500;
-    text-align: right;
-    max-width: 200px;
-    word-break: break-word;
-}
-
-.complaint-description {
-    background: #f8fafc;
-    padding: 15px;
-    border-radius: 10px;
-    margin: 20px 0;
-    border-left: 3px solid var(--primary-green);
-}
-
-.description-label {
-    font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.description-text {
-    color: var(--text-color);
-    line-height: 1.6;
-    font-size: 14px;
-}
-
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid #f1f5f9;
-}
-
-.timestamp {
-    font-size: 12px;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-view {
-    background: var(--blue);
-    color: white;
-}
-
-.btn-view:hover {
-    background: #2563eb;
-    transform: translateY(-2px);
-}
-
-.btn-status {
-    background: var(--primary-green);
-    color: white;
-}
-
-.btn-status:hover {
-    background: var(--dark-green);
-    transform: translateY(-2px);
-}
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    grid-column: 1 / -1;
-}
-
-.empty-state i {
-    font-size: 64px;
-    color: #cbd5e1;
-    margin-bottom: 20px;
-}
-
-.empty-state h3 {
-    color: var(--muted);
-    font-size: 20px;
-    margin-bottom: 10px;
-}
-
-.empty-state p {
-    color: #94a3b8;
-    font-size: 14px;
-}
-
-.pagination-container {
-    margin-top: 40px;
-    display: flex;
-    justify-content: center;
-}
-
-/* New Pagination Styles */
-.pagination {
-    font-weight: bold;
-    font-size: 16px;
-    font-family: 'helvetica neue', helvetica, arial, sans-serif;
-    display: flex;
-    gap: 8px;
-    list-style: none;
-    padding: 0;
-}
-
-.page-item {
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.page-item:hover {
-    transform: translateY(-2px);
-}
-
-.page-link {
-    padding: 8px 16px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 3px;
-    background: linear-gradient(to bottom, #e0e0e0, #b8b8b8);
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.6), inset 0 1px rgba(255, 255, 255, 0.4);
-    color: var(--text-color);
-    text-decoration: none;
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.72);
-    display: block;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.page-link:hover {
-    background: linear-gradient(to bottom,  #059669, #03422e);
-    color: #ffffff;
-    border-color: rgba(0, 0, 0, 0.08);
-}
-
-.page-item.active .page-link {
-    background: linear-gradient(to bottom, #10B981, #059669);
-    color: white;
-    border-color: var(--primary-green);
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.6), inset 0 1px rgba(255, 255, 255, 0.4);
-}
-
-.page-item.active .page-link:hover {
-    background: linear-gradient(to bottom, #10B981, #059669);
-    cursor: default;
-}
-
-.page-item.prev .page-link:before {
-    content: "« ";
-    font-weight: normal;
-}
-
-.page-item.next .page-link:after {
-    content: " »";
-    font-weight: normal;
-}
-
-.page-item.next .page-link:hover,
-.page-item.prev .page-link:hover {
-    border-color: rgba(0, 0, 0, 0.08);
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.1));
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.6), inset 0 1px rgba(255, 255, 255, 0.1);
-    color: #f0f0f0;
-    text-shadow: none;
-}
-
-.page-item.disabled .page-link {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.page-item.disabled .page-link:hover {
-    background: linear-gradient(to bottom, #e0e0e0, #b8b8b8);
-    color: var(--text-color);
-    transform: none;
-}
-
-.bulk-select {
-    padding: 10px 15px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.bulk-select:hover {
-    border-color: var(--primary-green);
-}
-
-.bulk-update-btn {
-    padding: 10px 20px;
-    background: var(--purple);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.bulk-update-btn:hover {
-    background: #7c3aed;
-    transform: translateY(-2px);
-}
-
-.status-selector {
-    position: relative;
-}
-
-.status-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    border-radius: 8px;
-    box-shadow: var(--shadow-md);
-    padding: 10px;
-    min-width: 180px;
-    display: none;
-    z-index: 1000;
-    animation: fadeInUp 0.2s ease;
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.status-dropdown.show {
-    display: block;
-}
-
-.status-option {
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 6px;
-    margin: 2px 0;
-    transition: background 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.status-option:hover {
-    background: #f1f5f9;
-}
-
-.checkbox-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 15px;
-}
-
-.checkbox-wrapper input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.checkbox-wrapper label {
-    cursor: pointer;
-    color: var(--text-color);
-    font-size: 14px;
-}
-
-@media (max-width: 1200px) {
-    .complaints-grid {
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 20px;
-    }
-}
-
-@media (max-width: 992px) {
-    .complaints-container {
-        padding: 20px;
-    }
-
-    .header-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-    }
-
-    .controls-section {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .complaints-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    }
-
-    .filter-controls {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .complaints-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .filter-controls {
-        grid-template-columns: 1fr;
-    }
-
-    .filter-item {
-        width: 100%;
-    }
-
-    .filter-item select, .filter-item input {
-        width: 100%;
-    }
-
-    .card-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
-
-    .card-footer {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
-
-    .action-buttons {
-        width: 100%;
-        justify-content: flex-end;
-    }
-
-    .filter-actions {
-        flex-direction: column;
-    }
-
-    .filter-btn, .clear-btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .complaints-container {
-        padding: 15px;
-    }
-
-    .header-section h1 {
-        font-size: 22px;
-    }
-
-    .complaint-card {
-        padding: 20px;
-    }
-
-    .complaint-title {
-        font-size: 16px;
-    }
-
-    .btn {
-        padding: 8px 16px;
-        font-size: 13px;
-    }
-
-    .controls-section {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .bulk-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .filter-section {
-        padding: 20px 15px;
-    }
-
-    .pagination {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .page-link {
-        padding: 6px 12px;
-        font-size: 14px;
-    }
-}
-
-@media (min-width: 1000px) {
-    .complaints-grid {
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    }
-
-    .filter-controls {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-</style>
+<link rel="stylesheet" href="{{ asset('css/Admin/complaints-index.css') }}">
 @endsection
 
 @section('content')
-<div class="complaints-container">
-    <div class="header-section">
-        <h1><i class="fa-solid fa-flag"></i> User Complaints</h1>
-
-        <div class="controls-section">
-            <div class="bulk-actions">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="selectAllComplaints">
-                    <label for="selectAllComplaints">Select All</label>
-                </div>
-
-                <div class="status-selector">
-                    <button class="bulk-update-btn" id="bulkUpdateBtn">
-                        <i class="fa-solid fa-layer-group"></i> Bulk Update
+<div class="complaint-dashboard">
+    <!-- Header Section -->
+    <div class="complaint-header">
+        <div class="header-left">
+            <div class="header-icon">
+                <i class="fas fa-message"></i>
+            </div>
+            <div class="header-text">
+                <h1>Complaints Management</h1>
+                <p>Manage and track user complaints efficiently</p>
+            </div>
+        </div>
+        
+        <!-- Bulk Actions -->
+        <div class="bulk-actions">
+            <label class="select-all">
+                <input type="checkbox" id="selectAllComplaints">
+                <span>Select All</span>
+            </label>
+            <div class="bulk-selector">
+                <button class="btn-bulk" id="bulkUpdateBtn">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Bulk Actions</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="bulk-dropdown" id="bulkStatusDropdown">
+                    <button class="bulk-option" data-status="new">
+                        <i class="fas fa-circle-plus" style="color: #4361ee;"></i>
+                        Mark as New
                     </button>
-                    <div class="status-dropdown" id="bulkStatusDropdown">
-                        <div class="status-option" data-status="new">
-                            <i class="fa-solid fa-circle-plus" style="color: #1d4ed8;"></i> Mark as New
-                        </div>
-                        <div class="status-option" data-status="in_progress">
-                            <i class="fa-solid fa-spinner" style="color: #92400e;"></i> Mark as In Progress
-                        </div>
-                        <div class="status-option" data-status="resolved">
-                            <i class="fa-solid fa-check-circle" style="color: #065f46;"></i> Mark as Resolved
-                        </div>
-                        <div class="status-option" data-status="rejected">
-                            <i class="fa-solid fa-times-circle" style="color: #991b1b;"></i> Mark as Rejected
-                        </div>
-                    </div>
+                    <button class="bulk-option" data-status="in_progress">
+                        <i class="fas fa-spinner" style="color: #ffb703;"></i>
+                        Mark as In Progress
+                    </button>
+                    <button class="bulk-option" data-status="resolved">
+                        <i class="fas fa-check-circle" style="color: #06d6a0;"></i>
+                        Mark as Resolved
+                    </button>
+                    <button class="bulk-option" data-status="rejected">
+                        <i class="fas fa-times-circle" style="color: #e63946;"></i>
+                        Mark as Rejected
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="filter-section">
-        <div class="filter-header">
-            <div class="filter-title">
-                <i class="fa-solid fa-sliders"></i> Filter Complaints
+    <!-- Search and Filter Section -->
+    <div class="search-section">
+        <div class="search-wrapper">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by ID, user, description..." value="{{ request('search') }}">
             </div>
+            <button class="btn-bulk" id="toggleFilterBtn">
+                <i class="fas fa-sliders-h"></i>
+                <span>Filters</span>
+            </button>
         </div>
 
-        <div class="filter-controls">
-            <div class="filter-item">
-                <label><i class="fa-solid fa-filter"></i> Status</label>
-                <select id="statusFilter">
-                    <option value="">All Statuses</option>
-                    <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>New</option>
-                    <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                    <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Resolved</option>
-                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
-                </select>
-            </div>
+        <!-- Filter Chips -->
+        <div class="filter-chips">
+            <button class="filter-chip {{ !request('status') ? 'active' : '' }}" data-filter="status" data-value="">
+                <i class="fas fa-list"></i> All
+            </button>
+            <button class="filter-chip {{ request('status') == 'new' ? 'active' : '' }}" data-filter="status" data-value="new">
+                <i class="fas fa-circle-plus"></i> New
+            </button>
+            <button class="filter-chip {{ request('status') == 'in_progress' ? 'active' : '' }}" data-filter="status" data-value="in_progress">
+                <i class="fas fa-spinner"></i> In Progress
+            </button>
+            <button class="filter-chip {{ request('status') == 'resolved' ? 'active' : '' }}" data-filter="status" data-value="resolved">
+                <i class="fas fa-check-circle"></i> Resolved
+            </button>
+            <button class="filter-chip {{ request('status') == 'rejected' ? 'active' : '' }}" data-filter="status" data-value="rejected">
+                <i class="fas fa-times-circle"></i> Rejected
+            </button>
+        </div>
 
-            <div class="filter-item">
-                <label><i class="fa-solid fa-calendar"></i> From Date</label>
-                <input type="date" id="fromDateFilter" value="{{ request('fromDate') }}" max="{{ date('Y-m-d') }}">
+        <!-- Advanced Filter Panel -->
+        <div class="filter-panel {{ request()->has('fromDate') || request()->has('type') ? 'show' : '' }}" id="filterPanel">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label><i class="fas fa-calendar"></i> From Date</label>
+                    <input type="date" id="fromDateFilter" value="{{ request('fromDate') }}" max="{{ date('Y-m-d') }}">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-calendar"></i> To Date</label>
+                    <input type="date" id="toDateFilter" value="{{ request('toDate') }}" max="{{ date('Y-m-d') }}">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-tag"></i> Complaint Type</label>
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="product_quality" {{ request('type') == 'product_quality' ? 'selected' : '' }}>Product Quality</option>
+                        <option value="payment_issue" {{ request('type') == 'payment_issue' ? 'selected' : '' }}>Payment Issue</option>
+                        <option value="wrong_location" {{ request('type') == 'wrong_location' ? 'selected' : '' }}>Wrong Location</option>
+                        <option value="farmer_contact" {{ request('type') == 'farmer_contact' ? 'selected' : '' }}>Farmer Contact</option>
+                        <option value="other" {{ request('type') == 'other' ? 'selected' : '' }}>Other</option>
+                    </select>
+                </div>
             </div>
-
-            <div class="filter-item">
-                <label><i class="fa-solid fa-calendar"></i> To Date</label>
-                <input type="date" id="toDateFilter" value="{{ request('toDate') }}" max="{{ date('Y-m-d') }}">
-            </div>
-
-            <div class="filter-item">
-                <label><i class="fa-solid fa-exclamation-circle"></i> Complaint Type</label>
-                <select id="typeFilter">
-                    <option value="">All Types</option>
-                    <option value="product_quality" {{ request('type') == 'product_quality' ? 'selected' : '' }}>Product Quality</option>
-                    <option value="payment_issue" {{ request('type') == 'payment_issue' ? 'selected' : '' }}>Payment Issue</option>
-                    <option value="wrong_location" {{ request('type') == 'wrong_location' ? 'selected' : '' }}>Wrong Location</option>
-                    <option value="farmer_contact" {{ request('type') == 'farmer_contact' ? 'selected' : '' }}>Farmer Contact</option>
-                    <option value="other" {{ request('type') == 'other' ? 'selected' : '' }}>Other</option>
-                </select>
-            </div>
-
             <div class="filter-actions">
-                <button class="filter-btn" id="applyFiltersBtn">
-                    <i class="fa-solid fa-filter"></i> Apply Filters
+                <button class="btn-bulk" id="applyFiltersBtn">
+                    <i class="fas fa-check"></i> Apply Filters
                 </button>
-                <button class="clear-btn" id="clearFiltersBtn">
-                    <i class="fa-solid fa-times"></i> Clear Filters
+                <button class="btn-bulk" id="clearFiltersBtn">
+                    <i class="fas fa-times"></i> Clear
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Complaints Grid -->
     @if($complaints->isEmpty())
-        <div class="empty-state">
-            <i class="fa-solid fa-flag"></i>
-            <h3>No Complaints Found</h3>
-            <p>There are currently no user complaints to display.</p>
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-flag"></i>
         </div>
+        <h3>No Complaints Found</h3>
+        <p>There are no complaints matching your criteria. Try adjusting your filters or check back later.</p>
+    </div>
     @else
-        <div class="complaints-grid">
-            @foreach($complaints as $complaint)
-                <div class="complaint-card" data-complaint-id="{{ $complaint->id }}">
-                    <div class="card-header">
-                        <div class="complaint-meta">
-                            <div class="complaint-id">#COMP-{{ str_pad($complaint->id, 6, '0', STR_PAD_LEFT) }}</div>
-                            <h3 class="complaint-title">
-                                <i class="fa-solid fa-user"></i>
-                                {{ $complaint->complainant->username ?? 'Unknown User' }}
-                            </h3>
-                        </div>
+    <div class="complaints-grid">
+        @foreach($complaints as $complaint)
+        <div class="complaint-card" data-id="{{ $complaint->id }}" data-status="{{ $complaint->status }}">
+            <div class="card-header">
+                <div class="card-badge">
+                    <span class="complaint-id">#{{ str_pad($complaint->id, 6, '0', STR_PAD_LEFT) }}</span>
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" class="complaint-checkbox" value="{{ $complaint->id }}">
+                </div>
+            </div>
 
-                        <div class="status-selector">
-                            <div class="status-badge status-{{ $complaint->status }}"
-                                 data-status="{{ $complaint->status }}"
-                                 data-complaint-id="{{ $complaint->id }}">
-                                <i class="fa-solid fa-circle"></i>
-                                {{ str_replace('_', ' ', ucfirst($complaint->status)) }}
-                                <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
-                            </div>
-
-                            <div class="status-dropdown">
-                                <div class="status-option" data-status="new">
-                                    <i class="fa-solid fa-circle-plus" style="color: #1d4ed8;"></i> New
-                                </div>
-                                <div class="status-option" data-status="in_progress">
-                                    <i class="fa-solid fa-spinner" style="color: #92400e;"></i> In Progress
-                                </div>
-                                <div class="status-option" data-status="resolved">
-                                    <i class="fa-solid fa-check-circle" style="color: #065f46;"></i> Resolved
-                                </div>
-                                <div class="status-option" data-status="rejected">
-                                    <i class="fa-solid fa-times-circle" style="color: #991b1b;"></i> Rejected
-                                </div>
-                            </div>
-                        </div>
+            <div class="card-content">
+                <!-- User Info -->
+                <div class="user-info-row">
+                    <div class="user-avatar">
+                        {{ substr($complaint->complainant->username ?? 'U', 0, 1) }}
                     </div>
-
-                    <div class="complaint-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Type</span>
-                            <span class="detail-value">{{ str_replace('_', ' ', ucfirst($complaint->complaint_type)) }}</span>
-                        </div>
-
-                        <div class="detail-row">
-                            <span class="detail-label">Against</span>
-                            <span class="detail-value">
-                                @if($complaint->against_user_id)
-                                    {{ $complaint->againstUser->username ?? 'Unknown User' }}
-                                @else
-                                    N/A
-                                @endif
-                            </span>
-                        </div>
-
-                        <div class="detail-row">
-                            <span class="detail-label">Order</span>
-                            <span class="detail-value">
-                                @if($complaint->related_order_id)
-                                    #ORD-{{ str_pad($complaint->related_order_id, 6, '0', STR_PAD_LEFT) }}
-                                @else
-                                    N/A
-                                @endif
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="complaint-description">
-                        <div class="description-label">Description</div>
-                        <div class="description-text">{{ $complaint->description }}</div>
-                    </div>
-
-                    <div class="card-footer">
-                        <div class="timestamp">
-                            <i class="fa-solid fa-clock"></i>
-                            {{ $complaint->created_at->format('M d, Y h:i A') }}
-                        </div>
-
-                        <div class="action-buttons">
-                            <button class="btn btn-view view-details-btn" data-id="{{ $complaint->id }}">
-                                <i class="fa-solid fa-eye"></i> View Details
-                            </button>
-
-                            <label class="checkbox-wrapper bulk-checkbox">
-                                <input type="checkbox" class="complaint-checkbox" value="{{ $complaint->id }}">
-                                <span>Select</span>
-                            </label>
+                    <div class="user-details-compact">
+                        <div class="user-name-compact">{{ $complaint->complainant->username ?? 'Unknown User' }}</div>
+                        <div class="user-meta">
+                            <i class="fas fa-circle"></i>
+                            <span>{{ $complaint->complainant_role ?? 'User' }}</span>
                         </div>
                     </div>
                 </div>
-            @endforeach
-        </div>
 
-        <div class="pagination-container">
-            {{ $complaints->links('vendor.pagination.custom1') }}
+                <!-- Type Badge -->
+                <div class="type-badge">
+                    <i class="fas fa-tag"></i>
+                    <span>{{ str_replace('_', ' ', ucfirst($complaint->complaint_type)) }}</span>
+                </div>
+
+                <!-- Description -->
+                <div class="complaint-description">
+                    "{{ Str::limit($complaint->description, 80) }}"
+                </div>
+
+                <!-- Meta Grid -->
+                <div class="meta-grid">
+                    <div class="meta-item-compact" data-tooltip="Against User">
+                        <i class="fas fa-user-slash"></i>
+                        <span>{{ $complaint->againstUser->username ?? 'N/A' }}</span>
+                    </div>
+                    <div class="meta-item-compact" data-tooltip="Order ID">
+                        <i class="fas fa-receipt"></i>
+                        <span>{{ $complaint->related_order_id ? '#ORD-'.str_pad($complaint->related_order_id, 6, '0', STR_PAD_LEFT) : 'N/A' }}</span>
+                    </div>
+                    <div class="meta-item-compact" data-tooltip="Created Date">
+                        <i class="fas fa-clock"></i>
+                        <span>{{ $complaint->created_at->format('d M, Y') }}</span>
+                    </div>
+                    <div class="meta-item-compact" data-tooltip="Last Updated">
+                        <i class="fas fa-history"></i>
+                        <span>{{ $complaint->updated_at->diffForHumans() }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <!-- Status Dropdown -->
+                <div class="status-wrapper">
+                    <button class="status-badge-compact {{ $complaint->status }}" data-id="{{ $complaint->id }}">
+                        <i class="fas fa-circle"></i>
+                        <span>{{ str_replace('_', ' ', ucfirst($complaint->status)) }}</span>
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                    <div class="status-dropdown-compact" data-id="{{ $complaint->id }}">
+                        <button class="status-option-compact" data-status="new">
+                            <i class="fas fa-circle-plus" style="color: #4361ee;"></i>
+                            New
+                        </button>
+                        <button class="status-option-compact" data-status="in_progress">
+                            <i class="fas fa-spinner" style="color: #ffb703;"></i>
+                            In Progress
+                        </button>
+                        <button class="status-option-compact" data-status="resolved">
+                            <i class="fas fa-check-circle" style="color: #06d6a0;"></i>
+                            Resolved
+                        </button>
+                        <button class="status-option-compact" data-status="rejected">
+                            <i class="fas fa-times-circle" style="color: #e63946;"></i>
+                            Rejected
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn-icon" onclick="viewDetails({{ $complaint->id }})" data-tooltip="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    @if($complaint->status != 'resolved')
+                    <button class="btn-icon alert" onclick="alertFacilitator({{ $complaint->id }})" data-tooltip="Alert Facilitator">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    @endif
+                </div>
+            </div>
         </div>
+        @endforeach
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+        {{ $complaints->links('vendor.pagination.modern') }}
+    </div>
     @endif
 </div>
 @endsection
 
 @section('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    let selectedComplaints = new Set();
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+let selectedComplaints = new Set();
+let searchTimeout;
 
-    // Set max date for date inputs to today
-    const today = new Date().toISOString().split('T')[0];
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-        input.setAttribute('max', today);
+document.addEventListener('DOMContentLoaded', function() {
+    initializeEventListeners();
+    initializeSearch();
+    initializeStats();
+});
+
+function initializeEventListeners() {
+    // Toggle filter panel
+    document.getElementById('toggleFilterBtn')?.addEventListener('click', function() {
+        document.getElementById('filterPanel').classList.toggle('show');
     });
 
-    // Date validation
-    function validateDates() {
-        const fromDate = document.getElementById('fromDateFilter').value;
-        const toDate = document.getElementById('toDateFilter').value;
+    // Filter chips
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            const value = this.dataset.value;
+            
+            document.querySelectorAll(`.filter-chip[data-filter="${filter}"]`).forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            
+            if (filter === 'status') {
+                updateUrlParam('status', value);
+            }
+        });
+    });
 
-        if (fromDate && toDate && fromDate > toDate) {
-            showWarning('From date cannot be later than To date');
-            return false;
-        }
-
-        return true;
-    }
-
-    // Status update functionality
-    document.querySelectorAll('.status-badge').forEach(badge => {
+    // Status dropdowns
+    document.querySelectorAll('.status-badge-compact').forEach(badge => {
         badge.addEventListener('click', function(e) {
             e.stopPropagation();
-            const dropdown = this.nextElementSibling;
+            const id = this.dataset.id;
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.status-dropdown-compact').forEach(d => {
+                if (d.dataset.id !== id) d.classList.remove('show');
+            });
+            
+            // Toggle current dropdown
+            const dropdown = document.querySelector(`.status-dropdown-compact[data-id="${id}"]`);
             dropdown.classList.toggle('show');
         });
     });
 
-    // Status option selection
-    document.querySelectorAll('.status-option').forEach(option => {
+    // Status options
+    document.querySelectorAll('.status-option-compact').forEach(option => {
         option.addEventListener('click', function() {
-            const status = this.getAttribute('data-status');
-            const complaintId = this.closest('.status-selector').querySelector('.status-badge').getAttribute('data-complaint-id');
-
-            if (complaintId) {
-                updateComplaintStatus(complaintId, status);
-            }
-
-            this.closest('.status-dropdown').classList.remove('show');
+            const status = this.dataset.status;
+            const id = this.closest('.status-dropdown-compact').dataset.id;
+            updateStatus(id, status);
+            this.closest('.status-dropdown-compact').classList.remove('show');
         });
     });
 
-    // View details button
-    document.querySelectorAll('.view-details-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const complaintId = this.getAttribute('data-id');
-            Swal.fire({
-                title: 'Loading Details...',
-                text: 'Please wait while we fetch complaint details',
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            fetch(`/admin/complaints/${complaintId}/details`)
-                .then(response => response.json())
-                .then(data => {
-                    Swal.close();
-                    if (data.success) {
-                        showComplaintDetails(data.complaint);
-                    } else {
-                        showError('Failed to load complaint details');
-                    }
-                })
-                .catch(error => {
-                    Swal.close();
-                    showError('Network error: ' + error.message);
-                });
-        });
+    // Close dropdowns on click outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.status-wrapper')) {
+            document.querySelectorAll('.status-dropdown-compact').forEach(d => d.classList.remove('show'));
+        }
+        if (!e.target.closest('.bulk-selector')) {
+            document.getElementById('bulkStatusDropdown')?.classList.remove('show');
+        }
     });
 
-    // Bulk update functionality
-    const bulkUpdateBtn = document.getElementById('bulkUpdateBtn');
-    const bulkStatusDropdown = document.getElementById('bulkStatusDropdown');
+    // Select all functionality
+    const selectAll = document.getElementById('selectAllComplaints');
+    const checkboxes = document.querySelectorAll('.complaint-checkbox');
 
-    if (bulkUpdateBtn) {
-        bulkUpdateBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (selectedComplaints.size === 0) {
-                showWarning('Please select at least one complaint to update');
-                return;
-            }
-            bulkStatusDropdown.classList.toggle('show');
-        });
-    }
-
-    // Bulk status option selection
-    document.querySelectorAll('#bulkStatusDropdown .status-option').forEach(option => {
-        option.addEventListener('click', function() {
-            const status = this.getAttribute('data-status');
-            bulkUpdateStatus(status);
-            bulkStatusDropdown.classList.remove('show');
-        });
-    });
-
-    // Checkbox functionality
-    const selectAllCheckbox = document.getElementById('selectAllComplaints');
-    const complaintCheckboxes = document.querySelectorAll('.complaint-checkbox');
-
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
-            const isChecked = this.checked;
-            complaintCheckboxes.forEach(checkbox => {
-                checkbox.checked = isChecked;
-                if (isChecked) {
-                    selectedComplaints.add(checkbox.value);
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => {
+                cb.checked = this.checked;
+                if (this.checked) {
+                    selectedComplaints.add(cb.value);
                 } else {
-                    selectedComplaints.delete(checkbox.value);
+                    selectedComplaints.delete(cb.value);
                 }
             });
+            updateBulkButtonState();
         });
     }
 
-    // Individual checkbox handling
-    complaintCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
+    // Individual checkboxes
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
             if (this.checked) {
                 selectedComplaints.add(this.value);
             } else {
                 selectedComplaints.delete(this.value);
-                selectAllCheckbox.checked = false;
+                if (selectAll) selectAll.checked = false;
             }
+            updateBulkButtonState();
         });
     });
 
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.status-selector')) {
-            document.querySelectorAll('.status-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('show');
-            });
-        }
-
-        if (!e.target.closest('.status-selector')) {
-            bulkStatusDropdown.classList.remove('show');
-        }
-    });
-
-    // Filter functionality
-    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
-    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
-
-    if (applyFiltersBtn) {
-        applyFiltersBtn.addEventListener('click', function() {
-            if (!validateDates()) {
+    // Bulk actions
+    const bulkBtn = document.getElementById('bulkUpdateBtn');
+    if (bulkBtn) {
+        bulkBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (selectedComplaints.size === 0) {
+                showWarning('Please select at least one complaint');
                 return;
             }
-            applyFilters();
+            document.getElementById('bulkStatusDropdown').classList.toggle('show');
         });
     }
 
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', function() {
-            clearFilters();
-        });
-    }
-
-    function applyFilters() {
-        const params = new URLSearchParams();
-
-        const statusFilter = document.getElementById('statusFilter');
-        const fromDateFilter = document.getElementById('fromDateFilter');
-        const toDateFilter = document.getElementById('toDateFilter');
-        const typeFilter = document.getElementById('typeFilter');
-
-        if (statusFilter && statusFilter.value) {
-            params.set('status', statusFilter.value);
-        }
-
-        if (fromDateFilter && fromDateFilter.value) {
-            params.set('fromDate', fromDateFilter.value);
-        }
-
-        if (toDateFilter && toDateFilter.value) {
-            params.set('toDate', toDateFilter.value);
-        }
-
-        if (typeFilter && typeFilter.value) {
-            params.set('type', typeFilter.value);
-        }
-
-        window.location.href = `/admin/complaints?${params.toString()}`;
-    }
-
-    function clearFilters() {
-        window.location.href = '/admin/complaints';
-    }
-
-    // Date inputs validation
-    document.querySelectorAll('#fromDateFilter, #toDateFilter').forEach(input => {
-        input.addEventListener('change', function() {
-            if (!validateDates()) {
-                this.value = '';
-            }
+    // Bulk options
+    document.querySelectorAll('.bulk-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const status = this.dataset.status;
+            bulkUpdate(status);
+            document.getElementById('bulkStatusDropdown').classList.remove('show');
         });
     });
 
-    function updateComplaintStatus(complaintId, newStatus) {
-        Swal.fire({
-            title: 'Updating Status...',
-            text: 'Please wait while we update the complaint status',
-            showConfirmButton: false,
-            allowOutsideClick: false,
-            willOpen: () => {
-                Swal.showLoading();
-            }
-        });
+    // Apply filters
+    document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
+    document.getElementById('clearFiltersBtn')?.addEventListener('click', clearFilters);
+}
 
-        fetch(`/admin/complaints/${complaintId}/update-status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ status: newStatus })
+function initializeSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                updateUrlParam('search', this.value);
+            }, 500);
+        });
+    }
+}
+
+function initializeStats() {
+    // Animate stats numbers
+    document.querySelectorAll('.stat-content h3').forEach(stat => {
+        const value = parseInt(stat.innerText);
+        animateValue(stat, 0, value, 1000);
+    });
+}
+
+function animateValue(element, start, end, duration) {
+    const range = end - start;
+    const increment = range / (duration / 10);
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= end) {
+            current = end;
+            clearInterval(timer);
+        }
+        element.textContent = Math.floor(current);
+    }, 10);
+}
+
+function updateBulkButtonState() {
+    const bulkBtn = document.getElementById('bulkUpdateBtn');
+    if (bulkBtn) {
+        const count = selectedComplaints.size;
+        bulkBtn.innerHTML = `<i class="fas fa-layer-group"></i><span>Bulk Actions ${count > 0 ? `(${count})` : ''}</span><i class="fas fa-chevron-down"></i>`;
+    }
+}
+
+function updateUrlParam(key, value) {
+    const url = new URL(window.location);
+    if (value) {
+        url.searchParams.set(key, value);
+    } else {
+        url.searchParams.delete(key);
+    }
+    window.location.href = url.toString();
+}
+
+function validateDates() {
+    const from = document.getElementById('fromDateFilter').value;
+    const to = document.getElementById('toDateFilter').value;
+    
+    if (from && to && from > to) {
+        showWarning('From date cannot be later than To date');
+        return false;
+    }
+    return true;
+}
+
+function applyFilters() {
+    if (!validateDates()) return;
+    
+    const params = new URLSearchParams();
+    const status = document.querySelector('.filter-chip.active[data-filter="status"]')?.dataset.value;
+    const from = document.getElementById('fromDateFilter').value;
+    const to = document.getElementById('toDateFilter').value;
+    const type = document.getElementById('typeFilter').value;
+    const search = document.getElementById('searchInput').value;
+    
+    if (status) params.set('status', status);
+    if (from) params.set('fromDate', from);
+    if (to) params.set('toDate', to);
+    if (type) params.set('type', type);
+    if (search) params.set('search', search);
+    
+    window.location.href = `/admin/complaints?${params.toString()}`;
+}
+
+function clearFilters() {
+    window.location.href = '/admin/complaints';
+}
+
+function updateStatus(id, status) {
+    const toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+
+    fetch(`/admin/complaints/${id}/update-status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ status: status })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            updateStatusUI(id, status);
+            toast.fire({
+                icon: 'success',
+                title: data.message
+            });
+            updateStats();
+        } else {
+            showError(data.message);
+        }
+    })
+    .catch(() => {
+        showError('Network error occurred');
+    });
+}
+
+function bulkUpdate(status) {
+    Swal.fire({
+        title: `Update ${selectedComplaints.size} Complaints?`,
+        html: `<p>Set status to <strong>${status.replace('_', ' ')}</strong></p>`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#4361ee',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, update',
+        cancelButtonText: 'Cancel'
+    }).then(result => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Updating...',
+                html: 'Please wait',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('/admin/complaints/bulk-update-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    complaint_ids: Array.from(selectedComplaints),
+                    status: status
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                Swal.close();
+                if (data.success) {
+                    selectedComplaints.forEach(id => updateStatusUI(id, status));
+                    selectedComplaints.clear();
+                    document.querySelectorAll('.complaint-checkbox').forEach(cb => cb.checked = false);
+                    document.getElementById('selectAllComplaints').checked = false;
+                    updateBulkButtonState();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    updateStats();
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(() => {
+                Swal.close();
+                showError('Network error occurred');
+            });
+        }
+    });
+}
+
+function updateStatusUI(id, status) {
+    const card = document.querySelector(`.complaint-card[data-id="${id}"]`);
+    if (card) {
+        card.dataset.status = status;
+        
+        const badge = document.querySelector(`.status-badge-compact[data-id="${id}"]`);
+        if (badge) {
+            badge.className = `status-badge-compact ${status}`;
+            badge.innerHTML = `<i class="fas fa-circle"></i><span>${status.replace('_', ' ')}</span><i class="fas fa-chevron-up"></i>`;
+        }
+    }
+}
+
+function updateStats() {
+    fetch('/admin/complaints/stats')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const stats = data.stats;
+                document.querySelector('.stat-card:nth-child(1) h3').textContent = stats.new;
+                document.querySelector('.stat-card:nth-child(2) h3').textContent = stats.in_progress;
+                document.querySelector('.stat-card:nth-child(3) h3').textContent = stats.resolved;
+                document.querySelector('.stat-card:nth-child(4) h3').textContent = stats.rejected;
+            }
         })
-        .then(response => response.json())
+        .catch(console.error);
+}
+
+function viewDetails(id) {
+    Swal.fire({
+        title: 'Loading...',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    fetch(`/admin/complaints/${id}/details`)
+        .then(res => res.json())
         .then(data => {
             Swal.close();
             if (data.success) {
-                updateStatusUI(complaintId, newStatus);
-                showSuccess(data.message);
+                showDetailsModal(data.complaint);
             } else {
-                showError(data.message);
+                showError('Failed to load details');
             }
         })
-        .catch(error => {
+        .catch(() => {
             Swal.close();
-            showError('Network error: ' + error.message);
+            showError('Network error occurred');
         });
-    }
+}
 
-    function bulkUpdateStatus(newStatus) {
-        Swal.fire({
-            title: 'Updating Multiple Complaints',
-            text: `Are you sure you want to update ${selectedComplaints.size} complaint(s) to "${newStatus.replace('_', ' ')}"?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#10B981',
-            cancelButtonColor: '#6B7280',
-            confirmButtonText: 'Yes, Update',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Updating...',
-                    text: 'Please wait while we update the complaints',
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    willOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
+function showDetailsModal(complaint) {
+    const date = new Date(complaint.created_at).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-                fetch('/admin/complaints/bulk-update-status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        complaint_ids: Array.from(selectedComplaints),
-                        status: newStatus
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    Swal.close();
-                    if (data.success) {
-                        // Update UI for selected complaints
-                        selectedComplaints.forEach(id => {
-                            updateStatusUI(id, newStatus);
-                        });
-
-                        // Clear selection
-                        selectedComplaints.clear();
-                        complaintCheckboxes.forEach(cb => cb.checked = false);
-                        selectAllCheckbox.checked = false;
-
-                        showSuccess(data.message);
-                    } else {
-                        showError(data.message);
-                    }
-                })
-                .catch(error => {
-                    Swal.close();
-                    showError('Network error: ' + error.message);
-                });
-            }
-        });
-    }
-
-    function updateStatusUI(complaintId, newStatus) {
-        const badge = document.querySelector(`.status-badge[data-complaint-id="${complaintId}"]`);
-        if (badge) {
-            // Remove old status class
-            badge.classList.remove('status-new', 'status-in_progress', 'status-resolved', 'status-rejected');
-
-            // Add new status class
-            badge.classList.add(`status-${newStatus}`);
-
-            // Update text
-            const statusText = newStatus.replace('_', ' ').charAt(0).toUpperCase() + newStatus.replace('_', ' ').slice(1);
-            badge.innerHTML = `<i class="fa-solid fa-circle"></i> ${statusText} <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>`;
-
-            // Update data attribute
-            badge.setAttribute('data-status', newStatus);
-        }
-    }
-
-    function showComplaintDetails(complaint) {
-        const detailsHtml = `
-            <div style="text-align: left; max-width: 500px;">
-                <h3 style="color: #10B981; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-                    <i class="fa-solid fa-flag"></i> Complaint Details
-                </h3>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Complaint ID</div>
-                        <div style="font-weight: 600; color: #0f1724;">#COMP-${complaint.id.toString().padStart(6, '0')}</div>
+    Swal.fire({
+        title: 'Complaint Details',
+        html: `
+            <div class="detail-modal">
+                <div class="detail-section">
+                    <div class="detail-title">
+                        <i class="fas fa-info-circle"></i>
+                        Basic Information
                     </div>
-
-                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Status</div>
-                        <div style="font-weight: 600; color: #0f1724;">${complaint.status.replace('_', ' ')}</div>
+                    <div class="detail-row">
+                        <span class="detail-label">ID:</span>
+                        <span class="detail-value">#${complaint.id.toString().padStart(6, '0')}</span>
                     </div>
-
-                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Type</div>
-                        <div style="font-weight: 600; color: #0f1724;">${complaint.complaint_type.replace('_', ' ')}</div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value">
+                            <span class="status-badge-compact ${complaint.status}" style="display: inline-flex; padding: 4px 12px;">
+                                ${complaint.status.replace('_', ' ')}
+                            </span>
+                        </span>
                     </div>
-
-                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Created</div>
-                        <div style="font-weight: 600; color: #0f1724;">${new Date(complaint.created_at).toLocaleDateString()}</div>
+                    <div class="detail-row">
+                        <span class="detail-label">Type:</span>
+                        <span class="detail-value">${complaint.complaint_type.replace('_', ' ')}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Created:</span>
+                        <span class="detail-value">${date}</span>
                     </div>
                 </div>
-
-                <div style="margin-bottom: 20px;">
-                    <div style="font-size: 14px; color: #6b7280; margin-bottom: 8px; font-weight: 600;">
-                        <i class="fa-solid fa-user"></i> Complainant
+                
+                <div class="detail-section">
+                    <div class="detail-title">
+                        <i class="fas fa-users"></i>
+                        Involved Parties
                     </div>
-                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px;">
-                        <div style="font-weight: 600; color: #0f1724;">${complaint.complainant?.username || 'Unknown User'}</div>
-                        <div style="font-size: 13px; color: #6b7280; margin-top: 5px;">Role: ${complaint.complainant_role}</div>
+                    <div class="detail-row">
+                        <span class="detail-label">From:</span>
+                        <span class="detail-value">${complaint.complainant?.username || 'Unknown'} (${complaint.complainant_role || 'User'})</span>
                     </div>
-                </div>
-
-                ${complaint.against_user_id ? `
-                <div style="margin-bottom: 20px;">
-                    <div style="font-size: 14px; color: #6b7280; margin-bottom: 8px; font-weight: 600;">
-                        <i class="fa-solid fa-user-slash"></i> Complained Against
+                    <div class="detail-row">
+                        <span class="detail-label">Against:</span>
+                        <span class="detail-value">${complaint.against_user?.username || 'N/A'}</span>
                     </div>
-                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px;">
-                        <div style="font-weight: 600; color: #0f1724;">${complaint.against_user?.username || 'Unknown User'}</div>
-                    </div>
-                </div>
-                ` : ''}
-
-                ${complaint.related_order_id ? `
-                <div style="margin-bottom: 20px;">
-                    <div style="font-size: 14px; color: #6b7280; margin-bottom: 8px; font-weight: 600;">
-                        <i class="fa-solid fa-receipt"></i> Related Order
-                    </div>
-                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px;">
-                        <div style="font-weight: 600; color: #0f1724;">Order #${complaint.related_order_id}</div>
+                    <div class="detail-row">
+                        <span class="detail-label">Order:</span>
+                        <span class="detail-value">${complaint.related_order_id ? '#ORD-'+complaint.related_order_id.toString().padStart(6,'0') : 'N/A'}</span>
                     </div>
                 </div>
-                ` : ''}
-
-                <div style="margin-bottom: 20px;">
-                    <div style="font-size: 14px; color: #6b7280; margin-bottom: 8px; font-weight: 600;">
-                        <i class="fa-solid fa-file-alt"></i> Description
+                
+                <div class="detail-section">
+                    <div class="detail-title">
+                        <i class="fas fa-align-left"></i>
+                        Description
                     </div>
-                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; line-height: 1.6;">
+                    <div class="detail-description">
                         ${complaint.description}
                     </div>
                 </div>
+                
+                ${complaint.admin_notes ? `
+                <div class="detail-section">
+                    <div class="detail-title">
+                        <i class="fas fa-sticky-note"></i>
+                        Admin Notes
+                    </div>
+                    <div class="detail-description" style="border-left-color: #ffb703;">
+                        ${complaint.admin_notes}
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="detail-section">
+                    <div class="detail-title">
+                        <i class="fas fa-clock"></i>
+                        Timeline
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Created:</span>
+                        <span class="detail-value">${new Date(complaint.created_at).toLocaleString()}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Updated:</span>
+                        <span class="detail-value">${new Date(complaint.updated_at).toLocaleString()}</span>
+                    </div>
+                </div>
+            </div>
+        `,
+        width: 600,
+        showConfirmButton: false,
+        showCloseButton: true,
+        showCancelButton: true,
+        cancelButtonText: 'Close',
+        showDenyButton: true,
+        denyButtonText: 'Take Action',
+        denyButtonColor: '#4361ee',
+        didOpen: () => {
+            // Add custom styles for modal
+            const style = document.createElement('style');
+            style.textContent = `
+                .detail-modal {
+                    text-align: left;
+                    max-height: 70vh;
+                    overflow-y: auto;
+                    padding-right: 10px;
+                }
+                .detail-modal::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .detail-modal::-webkit-scrollbar-track {
+                    background: #f1f5f9;
+                    border-radius: 10px;
+                }
+                .detail-modal::-webkit-scrollbar-thumb {
+                    background: #4361ee;
+                    border-radius: 10px;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }).then((result) => {
+        if (result.isDenied) {
+            // Open quick action menu
+            showQuickActions(complaint);
+        }
+    });
+}
 
-                <div style="display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
-                    <button onclick="updateComplaintStatus(${complaint.id}, 'in_progress')"
-                            style="flex: 1; background: #f59e0b; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer;">
-                        <i class="fa-solid fa-spinner"></i> Mark In Progress
+function showQuickActions(complaint) {
+    Swal.fire({
+        title: 'Quick Actions',
+        html: `
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                <button class="quick-action-btn" onclick="updateStatus(${complaint.id}, 'in_progress')">
+                    <i class="fas fa-spinner" style="color: #ffb703;"></i>
+                    Mark In Progress
+                </button>
+                <button class="quick-action-btn" onclick="updateStatus(${complaint.id}, 'resolved')">
+                    <i class="fas fa-check-circle" style="color: #06d6a0;"></i>
+                    Mark Resolved
+                </button>
+                <button class="quick-action-btn" onclick="updateStatus(${complaint.id}, 'rejected')">
+                    <i class="fas fa-times-circle" style="color: #e63946;"></i>
+                    Mark Rejected
+                </button>
+                <button class="quick-action-btn" onclick="alertFacilitator(${complaint.id})">
+                    <i class="fas fa-bell" style="color: #4361ee;"></i>
+                    Alert Facilitator
+                </button>
+            </div>
+            <style>
+                .quick-action-btn {
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid var(--border);
+                    border-radius: 8px;
+                    background: white;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    transition: all 0.2s;
+                }
+                .quick-action-btn:hover {
+                    background: #f8fafc;
+                    transform: translateX(5px);
+                    border-color: #4361ee;
+                }
+            </style>
+        `,
+        showConfirmButton: false,
+        showCloseButton: true,
+        showCancelButton: true,
+        cancelButtonText: 'Close'
+    });
+}
+
+function alertFacilitator(id) {
+    // Get facilitators list from data attribute or fetch it
+    const facilitators = @json($facilitatorsList ?? []);
+    
+    if (!facilitators || facilitators.length === 0) {
+        showWarning('No facilitators available');
+        return;
+    }
+    
+    // Create options object for select
+    let options = {};
+    facilitators.forEach(f => {
+        options[f.user_id] = `${f.name} ${f.assigned_division ? `(${f.assigned_division})` : ''}`;
+    });
+
+    Swal.fire({
+        title: 'Alert Facilitator',
+        html: `
+            <div style="margin: 20px 0;">
+                <p style="margin-bottom: 10px; color: #64748b;">Select a facilitator to notify:</p>
+                <select id="facilitatorSelect" class="swal2-select" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <option value="">Choose facilitator...</option>
+                    ${Object.entries(options).map(([id, name]) => `<option value="${id}">${name}</option>`).join('')}
+                </select>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Send Alert',
+        confirmButtonColor: '#4361ee',
+        cancelButtonText: 'Cancel',
+        preConfirm: () => {
+            const facilitatorId = document.getElementById('facilitatorSelect').value;
+            const sendNotification = document.getElementById('sendNotification').checked;
+            
+            if (!facilitatorId) {
+                Swal.showValidationMessage('Please select a facilitator');
+                return false;
+            }
+            
+            return fetch('/admin/complaints/alert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    complaint_id: id,
+                    facilitator_id: facilitatorId,
+                    send_notification: sendNotification
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    throw new Error(data.message);
+                }
+                return data;
+            })
+            .catch(error => {
+                Swal.showValidationMessage(error.message);
+            });
+        }
+    }).then(result => {
+        if (result.isConfirmed && result.value.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Alert Sent!',
+                text: result.value.message,
+                timer: 2000,
+                showConfirmButton: false
+            });
+            
+            // Log the action
+            console.log(`Alert sent for complaint #${id} to facilitator`);
+        }
+    });
+}
+
+// Notification functions
+function showSuccess(message) {
+    Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: message,
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
+}
+
+function showError(message) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message,
+        confirmButtonColor: '#4361ee',
+        confirmButtonText: 'OK'
+    });
+}
+
+function showWarning(message) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Warning',
+        text: message,
+        confirmButtonColor: '#4361ee',
+        confirmButtonText: 'Got it'
+    });
+}
+
+// Export functionality (optional)
+function exportComplaints() {
+    const status = document.querySelector('.filter-chip.active[data-filter="status"]')?.dataset.value || '';
+    const type = document.getElementById('typeFilter')?.value || '';
+    
+    Swal.fire({
+        title: 'Export Complaints',
+        html: `
+            <div style="margin: 20px 0;">
+                <p style="margin-bottom: 15px;">Choose export format:</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="export-btn" onclick="exportFormat('csv')">
+                        <i class="fas fa-file-csv"></i> CSV
                     </button>
-                    <button onclick="updateComplaintStatus(${complaint.id}, 'resolved')"
-                            style="flex: 1; background: #10B981; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer;">
-                        <i class="fa-solid fa-check"></i> Mark Resolved
+                    <button class="export-btn" onclick="exportFormat('excel')">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </button>
+                    <button class="export-btn" onclick="exportFormat('pdf')">
+                        <i class="fas fa-file-pdf"></i> PDF
                     </button>
                 </div>
             </div>
-        `;
+            <style>
+                .export-btn {
+                    padding: 10px 20px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 8px;
+                    background: white;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.2s;
+                }
+                .export-btn:hover {
+                    background: #f1f5f9;
+                    border-color: #4361ee;
+                    transform: translateY(-2px);
+                }
+            </style>
+        `,
+        showConfirmButton: false,
+        showCloseButton: true
+    });
+}
 
-        Swal.fire({
-            title: 'Complaint Details',
-            html: detailsHtml,
-            width: 600,
-            showCloseButton: true,
-            showConfirmButton: false
-        });
+function exportFormat(format) {
+    Swal.close();
+    
+    // Build export URL with current filters
+    const params = new URLSearchParams(window.location.search);
+    params.set('export', format);
+    
+    window.location.href = `/admin/complaints/export?${params.toString()}`;
+    
+    showSuccess(`Exporting complaints as ${format.toUpperCase()}...`);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + F to focus search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        document.getElementById('searchInput')?.focus();
     }
-
-    function showSuccess(message) {
-        Swal.fire({
-            title: 'Success!',
-            text: message,
-            icon: 'success',
-            confirmButtonColor: '#10B981',
-            confirmButtonText: 'OK',
-            timer: 3000,
-            timerProgressBar: true
-        });
+    
+    // Esc to clear selections
+    if (e.key === 'Escape') {
+        selectedComplaints.clear();
+        document.querySelectorAll('.complaint-checkbox').forEach(cb => cb.checked = false);
+        document.getElementById('selectAllComplaints').checked = false;
+        updateBulkButtonState();
     }
-
-    function showError(message) {
-        Swal.fire({
-            title: 'Error!',
-            text: message,
-            icon: 'error',
-            confirmButtonColor: '#EF4444',
-            confirmButtonText: 'OK'
-        });
+    
+    // Ctrl/Cmd + A to select all (when not in input)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !e.target.matches('input, textarea')) {
+        e.preventDefault();
+        if (document.querySelectorAll('.complaint-checkbox').length > 0) {
+            const selectAll = document.getElementById('selectAllComplaints');
+            if (selectAll) {
+                selectAll.click();
+            }
+        }
     }
-
-    function showWarning(message) {
-        Swal.fire({
-            title: 'Warning',
-            text: message,
-            icon: 'warning',
-            confirmButtonColor: '#F59E0B',
-            confirmButtonText: 'OK'
-        });
-    }
-
-    // Make updateComplaintStatus available globally for the details modal
-    window.updateComplaintStatus = updateComplaintStatus;
 });
+
+// Auto-refresh functionality (optional)
+let autoRefreshInterval;
+
+function startAutoRefresh(interval = 30000) {
+    stopAutoRefresh();
+    autoRefreshInterval = setInterval(() => {
+        // Only refresh if page is visible and no modals are open
+        if (!document.hidden && !Swal.isVisible()) {
+            refreshData();
+        }
+    }, interval);
+}
+
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+}
+
+function refreshData() {
+    // Show subtle loading indicator
+    const refreshIndicator = document.createElement('div');
+    refreshIndicator.className = 'refresh-indicator';
+    refreshIndicator.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Updating...';
+    document.body.appendChild(refreshIndicator);
+    
+    fetch(window.location.href)
+        .then(res => res.text())
+        .then(html => {
+            // Parse and update only the complaints grid
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newGrid = doc.querySelector('.complaints-grid');
+            const newStats = doc.querySelector('.stats-grid');
+            
+            if (newGrid) {
+                document.querySelector('.complaints-grid').innerHTML = newGrid.innerHTML;
+            }
+            if (newStats) {
+                document.querySelector('.stats-grid').innerHTML = newStats.innerHTML;
+            }
+            
+            // Reinitialize event listeners
+            initializeEventListeners();
+            
+            setTimeout(() => {
+                refreshIndicator.remove();
+            }, 1000);
+        })
+        .catch(() => {
+            refreshIndicator.remove();
+        });
+}
+
+// Initialize auto-refresh (optional - comment out if not needed)
+// startAutoRefresh(60000); // Refresh every minute
+
+// Clean up on page unload
+window.addEventListener('beforeunload', function() {
+    stopAutoRefresh();
+});
+
 </script>
 @endsection

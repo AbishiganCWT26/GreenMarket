@@ -861,8 +861,15 @@ class FarmerController extends Controller
         $this->shareCounts();
 
         $leadFarmer = null;
+        $leadFarmerUser = null;
         if ($farmer->lead_farmer_id) {
             $leadFarmer = LeadFarmer::find($farmer->lead_farmer_id);
+            if ($leadFarmer && $leadFarmer->user_id) {
+                $leadFarmerUser = User::find($leadFarmer->user_id);
+                if ($leadFarmerUser) {
+                    $leadFarmerUser->name = $leadFarmer->name;
+                }
+            }
         }
 
         $orders = Order::where('farmer_id', $farmer->id)
@@ -871,15 +878,7 @@ class FarmerController extends Controller
             ->limit(20)
             ->get();
 
-        $users = User::whereIn('role', ['buyer', 'lead_farmer', 'facilitator'])
-            ->where('is_active', true)
-            ->get()
-            ->map(function($user) {
-                $user->name = $this->getUserName($user);
-                return $user;
-            });
-
-        return view('farmer.complaints.create', compact('leadFarmer', 'orders', 'users'));
+        return view('farmer.complaints.create', compact('leadFarmer', 'leadFarmerUser', 'orders'));
     }
 
     private function getUserName($user)
@@ -904,6 +903,13 @@ class FarmerController extends Controller
         $user = Auth::user();
         $farmer = Farmer::where('user_id', $user->id)->first();
 
+        if (!$farmer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Farmer profile not found.'
+            ], 404);
+        }
+
         $request->validate([
             'complaint_type' => 'required|in:payment_delay,payment_missing,wrong_data_entry,other',
             'against_user_id' => 'nullable|exists:users,id',
@@ -924,21 +930,14 @@ class FarmerController extends Controller
                 'status' => 'new',
             ]);
 
-            Notification::create([
-                'recipient_type' => 'system_wide',
-                'title' => 'New Complaint Filed',
-                'message' => 'Farmer ' . $farmer->name . ' has filed a complaint about ' . $request->complaint_type . '. Complaint ID: #' . $complaint->id,
-                'notification_type' => 'admin_alert',
-                'related_id' => $complaint->id,
-            ]);
-
+            // Notify active admins
             $admins = User::where('role', 'admin')->where('is_active', true)->get();
             foreach ($admins as $admin) {
                 Notification::create([
                     'user_id' => $admin->id,
                     'recipient_type' => 'user',
                     'title' => 'New Farmer Complaint',
-                    'message' => 'Farmer ' . $farmer->name . ' has filed a new complaint. Please review it.',
+                    'message' => 'Farmer ' . $farmer->name . ' (#' . $user->id . ') has filed a new complaint about ' . str_replace('_', ' ', $request->complaint_type) . '. Please review it.',
                     'notification_type' => 'admin_alert',
                     'related_id' => $complaint->id,
                 ]);
@@ -958,7 +957,7 @@ class FarmerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to file complaint. Please try again.',
-                'error' => $e->getMessage()
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
