@@ -110,38 +110,6 @@
 		</div>
 	</div>
 
-	<div class="stats-section">
-		<div class="stat-card">
-			<div class="stat-icon total">
-				<i class="fas fa-boxes"></i>
-			</div>
-			<div class="stat-info">
-				<h3 id="total-products">0</h3>
-				<p>Total Products</p>
-			</div>
-		</div>
-
-		<div class="stat-card">
-			<div class="stat-icon available">
-				<i class="fas fa-check-circle"></i>
-			</div>
-			<div class="stat-info">
-				<h3 id="available-products">0</h3>
-				<p>Have It</p>
-			</div>
-		</div>
-
-		<div class="stat-card">
-			<div class="stat-icon categories">
-				<i class="fas fa-tags"></i>
-			</div>
-			<div class="stat-info">
-				<h3 id="total-categories">0</h3>
-				<p>Categories</p>
-			</div>
-		</div>
-	</div>
-
 	<div class="products-section">
 		<div class="section-header">
 			<h2><i class="fas fa-box-open"></i> Product Listings</h2>
@@ -159,15 +127,23 @@
 
 		<div class="pagination-wrapper">
 			<div class="pagination-container" id="pagination-container" style="display: none;">
-				<div class="paginate left" id="prev-page" data-state="disabled">
-					<i></i>
-					<i></i>
+				<button class="paginate left" id="prev-page" data-state="disabled" aria-label="Previous page">
+					<svg class="icon" viewBox="0 0 24 24" width="20" height="20">
+						<path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				</button>
+				
+				<div class="counter" id="page-counter-display">
+					<span class="current-page">1</span>
+					<span class="separator">/</span>
+					<span class="total-pages">1</span>
 				</div>
-				<div class="counter" id="page-counter-display">1 / 1</div>
-				<div class="paginate right" id="next-page" data-state="">
-					<i></i>
-					<i></i>
-				</div>
+				
+				<button class="paginate right" id="next-page" data-state="" aria-label="Next page">
+					<svg class="icon" viewBox="0 0 24 24" width="20" height="20">
+						<path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				</button>
 			</div>
 		</div>
 
@@ -911,3 +887,6 @@
 	});
 </script>
 @endsection
+
+
+ 

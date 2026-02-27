@@ -1231,6 +1231,7 @@ textarea.form-input {
 		grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
 	}
 }
+}
 
 /* Large Ultrawide / XXXL Screens */
 @media (min-width: 1501px) and (max-width: 2559px) {
