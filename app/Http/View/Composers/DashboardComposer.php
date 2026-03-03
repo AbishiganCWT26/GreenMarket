@@ -22,12 +22,15 @@ class DashboardComposer
 
         // SALES
         $sales = DB::table('orders')
-            ->where('order_status', 'paid')
+            ->whereIn('order_status', ['paid', 'completed'])
             ->sum('total_amount');
 
         // GROUPS RANKING
         $groups = DB::table('lead_farmers')
-            ->leftJoin('orders', 'lead_farmers.id', '=', 'orders.lead_farmer_id')
+            ->leftJoin('orders', function($join) {
+                $join->on('lead_farmers.id', '=', 'orders.lead_farmer_id')
+                     ->whereIn('orders.order_status', ['paid', 'completed']);
+            })
             ->select(
                 'lead_farmers.id',
                 'lead_farmers.group_name',
