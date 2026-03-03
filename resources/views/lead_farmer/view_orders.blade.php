@@ -8,198 +8,160 @@
 @endsection
 
 @section('content')
-<div class="orders-container">
-	<div class="orders-header">
-		<h1 class="orders-title">
-			<i class="fa-solid fa-sack-dollar"></i>
-			Orders Management
-		</h1>
-		
-		<div class="controls-container">
-			<div class="view-toggle">
-				<button class="view-toggle-btn active" data-view="cards">
-					<i class="fa-solid fa-grip"></i>
-					Cards
-				</button>
-				<button class="view-toggle-btn" data-view="table">
-					<i class="fa-solid fa-table"></i>
-					Table
-				</button>
+<div class="order-app">
+	<div class="app-header">
+		<div class="header-left">
+			<div class="header-icon">
+				<i class="fas fa-sack-dollar"></i>
 			</div>
-			
-			<div class="search-box">
-				<input type="text" class="search-input" placeholder="Search orders..." id="searchInput">
-				<i class="fa-solid fa-search search-icon"></i>
+			<div class="header-text">
+				<h2 class="header-title">Orders Management</h2>
+				<p class="header-subtitle">Track and manage customer orders</p>
 			</div>
-			
-			<div class="filters-box">
-				<select class="filter-select" id="statusFilter">
-					<option value="">All Status</option>
-					<option value="confirmed">Confirmed</option>
-					<option value="paid">Paid</option>
-					<option value="ready_for_pickup">Ready</option>
-					<option value="completed">Completed</option>
-					<option value="cancelled">Cancelled</option>
-				</select>
-				
-				<select class="filter-select" id="paymentFilter">
-					<option value="">Payment Status</option>
-					<option value="pending">Pending</option>
-					<option value="completed">Completed</option>
-				</select>
+		</div>
+		<div class="header-right">
+			<div class="view-toggles">
+				<button class="view-btn active" data-view="cards">
+					<i class="fa-solid fa-table-cells"></i>
+				</button>
+				<button class="view-btn" data-view="table">
+					<i class="fas fa-table"></i>
+				</button>
 			</div>
 		</div>
 	</div>
-	
-	<div class="quick-stats">
-		<div class="stat-item">
-			<div class="stat-icon">
-				<i class="fa-solid fa-cart-shopping"></i>
-			</div>
-			<div class="stat-content">
-				<div class="stat-value" id="totalOrders">0</div>
-				<div class="stat-label">Total Orders</div>
-			</div>
+
+	<div class="stats-bar">
+		<div class="stat-block">
+			<span class="stat-value" id="totalOrders">0</span>
+			<span class="stat-label">Total Orders</span>
 		</div>
-		
-		<div class="stat-item">
-			<div class="stat-icon">
-				<i class="fa-solid fa-money-bill-wave"></i>
-			</div>
-			<div class="stat-content">
-				<div class="stat-value" id="pendingPayments">0</div>
-				<div class="stat-label">Pending Payments</div>
-			</div>
+		<div class="stat-block">
+			<span class="stat-value" id="pendingPayments">0</span>
+			<span class="stat-label">Pending</span>
+		</div>
+		<div class="stat-block">
+			<span class="stat-value" id="readyForPickup">0</span>
+			<span class="stat-label">Ready</span>
+		</div>
+		<div class="stat-block">
+			<span class="stat-value" id="totalRevenue">LKR 0</span>
+			<span class="stat-label">Revenue</span>
 		</div>
 	</div>
-	
-	<div class="cards-view" id="cardsView">
+
+	<div class="filter-bar">
+		<div class="search-wrap">
+			<i class="fas fa-search search-icon"></i>
+			<input type="text" class="search-input" id="searchInput" placeholder="Search orders...">
+		</div>
+		<div class="filter-group">
+			<select class="filter-select" id="statusFilter">
+				<option value="">All Status</option>
+				<option value="confirmed">Confirmed</option>
+				<option value="paid">Paid</option>
+				<option value="ready_for_pickup">Ready</option>
+				<option value="completed">Completed</option>
+				<option value="cancelled">Cancelled</option>
+			</select>
+			<select class="filter-select" id="paymentFilter">
+				<option value="">All Payments</option>
+				<option value="pending">Pending</option>
+				<option value="completed">Completed</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="cards-view active" id="cardsView">
 		@if($orders->count() > 0)
 			@foreach($orders as $order)
-				<div class="order-card fade-in" data-status="{{ $order->order_status }}" 
-					 data-payment="{{ $order->payments->where('payment_status', 'completed')->first() ? 'completed' : 'pending' }}"
+				@php $payment = $order->payments->where('payment_status', 'completed')->first(); @endphp
+				<div class="order-card" data-status="{{ $order->order_status }}" 
+					 data-payment="{{ $payment ? 'completed' : 'pending' }}"
 					 data-search="{{ strtolower($order->order_number . ' ' . $order->buyer->name . ' ' . $order->farmer->name) }}"
-					 data-buyer-name="{{ $order->buyer->name }}"
-					 data-farmer-name="{{ $order->farmer->name }}"
-					 data-order-id="{{ $order->id }}"
-					 data-total-amount="{{ $order->total_amount }}">
-					<div class="card-header">
-						<div>
-							<div class="order-id">
-								<i class="fa-solid fa-hashtag"></i>
-								{{ $order->order_number }}
+					 data-buyer="{{ $order->buyer->name }}"
+					 data-farmer="{{ $order->farmer->name }}"
+					 data-id="{{ $order->id }}"
+					 data-amount="{{ $order->total_amount }}">
+					<div class="card-head">
+						<div class="order-badge">#{{ $order->order_number }}</div>
+						<span class="order-status status-{{ $order->order_status }}">{{ str_replace('_', ' ', $order->order_status) }}</span>
+					</div>
+					<div class="card-body">
+						<div class="order-users">
+							<div class="user-chip">
+								<i class="fas fa-user"></i>
+								<span>{{ $order->buyer->name }}</span>
 							</div>
-							<div class="order-date">
-								{{ \Carbon\Carbon::parse($order->created_at)->format('M d, Y') }}
+							<div class="user-chip">
+								<i class="fas fa-user-tie"></i>
+								<span>{{ $order->farmer->name }}</span>
 							</div>
 						</div>
-						<div class="status-badge status-{{ $order->order_status }}">
-							{{ str_replace('_', ' ', $order->order_status) }}
+						<div class="order-location">
+							<i class="fas fa-map-pin"></i>
+							<span>{{ $order->farmer->residential_address ?? 'No address' }}</span>
+						</div>
+						<div class="order-total">
+							<span class="total-label">Total</span>
+							<span class="total-value">LKR {{ number_format($order->total_amount, 2) }}</span>
+						</div>
+						<div class="payment-chip {{ $payment ? 'paid' : 'pending' }}">
+							<i class="fas {{ $payment ? 'fa-check-circle' : 'fa-clock' }}"></i>
+							<span>{{ $payment ? 'Paid via ' . $payment->payment_method : 'Payment Pending' }}</span>
 						</div>
 					</div>
-					
-					<div class="card-body">
-						<div class="details-grid">
-							<div class="detail-item">
-								<span class="detail-label">Buyer</span>
-								<span class="detail-value">{{ $order->buyer->name }}</span>
-							</div>
-							<div class="detail-item">
-								<span class="detail-label">Farmer</span>
-								<span class="detail-value">{{ $order->farmer->name }}</span>
-							</div>
-							<div class="detail-item">
-								<span class="detail-label">Contact</span>
-								<span class="detail-value">{{ $order->farmer->primary_mobile }}</span>
-							</div>
-							<div class="detail-item">
-								<span class="detail-label">Location</span>
-								<span class="detail-value">{{ $order->farmer->residential_address }}</span>
-							</div>
-						</div>
-						
-						<div class="total-row">
-							<span class="total-label">Total Amount</span>
-							<span class="total-amount">LKR {{ number_format($order->total_amount, 2) }}</span>
-						</div>
-						
-						<div class="payment-status">
-							@php
-								$payment = $order->payments->where('payment_status', 'completed')->first();
-							@endphp
-							@if($payment)
-								<i class="fa-solid fa-circle-check payment-completed"></i>
-								<span class="payment-completed">Paid: {{ $payment->payment_method }}</span>
-							@else
-								<i class="fa-solid fa-clock payment-pending"></i>
-								<span class="payment-pending">Payment Pending</span>
-							@endif
-						</div>
-						
-						<div class="card-actions">
+					<div class="card-foot">
+						<div class="action-group">
 							@if(!$payment && $order->order_status != 'cancelled')
-								<button class="action-btn btn-primary mark-payment-btn" 
-										data-order-id="{{ $order->id }}"
-										data-order-number="{{ $order->order_number }}"
-										data-buyer-name="{{ $order->buyer->name }}"
-										data-farmer-name="{{ $order->farmer->name }}"
-										data-total-amount="{{ $order->total_amount }}">
-									<i class="fa-solid fa-money-bill-wave"></i>
-									Mark Paid
+								<button class="action-btn primary small mark-payment" 
+										data-id="{{ $order->id }}"
+										data-number="{{ $order->order_number }}"
+										data-buyer="{{ $order->buyer->name }}"
+										data-farmer="{{ $order->farmer->name }}"
+										data-amount="{{ $order->total_amount }}"
+										data-items="{{ $order->orderItems->map(fn($i) => $i->product_name_snapshot . ' (' . $i->quantity_ordered . ')')->join(', ') }}">
+									<i class="fas fa-money-bill-wave"></i>
 								</button>
 							@endif
-							
 							@if($order->order_status == 'confirmed' && !$payment)
-								<button class="action-btn btn-warning ready-pickup-btn" 
-										data-order-id="{{ $order->id }}">
-									<i class="fa-solid fa-box-open"></i>
-									Ready
+								<button class="action-btn warning small ready-pickup" data-id="{{ $order->id }}">
+									<i class="fas fa-box-open"></i>
 								</button>
 							@endif
-							
 							@if($order->order_status == 'ready_for_pickup' && $payment)
-								<button class="action-btn btn-primary complete-order-btn" 
-										data-order-id="{{ $order->id }}">
-									<i class="fa-solid fa-check-circle"></i>
-									Complete
+								<button class="action-btn primary small complete-order" data-id="{{ $order->id }}">
+									<i class="fas fa-check-circle"></i>
 								</button>
 							@endif
-							
-							<button class="action-btn btn-secondary view-details-btn" 
-									data-order-id="{{ $order->id }}">
-								<i class="fa-solid fa-eye"></i>
-								View
+							<button class="action-btn secondary small view-details" data-id="{{ $order->id }}">
+								<i class="fas fa-eye"></i>
 							</button>
 						</div>
-						
-						<div class="order-items" style="display: none;" data-order-id="{{ $order->id }}">
-							@foreach($order->orderItems as $item)
-								<div class="order-item" data-name="{{ $item->product_name_snapshot }}" data-quantity="{{ $item->quantity_ordered }}">
-									{{ $item->product_name_snapshot }} ({{ $item->quantity_ordered }})
-								</div>
-							@endforeach
-						</div>
+					</div>
+					<div class="order-items-hidden" data-id="{{ $order->id }}" style="display:none;">
+						@foreach($order->orderItems as $item)
+							<div data-name="{{ $item->product_name_snapshot }}" data-qty="{{ $item->quantity_ordered }}"></div>
+						@endforeach
 					</div>
 				</div>
 			@endforeach
 		@else
-			<div class="no-orders">
-				<div class="no-orders-icon">
-					<i class="fa-solid fa-shopping-cart"></i>
-				</div>
+			<div class="empty-box">
+				<i class="fas fa-shopping-cart"></i>
 				<h3>No Orders Found</h3>
-				<p>When orders are placed, they will appear here</p>
+				<p>Orders will appear here when placed</p>
 			</div>
 		@endif
 	</div>
-	
-	<div class="tables-view" id="tableView">
+
+	<div class="table-view" id="tableView">
 		@if($orders->count() > 0)
-			<div class="table-container">
-				<table class="data-table">
+			<div class="table-wrap">
+				<table class="order-table">
 					<thead>
 						<tr>
-							<th>Order #</th>
+							<th>Order</th>
 							<th>Date</th>
 							<th>Buyer</th>
 							<th>Farmer</th>
@@ -211,61 +173,44 @@
 					</thead>
 					<tbody>
 						@foreach($orders as $order)
-							@php
-								$payment = $order->payments->where('payment_status', 'completed')->first();
-							@endphp
+							@php $payment = $order->payments->where('payment_status', 'completed')->first(); @endphp
 							<tr data-status="{{ $order->order_status }}" 
 								data-payment="{{ $payment ? 'completed' : 'pending' }}"
 								data-search="{{ strtolower($order->order_number . ' ' . $order->buyer->name . ' ' . $order->farmer->name) }}"
-								data-buyer-name="{{ $order->buyer->name }}"
-								data-farmer-name="{{ $order->farmer->name }}"
-								data-order-id="{{ $order->id }}"
-								data-total-amount="{{ $order->total_amount }}">
-								<td>{{ $order->order_number }}</td>
-								<td>{{ \Carbon\Carbon::parse($order->created_at)->format('M d') }}</td>
+								data-id="{{ $order->id }}">
+								<td><span class="order-num">#{{ $order->order_number }}</span></td>
+								<td>{{ \Carbon\Carbon::parse($order->created_at)->format('d M') }}</td>
 								<td>{{ $order->buyer->name }}</td>
 								<td>{{ $order->farmer->name }}</td>
-								<td>LKR {{ number_format($order->total_amount, 2) }}</td>
-								<td>
-									<span class="status-badge status-{{ $order->order_status }}">
-										{{ str_replace('_', ' ', $order->order_status) }}
-									</span>
-								</td>
+								<td class="amount-cell">LKR {{ number_format($order->total_amount, 2) }}</td>
+								<td><span class="status-badge status-{{ $order->order_status }}">{{ str_replace('_', ' ', $order->order_status) }}</span></td>
 								<td>
 									@if($payment)
-										<span class="payment-completed">
-											<i class="fa-solid fa-check-circle"></i> Paid
-										</span>
+										<span class="pay-badge paid"><i class="fas fa-check-circle"></i> Paid</span>
 									@else
-										<span class="payment-pending">
-											<i class="fa-solid fa-clock"></i> Pending
-										</span>
+										<span class="pay-badge pending"><i class="fas fa-clock"></i> Pending</span>
 									@endif
 								</td>
 								<td>
 									<div class="table-actions">
 										@if(!$payment && $order->order_status != 'cancelled')
-											<button class="table-btn btn-primary mark-payment-btn" 
-													data-order-id="{{ $order->id }}"
-													data-order-number="{{ $order->order_number }}"
-													data-buyer-name="{{ $order->buyer->name }}"
-													data-farmer-name="{{ $order->farmer->name }}"
-													data-total-amount="{{ $order->total_amount }}">
-												<i class="fa-solid fa-money-bill-wave"></i>
+											<button class="table-btn primary mark-payment" 
+													data-id="{{ $order->id }}"
+													data-number="{{ $order->order_number }}"
+													data-buyer="{{ $order->buyer->name }}"
+													data-farmer="{{ $order->farmer->name }}"
+													data-amount="{{ $order->total_amount }}"
+													data-items="{{ $order->orderItems->map(fn($i) => $i->product_name_snapshot . ' (' . $i->quantity_ordered . ')')->join(', ') }}">
+												<i class="fas fa-money-bill-wave"></i>
 											</button>
 										@endif
-										
-										<button class="table-btn btn-secondary view-details-btn" 
-												data-order-id="{{ $order->id }}">
-											<i class="fa-solid fa-eye"></i>
+										<button class="table-btn secondary view-details" data-id="{{ $order->id }}">
+											<i class="fas fa-eye"></i>
 										</button>
 									</div>
-									
-									<div class="order-items" style="display: none;" data-order-id="{{ $order->id }}">
+									<div class="order-items-hidden" data-id="{{ $order->id }}" style="display:none;">
 										@foreach($order->orderItems as $item)
-											<div class="order-item" data-name="{{ $item->product_name_snapshot }}" data-quantity="{{ $item->quantity_ordered }}">
-												{{ $item->product_name_snapshot }} ({{ $item->quantity_ordered }})
-											</div>
+											<div data-name="{{ $item->product_name_snapshot }}" data-qty="{{ $item->quantity_ordered }}"></div>
 										@endforeach
 									</div>
 								</td>
@@ -274,116 +219,71 @@
 					</tbody>
 				</table>
 			</div>
-		@else
-			<div class="no-orders">
-				<div class="no-orders-icon">
-					<i class="fa-solid fa-shopping-cart"></i>
-				</div>
-				<h3>No Orders Found</h3>
-				<p>When orders are placed, they will appear here</p>
-			</div>
 		@endif
 	</div>
-	
+
 	@if($orders->hasPages())
-		<div class="compact-pagination">
+		<div class="page-bar">
 			@if($orders->onFirstPage())
-				<span class="page-item disabled">
-					<span class="page-link"><i class="fa-solid fa-chevron-left"></i></span>
-				</span>
+				<span class="page-link disabled"><i class="fas fa-chevron-left"></i></span>
 			@else
-				<a href="{{ $orders->previousPageUrl() }}" class="page-item">
-					<span class="page-link"><i class="fa-solid fa-chevron-left"></i></span>
-				</a>
+				<a href="{{ $orders->previousPageUrl() }}" class="page-link"><i class="fas fa-chevron-left"></i></a>
 			@endif
 			
 			@for($i = 1; $i <= $orders->lastPage(); $i++)
 				@if($i == $orders->currentPage())
-					<span class="page-item active">
-						<span class="page-link">{{ $i }}</span>
-					</span>
+					<span class="page-link active">{{ $i }}</span>
 				@else
-					<a href="{{ $orders->url($i) }}" class="page-item">
-						<span class="page-link">{{ $i }}</span>
-					</a>
+					<a href="{{ $orders->url($i) }}" class="page-link">{{ $i }}</a>
 				@endif
 			@endfor
 			
 			@if($orders->hasMorePages())
-				<a href="{{ $orders->nextPageUrl() }}" class="page-item">
-					<span class="page-link"><i class="fa-solid fa-chevron-right"></i></span>
-				</a>
+				<a href="{{ $orders->nextPageUrl() }}" class="page-link"><i class="fas fa-chevron-right"></i></a>
 			@else
-				<span class="page-item disabled">
-					<span class="page-link"><i class="fa-solid fa-chevron-right"></i></span>
-				</span>
+				<span class="page-link disabled"><i class="fas fa-chevron-right"></i></span>
 			@endif
 		</div>
 	@endif
 </div>
 
-<div class="payment-modal" id="paymentModal">
-	<div class="modal-content">
-		<div class="modal-header">
-			<h2>
-				<i class="fa-solid fa-money-bill-wave"></i>
-				Confirm Payment
-			</h2>
-			<button class="close-modal" id="closePaymentModal">
-				<i class="fa-solid fa-times"></i>
-			</button>
+<!-- Payment Modal -->
+<div class="modal-overlay" id="paymentModal">
+	<div class="modal-box">
+		<div class="modal-head">
+			<h3><i class="fas fa-money-bill-wave"></i> Confirm Payment</h3>
+			<button class="modal-close" id="closePaymentModal"><i class="fas fa-times"></i></button>
 		</div>
-		
-		<div id="paymentForm">
-			<div class="form-group">
-				<label class="form-label">Order Number</label>
-				<input type="text" class="form-control" id="modalOrderNumber" readonly>
+		<div class="modal-body">
+			<div class="modal-field">
+				<label>Order Number</label>
+				<input type="text" class="modal-input" id="modalOrderNumber" readonly>
 			</div>
-			
-			<div class="form-group">
-				<label class="form-label">Total Amount</label>
-				<input type="text" class="form-control" id="modalOrderAmount" readonly>
+			<div class="modal-field">
+				<label>Total Amount</label>
+				<input type="text" class="modal-input" id="modalOrderAmount" readonly>
 			</div>
-			
-			<div class="form-group">
-				<label class="form-label">Payment Method</label>
-				<select class="form-control" id="paymentMethod">
+			<div class="modal-field">
+				<label>Payment Method</label>
+				<select class="modal-select" id="paymentMethod">
 					<option value="cash">Cash</option>
 					<option value="bank">Bank Transfer</option>
 					<option value="mobile_wallet">Mobile Wallet</option>
 				</select>
 			</div>
-			
-			<div class="form-group">
-				<label class="form-label">Reference Number</label>
-				<input type="text" class="form-control" id="transactionNumber" 
-					   placeholder="Enter reference number">
+			<div class="modal-field">
+				<label>Reference Number</label>
+				<input type="text" class="modal-input" id="transactionNumber" placeholder="Optional">
 			</div>
-			
-			<div class="invoice-preview">
-				<div class="invoice-row">
-					<span>Buyer:</span>
-					<span id="invoiceBuyer"></span>
-				</div>
-				<div class="invoice-row">
-					<span>Farmer:</span>
-					<span id="invoiceFarmer"></span>
-				</div>
-				<div class="invoice-row">
-					<span>Items:</span>
-					<span id="invoiceItems"></span>
-				</div>
+			<div class="modal-preview">
+				<div class="preview-row"><span>Buyer:</span> <span id="invoiceBuyer"></span></div>
+				<div class="preview-row"><span>Farmer:</span> <span id="invoiceFarmer"></span></div>
+				<div class="preview-row"><span>Items:</span> <span id="invoiceItems"></span></div>
 			</div>
-			
-			<div class="modal-actions">
-				<button class="btn btn-cancel" id="cancelPayment">
-					Cancel
-				</button>
-				<button class="btn btn-success" id="confirmPayment">
-					<i class="fa-solid fa-check-circle"></i>
-					Confirm
-				</button>
-			</div>
+		</div>
+		<div class="modal-foot">
+			<button class="modal-btn cancel" id="cancelPayment">Cancel</button>
+			<button class="modal-btn confirm" id="confirmPayment"><i class="fas fa-check"></i> Confirm</button>
 		</div>
 	</div>
 </div>
@@ -394,355 +294,246 @@
 document.addEventListener('DOMContentLoaded', function() {
 	const cardsView = document.getElementById('cardsView');
 	const tableView = document.getElementById('tableView');
-	const viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
+	const viewBtns = document.querySelectorAll('.view-btn');
 	const searchInput = document.getElementById('searchInput');
 	const statusFilter = document.getElementById('statusFilter');
 	const paymentFilter = document.getElementById('paymentFilter');
-	const paymentModal = document.getElementById('paymentModal');
-	const closePaymentModal = document.getElementById('closePaymentModal');
-	const cancelPayment = document.getElementById('cancelPayment');
-	
+	const modal = document.getElementById('paymentModal');
+	const closeModal = document.getElementById('closePaymentModal');
+	const cancelModal = document.getElementById('cancelPayment');
+
 	let currentOrderId = null;
 	let currentOrderNumber = null;
-	
-	function updateStats() {
-		const totalOrders = document.querySelectorAll('.order-card').length;
-		const pendingPayments = document.querySelectorAll('.payment-pending').length;
-		const readyForPickup = document.querySelectorAll('.status-ready_for_pickup').length;
-		
-		let totalRevenue = 0;
-		document.querySelectorAll('.total-amount').forEach(element => {
-			const text = element.textContent.replace('LKR', '').replace(',', '').trim();
-			const amount = parseFloat(text);
-			if (!isNaN(amount)) {
-				totalRevenue += amount;
-			}
-		});
-		
-		document.getElementById('totalOrders').textContent = totalOrders;
-		document.getElementById('pendingPayments').textContent = pendingPayments;
-		document.getElementById('readyForPickup').textContent = readyForPickup;
-		document.getElementById('totalRevenue').textContent = 'LKR ' + totalRevenue.toFixed(2);
-	}
-	
-	viewToggleBtns.forEach(btn => {
+
+	// View toggle
+	viewBtns.forEach(btn => {
 		btn.addEventListener('click', function() {
-			viewToggleBtns.forEach(b => b.classList.remove('active'));
+			viewBtns.forEach(b => b.classList.remove('active'));
 			this.classList.add('active');
-			
-			const view = this.getAttribute('data-view');
+			const view = this.dataset.view;
 			if (view === 'cards') {
-				cardsView.style.display = 'grid';
-				tableView.style.display = 'none';
+				cardsView.classList.add('active');
+				tableView.classList.remove('active');
 			} else {
-				cardsView.style.display = 'none';
-				tableView.style.display = 'block';
-			}
-		});
-	});
-	
-	function filterOrders() {
-		const searchTerm = searchInput.value.toLowerCase();
-		const statusValue = statusFilter.value;
-		const paymentValue = paymentFilter.value;
-		
-		const cards = document.querySelectorAll('.order-card');
-		const rows = document.querySelectorAll('.data-table tbody tr');
-		
-		cards.forEach(card => {
-			const cardSearch = card.getAttribute('data-search');
-			const cardStatus = card.getAttribute('data-status');
-			const cardPayment = card.getAttribute('data-payment');
-			
-			let show = true;
-			
-			if (searchTerm && !cardSearch.includes(searchTerm)) {
-				show = false;
-			}
-			
-			if (statusValue && cardStatus !== statusValue) {
-				show = false;
-			}
-			
-			if (paymentValue && cardPayment !== paymentValue) {
-				show = false;
-			}
-			
-			card.style.display = show ? 'block' : 'none';
-		});
-		
-		rows.forEach(row => {
-			const rowSearch = row.getAttribute('data-search');
-			const rowStatus = row.getAttribute('data-status');
-			const rowPayment = row.getAttribute('data-payment');
-			
-			let show = true;
-			
-			if (searchTerm && !rowSearch.includes(searchTerm)) {
-				show = false;
-			}
-			
-			if (statusValue && rowStatus !== statusValue) {
-				show = false;
-			}
-			
-			if (paymentValue && rowPayment !== paymentValue) {
-				show = false;
-			}
-			
-			row.style.display = show ? 'table-row' : 'none';
-		});
-		
-		updateStats();
-	}
-	
-	searchInput.addEventListener('input', filterOrders);
-	statusFilter.addEventListener('change', filterOrders);
-	paymentFilter.addEventListener('change', filterOrders);
-	
-	function showPaymentModal(orderId, orderNumber, orderData) {
-		currentOrderId = orderId;
-		currentOrderNumber = orderNumber;
-		
-		document.getElementById('modalOrderNumber').value = orderNumber;
-		document.getElementById('modalOrderAmount').value = 'LKR ' + parseFloat(orderData.total_amount).toFixed(2);
-		document.getElementById('invoiceBuyer').textContent = orderData.buyer_name;
-		document.getElementById('invoiceFarmer').textContent = orderData.farmer_name;
-		document.getElementById('invoiceItems').textContent = orderData.items;
-		
-		paymentModal.style.display = 'flex';
-		document.body.style.overflow = 'hidden';
-	}
-	
-	document.addEventListener('click', function(e) {
-		if (e.target.classList.contains('mark-payment-btn') || e.target.closest('.mark-payment-btn')) {
-			const btn = e.target.classList.contains('mark-payment-btn') ? e.target : e.target.closest('.mark-payment-btn');
-			const orderId = btn.getAttribute('data-order-id');
-			const orderNumber = btn.getAttribute('data-order-number');
-			const buyerName = btn.getAttribute('data-buyer-name');
-			const farmerName = btn.getAttribute('data-farmer-name');
-			const totalAmount = btn.getAttribute('data-total-amount');
-			
-			const orderCard = btn.closest('.order-card') || btn.closest('tr');
-			const orderItemsContainer = orderCard.querySelector('.order-items[data-order-id="' + orderId + '"]');
-			
-			let itemsText = '';
-			if (orderItemsContainer) {
-				const orderItems = orderItemsContainer.querySelectorAll('.order-item');
-				const itemsArray = [];
-				orderItems.forEach(item => {
-					const name = item.getAttribute('data-name');
-					const quantity = item.getAttribute('data-quantity');
-					itemsArray.push(name + ' (' + quantity + ')');
-				});
-				itemsText = itemsArray.join(', ');
-			}
-			
-			const orderData = {
-				total_amount: totalAmount || '0',
-				buyer_name: buyerName || '',
-				farmer_name: farmerName || '',
-				items: itemsText || 'No items found'
-			};
-			
-			showPaymentModal(orderId, orderNumber, orderData);
-		}
-		
-		if (e.target.classList.contains('ready-pickup-btn') || e.target.closest('.ready-pickup-btn')) {
-			const btn = e.target.classList.contains('ready-pickup-btn') ? e.target : e.target.closest('.ready-pickup-btn');
-			const orderId = btn.getAttribute('data-order-id');
-			
-			Swal.fire({
-				title: 'Mark as Ready?',
-				text: 'Are you sure products are ready for pickup?',
-				icon: 'question',
-				showCancelButton: true,
-				confirmButtonColor: '#f59e0b',
-				cancelButtonColor: '#6b7280',
-				confirmButtonText: 'Yes, mark ready',
-				cancelButtonText: 'Cancel',
-				width: 300
-			}).then((result) => {
-				if (result.isConfirmed) {
-					updateOrderStatus(orderId, 'ready_for_pickup');
-				}
-			});
-		}
-		
-		if (e.target.classList.contains('complete-order-btn') || e.target.closest('.complete-order-btn')) {
-			const btn = e.target.classList.contains('complete-order-btn') ? e.target : e.target.closest('.complete-order-btn');
-			const orderId = btn.getAttribute('data-order-id');
-			
-			Swal.fire({
-				title: 'Complete Order?',
-				text: 'Mark this order as completed?',
-				icon: 'question',
-				showCancelButton: true,
-				confirmButtonColor: '#10B981',
-				cancelButtonColor: '#6b7280',
-				confirmButtonText: 'Yes, complete',
-				cancelButtonText: 'Cancel',
-				width: 300
-			}).then((result) => {
-				if (result.isConfirmed) {
-					updateOrderStatus(orderId, 'completed');
-				}
-			});
-		}
-		
-		if (e.target.classList.contains('view-details-btn') || e.target.closest('.view-details-btn')) {
-			const btn = e.target.classList.contains('view-details-btn') ? e.target : e.target.closest('.view-details-btn');
-			const orderId = btn.getAttribute('data-order-id');
-			
-			window.location.href = '{{ route("lf.orders.view", ["id" => ":id"]) }}'.replace(':id', orderId);
-		}
-	});
-	
-	function closeModal() {
-		paymentModal.style.display = 'none';
-		document.body.style.overflow = 'auto';
-		currentOrderId = null;
-		currentOrderNumber = null;
-	}
-	
-	closePaymentModal.addEventListener('click', closeModal);
-	cancelPayment.addEventListener('click', closeModal);
-	
-	paymentModal.addEventListener('click', function(e) {
-		if (e.target === paymentModal) {
-			closeModal();
-		}
-	});
-	
-	document.getElementById('confirmPayment').addEventListener('click', function() {
-		const paymentMethod = document.getElementById('paymentMethod').value;
-		const transactionNumber = document.getElementById('transactionNumber').value;
-		
-		if (!currentOrderId) {
-			Swal.fire({
-				title: 'Error',
-				text: 'No order selected',
-				icon: 'error',
-				width: 300
-			});
-			return;
-		}
-		
-		Swal.fire({
-			title: 'Confirm Payment',
-			text: 'Are you sure payment was received?',
-			icon: 'question',
-			showCancelButton: true,
-			confirmButtonColor: '#10B981',
-			cancelButtonColor: '#6b7280',
-			confirmButtonText: 'Yes, confirm',
-			cancelButtonText: 'Cancel',
-			width: 300
-		}).then((result) => {
-			if (result.isConfirmed) {
-				fetch('{{ route("lf.orders.markPayment") }}', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-CSRF-TOKEN': '{{ csrf_token() }}',
-						'Accept': 'application/json'
-					},
-					body: JSON.stringify({
-						order_id: currentOrderId,
-						payment_method: paymentMethod,
-						transaction_number: transactionNumber || null
-					})
-				})
-				.then(response => response.json())
-				.then(data => {
-					if (data.success) {
-						Swal.fire({
-							title: 'Success!',
-							text: data.message,
-							icon: 'success',
-							timer: 2000,
-							showConfirmButton: false,
-							width: 300
-						});
-						
-						setTimeout(() => {
-							location.reload();
-						}, 2000);
-					} else {
-						Swal.fire({
-							title: 'Error',
-							text: data.message || 'Failed to mark payment',
-							icon: 'error',
-							width: 300
-						});
-					}
-					
-					closeModal();
-				})
-				.catch(error => {
-					Swal.fire({
-						title: 'Network Error',
-						text: 'Please try again',
-						icon: 'error',
-						width: 300
-					});
-				});
+				tableView.classList.add('active');
+				cardsView.classList.remove('active');
 			}
 		});
 	});
 
-	function updateOrderStatus(orderId, status) {
+	// Filter function
+	function filterItems() {
+		const term = searchInput.value.toLowerCase();
+		const status = statusFilter.value;
+		const payment = paymentFilter.value;
+
+		// Filter cards
+		document.querySelectorAll('.order-card').forEach(card => {
+			let show = true;
+			const cardSearch = card.dataset.search;
+			const cardStatus = card.dataset.status;
+			const cardPayment = card.dataset.payment;
+
+			if (term && !cardSearch.includes(term)) show = false;
+			if (status && cardStatus !== status) show = false;
+			if (payment && cardPayment !== payment) show = false;
+
+			card.style.display = show ? 'block' : 'none';
+		});
+
+		// Filter table rows
+		document.querySelectorAll('.order-table tbody tr').forEach(row => {
+			let show = true;
+			const rowSearch = row.dataset.search;
+			const rowStatus = row.dataset.status;
+			const rowPayment = row.dataset.payment;
+
+			if (term && !rowSearch.includes(term)) show = false;
+			if (status && rowStatus !== status) show = false;
+			if (payment && rowPayment !== payment) show = false;
+
+			row.style.display = show ? 'table-row' : 'none';
+		});
+
+		updateStats();
+	}
+
+	searchInput.addEventListener('input', filterItems);
+	statusFilter.addEventListener('change', filterItems);
+	paymentFilter.addEventListener('change', filterItems);
+
+	// Stats update
+	function updateStats() {
+		const cards = document.querySelectorAll('.order-card');
+		const pending = document.querySelectorAll('.payment-chip.pending').length;
+		const ready = document.querySelectorAll('.status-ready_for_pickup').length;
+		let total = 0;
+
+		cards.forEach(c => {
+			const amount = parseFloat(c.dataset.amount) || 0;
+			total += amount;
+		});
+
+		document.getElementById('totalOrders').textContent = cards.length;
+		document.getElementById('pendingPayments').textContent = pending;
+		document.getElementById('readyForPickup').textContent = ready;
+		document.getElementById('totalRevenue').textContent = 'LKR ' + total.toFixed(2);
+	}
+
+	// Payment modal
+	function openPaymentModal(orderId, orderNumber, data) {
+		currentOrderId = orderId;
+		currentOrderNumber = orderNumber;
+		document.getElementById('modalOrderNumber').value = orderNumber;
+		document.getElementById('modalOrderAmount').value = 'LKR ' + parseFloat(data.amount).toFixed(2);
+		document.getElementById('invoiceBuyer').textContent = data.buyer;
+		document.getElementById('invoiceFarmer').textContent = data.farmer;
+		document.getElementById('invoiceItems').textContent = data.items;
+		modal.style.display = 'flex';
+		document.body.style.overflow = 'hidden';
+	}
+
+	function closeModalFunc() {
+		modal.style.display = 'none';
+		document.body.style.overflow = 'auto';
+		currentOrderId = null;
+		currentOrderNumber = null;
+	}
+
+	closeModal.addEventListener('click', closeModalFunc);
+	cancelModal.addEventListener('click', closeModalFunc);
+	modal.addEventListener('click', (e) => {
+		if (e.target === modal) closeModalFunc();
+	});
+
+	// Event delegation for buttons
+	document.addEventListener('click', function(e) {
+		const target = e.target.closest('button');
+		if (!target) return;
+
+		// Mark payment
+		if (target.classList.contains('mark-payment')) {
+			const id = target.dataset.id;
+			const number = target.dataset.number;
+			const data = {
+				buyer: target.dataset.buyer,
+				farmer: target.dataset.farmer,
+				amount: target.dataset.amount,
+				items: target.dataset.items
+			};
+			openPaymentModal(id, number, data);
+		}
+
+		// Ready for pickup
+		if (target.classList.contains('ready-pickup')) {
+			const id = target.dataset.id;
+			Swal.fire({
+				title: 'Mark as Ready?',
+				text: 'Confirm products are ready for pickup',
+				icon: 'question',
+				showCancelButton: true,
+				confirmButtonColor: '#f59e0b',
+				cancelButtonColor: '#6b7280',
+				confirmButtonText: 'Yes, mark ready'
+			}).then(r => {
+				if (r.isConfirmed) updateOrderStatus(id, 'ready_for_pickup');
+			});
+		}
+
+		// Complete order
+		if (target.classList.contains('complete-order')) {
+			const id = target.dataset.id;
+			Swal.fire({
+				title: 'Complete Order?',
+				text: 'Mark this order as completed',
+				icon: 'question',
+				showCancelButton: true,
+				confirmButtonColor: '#10B981',
+				cancelButtonColor: '#6b7280',
+				confirmButtonText: 'Yes, complete'
+			}).then(r => {
+				if (r.isConfirmed) updateOrderStatus(id, 'completed');
+			});
+		}
+
+		// View details
+		if (target.classList.contains('view-details')) {
+			const id = target.dataset.id;
+			window.location.href = '{{ route("lf.orders.view", ["id" => ":id"]) }}'.replace(':id', id);
+		}
+	});
+
+	// Confirm payment
+	document.getElementById('confirmPayment').addEventListener('click', function() {
+		const method = document.getElementById('paymentMethod').value;
+		const ref = document.getElementById('transactionNumber').value;
+
+		if (!currentOrderId) return;
+
+		Swal.fire({
+			title: 'Confirm Payment',
+			text: 'Mark this order as paid?',
+			icon: 'question',
+			showCancelButton: true,
+			confirmButtonColor: '#10B981',
+			cancelButtonColor: '#6b7280',
+			confirmButtonText: 'Yes, confirm'
+		}).then(r => {
+			if (r.isConfirmed) {
+				fetch('{{ route("lf.orders.markPayment") }}', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRF-TOKEN': '{{ csrf_token() }}'
+					},
+					body: JSON.stringify({
+						order_id: currentOrderId,
+						payment_method: method,
+						transaction_number: ref || null
+					})
+				})
+				.then(res => res.json())
+				.then(data => {
+					if (data.success) {
+						Swal.fire({ icon: 'success', title: 'Success', text: data.message, timer: 1500, showConfirm: false });
+						closeModalFunc();
+						setTimeout(() => location.reload(), 1500);
+					} else {
+						Swal.fire({ icon: 'error', title: 'Error', text: data.message });
+					}
+				})
+				.catch(() => Swal.fire({ icon: 'error', title: 'Error', text: 'Network error' }));
+			}
+		});
+	});
+
+	function updateOrderStatus(id, status) {
 		fetch('{{ route("lf.orders.updateStatus") }}', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'X-CSRF-TOKEN': '{{ csrf_token() }}',
-				'Accept': 'application/json'
+				'X-CSRF-TOKEN': '{{ csrf_token() }}'
 			},
-			body: JSON.stringify({
-				order_id: orderId,
-				status: status
-			})
+			body: JSON.stringify({ order_id: id, status: status })
 		})
-		.then(response => response.json())
+		.then(res => res.json())
 		.then(data => {
 			if (data.success) {
-				Swal.fire({
-					title: 'Success!',
-					text: data.message,
-					icon: 'success',
-					timer: 2000,
-					showConfirmButton: false,
-					width: 300
-				});
-				
-				setTimeout(() => {
-					location.reload();
-				}, 2000);
+				Swal.fire({ icon: 'success', title: 'Success', text: data.message, timer: 1500, showConfirm: false });
+				setTimeout(() => location.reload(), 1500);
 			} else {
-				Swal.fire({
-					title: 'Error',
-					text: data.message || 'Failed to update status',
-					icon: 'error',
-					width: 300
-				});
+				Swal.fire({ icon: 'error', title: 'Error', text: data.message });
 			}
 		})
-		.catch(error => {
-			Swal.fire({
-				title: 'Network Error',
-				text: 'Please try again',
-				icon: 'error',
-				width: 300
-			});
-		});
+		.catch(() => Swal.fire({ icon: 'error', title: 'Error', text: 'Network error' }));
 	}
-	
-	updateStats();
-	
-	document.querySelectorAll('.order-card').forEach((card, index) => {
-		card.style.animationDelay = (index * 0.1) + 's';
+
+	// Animation delays
+	document.querySelectorAll('.order-card').forEach((card, i) => {
+		card.style.animationDelay = (i * 0.05) + 's';
 	});
+
+	updateStats();
 });
 </script>
 @endsection

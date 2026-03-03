@@ -56,9 +56,6 @@
                 <li>
                     <a href="{{ route('lf.manageProducts') }}" class="menu-link {{ request()->routeIs('lf.manageProducts') ? 'active' : '' }}">
                         <i class="fa-solid fa-box-open"></i><span>Manage Products</span>
-                        @if(isset($sharedCounts['lowStockProducts']) && $sharedCounts['lowStockProducts'] > 0)
-                            <span class="badge bg-warning">{{ $sharedCounts['lowStockProducts'] }}</span>
-                        @endif
                     </a>
                 </li>
 
@@ -67,9 +64,6 @@
                 <li>
                     <a href="{{ route('lf.orders') }}" class="menu-link {{ request()->routeIs('lf.orders') ? 'active' : '' }}">
                         <i class="fa-solid fa-shopping-cart"></i><span>View Orders</span>
-                        @if(isset($sharedCounts['pendingOrders']) && $sharedCounts['pendingOrders'] > 0)
-                            <span class="badge bg-info">{{ $sharedCounts['pendingOrders'] }}</span>
-                        @endif
                     </a>
                 </li>
 

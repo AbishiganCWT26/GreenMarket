@@ -427,7 +427,7 @@ class LeadFarmerController extends Controller
         }
 
         $viewType = $request->input('view_type', 'card');
-        $itemsPerPage = ($viewType === 'card') ? 15 : 10;
+        $itemsPerPage = ($viewType === 'card') ? 12 : 10;
 
         $products = $query->orderBy('created_at', 'desc')->paginate($itemsPerPage);
         $products->appends($request->all());
