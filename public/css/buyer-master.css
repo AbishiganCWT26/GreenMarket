@@ -302,7 +302,6 @@ body {
     min-width: 20px;
     text-align: center;
     box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
-    animation: bounce 2s infinite;
 }
 
 @keyframes bounce {
