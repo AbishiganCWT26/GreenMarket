@@ -420,7 +420,8 @@ class BuyerController extends Controller
             ->select(
                 'orders.*',
                 'farmers.name as farmer_name',
-                'lead_farmers.name as lead_farmer_name'
+                'lead_farmers.name as lead_farmer_name',
+                'lead_farmers.primary_mobile as lead_farmer_contact'
             )
             ->join('farmers', 'orders.farmer_id', '=', 'farmers.id')
             ->join('lead_farmers', 'orders.lead_farmer_id', '=', 'lead_farmers.id')

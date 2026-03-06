@@ -551,11 +551,11 @@ class FarmerController extends Controller
             $order->update(['order_status' => 'ready_for_pickup']);
 
             Notification::create([
-                'user_id' => $order->buyer_id,
+                'user_id' => $order->buyer->user_id,
                 'recipient_type' => 'user',
                 'title' => 'Order Ready for Pickup',
-                'message' => 'Your order #' . $order->order_code . ' is ready for pickup from the farmer.',
-                'notification_type' => 'order_status',
+                'message' => 'Your order #' . $order->order_number . ' is ready for pickup from the farmer.',
+                'notification_type' => 'ready_for_pickup',
                 'related_id' => $order->id,
             ]);
 
@@ -564,6 +564,7 @@ class FarmerController extends Controller
                 'message' => 'Order marked as ready for pickup. Buyer has been notified.'
             ]);
         } catch (\Exception $e) {
+            \Log::error('markOrderReady failed: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update order status.'
@@ -783,18 +784,19 @@ class FarmerController extends Controller
         // Share counts with view
         $this->shareCounts();
 
-        $orders = Order::where('farmer_id', $farmer->id)
-            ->whereIn('order_status', ['paid', 'ready_for_pickup'])
-            ->with(['buyer', 'orderItems.product', 'payment'])
+        $query = Order::where('farmer_id', $farmer->id)
+            ->whereIn('order_status', ['paid', 'ready_for_pickup']);
+
+        $pendingOrders = $query->count();
+
+        $orders = $query->with(['buyer', 'orderItems.product', 'payment'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         foreach ($orders as $order) {
             $order->items_total = $order->orderItems->sum('item_total');
             $order->delivery_fee = $order->total_amount - $order->orderItems->sum('item_total');
         }
-
-        $pendingOrders = $orders->count();
 
         return view('farmer.orders.active', compact('orders', 'pendingOrders'));
     }

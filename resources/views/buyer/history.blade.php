@@ -29,7 +29,7 @@ body {
 }
 
 .history-container {
-    max-width: 1200px;
+    max-width: 2500px;
     margin: 0 auto;
     padding: 1.5rem 1rem;
 }
@@ -329,13 +329,18 @@ body {
     color: #92400e;
 }
 
+.status-badge.ready_for_pickup {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+}
+
 .status-badge.paid {
     background: #d1fae5;
     color: #065f46;
 }
 
 .status-badge.completed {
-    background: linear-gradient(135deg, #10B981, #059669);
+    background: linear-gradient(135deg, rgba(12, 219, 233, 1), rgba(83, 208, 217, 1));
     color: white;
 }
 
@@ -774,6 +779,68 @@ body {
         padding: 1rem;
     }
 }
+/* SweetAlert Custom Styling */
+.pickup-swal-popup {
+    border-radius: 15px !important;
+    padding: 1.5rem !important;
+}
+
+.pickup-swal-title {
+    color: var(--dark-green) !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+
+.pickup-info-container {
+    text-align: left;
+    margin-top: 1rem;
+}
+
+.pickup-info-group {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid var(--primary-green);
+}
+
+.pickup-info-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.pickup-info-value {
+    display: block;
+    font-size: 1rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.pickup-map-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--blue);
+    color: white !important;
+    padding: 0.75rem 1.25rem;
+    border-radius: 6px;
+    text-decoration: none !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.pickup-map-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
 </style>
 @endsection
 
@@ -943,11 +1010,11 @@ body {
                     <div class="farmer-info">
                         <div class="farmer-name">
                             <i class="fas fa-user-tie"></i>
-                            Lead Farmer: {{ $order->lead_farmer_name }}
+                            Seller: {{ $order->lead_farmer_name }}
                         </div>
                         <div class="farmer-detail">
                             <i class="fas fa-user"></i>
-                            Farmer: {{ $order->farmer_name }}
+                            Seller Phone No: {{ $order->lead_farmer_contact }}
                         </div>
                     </div>
 
@@ -958,7 +1025,7 @@ body {
                         </button>
 
                         @if($order->order_status == 'ready_for_pickup')
-                            <button class="action-btn btn-secondary">
+                            <button class="action-btn btn-secondary track-pickup-btn" data-order-id="{{ $order->id }}">
                                 <i class="fas fa-map-marker-alt"></i>
                                 Track Pickup
                             </button>
@@ -1313,7 +1380,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         <!-- ================= FOOTER NOTES ================= -->
                         <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #6b7280; font-size: 0.85rem;">
-                            <p><strong>Notes:</strong> Thank you for your purchase! Please contact the farmer for pickup arrangements.</p>
+                            <p><strong>Notes:</strong> Thank you for your purchase! Please contact the seller for pickup arrangements.</p>
                         </div>
                     </div>
                 </div>
@@ -1512,6 +1579,73 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
             });
+        });
+    });
+
+    // Track Pickup functionality
+    document.querySelectorAll('.track-pickup-btn').forEach(button => {
+        button.addEventListener('click', async function() {
+            const orderId = this.getAttribute('data-order-id');
+            
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            
+            try {
+                const response = await fetch(`/buyer/invoice/data/${orderId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch data');
+                
+                const data = await response.json();
+                
+                if (!data.success) throw new Error(data.message || 'Failed to load details');
+
+                Swal.fire({
+                    title: '<i class="fas fa-truck-loading me-2"></i>Pickup Details',
+                    html: `
+                        <div class="pickup-info-container">
+                            <div class="pickup-info-group">
+                                <span class="pickup-info-label">Seller Name</span>
+                                <span class="pickup-info-value">${data.lead_farmer_name}</span>
+                            </div>
+                            <div class="pickup-info-group">
+                                <span class="pickup-info-label">Seller Phone No</span>
+                                <span class="pickup-info-value">
+                                    <a href="tel:${data.lead_farmer_contact}" style="color: var(--primary-green); text-decoration: none;">
+                                        <i class="fas fa-phone-alt me-1"></i> ${data.lead_farmer_contact}
+                                    </a>
+                                </span>
+                            </div>
+                            <div class="pickup-info-group">
+                                <span class="pickup-info-label">Pickup Address</span>
+                                <span class="pickup-info-value">${data.products_pickup_address}</span>
+                            </div>
+                            ${data.products_pickup_map_link ? `
+                                <a href="${data.products_pickup_map_link}" target="_blank" class="pickup-map-btn">
+                                    <i class="fas fa-map-marked-alt"></i> Open in Google Maps
+                                </a>
+                            ` : ''}
+                        </div>
+                    `,
+                    showCloseButton: true,
+                    showConfirmButton: false,
+                    customClass: {
+                        popup: 'pickup-swal-popup',
+                        title: 'pickup-swal-title'
+                    },
+                    width: '450px'
+                });
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast(error.message || 'Error loading pickup information', 'error');
+            } finally {
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+            }
         });
     });
 
