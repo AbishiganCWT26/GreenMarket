@@ -582,11 +582,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Cash on Delivery',
-                cancelButtonText: 'Bank Card Payment',
-                showDenyButton: true,
                 denyButtonText: 'Cancel',
                 confirmButtonColor: '#10B981',
-                cancelButtonColor: '#3B82F6',
                 denyButtonColor: '#6B7280'
             });
 
@@ -598,13 +595,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="text-start">
                             <p><strong>How Cash on Delivery works:</strong></p>
                             <ul>
-                                <li>Lead farmer will receive the product from farmer (outside the system)</li>
-                                <li>After receiving ready product notification from farmer</li>
-                                <li>The product will be delivered soon by lead farmer</li>
                                 <li>You will directly contact the lead farmer for pickup</li>
-                                <li>Lead farmer is responsible for payment collection (cash on delivery)</li>
-                                <li>Lead farmer will update the system about payment status</li>
-                                <li>Lead farmer gives payment to the farmer (outside the system)</li>
                             </ul>
                         </div>
                     `,
@@ -661,15 +652,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             showAlert('Failed to place order. Please try again.', 'error');
                         }
                     }
-                });
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                // Bank Card Payment selected
-                Swal.fire({
-                    title: 'Payment Gateway Coming Soon',
-                    text: 'Online payment gateway will be available soon. Please use Cash on Delivery for now.',
-                    icon: 'info',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#3B82F6'
                 });
             }
         });

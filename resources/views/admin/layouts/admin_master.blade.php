@@ -35,10 +35,12 @@
 
                 <li><a href="{{ url('/admin/users') }}" class="menu-link {{ request()->is('admin/users*') ? 'active' : '' }}"><i class="fa-solid fa-users-gear"></i><span>User Management</span></a></li>
                 <li><a href="{{ url('/admin/products') }}" class="menu-link {{ request()->is('admin/products*') ? 'active' : '' }}"><i class="fa-solid fa-box-open"></i><span>Product Oversight</span></a></li>
+                <li><a href="{{ route('admin.inventory.index') }}" class="menu-link {{ request()->routeIs('admin.inventory.index') ? 'active' : '' }}"><i class="fa-solid fa-chart-line"></i><span>Inventory Oversight</span></a></li>
                 <li><a href="{{ url('/admin/sales') }}" class="menu-link {{ request()->is('admin/sales*') ? 'active' : '' }}"><i class="fa-solid fa-receipt"></i><span>Sales</span></a></li>
                 <li><a href="{{ url('/admin/complaints') }}" class="menu-link {{ request()->is('admin/complaints*') ? 'active' : '' }}"><i class="fa-solid fa-flag"></i><span>Users Complaints</span></a></li>
                 <li><a href="{{ url('/admin/lead-farmer-groups') }}" class="menu-link {{ request()->is('admin/lead-farmer-groups*') ? 'active' : '' }}"><i class="fa-solid fa-users-between-lines"></i><span>Lead Farmer Groups</span></a></li>
                 <li><a href="{{ url('/admin/buyer-requests') }}" class="menu-link {{ request()->is('admin/buyer-requests*') ? 'active' : '' }}"><i class="fa-solid fa-handshake"></i><span>Buyer Requests</span></a></li>
+                
 
                 <li class="menu-heading">TAXONOMY</li>
 

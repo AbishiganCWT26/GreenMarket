@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use PDF;
+use Carbon\Carbon;
+use App\Models\Product;
+use App\Models\InventoryLog;
+use App\Models\LeadFarmer;
+use App\Models\Farmer;
+use App\Models\ProductCategory;
 
 class ProductController extends Controller
 {
@@ -687,5 +693,74 @@ class ProductController extends Controller
 	{
 		$products = $this->getFilteredProducts($request);
 		return response()->json(['products' => $products]);
+	}
+
+	public function stockReport(Request $request)
+	{
+		$products = Product::with(['leadFarmer', 'farmer', 'category'])
+			->orderBy('quantity', 'asc')
+			->get();
+
+		if ($request->has('export') && $request->export == 'pdf') {
+			$pdf = PDF::loadView('admin.inventory.reports.stock_pdf', compact('products'));
+			return $pdf->download('stock-report-' . date('Y-m-d') . '.pdf');
+		}
+
+		return view('admin.inventory.reports.stock', compact('products'));
+	}
+
+	public function movementReport(Request $request)
+	{
+		$logsQuery = InventoryLog::with(['product', 'user', 'order'])
+			->orderBy('created_at', 'desc');
+
+		if ($request->filled('product_id')) {
+			$logsQuery->where('product_id', $request->product_id);
+		}
+		if ($request->filled('type')) {
+			$logsQuery->where('type', $request->type);
+		}
+
+		$logs = $logsQuery->get();
+
+		if ($request->has('export') && $request->export == 'pdf') {
+			$pdf = PDF::loadView('admin.inventory.reports.Movement-Logs_pdf', compact('logs'));
+			return $pdf->download('movement-logs-report-' . date('Y-m-d') . '.pdf');
+		}
+
+		return view('admin.inventory.reports.movement_logs', compact('logs'));
+	}
+
+	public function inventory(Request $request)
+	{
+		// Get products with relationships
+		$productsQuery = Product::with(['leadFarmer', 'farmer', 'category'])
+			->orderBy('created_at', 'desc');
+
+		// Apply filters for products
+		if ($request->filled('lead_farmer_id')) {
+			$productsQuery->where('lead_farmer_id', $request->lead_farmer_id);
+		}
+
+		// Get products (paginated for performance)
+		$products = $productsQuery->get();
+
+		// Get inventory logs
+		$logsQuery = InventoryLog::with(['product', 'user', 'order'])
+			->orderBy('created_at', 'desc');
+
+		if ($request->filled('product_id')) {
+			$logsQuery->where('product_id', $request->product_id);
+		}
+		if ($request->filled('type')) {
+			$logsQuery->where('type', $request->type);
+		}
+
+		$logs = $logsQuery->get();
+
+		// Get lead farmers for filter
+		$leadFarmers = LeadFarmer::with('user')->get();
+
+		return view('admin.inventory', compact('products', 'logs', 'leadFarmers'));
 	}
 }

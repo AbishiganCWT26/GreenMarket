@@ -14,6 +14,8 @@ use App\Models\Buyer;
 use App\Mail\BuyerRegistrationMail;
 use App\Mail\OrderNotificationMail;
 use Illuminate\Support\Facades\Log;
+use App\Services\InventoryService;
+use App\Models\Product;
 
 class BuyerController extends Controller
 {
@@ -1380,10 +1382,17 @@ class BuyerController extends Controller
                     'updated_at' => now()
                 ]);
 
-                // Update product quantity using cart_quantity
-                DB::table('products')
-                    ->where('id', $item->product_id)
-                    ->decrement('quantity', $item->cart_quantity);
+                // Update product quantity using InventoryService
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    app(InventoryService::class)->updateStock(
+                        $product,
+                        -$item->cart_quantity,
+                        'order_placed',
+                        'Order #' . $orderNumber . ' placed via Credit Card',
+                        $orderId
+                    );
+                }
             }
 
             $paymentRef = 'PAY-' . date('YmdHis') . '-' . strtoupper(uniqid());
@@ -1596,10 +1605,17 @@ class BuyerController extends Controller
                     'updated_at' => now()
                 ]);
 
-                // Update product quantity in products table
-                DB::table('products')
-                    ->where('id', $item->product_id)
-                    ->decrement('quantity', $item->cart_quantity); // Use cart_quantity
+                // Update product quantity using InventoryService
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    app(InventoryService::class)->updateStock(
+                        $product,
+                        -$item->cart_quantity,
+                        'order_placed',
+                        'Order #' . $orderNumber . ' placed via COD',
+                        $orderId
+                    );
+                }
             }
 
             // Create invoice for this order
@@ -1762,9 +1778,16 @@ class BuyerController extends Controller
                 ->where('order_id', $orderId)
                 ->get();
             foreach ($orderItems as $item) {
-                DB::table('products')
-                    ->where('id', $item->product_id)
-                    ->increment('quantity', $item->quantity_ordered);
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    app(InventoryService::class)->updateStock(
+                        $product,
+                        $item->quantity_ordered,
+                        'order_cancelled',
+                        'Order #' . $order->order_number . ' cancelled by buyer',
+                        $orderId
+                    );
+                }
             }
             DB::table('orders')
                 ->where('id', $orderId)

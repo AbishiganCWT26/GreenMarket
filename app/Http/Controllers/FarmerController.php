@@ -19,6 +19,9 @@ use App\Models\Complaint;
 use App\Models\Notification;
 use App\Models\LeadFarmer;
 use App\Models\BuyerProductRequest;
+use App\Models\InventoryLog;
+use App\Models\ProductCategory;
+use App\Services\InventoryService;
 
 class FarmerController extends Controller
 {
@@ -1305,4 +1308,126 @@ class FarmerController extends Controller
         ]);
     }
 
+    public function myInventory()
+    {
+        $farmerId = Auth::user()->farmer->id;
+        
+        $products = Product::where('farmer_id', $farmerId)
+            ->with(['category', 'subcategory'])
+            ->get();
+            
+        $logs = InventoryLog::whereHas('product', function($q) use ($farmerId) {
+                $q->where('farmer_id', $farmerId);
+            })
+            ->with(['product', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        $categories = ProductCategory::where('is_active', true)->get();
+
+        // Calculate statistics
+        $totalProducts = $products->count();
+        $totalInventoryValue = $products->sum(function($p) {
+            return $p->quantity * $p->selling_price;
+        });
+        
+        $lowStockCount = $products->filter(function($p) {
+            return $p->inventory_status == 'Low Stock' || $p->inventory_status == 'Critical';
+        })->count();
+        
+        $outOfStockCount = $products->filter(function($p) {
+            return $p->inventory_status == 'Out of Stock';
+        })->count();
+
+        return view('farmer.inventory.Inventory-Dashboard', compact(
+            'products',
+            'logs',
+            'categories',
+            'totalProducts',
+            'totalInventoryValue',
+            'lowStockCount',
+            'outOfStockCount'
+        ));
+    }
+
+    public function inventoryList(Request $request)
+    {
+        $farmerId = Auth::user()->farmer->id;
+        $query = Product::with(['category', 'subcategory'])
+            ->where('farmer_id', $farmerId);
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('search')) {
+            $query->where('product_name', 'like', '%' . $request->search . '%');
+        }
+
+        $products = $query->paginate(15);
+        
+        if ($request->filled('status')) {
+            $statusFilter = $request->status;
+            $products->setCollection(
+                $products->getCollection()->filter(function ($product) use ($statusFilter) {
+                    return $product->inventory_status === $statusFilter;
+                })
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'html' => view('farmer.inventory.partials.product_list', compact('products'))->render()
+        ]);
+    }
+
+    public function inventoryProductsPdf(Request $request)
+    {
+        $farmerId = Auth::user()->farmer->id;
+        $query = Product::with(['category', 'subcategory'])
+            ->where('farmer_id', $farmerId);
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('search')) {
+            $query->where('product_name', 'like', '%' . $request->search . '%');
+        }
+
+        $products = $query->get();
+        
+        if ($request->filled('status')) {
+            $statusFilter = $request->status;
+            $products = $products->filter(function ($product) use ($statusFilter) {
+                return $product->inventory_status === $statusFilter;
+            });
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('farmer.inventory.Inventory-Products_pdf', compact('products'));
+        return $pdf->download('My-Product-Inventory-' . date('Y-m-d') . '.pdf');
+    }
+
+    public function inventoryMovementLogsPdf(Request $request)
+    {
+        $farmerId = Auth::user()->farmer->id;
+        
+        $query = InventoryLog::whereHas('product', function($q) use ($farmerId) {
+                $q->where('farmer_id', $farmerId);
+            })
+            ->with(['product', 'user']);
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+        if ($request->filled('search')) {
+            $query->whereHas('product', function($q) use ($request) {
+                $q->where('product_name', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $logs = $query->orderBy('created_at', 'desc')->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('farmer.inventory.Inventory-Movement-Logs_pdf', compact('logs'));
+        return $pdf->download('My-Inventory-Movements-' . date('Y-m-d') . '.pdf');
+    }
 }

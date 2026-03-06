@@ -47,6 +47,10 @@
                     <a href="{{ route('farmer.productRequests') }}" class="menu-link {{ request()->routeIs('farmer.productRequests') ? 'active' : '' }}">
                         <i class="fa-solid fa-handshake"></i><span>Buyer Requests</span>
                     </a>
+                <li>
+                    <a href="{{ route('farmer.inventory') }}" class="menu-link {{ request()->routeIs('farmer.inventory') ? 'active' : '' }}">
+                        <i class="fa-solid fa-warehouse"></i><span>My Inventory</span>
+                    </a>
                 </li>
 
                 <li class="menu-heading">ORDERS</li>

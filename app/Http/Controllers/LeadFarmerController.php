@@ -8,12 +8,14 @@ use App\Models\Product;
 use App\Models\LeadFarmer;
 use App\Models\ProductCategory;
 use App\Models\ProductSubcategory;
-use App\Models\SystemStandard;
 use App\Models\Order;
-use App\Models\Notification;
-use App\Models\ProductExample;
-use App\Models\OtpVerification;
 use App\Models\Payment;
+use App\Models\Notification;
+use App\Models\OtpVerification;
+use App\Models\ProductExample;
+use App\Models\SystemStandard;
+use App\Models\InventoryLog;
+use App\Services\InventoryService;
 use App\Mail\FarmerRegistrationMail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -1016,6 +1018,87 @@ class LeadFarmerController extends Controller
         }
     }
 
+    public function inventoryMovementLogs(Request $request)
+    {
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+        
+        $query = InventoryLog::with(['product.farmer', 'user', 'order'])
+            ->whereHas('product', function($q) use ($leadFarmerId) {
+                $q->where('lead_farmer_id', $leadFarmerId);
+            });
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('product', function($pq) use ($search) {
+                    $pq->where('product_name', 'like', "%$search%")
+                      ->orWhereHas('farmer', function($fq) use ($search) {
+                          $fq->where('name', 'like', "%$search%");
+                      });
+                })
+                ->orWhere('reason', 'like', "%$search%");
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('farmer_id')) {
+            $query->whereHas('product', function($q) use ($request) {
+                $q->where('farmer_id', $request->farmer_id);
+            });
+        }
+
+        $logs = $query->orderBy('created_at', 'desc')->paginate(15);
+        $logs->appends($request->all());
+
+        $farmers = Farmer::where('lead_farmer_id', $leadFarmerId)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('lead_farmer.inventory.Inventory-Movement-Logs', compact('logs', 'farmers'));
+    }
+
+    public function inventoryMovementLogsPdf(Request $request)
+    {
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+        
+        $query = InventoryLog::with(['product.farmer', 'user', 'order'])
+            ->whereHas('product', function($q) use ($leadFarmerId) {
+                $q->where('lead_farmer_id', $leadFarmerId);
+            });
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('product', function($pq) use ($search) {
+                    $pq->where('product_name', 'like', "%$search%")
+                      ->orWhereHas('farmer', function($fq) use ($search) {
+                          $fq->where('name', 'like', "%$search%");
+                      });
+                })
+                ->orWhere('reason', 'like', "%$search%");
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('farmer_id')) {
+            $query->whereHas('product', function($q) use ($request) {
+                $q->where('farmer_id', $request->farmer_id);
+            });
+        }
+
+        $logs = $query->orderBy('created_at', 'desc')->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('lead_farmer.inventory.Inventory-Movement-Logs_pdf', compact('logs'));
+        return $pdf->download('Movement-Logs-' . date('Y-m-d') . '.pdf');
+    }
+
     public function getSubcategories($categoryId)
     {
         $subcategories = ProductSubcategory::where('category_id', $categoryId)
@@ -1585,14 +1668,17 @@ class LeadFarmerController extends Controller
             $order->paid_date = now();
             $order->save();
 
+            // Log payment confirmation for each item (0 change as stock was decremented on order placement)
             foreach ($order->orderItems as $item) {
                 $product = Product::find($item->product_id);
                 if ($product) {
-                    $product->quantity = max(0, $product->quantity - $item->quantity_ordered);
-                    if ($product->quantity <= 0) {
-                        $product->is_available = false;
-                    }
-                    $product->save();
+                    app(InventoryService::class)->updateStock(
+                        $product,
+                        0,
+                        'payment_confirmed',
+                        'Payment confirmed for Order #' . $order->order_number,
+                        $order->id
+                    );
                 }
             }
 
@@ -1697,5 +1783,165 @@ class LeadFarmerController extends Controller
                 'message' => 'Error updating order status: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function inventoryDashboard(Request $request)
+    {
+        $leadFarmerId = auth()->user()->leadFarmer->id;
+
+        // Get all products for this lead farmer's group
+        $products = Product::where('lead_farmer_id', $leadFarmerId)
+            ->with(['farmer', 'category'])
+            ->get();
+
+        // Get inventory logs for this lead farmer's group
+        $logs = InventoryLog::whereHas('product', function($query) use ($leadFarmerId) {
+                $query->where('lead_farmer_id', $leadFarmerId);
+            })
+            ->with(['product', 'product.farmer', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        // Get farmers for this lead farmer's group
+        $farmers = Farmer::where('lead_farmer_id', $leadFarmerId)->get();
+
+        // Get categories
+        $categories = ProductCategory::all();
+
+        // Calculate statistics
+        $totalProducts = $products->count();
+        $totalInventoryValue = $products->sum(function($p) {
+            return $p->quantity * $p->selling_price;
+        });
+        
+        $lowStockCount = $products->filter(function($p) {
+            return $p->inventory_status == 'Low Stock' || $p->inventory_status == 'Critical';
+        })->count();
+        
+        $outOfStockCount = $products->filter(function($p) {
+            return $p->inventory_status == 'Out of Stock';
+        })->count();
+
+        return view('lead_farmer.inventory.Inventory-Dashboard', compact(
+            'products',
+            'logs',
+            'farmers',
+            'categories',
+            'totalProducts',
+            'totalInventoryValue',
+            'lowStockCount',
+            'outOfStockCount'
+        ));
+    }
+
+    public function inventoryList(Request $request)
+    {
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+        $query = Product::with(['farmer', 'category', 'subcategory'])
+            ->where('lead_farmer_id', $leadFarmerId);
+
+        // Filtering
+        if ($request->filled('farmer_id')) {
+            $query->where('farmer_id', $request->farmer_id);
+        }
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('search')) {
+            $query->where('product_name', 'like', '%' . $request->search . '%');
+        }
+
+        $products = $query->paginate(15);
+        
+        // Manual filter for stock status (since it's an accessor)
+        if ($request->filled('status')) {
+            $statusFilter = $request->status;
+            $products->setCollection(
+                $products->getCollection()->filter(function ($product) use ($statusFilter) {
+                    return $product->inventory_status === $statusFilter;
+                })
+            );
+        }
+
+        $farmers = Farmer::where('lead_farmer_id', $leadFarmerId)->get();
+        $categories = ProductCategory::where('is_active', true)->get();
+
+        return view('lead_farmer.inventory.list', compact('products', 'farmers', 'categories'));
+    }
+
+    public function updateInventoryStock(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,id',
+            'update_type' => 'required|in:add,reduce,adjust',
+            'quantity' => 'required|numeric|min:0',
+            'reason' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+        $product = Product::where('id', $request->product_id)
+            ->where('lead_farmer_id', $leadFarmerId)
+            ->firstOrFail();
+
+        $inventoryService = app(InventoryService::class);
+        
+        try {
+            if ($request->update_type === 'add') {
+                $inventoryService->updateStock($product, $request->quantity, 'manual_add', $request->reason);
+            } elseif ($request->update_type === 'reduce') {
+                $inventoryService->updateStock($product, -$request->quantity, 'manual_reduce', $request->reason);
+            } else {
+                $inventoryService->adjustStock($product, $request->quantity, $request->reason);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Stock updated successfully!',
+                'new_quantity' => $product->fresh()->quantity,
+                'new_status' => $product->fresh()->inventory_status
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating stock: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function inventoryProductsPdf(Request $request)
+    {
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+        $query = Product::with(['farmer', 'category', 'subcategory'])
+            ->where('lead_farmer_id', $leadFarmerId);
+
+        if ($request->filled('farmer_id')) {
+            $query->where('farmer_id', $request->farmer_id);
+        }
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('search')) {
+            $query->where('product_name', 'like', '%' . $request->search . '%');
+        }
+
+        $products = $query->get();
+        
+        if ($request->filled('status')) {
+            $statusFilter = $request->status;
+            $products = $products->filter(function ($product) use ($statusFilter) {
+                return $product->inventory_status === $statusFilter;
+            });
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('lead_farmer.inventory.Inventory-Products_pdf', compact('products'));
+        return $pdf->download('Product-Inventory-' . date('Y-m-d') . '.pdf');
     }
 }

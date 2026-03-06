@@ -139,6 +139,9 @@ Route::prefix('farmer')
 
     Route::get('/product-requests', [FarmerController::class, 'viewProductRequests'])->name('farmer.productRequests');
     Route::get('/product-requests/{id}/details', [FarmerController::class, 'getRequestDetails'])->name('farmer.productRequest.details');
+    Route::get('/inventory', [FarmerController::class, 'myInventory'])->name('farmer.inventory');
+    Route::get('/inventory/movement/pdf', [FarmerController::class, 'inventoryMovementLogsPdf'])->name('farmer.inventory.report.movement');
+    Route::get('/inventory/products/pdf', [FarmerController::class, 'inventoryProductsPdf'])->name('farmer.inventory.report.products');
 });
 
 /*
@@ -188,6 +191,13 @@ Route::prefix('lead-farmer')
     Route::get('/reports/sales', [LeadFarmerController::class, 'salesReports'])->name('lf.reports.sales');
     Route::get('/reports/inventory', [LeadFarmerController::class, 'inventoryReports'])->name('lf.reports.inventory');
     Route::get('/reports/farmer-performance', [LeadFarmerController::class, 'farmerPerformanceReports'])->name('lf.reports.farmer-performance');
+    
+    // Inventory Management
+    Route::get('/inventory', [LeadFarmerController::class, 'inventoryDashboard'])->name('lf.inventory.dashboard');
+    Route::get('/inventory/list', [LeadFarmerController::class, 'inventoryList'])->name('lf.inventory.list');
+    Route::get('/inventory/movement/pdf', [LeadFarmerController::class, 'inventoryMovementLogsPdf'])->name('lf.inventory.report.movement');
+    Route::get('/inventory/products/pdf', [LeadFarmerController::class, 'inventoryProductsPdf'])->name('lf.inventory.report.products');
+    Route::post('/inventory/update-stock', [LeadFarmerController::class, 'updateInventoryStock'])->name('lf.inventory.updateStock');
 
     Route::get('/notifications', [LeadFarmerController::class, 'notifications'])->name('lf.notifications');
     Route::post('/notifications/mark-all-read', [LeadFarmerController::class, 'markAllNotificationsRead'])->name('lf.notifications.mark-all-read');
@@ -450,6 +460,10 @@ Route::prefix('admin')
 	Route::get('/products/{product}/details', [ProductController::class, 'getProductDetails'])->name('products.details');
 	Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 	Route::get('/products/get-farmers-by-lead-farmer/{leadFarmerId}', [ProductController::class, 'getFarmersByLeadFarmer'])->name('products.get-farmers');
+
+	Route::get('/inventory', [ProductController::class, 'inventory'])->name('inventory.index');
+    Route::get('/inventory/report/stock', [ProductController::class, 'stockReport'])->name('inventory.report.stock');
+    Route::get('/inventory/report/movement', [ProductController::class, 'movementReport'])->name('inventory.report.movement');
 
 	Route::get('/buyer-requests', [BuyerRequestProductsController::class, 'index'])->name('buyer-requests.index');
 	Route::delete('/buyer-requests/{id}', [BuyerRequestProductsController::class, 'destroy'])->name('buyer-requests.destroy');

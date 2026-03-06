@@ -24,7 +24,10 @@
 		</div>
 		<div class="welcome-illustration">
 			<div class="farm-icon">
-				<i class="fas fa-tractor"></i>
+				<img src="{{ Auth::user()->profile_photo ? asset('uploads/profile_pictures/' . Auth::user()->profile_photo) : asset('assets/images/farmer.png') }}" 
+                     alt="Farmer Profile" 
+                     class="farmer-profile-image"
+                     onerror="this.src='{{ asset('assets/images/farmer.png') }}'">
 			</div>
 		</div>
 	</div>

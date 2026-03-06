@@ -1,313 +1,208 @@
 @if ($paginator->hasPages())
-<nav class="pagination-container" aria-label="Page navigation">
-    <div class="pagination-wrapper">
-        {{-- Previous Page Link --}}
-        @if ($paginator->onFirstPage())
-        <button class="pagination-btn prev-btn disabled" aria-disabled="true">
-            <svg class="pagination-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 18l-6-6 6-6"/>
-            </svg>
-            <span>Previous</span>
-        </button>
-        @else
-        <a href="{{ $paginator->previousPageUrl() }}" class="pagination-btn prev-btn" rel="prev">
-            <svg class="pagination-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 18l-6-6 6-6"/>
-            </svg>
-            <span>Previous</span>
-        </a>
-        @endif
+<nav class="pager">
+	<div class="pager-box">
+		@if ($paginator->onFirstPage())
+		<span class="pager-btn disabled">
+			<i class="pager-icon">❮</i>
+		</span>
+		@else
+		<a href="{{ $paginator->previousPageUrl() }}" class="pager-btn">
+			<i class="pager-icon">❮</i>
+		</a>
+		@endif
 
-        <div class="pagination-numbers">
-            @foreach ($elements as $element)
-                {{-- "Three Dots" Separator --}}
-                @if (is_string($element))
-                <span class="pagination-dots">{{ $element }}</span>
-                @endif
+		<div class="pager-numbers">
+			@foreach ($elements as $element)
+				@if (is_string($element))
+				<span class="pager-dots">•••</span>
+				@endif
 
-                {{-- Array Of Links --}}
-                @if (is_array($element))
-                    @foreach ($element as $page => $url)
-                        @if ($page == $paginator->currentPage())
-                        <span class="pagination-number active" aria-current="page">{{ $page }}</span>
-                        @else
-                        <a href="{{ $url }}" class="pagination-number">{{ $page }}</a>
-                        @endif
-                    @endforeach
-                @endif
-            @endforeach
-        </div>
+				@if (is_array($element))
+					@foreach ($element as $page => $url)
+						@if ($page == $paginator->currentPage())
+						<span class="pager-num active">{{ $page }}</span>
+						@else
+						<a href="{{ $url }}" class="pager-num">{{ $page }}</a>
+						@endif
+					@endforeach
+				@endif
+			@endforeach
+		</div>
 
-        {{-- Next Page Link --}}
-        @if ($paginator->hasMorePages())
-        <a href="{{ $paginator->nextPageUrl() }}" class="pagination-btn next-btn" rel="next">
-            <span>Next</span>
-            <svg class="pagination-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
-            </svg>
-        </a>
-        @else
-        <button class="pagination-btn next-btn disabled" aria-disabled="true">
-            <span>Next</span>
-            <svg class="pagination-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
-            </svg>
-        </button>
-        @endif
-    </div>
+		@if ($paginator->hasMorePages())
+		<a href="{{ $paginator->nextPageUrl() }}" class="pager-btn">
+			<i class="pager-icon">❯</i>
+		</a>
+		@else
+		<span class="pager-btn disabled">
+			<i class="pager-icon">❯</i>
+		</span>
+		@endif
+	</div>
 </nav>
 @endif
 
 <style>
-    :root {
-        --primary-green: #10B981;
-        --dark-green: #059669;
-        --body-bg: #f6f8fa;
-        --card-bg: #ffffff;
-        --text-color: #0f1724;
-        --muted: #6b7280;
-        --border-color: #e5e7eb;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+.pager{
+	width:100%;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	margin:10px 0;
+	animation:fadeIn .4s ease
+}
 
-    .pagination-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        background: var(--card-bg);
-        padding: 12px 20px;
-        border-radius: 16px;
-        box-shadow: 
-            0 4px 20px rgba(15, 23, 36, 0.05),
-            0 1px 3px rgba(15, 23, 36, 0.04);
-        border: 1px solid var(--border-color);
-        flex-wrap: wrap;
-        justify-content: center;
-        max-width: 100%;
-    }
+@keyframes fadeIn{
+	from{opacity:0;transform:translateY(8px)}
+	to{opacity:1;transform:translateY(0)}
+}
 
-    .pagination-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 20px;
-        background: var(--body-bg);
-        border: 2px solid transparent;
-        border-radius: 12px;
-        color: var(--text-color);
-        font-weight: 600;
-        font-size: 14px;
-        text-decoration: none;
-        cursor: pointer;
-        transition: var(--transition);
-        white-space: nowrap;
-        position: relative;
-        overflow: hidden;
-    }
+.pager-box{
+	display:flex;
+	align-items:center;
+	gap:6px;
+	background:#ffffff;
+	padding:6px 10px;
+	border-radius:30px;
+	border:1px solid #e6e9ef;
+	box-shadow:0 2px 8px rgba(0,0,0,.05);
+	transition:.3s
+}
 
-    .pagination-btn:not(.disabled):hover {
-        background: var(--primary-green);
-        color: white;
-        border-color: var(--primary-green);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
-    }
+.pager-box:hover{
+	box-shadow:0 6px 14px rgba(0,0,0,.08)
+}
 
-    .pagination-btn:not(.disabled):hover .pagination-icon {
-        stroke: white;
-        transform: translateX(-2px);
-    }
+.pager-btn{
+	width:32px;
+	height:32px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	border-radius:50%;
+	background:#f7f8fa;
+	color:#444;
+	text-decoration:none;
+	font-size:14px;
+	transition:.25s
+}
 
-    .next-btn:not(.disabled):hover .pagination-icon {
-        transform: translateX(2px);
-    }
+.pager-btn:hover{
+	background:#10b981;
+	color:#fff;
+	transform:translateY(-2px) scale(1.05);
+	box-shadow:0 4px 10px rgba(16,185,129,.3)
+}
 
-    .pagination-btn.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        background: var(--body-bg);
-        color: var(--muted);
-    }
+.pager-btn.disabled{
+	opacity:.35;
+	pointer-events:none
+}
 
-    .pagination-icon {
-        width: 18px;
-        height: 18px;
-        stroke: var(--text-color);
-        transition: var(--transition);
-    }
+.pager-icon{
+	font-style:normal;
+	font-weight:600
+}
 
-    .pagination-numbers {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+.pager-numbers{
+	display:flex;
+	align-items:center;
+	gap:4px
+}
 
-    .pagination-number {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 40px;
-        height: 40px;
-        padding: 0 4px;
-        background: var(--body-bg);
-        border: 2px solid transparent;
-        border-radius: 10px;
-        color: var(--text-color);
-        font-weight: 600;
-        font-size: 14px;
-        text-decoration: none;
-        transition: var(--transition);
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
+.pager-num{
+	min-width:30px;
+	height:30px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	border-radius:20px;
+	font-size:13px;
+	color:#444;
+	text-decoration:none;
+	background:#f4f6f9;
+	transition:.25s
+}
 
-    .pagination-number:hover:not(.active) {
-        background: var(--primary-green);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    }
+.pager-num:hover{
+	background:#3b82f6;
+	color:#fff;
+	transform:translateY(-2px);
+	box-shadow:0 4px 10px rgba(59,130,246,.25)
+}
 
-    .pagination-number.active {
-        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
-        color: white;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-        animation: gentlePulse 3s ease-in-out infinite;
-        border-color: transparent;
-    }
+.pager-num.active{
+	background:#10b981;
+	color:#fff;
+	font-weight:600;
+	animation:pulse 2s infinite
+}
 
-    .pagination-dots {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        color: var(--muted);
-        font-weight: 600;
-        user-select: none;
-    }
+@keyframes pulse{
+	0%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}
+	70%{box-shadow:0 0 0 10px rgba(16,185,129,0)}
+	100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}
+}
 
-    /* Ripple effect */
-    .pagination-number:after,
-    .pagination-btn:after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 80%);
-        transform: scale(0);
-        transition: transform 0.5s ease-out;
-    }
+.pager-dots{
+	padding:0 6px;
+	font-size:12px;
+	color:#aaa
+}
 
-    .pagination-number:active:after,
-    .pagination-btn:active:after {
-        transform: scale(2);
-        opacity: 0;
-    }
+@media screen and (min-width:2560px){
+	.pager-box{padding:12px 18px;gap:10px}
+	.pager-btn{width:48px;height:48px;font-size:20px}
+	.pager-num{min-width:46px;height:46px;font-size:18px}
+}
 
-    @keyframes gentlePulse {
-        0%, 100% {
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-            transform: scale(1);
-        }
-        50% {
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
-            transform: scale(1.02);
-        }
-    }
+@media screen and (min-width:1501px) and (max-width:2559px){
+	.pager-btn{width:40px;height:40px}
+	.pager-num{min-width:38px;height:38px;font-size:16px}
+}
 
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .pagination-wrapper {
-            padding: 10px 16px;
-            gap: 12px;
-            border-radius: 12px;
-        }
+@media screen and (min-width:1400px) and (max-width:1500px){
+	.pager-btn{width:36px;height:36px}
+	.pager-num{min-width:34px;height:34px}
+}
 
-        .pagination-btn {
-            padding: 8px 16px;
-            font-size: 13px;
-        }
+@media screen and (min-width:1200px) and (max-width:1399px){
+	.pager-btn{width:34px;height:34px}
+	.pager-num{min-width:32px;height:32px}
+}
 
-        .pagination-number {
-            min-width: 36px;
-            height: 36px;
-            font-size: 13px;
-        }
+@media screen and (min-width:1001px) and (max-width:1199px){
+	.pager-btn{width:32px;height:32px}
+	.pager-num{min-width:30px;height:30px}
+}
 
-        .pagination-dots {
-            width: 36px;
-            height: 36px;
-        }
+@media screen and (max-width:1000px){
+	.pager-box{padding:5px 8px}
+}
 
-        .pagination-btn span {
-            display: none;
-        }
+@media screen and (min-width:992px) and (max-width:999px){
+	.pager-num{min-width:28px;height:28px;font-size:12px}
+}
 
-        .pagination-btn .pagination-icon {
-            width: 16px;
-            height: 16px;
-        }
-    }
+@media screen and (min-width:768px) and (max-width:991px){
+	.pager-num{min-width:26px;height:26px;font-size:12px}
+}
 
-    @media (max-width: 480px) {
-        .pagination-wrapper {
-            flex-direction: column;
-            gap: 10px;
-            padding: 16px;
-        }
+@media screen and (min-width:576px) and (max-width:767px){
+	.pager-num:nth-child(n+5){display:none}
+}
 
-        .pagination-numbers {
-            order: 2;
-            width: 100%;
-            justify-content: center;
-        }
+@media screen and (min-width:481px) and (max-width:575px){
+	.pager-num:not(.active):not(:first-child):not(:last-child){display:none}
+}
 
-        .pagination-btn {
-            order: 1;
-            width: 100%;
-            justify-content: center;
-        }
+@media screen and (min-width:380px) and (max-width:480px){
+	.pager-btn{width:26px;height:26px}
+	.pager-num{min-width:24px;height:24px;font-size:11px}
+}
 
-        .prev-btn {
-            order: 1;
-        }
-
-        .next-btn {
-            order: 3;
-        }
-
-        .pagination-number:not(.active):not(:first-child):not(:last-child):not(.pagination-dots) {
-            display: none;
-        }
-
-        .pagination-dots,
-        .pagination-number.active,
-        .pagination-number:first-child,
-        .pagination-number:last-child {
-            display: flex;
-        }
-    }
-
-    @media (max-width: 360px) {
-        .pagination-wrapper {
-            padding: 12px;
-        }
-
-        .pagination-number {
-            min-width: 32px;
-            height: 32px;
-            font-size: 12px;
-        }
-
-        .pagination-dots {
-            width: 32px;
-            height: 32px;
-        }
-    }
+@media screen and (max-width:379px){
+	.pager-btn{width:26px;height:26px}
+	.pager-num{min-width:24px;height:24px;font-size:11px}
+}
 </style>
