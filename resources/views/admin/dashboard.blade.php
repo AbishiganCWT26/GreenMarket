@@ -75,10 +75,10 @@
         </div>
         <ul class="action-list">
             <li><a href="{{ url('/admin/users') }}"><i class="fa-solid fa-users-gear action-icon"></i> Manage users</a></li>
-            <li><a href="{{ url('/admin/users/create') }}"><i class="fa-solid fa-user-plus action-icon"></i> Register Admin / Facilitator</a></li>
-            <li><a href="{{ url('/admin/taxonomy/create') }}"><i class="fa-solid fa-plus action-icon"></i> Add Product Category</a></li>
+            <li><a href="{{ url('/admin/sales') }}"><i class="fa-solid fa-receipt action-icon"></i> Sales Recorders</a></li>
+            <li><a href="{{ url('/admin/taxonomy') }}"><i class="fa-solid fa-seedling action-icon"></i> Add Product Category</a></li>
             <li><a href="{{ url('/admin/reports/generate') }}"><i class="fa-solid fa-file-invoice action-icon"></i> Generate Report</a></li>
-            <li><a href="{{ url('/admin/announcements/create') }}"><i class="fa-solid fa-bullhorn action-icon"></i> Publish Announcement</a></li>
+            <li><a href="{{ url('/admin/config') }}"><i class="fa-solid fa-gear action-icon"></i> System Configuration</a></li>
         </ul>
     </div>
 </div>
