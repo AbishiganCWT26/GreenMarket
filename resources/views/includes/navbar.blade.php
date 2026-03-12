@@ -15,6 +15,87 @@
 			height: 100px !important;
 			object-fit: contain !important;
 		}
+
+		/* Google Translate Styling */
+		#google_translate_element {
+			display: flex;
+			align-items: center;
+			margin-right: 15px;
+		}
+
+		.goog-te-gadget-simple {
+			background-color: rgba(255, 255, 255, 0.9) !important;
+			border: 1px solid rgba(16, 185, 129, 0.2) !important;
+			padding: 4px 8px !important;
+			border-radius: 8px !important;
+			cursor: pointer !important;
+			font-family: 'Inter', sans-serif !important;
+			transition: all 0.3s ease !important;
+		}
+
+		.goog-te-gadget-simple:hover {
+			border-color: #10B981 !important;
+			box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1) !important;
+		}
+
+		.goog-te-menu-value {
+			color: #0f1724 !important;
+			font-size: 0.85rem !important;
+			font-weight: 500 !important;
+			display: flex !important;
+			align-items: center !important;
+			gap: 4px !important;
+		}
+
+		.goog-te-menu-value span:first-child {
+			color: #0f1724 !important;
+		}
+
+		.goog-te-menu-value img {
+			display: none !important;
+		}
+
+		.goog-te-gadget-icon {
+			display: none !important;
+		}
+
+		/* Responsive Adjustments */
+		@media (max-width: 991px) {
+			#google_translate_element {
+				margin-right: 10px;
+			}
+			.goog-te-menu-value span:first-child {
+				font-size: 0.75rem !important;
+			}
+		}
+
+		@media (max-width: 576px) {
+			#google_translate_element {
+				margin-right: 5px;
+			}
+			.goog-te-gadget-simple {
+				padding: 2px 5px !important;
+			}
+		}
+
+		/* Hide Google Translate Top Bar */
+		body {
+			top: 0 !important;
+		}
+		.goog-te-banner-frame.skiptranslate {
+			display: none !important;
+		}
+		.goog-tooltip {
+			display: none !important;
+		}
+		.goog-tooltip:hover {
+			display: none !important;
+		}
+		.goog-text-highlight {
+			background-color: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+		}
 	</style>
 
 </head>
@@ -51,6 +132,7 @@
 			</nav>
 
 			<div class="header-actions">
+				<div id="google_translate_element"></div>
 				@guest
 					<div class="auth-group">
 						<a href="{{ url('/register/buyer') }}" class="btn btn-register">
@@ -199,6 +281,18 @@
 			@endguest
 		</div>
 	</header>
+
+
+	<script type="text/javascript">
+		function googleTranslateElementInit() {
+			new google.translate.TranslateElement({
+				pageLanguage: 'en',
+				includedLanguages: 'en,si,ta',
+				layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+			}, 'google_translate_element');
+		}
+	</script>
+	<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
