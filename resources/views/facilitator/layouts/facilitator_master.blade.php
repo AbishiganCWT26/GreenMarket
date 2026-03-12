@@ -63,9 +63,32 @@
                 <li>
                     <a href="{{ route('facilitator.users') }}" class="menu-link {{ request()->routeIs('facilitator.users') ? 'active' : '' }}">
                         <i class="fa-solid fa-users"></i><span>Manage Users</span>
-                        @if(isset($sharedCounts['pendingComplaints']) && $sharedCounts['pendingComplaints'] > 0)
-                            <span class="badge bg-danger">{{ $sharedCounts['pendingComplaints'] }}</span>
-                        @endif
+                    </a>
+                </li>
+
+                <li class="menu-heading">MONITORING</li>
+
+                <li>
+                    <a href="{{ route('facilitator.products') }}" class="menu-link {{ request()->routeIs('facilitator.products') ? 'active' : '' }}">
+                        <i class="fa-solid fa-seedling"></i><span>Product Oversight</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('facilitator.sales') }}" class="menu-link {{ request()->routeIs('facilitator.sales') ? 'active' : '' }}">
+                        <i class="fa-solid fa-chart-line"></i><span>Sales Records</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('facilitator.lead-farmer-groups') }}" class="menu-link {{ request()->routeIs('facilitator.lead-farmer-groups') ? 'active' : '' }}">
+                        <i class="fa-solid fa-users-between-lines"></i><span>Lead Farmer Groups</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('facilitator.buyer-requests') }}" class="menu-link {{ request()->routeIs('facilitator.buyer-requests') ? 'active' : '' }}">
+                        <i class="fa-solid fa-handshake"></i><span>Buyer Requests</span>
                     </a>
                 </li>
 

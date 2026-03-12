@@ -412,6 +412,14 @@ Route::prefix('facilitator')
     Route::get('/notifications', [FacilitatorController::class, 'notifications'])->name('facilitator.notifications');
     Route::post('/notifications/mark-read/{id}', [FacilitatorController::class, 'markNotificationRead'])->name('facilitator.notifications.mark-read');
     Route::post('/notifications/mark-all-read', [FacilitatorController::class, 'markAllNotificationsAsRead'])->name('facilitator.notifications.mark-all-read');
+
+    // Monitoring Sections
+    Route::get('/products', [FacilitatorController::class, 'products'])->name('facilitator.products');
+    Route::post('/products/send-alert', [FacilitatorController::class, 'sendProductAlert'])->name('facilitator.products.send-alert');
+    Route::get('/sales', [FacilitatorController::class, 'sales'])->name('facilitator.sales');
+    Route::get('/sales/{id}/details', [FacilitatorController::class, 'salesDetails'])->name('facilitator.sales.details');
+    Route::get('/lead-farmer-groups', [FacilitatorController::class, 'leadFarmerGroups'])->name('facilitator.lead-farmer-groups');
+    Route::get('/buyer-requests', [FacilitatorController::class, 'buyerRequests'])->name('facilitator.buyer-requests');
 });
 
 

@@ -77,7 +77,7 @@
 							case 'facilitator':
 								$dashboardUrl = '/facilitator/dashboard';
 								$ProfileUrl = '/facilitator/profile';
-								$SettingsUrl = '/facilitator/account/settings';
+								$SettingsUrl = '/facilitator/profile';
 								break;
 							case 'lead_farmer':
 								$dashboardUrl = '/lead-farmer/dashboard';

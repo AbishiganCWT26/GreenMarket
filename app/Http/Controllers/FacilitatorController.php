@@ -14,6 +14,11 @@ use App\Models\ProductExample;
 use App\Models\SystemStandard;
 use App\Models\Complaint;
 use App\Models\Notification;
+use App\Models\Product;
+use App\Models\Order;
+use App\Models\BuyerProductRequest;
+use App\Models\LeadFarmer;
+use App\Models\Farmer;
 use Carbon\Carbon;
 
 class FacilitatorController extends Controller
@@ -1360,5 +1365,252 @@ class FacilitatorController extends Controller
                 'message' => 'An error occurred while updating the password.'
             ], 500);
         }
+    }
+
+    public function products(Request $request)
+    {
+        $perPage = $request->get('per_page', 12);
+        $leadFarmers = DB::table('lead_farmers')->orderBy('group_name')->get();
+        $categories = DB::table('product_categories')->orderBy('category_name')->get();
+
+        $query = DB::table('products')
+            ->leftJoin('farmers', 'products.farmer_id', '=', 'farmers.id')
+            ->leftJoin('users as u_f', 'farmers.user_id', '=', 'u_f.id')
+            ->leftJoin('lead_farmers', 'products.lead_farmer_id', '=', 'lead_farmers.id')
+            ->leftJoin('users as u_lf', 'lead_farmers.user_id', '=', 'u_lf.id')
+            ->leftJoin('product_categories', 'products.category_id', '=', 'product_categories.id')
+            ->leftJoin('product_subcategories', 'products.subcategory_id', '=', 'product_subcategories.id')
+            ->select(
+                'products.*',
+                'farmers.name as farmer_name',
+                'farmers.primary_mobile as farmer_mobile',
+                'u_f.profile_photo as farmer_photo',
+                'lead_farmers.group_name as lead_group_name',
+                'lead_farmers.name as lead_farmer_name',
+                'lead_farmers.primary_mobile as lead_farmer_mobile',
+                'u_lf.profile_photo as lead_farmer_photo',
+                'product_categories.category_name as category_name',
+                'product_subcategories.subcategory_name as subcategory_name'
+            );
+
+        // Apply filters
+        if ($request->filled('lead_farmer_id')) {
+            $query->where('products.lead_farmer_id', $request->lead_farmer_id);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('products.category_id', $request->category_id);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('products.product_name', 'ilike', "%{$search}%")
+                  ->orWhere('product_categories.category_name', 'ilike', "%{$search}%")
+                  ->orWhere('lead_farmers.group_name', 'ilike', "%{$search}%")
+                  ->orWhere('farmers.name', 'ilike', "%{$search}%");
+            });
+        }
+
+        $products = $query->orderBy('products.created_at', 'desc')->paginate($perPage)->appends($request->query());
+
+        return view('facilitator.products.index', compact('products', 'leadFarmers', 'categories'));
+    }
+
+    public function sendProductAlert(Request $request)
+    {
+        try {
+            $request->validate([
+                'product_id' => 'required|exists:products,id',
+                'message' => 'required|string|max:500'
+            ]);
+
+            $product = DB::table('products')
+                ->leftJoin('farmers', 'products.farmer_id', '=', 'farmers.id')
+                ->where('products.id', $request->product_id)
+                ->select('products.*', 'farmers.name as farmer_name')
+                ->first();
+
+            $leadFarmer = DB::table('lead_farmers')->where('id', $product->lead_farmer_id)->first();
+
+            if (!$leadFarmer) {
+                return response()->json(['success' => false, 'message' => 'Lead farmer not found'], 404);
+            }
+
+            // Create notification for Lead Farmer
+            Notification::create([
+                'user_id' => $leadFarmer->user_id,
+                'recipient_type' => 'lead_farmer', // Added required recipient_type
+                'title' => 'Product Change Required',
+                'message' => "Facilitator request for product '{$product->product_name}' (Farmer: {$product->farmer_name}): {$request->message}",
+                'notification_type' => 'admin_alert', // Changed to an allowed type
+                'is_read' => false
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Alert sent to lead farmer successfully!']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Validation error: ' . implode(', ', $e->validator->errors()->all())
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function sales(Request $request)
+    {
+        $perPage = $request->get('per_page', 12);
+        $query = DB::table('orders')
+            ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
+            ->leftJoin('users as u_b', 'buyers.user_id', '=', 'u_b.id')
+            ->leftJoin('lead_farmers', 'orders.lead_farmer_id', '=', 'lead_farmers.id')
+            ->leftJoin('users as u_lf', 'lead_farmers.user_id', '=', 'u_lf.id')
+            ->select(
+                'orders.*',
+                'buyers.name as buyer_name',
+                'u_b.profile_photo as buyer_photo',
+                'lead_farmers.name as lead_farmer_name',
+                'u_lf.profile_photo as lead_farmer_photo',
+                'lead_farmers.group_name as group_name'
+            )
+            ->whereIn('orders.order_status', ['paid', 'completed']);
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('orders.created_at', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('orders.created_at', '<=', $request->end_date);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('orders.order_number', 'ilike', "%{$search}%")
+                  ->orWhere('buyers.name', 'ilike', "%{$search}%")
+                  ->orWhere('lead_farmers.group_name', 'ilike', "%{$search}%");
+            });
+        }
+
+        $totalSalesCount = $query->count();
+        $totalRevenue = $query->sum('total_amount');
+
+        $sales = $query->orderBy('orders.created_at', 'desc')->paginate($perPage)->appends($request->query());
+
+        return view('facilitator.sales.index', compact('sales', 'totalSalesCount', 'totalRevenue'));
+    }
+
+    public function salesDetails($id)
+    {
+        try {
+            $order = Order::with([
+                'buyer.user',
+                'farmer.user',
+                'leadFarmer.user',
+                'orderItems.product.category',
+                'orderItems.product.subcategory',
+                'payments'
+            ])->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'order' => $order
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function leadFarmerGroups(Request $request)
+    {
+        $perPage = $request->get('per_page', 12);
+        $search = $request->get('search');
+
+        $query = DB::table('lead_farmers as lf')
+            ->leftJoin('users as u', 'lf.user_id', '=', 'u.id')
+            ->select(
+                'lf.id',
+                'lf.group_name',
+                'lf.group_number',
+                'lf.primary_mobile',
+                'u.profile_photo as lead_farmer_photo',
+                DB::raw('COUNT(DISTINCT f.id) as total_farmers'),
+                DB::raw('COUNT(DISTINCT p.id) as total_products'),
+                DB::raw('(SELECT COUNT(*) FROM orders WHERE lead_farmer_id = lf.id AND order_status IN (\'paid\', \'completed\')) as sales_count'),
+                DB::raw('(SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE lead_farmer_id = lf.id AND order_status IN (\'paid\', \'completed\')) as total_sales')
+            )
+            ->leftJoin('farmers as f', 'lf.id', '=', 'f.lead_farmer_id')
+            ->leftJoin('products as p', 'lf.id', '=', 'p.lead_farmer_id')
+            ->groupBy('lf.id', 'lf.group_name', 'lf.group_number', 'lf.primary_mobile', 'u.profile_photo');
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('lf.group_name', 'ilike', "%{$search}%")
+                  ->orWhere('lf.group_number', 'ilike', "%{$search}%");
+            });
+        }
+
+        $groups = $query->orderBy('total_sales', 'desc')->get();
+
+        // Assign ranks to all results before filtering
+        // Or if we want persistent ranks regardless of current search results,
+        // we should rank the entire set first.
+        
+        $allGroupsWithRank = DB::table('lead_farmers as lf')
+            ->leftJoin('users as u', 'lf.user_id', '=', 'u.id')
+            ->select(
+                'lf.id',
+                DB::raw('(SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE lead_farmer_id = lf.id AND order_status IN (\'paid\', \'completed\')) as total_sales')
+            )
+            ->orderBy('total_sales', 'desc')
+            ->get();
+
+        $ranks = [];
+        $rank = 1;
+        foreach ($allGroupsWithRank as $g) {
+            $ranks[$g->id] = $rank++;
+        }
+
+        foreach ($groups as $group) {
+            $group->rank = $ranks[$group->id] ?? 0;
+        }
+
+        $currentPage = $request->get('page', 1);
+        $paginatedGroups = new \Illuminate\Pagination\LengthAwarePaginator(
+            $groups->forPage($currentPage, $perPage),
+            $groups->count(),
+            $perPage,
+            $currentPage,
+            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+        );
+
+        return view('facilitator.lead-farmer-groups.index', compact('paginatedGroups'));
+    }
+
+    public function buyerRequests(Request $request)
+    {
+        $perPage = $request->get('per_page', 12);
+        $search = $request->input('search');
+
+        $query = BuyerProductRequest::with(['buyer.user'])
+            ->orderBy('created_at', 'desc');
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('product_name', 'ilike', "%{$search}%")
+                  ->orWhereHas('buyer', function($bq) use ($search) {
+                      $bq->where('name', 'ilike', "%{$search}%")
+                        ->orWhere('business_name', 'ilike', "%{$search}%");
+                  });
+            });
+        }
+
+        $buyerRequests = $query->paginate($perPage)->appends($request->query());
+
+        return view('facilitator.buyer-requests.index', compact('buyerRequests'));
     }
 }
