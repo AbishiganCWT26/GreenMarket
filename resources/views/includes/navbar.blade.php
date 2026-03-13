@@ -15,89 +15,36 @@
 			height: 100px !important;
 			object-fit: contain !important;
 		}
-
-		/* Google Translate Styling */
-		#google_translate_element {
-			display: flex;
-			align-items: center;
-			margin-right: 15px;
-		}
-
-		.goog-te-gadget-simple {
-			background-color: rgba(255, 255, 255, 0.9) !important;
-			border: 1px solid rgba(16, 185, 129, 0.2) !important;
-			padding: 4px 8px !important;
-			border-radius: 8px !important;
-			cursor: pointer !important;
-			font-family: 'Inter', sans-serif !important;
-			transition: all 0.3s ease !important;
-		}
-
-		.goog-te-gadget-simple:hover {
-			border-color: #10B981 !important;
-			box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1) !important;
-		}
-
-		.goog-te-menu-value {
-			color: #0f1724 !important;
+		
+		.swal-popup-compact {
 			font-size: 0.85rem !important;
-			font-weight: 500 !important;
-			display: flex !important;
-			align-items: center !important;
-			gap: 4px !important;
+			padding: 8px 16px !important;
+			border-radius: 40px !important;
+			width: auto !important;
+			max-width: 260px !important;
+			box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+			border: 1px solid rgba(16,185,129,0.2) !important;
+			font-family: 'Inter', sans-serif !important;
 		}
-
-		.goog-te-menu-value span:first-child {
-			color: #0f1724 !important;
+		
+		.swal2-container.swal2-bottom-end {
+			align-items: flex-end;
+			justify-content: flex-end;
+			padding: 20px;
 		}
-
-		.goog-te-menu-value img {
-			display: none !important;
+		
+		body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
+			padding-right: 0 !important;
 		}
-
-		.goog-te-gadget-icon {
-			display: none !important;
-		}
-
-		/* Responsive Adjustments */
-		@media (max-width: 991px) {
-			#google_translate_element {
-				margin-right: 10px;
-			}
-			.goog-te-menu-value span:first-child {
+		
+		@media (max-width: 480px) {
+			.swal-popup-compact {
+				max-width: 200px !important;
 				font-size: 0.75rem !important;
+				padding: 6px 12px !important;
 			}
-		}
-
-		@media (max-width: 576px) {
-			#google_translate_element {
-				margin-right: 5px;
-			}
-			.goog-te-gadget-simple {
-				padding: 2px 5px !important;
-			}
-		}
-
-		/* Hide Google Translate Top Bar */
-		body {
-			top: 0 !important;
-		}
-		.goog-te-banner-frame.skiptranslate {
-			display: none !important;
-		}
-		.goog-tooltip {
-			display: none !important;
-		}
-		.goog-tooltip:hover {
-			display: none !important;
-		}
-		.goog-text-highlight {
-			background-color: transparent !important;
-			border: none !important;
-			box-shadow: none !important;
 		}
 	</style>
-
 </head>
 <body>
 	@include('includes.loader')
@@ -132,7 +79,6 @@
 			</nav>
 
 			<div class="header-actions">
-				<div id="google_translate_element"></div>
 				@guest
 					<div class="auth-group">
 						<a href="{{ url('/register/buyer') }}" class="btn btn-register">
@@ -214,7 +160,12 @@
 						</div>
 					</div>
 				@endguest
-
+				<div class="translate-card">
+					<div class="translate-icon">
+						<i class="fas fa-language"></i>
+					</div>
+					<div id="google_translate_element"></div>
+				</div>
 				<button class="mobile-menu-btn" id="mobileMenuBtn">
 					<i class="fas fa-bars"></i>
 				</button>
@@ -282,7 +233,6 @@
 		</div>
 	</header>
 
-
 	<script type="text/javascript">
 		function googleTranslateElementInit() {
 			new google.translate.TranslateElement({
@@ -291,6 +241,32 @@
 				layout: google.translate.TranslateElement.InlineLayout.SIMPLE
 			}, 'google_translate_element');
 		}
+		
+		window.welcomeShown = false;
+		
+		function showWelcomeMessage() {
+			if (!window.welcomeShown) {
+				Swal.fire({
+					icon: 'info',
+					title: 'translate ready',
+					text: 'choose language from the compact menu',
+					timer: 1500,
+					showConfirmButton: false,
+					toast: true,
+					position: 'bottom-end',
+					background: '#ffffff',
+					iconColor: '#3b82f6',
+					customClass: { popup: 'swal-popup-compact' }
+				});
+				window.welcomeShown = true;
+			}
+		}
+		
+		const originalInit = window.googleTranslateElementInit;
+		window.googleTranslateElementInit = function() {
+			originalInit();
+			setTimeout(showWelcomeMessage, 600);
+		};
 	</script>
 	<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -350,6 +326,58 @@
 					}
 				}
 			});
+
+			setTimeout(function() {
+				const gadget = document.querySelector('.goog-te-gadget-simple');
+				if (!gadget) return;
+
+				let previousLangText = gadget.innerText || 'en';
+
+				const observer = new MutationObserver(function(mutations) {
+					mutations.forEach(function(mut) {
+						if (mut.type === 'characterData' || mut.type === 'childList') {
+							const currentText = gadget.innerText || '';
+							if (currentText !== previousLangText && currentText.trim() !== '') {
+								Swal.fire({
+									icon: 'success',
+									title: 'language updated',
+									text: 'page content will now appear in selected language.',
+									timer: 1700,
+									showConfirmButton: false,
+									background: '#ffffff',
+									iconColor: '#10B981',
+									toast: true,
+									position: 'bottom-end',
+									showClass: { popup: 'animate__animated animate__fadeInUp' },
+									hideClass: { popup: 'animate__animated animate__fadeOutDown' },
+									customClass: {
+										popup: 'swal-popup-compact'
+									}
+								});
+								previousLangText = currentText;
+							}
+						}
+					});
+				});
+
+				if (gadget) {
+					observer.observe(gadget, { childList: true, subtree: true, characterData: true });
+				}
+			}, 800);
+
+			window.addEventListener('error', function(e) {
+				if (e.target && (e.target.src || '').includes('translate.google')) {
+					e.preventDefault();
+					Swal.fire({
+						icon: 'error',
+						title: 'translation error',
+						text: 'google translate failed to load. please refresh.',
+						confirmButtonColor: '#059669',
+						background: '#ffffff',
+						iconColor: '#f59e0b'
+					});
+				}
+			}, true);
 
 			@if(session('success'))
 				Swal.fire({
