@@ -136,7 +136,7 @@ body {
     align-items: center;
     gap: 2px;
     background: rgba(16, 185, 129, 0.03);
-    padding: 8px;
+    padding: 4px;
     border-radius: var(--radius-full);
     border: 1px solid rgba(16, 185, 129, 0.08);
 }
@@ -206,7 +206,7 @@ body {
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 5px;
 }
 
 .auth-group {
@@ -222,7 +222,7 @@ body {
     padding: 8px 18px;
     border-radius: var(--radius-full);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     text-decoration: none;
     transition: var(--transition);
     cursor: pointer;
@@ -295,8 +295,8 @@ body {
 }
 
 .user-avatar {
-    width: 35px;
-    height: 35px;
+    width: 27px;
+    height: 27px;
     border-radius: var(--radius-full);
     overflow: hidden;
     border: 2px solid var(--primary-green);
@@ -645,6 +645,7 @@ body {
     align-items: center !important;
     gap: 4px !important;
     font-family: 'Inter', sans-serif !important;
+    font-size: 14px !important;
     transition: all 0.2s ease !important;
     cursor: pointer !important;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
@@ -752,7 +753,7 @@ body {
 
     .nav-item {
         padding: 5px 6px;
-        font-size: 0.65rem;
+        font-size: 0.8rem;
     }
 
     .btn {
@@ -838,6 +839,10 @@ body {
 
     .goog-te-menu-value {
         font-size: 0.65rem !important;
+    }
+
+    .goog-te-gadget-simple {
+        font-size: 10px !important;
     }
 }
 
@@ -1098,14 +1103,14 @@ body {
 
 @media (min-width: 1001px) and (max-width: 1199px) {
     .translate-card {
-        padding: 7px 12px;
-        gap: 8px;
+        padding: 6px 5px;
+        gap: 4px;
     }
 
     .translate-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 1rem;
+        width: 25px;
+        height: 25px;
+        font-size: 0.85rem;
     }
 }
 
@@ -1157,6 +1162,10 @@ body {
     .goog-te-menu-value {
         font-size: 0.65rem !important;
     }
+
+    .header-actions {
+        gap: 5px;
+    }
 }
 
 @media (min-width: 576px) and (max-width: 767px) {
@@ -1178,6 +1187,10 @@ body {
 
     .goog-te-menu-value {
         font-size: 0.6rem !important;
+    }
+
+    .header-actions {
+        gap: 5px;
     }
 }
 
@@ -1201,6 +1214,10 @@ body {
     .goog-te-menu-value {
         font-size: 0.55rem !important;
     }
+
+    .header-actions {
+        gap: 5px;
+    }
 }
 
 @media (min-width: 380px) and (max-width: 480px) {
@@ -1223,6 +1240,10 @@ body {
     .goog-te-menu-value {
         font-size: 0.5rem !important;
     }
+
+    .header-actions {
+        gap: 4px;
+    }
 }
 
 @media (max-width: 379px) {
@@ -1233,9 +1254,8 @@ body {
 
     .translate-icon {
         width: 20px;
-        height: 20px;
-        font-size: 0.6rem;
-        border-radius: 6px;
+        height: 15px;
+        font-size: 0.55rem;
     }
 
     .goog-te-gadget-simple {
@@ -1244,6 +1264,14 @@ body {
 
     .goog-te-menu-value {
         font-size: 0.45rem !important;
+    }
+
+    .goog-te-gadget-simple {
+        font-size: 8px !important;
+    }
+
+    .header-actions {
+        gap: 5px;
     }
 }
 

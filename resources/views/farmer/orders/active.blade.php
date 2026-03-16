@@ -32,7 +32,7 @@
 			</button>
 			<div class="view-toggle">
 				<button class="view-btn active" id="cardViewBtn" title="Card View">
-					<i class="fa-solid fa-grid-2"></i>
+					<i class="fa-solid fa-grip"></i>
 				</button>
 				<button class="view-btn" id="tableViewBtn" title="Table View">
 					<i class="fa-solid fa-table"></i>

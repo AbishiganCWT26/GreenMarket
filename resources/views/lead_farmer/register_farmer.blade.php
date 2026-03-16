@@ -682,6 +682,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+
+        // Auto-fill WhatsApp number if empty
+        const primaryMobile = document.getElementById('primary_mobile').value;
+        const whatsappNumberField = document.getElementById('whatsapp_number');
+        if (!whatsappNumberField.value.trim()) {
+            whatsappNumberField.value = primaryMobile;
+        }
         
         if (!validateForm()) {
             return false;
@@ -697,10 +704,25 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok) {
+                if (response.status === 422) {
+                    let errorMessage = 'Validation failed:<br><ul style="text-align: left;">';
+                    Object.values(data.errors).forEach(err => {
+                        errorMessage += `<li>${err[0]}</li>`;
+                    });
+                    errorMessage += '</ul>';
+                    throw new Error(errorMessage);
+                }
+                throw new Error(data.message || 'Registration failed');
+            }
+            return data;
+        })
         .then(data => {
             if (data.success) {
                 Swal.fire({
