@@ -3,7 +3,7 @@
 @section('title', 'Generate Custom Report')
 
 @section('content')
-<link rel="stylesheet" href="{{ asset('css/admin/report-generate.css') }}">
+<link rel="stylesheet" href="{{ asset('css/Admin/report-generate.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="page-header">

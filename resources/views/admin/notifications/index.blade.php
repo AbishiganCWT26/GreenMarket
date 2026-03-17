@@ -3,7 +3,7 @@
 @section('title', 'Admin Notifications')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/admin-notification.css') }}">
+<link rel="stylesheet" href="{{ asset('css/Admin/admin-notification.css') }}">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 @endsection
 

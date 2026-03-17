@@ -3,7 +3,7 @@
 @section('title', 'Product Taxonomy & Category Management')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/taxonomy-manager.css') }}">
+<link rel="stylesheet" href="{{ asset('css/Admin/taxonomy-manager.css') }}">
 @endsection
 
 @section('content')
