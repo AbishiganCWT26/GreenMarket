@@ -11,302 +11,380 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<meta name="csrf-token" content="{{ csrf_token() }}">
-	<style>
-		.goog-te-gadget-simple {
-			background-color: #f0f4f9 !important;
-			border: 1px solid #e2e8f0 !important;
-			border-radius: 30px !important;
-			padding: 2px 8px 2px 6px !important;
-			display: flex !important;
-			align-items: center !important;
-			gap: 2px !important;
-			font-family: 'Inter', sans-serif !important;
-			font-size: 7pt !important;
-			transition: all 0.2s ease !important;
-			cursor: pointer !important;
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
-			line-height: 1 !important;
-		}
+	<!-- Google Translate Compact Card CSS -->
+    <style>
+    .goog-te-gadget-simple {
+        background-color: #f0f4f9 !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 20px !important;
+        padding: 1px 6px 1px 4px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 1px !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 5pt !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+        line-height: 1 !important;
+    }
 
-		.translate-card {
-			background-color: #ffffff !important;
-			box-shadow: 0 3px 8px rgba(15, 23, 36, 0.05), 0 1px 2px rgba(15, 23, 36, 0.03) !important;
-			border-radius: 18px !important;
-			padding: 2px 4px !important;
-			display: inline-flex !important;
-			align-items: center !important;
-			gap: 2px !important;
-			transition: all 0.25s ease !important;
-			border: 1px solid rgba(16, 185, 129, 0.1) !important;
-			backdrop-filter: blur(1px) !important;
-		}
+    .translate-card {
+        background-color: #ffffff !important;
+        box-shadow: 0 2px 5px rgba(15, 23, 36, 0.04), 0 1px 2px rgba(15, 23, 36, 0.02) !important;
+        border-radius: 14px !important;
+        padding: 1px 3px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 1px !important;
+        transition: all 0.25s ease !important;
+        border: 1px solid rgba(16, 185, 129, 0.1) !important;
+        backdrop-filter: blur(1px) !important;
+    }
 
-		.goog-te-gadget-simple:hover {
-			background-color: #e9eef3 !important;
-			border-color: #10B981 !important;
-			box-shadow: 0 4px 8px rgba(16, 185, 129, 0.1) !important;
-			transform: translateY(-1px);
-		}
+    .goog-te-gadget-simple:hover {
+        background-color: #e9eef3 !important;
+        border-color: #10B981 !important;
+        box-shadow: 0 3px 6px rgba(16, 185, 129, 0.08) !important;
+        transform: translateY(-0.5px);
+    }
 
-		.goog-te-gadget-simple:active {
-			transform: scale(0.98) translateY(1px) !important;
-			box-shadow: 0 1px 3px rgba(16, 185, 129, 0.15) !important;
-		}
+    .goog-te-gadget-simple:active {
+        transform: scale(0.98) translateY(0.5px) !important;
+        box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1) !important;
+    }
 
-		.goog-te-menu-value {
-			color: #0f1724 !important;
-			font-size: 0.65rem !important;
-			font-weight: 500 !important;
-			letter-spacing: 0.01em !important;
-			display: flex !important;
-			align-items: center !important;
-			gap: 1px !important;
-		}
+    .goog-te-menu-value {
+        color: #0f1724 !important;
+        font-size: 0.5rem !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.01em !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5px !important;
+    }
 
-		.goog-te-gadget-icon {
-			display: none !important;
-		}
+    .goog-te-gadget-icon {
+        display: none !important;
+    }
 
-		.goog-te-menu-value img {
-			display: none !important;
-		}
+    .goog-te-menu-value img {
+        display: none !important;
+    }
 
-		.goog-te-menu-value span:first-child {
-			color: #0f1724 !important;
-			font-weight: 500 !important;
-			font-size: 0.6rem !important;
-		}
+    .goog-te-menu-value span:first-child {
+        color: #0f1724 !important;
+        font-weight: 500 !important;
+        font-size: 0.45rem !important;
+    }
 
-		.goog-te-menu-value span:last-child {
-			color: #10B981 !important;
-			font-size: 0.7rem !important;
-			margin-left: 1px !important;
-			font-weight: 600 !important;
-			opacity: 0.9;
-			transition: transform 0.2s;
-		}
+    .goog-te-menu-value span:last-child {
+        color: #10B981 !important;
+        font-size: 0.55rem !important;
+        margin-left: 0.5px !important;
+        font-weight: 600 !important;
+        opacity: 0.9;
+        transition: transform 0.2s;
+    }
 
-		.goog-te-gadget-simple:hover .goog-te-menu-value span:last-child {
-			transform: translateY(1px);
-			color: #059669 !important;
-		}
+    .goog-te-gadget-simple:hover .goog-te-menu-value span:last-child {
+        transform: translateY(0.5px);
+        color: #059669 !important;
+    }
 
-		.VIpgJd-ZVi9od-ORHb,
-		.VIpgJd-ZVi9od-ORHb-OEVmcd,
-		.goog-te-banner-frame.skiptranslate {
-			display: none !important;
-		}
+    .VIpgJd-ZVi9od-ORHb,
+    .VIpgJd-ZVi9od-ORHb-OEVmcd,
+    .goog-te-banner-frame.skiptranslate {
+        display: none !important;
+    }
 
-		.goog-tooltip,
-		.goog-tooltip:hover,
-		.goog-text-highlight {
-			display: none !important;
-			background-color: transparent !important;
-			border: none !important;
-			box-shadow: none !important;
-		}
+    .goog-tooltip,
+    .goog-tooltip:hover,
+    .goog-text-highlight {
+        display: none !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
 
-		iframe.goog-te-banner-frame,
-		.goog-te-banner-frame,
-		[class*="VIpgJd-ZVi9od-ORHb"] {
-			display: none !important;
-		}
+    iframe.goog-te-banner-frame,
+    .goog-te-banner-frame,
+    [class*="VIpgJd-ZVi9od-ORHb"] {
+        display: none !important;
+    }
 
-		body {
-			top: 0 !important;
-		}
+    body {
+        top: 0 !important;
+    }
 
-		@media screen and (min-width: 2560px) and (max-width: 5000px) {
-			.goog-te-gadget-simple {
-				border-radius: 35px !important;
-				padding: 3px 10px 3px 8px !important;
-				font-size: 10pt !important;
-				gap: 3px !important;
-			}
-			.translate-card {
-				border-radius: 22px !important;
-				padding: 3px 5px !important;
-				gap: 3px !important;
-			}
-			.goog-te-menu-value {
-				font-size: 0.7rem !important;
-			}
-			.goog-te-menu-value span:first-child {
-				font-size: 0.65rem !important;
-			}
-			.goog-te-menu-value span:last-child {
-				font-size: 0.75rem !important;
-			}
-		}
+    .translate-icon {
+        width: 30px !important;
+        height: 25px !important;
+    }
 
-		@media screen and (min-width: 1501px) and (max-width: 2559px) {
-			.goog-te-gadget-simple {
-				border-radius: 32px !important;
-				padding: 2px 9px 2px 7px !important;
-				font-size: 10pt !important;
-			}
-			.translate-card {
-				border-radius: 20px !important;
-				padding: 2px 4px !important;
-			}
-		}
+    @media screen and (min-width: 2560px) and (max-width: 5000px) {
+            .goog-te-gadget-simple {
+                border-radius: 24px !important;
+                padding: 2px 8px 2px 6px !important;
+                font-size: 12pt !important;
+                gap: 2px !important;
+            }
+            .translate-card {
+                border-radius: 16px !important;
+                padding: 2px 4px !important;
+                gap: 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.6rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.55rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.65rem !important;
+            }
+        }
 
-		@media screen and (min-width: 1400px) and (max-width: 1500px) {
-			.goog-te-gadget-simple {
-				border-radius: 30px !important;
-				padding: 2px 8px 2px 6px !important;
-				font-size: 10pt !important;
-			}
-		}
+        @media screen and (min-width: 1501px) and (max-width: 2559px) {
+            .goog-te-gadget-simple {
+                border-radius: 22px !important;
+                padding: 2px 7px 2px 5px !important;
+                font-size: 12pt !important;
+            }
+            .translate-card {
+                border-radius: 15px !important;
+                padding: 2px 4px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.55rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.5rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.6rem !important;
+            }
+        }
 
-		@media screen and (min-width: 1200px) and (max-width: 1399px) {
-			.goog-te-gadget-simple {
-				border-radius: 28px !important;
-				padding: 2px 7px 2px 5px !important;
-				font-size: 10pt !important;
-			}
-			.translate-card {
-				border-radius: 16px !important;
-			}
-		}
+        @media screen and (min-width: 1400px) and (max-width: 1500px) {
+            .goog-te-gadget-simple {
+                border-radius: 21px !important;
+                padding: 2px 6px 2px 5px !important;
+                font-size: 12pt !important;
+            }
+            .translate-card {
+                border-radius: 14px !important;
+                padding: 1.5px 3px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.5rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.45rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.55rem !important;
+            }
+        }
 
-		@media screen and (min-width: 1001px) and (max-width: 1199px) {
-			.goog-te-gadget-simple {
-				border-radius: 26px !important;
-				padding: 2px 6px 2px 5px !important;
-				font-size: 10pt !important;
-			}
-			.goog-te-menu-value {
-				font-size: 0.6rem !important;
-			}
-			.goog-te-menu-value span:first-child {
-				font-size: 0.55rem !important;
-			}
-			.goog-te-menu-value span:last-child {
-				font-size: 0.65rem !important;
-			}
-		}
+        @media screen and (min-width: 1200px) and (max-width: 1399px) {
+            .goog-te-gadget-simple {
+                border-radius: 20px !important;
+                padding: 1.5px 5px 1.5px 4px !important;
+                font-size: 12pt !important;
+            }
+            .translate-card {
+                border-radius: 13px !important;
+                padding: 1px 3px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.45rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.4rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.5rem !important;
+            }
+        }
 
-		@media screen and (max-width: 1000px) {
-			.goog-te-gadget-simple {
-				border-radius: 25px !important;
-				padding: 2px 6px 2px 4px !important;
-				font-size: 10pt !important;
-			}
-			.translate-card {
-				border-radius: 15px !important;
-			}
-			.goog-te-menu-value {
-				font-size: 0.55rem !important;
-			}
-		}
+        @media screen and (min-width: 1001px) and (max-width: 1199px) {
+            .goog-te-gadget-simple {
+                border-radius: 19px !important;
+                padding: 1px 5px 1px 4px !important;
+                font-size: 10pt !important;
+            }
+            .translate-card {
+                border-radius: 12px !important;
+                padding: 1px 3px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.4rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.35rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.45rem !important;
+            }
+        }
 
-		@media screen and (min-width: 992px) and (max-width: 999px) {
-			.goog-te-gadget-simple {
-				border-radius: 24px !important;
-				padding: 1px 5px 1px 4px !important;
-				gap: 1px !important;
-			}
-		}
+        @media screen and (max-width: 1000px) {
+            .goog-te-gadget-simple {
+                border-radius: 18px !important;
+                padding: 1px 4px 1px 3px !important;
+                font-size: 10pt !important;
+            }
+            .translate-card {
+                border-radius: 11px !important;
+                padding: 1px 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.35rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.3rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.4rem !important;
+            }
+        }
 
-		@media screen and (min-width: 768px) and (max-width: 991px) {
-			.goog-te-gadget-simple {
-				border-radius: 22px !important;
-				padding: 1px 5px 1px 3px !important;
-				font-size: 10pt !important;
-			}
-			.translate-card {
-				border-radius: 14px !important;
-			}
-			.goog-te-menu-value {
-				font-size: 0.5rem !important;
-			}
-			.goog-te-menu-value span:first-child {
-				font-size: 0.45rem !important;
-			}
-			.goog-te-menu-value span:last-child {
-				font-size: 0.55rem !important;
-			}
-		}
+        @media screen and (min-width: 992px) and (max-width: 999px) {
+            .goog-te-gadget-simple {
+                border-radius: 17px !important;
+                padding: 1px 4px 1px 3px !important;
+                font-size: 10pt !important;
+                gap: 1px !important;
+            }
+            .translate-card {
+                border-radius: 10px !important;
+                padding: 1px 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.3rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.25rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.35rem !important;
+            }
+        }
 
-		@media screen and (min-width: 576px) and (max-width: 767px) {
-			.goog-te-gadget-simple {
-				border-radius: 20px !important;
-				padding: 1px 4px 1px 3px !important;
-				font-size: 10pt !important;
-				gap: 1px !important;
-			}
-			.translate-card {
-				border-radius: 12px !important;
-				padding: 1px 3px !important;
-			}
-			.goog-te-menu-value {
-				font-size: 0.45rem !important;
-			}
-		}
+        @media screen and (min-width: 768px) and (max-width: 991px) {
+            .goog-te-gadget-simple {
+                border-radius: 16px !important;
+                padding: 1px 4px 1px 3px !important;
+                font-size: 8pt !important;
+            }
+            .translate-card {
+                border-radius: 9px !important;
+                padding: 1px 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.3rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.25rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.35rem !important;
+            }
+        }
 
-		@media screen and (min-width: 481px) and (max-width: 575px) {
-			.goog-te-gadget-simple {
-				border-radius: 18px !important;
-				padding: 1px 3px 1px 2px !important;
-				font-size: 10pt !important;
-				gap: 0.5px !important;
-			}
-			.translate-card {
-				border-radius: 10px !important;
-				padding: 1px 2px !important;
-			}
-			.goog-te-menu-value span:first-child {
-				font-size: 0.4rem !important;
-			}
-			.goog-te-menu-value span:last-child {
-				font-size: 0.45rem !important;
-			}
-		}
+        @media screen and (min-width: 576px) and (max-width: 767px) {
+            .goog-te-gadget-simple {
+                border-radius: 15px !important;
+                padding: 1px 3px 1px 2px !important;
+                font-size: 7pt !important;
+                gap: 0.5px !important;
+            }
+            .translate-card {
+                border-radius: 8px !important;
+                padding: 0.5px 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.3rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.25rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.35rem !important;
+            }
+        }
 
-		@media screen and (min-width: 330px) and (max-width: 480px) {
-			.goog-te-gadget-simple {
-				border-radius: 16px !important;
-				padding: 0.5px 2px 0.5px 1px !important;
-				font-size: 10pt !important;
-				gap: 0.5px !important;
-			}
-			.translate-card {
-				border-radius: 8px !important;
-				padding: 0.5px 1px !important;
-			}
-			.goog-te-menu-value {
-				font-size: 0.4rem !important;
-			}
-			.goog-te-menu-value span:first-child {
-				font-size: 0.35rem !important;
-			}
-			.goog-te-menu-value span:last-child {
-				font-size: 0.4rem !important;
-			}
-		}
+        @media screen and (min-width: 481px) and (max-width: 575px) {
+            .goog-te-gadget-simple {
+                border-radius: 14px !important;
+                padding: 1px 3px 1px 2px !important;
+                font-size: 4.5pt !important;
+                gap: 0.5px !important;
+            }
+            .translate-card {
+                border-radius: 7px !important;
+                padding: 0.5px 2px !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.2rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.3rem !important;
+            }
+        }
 
-		@media screen and (max-width: 329px) {
-			.goog-te-gadget-simple {
-				border-radius: 14px !important;
-				padding: 0.5px 2px 0.5px 1px !important;
-				font-size: 6pt !important;
-				gap: 0.5px !important;
-			}
-			.translate-card {
-				border-radius: 6px !important;
-				padding: 0.5px 1px !important;
-			}
-			.goog-te-menu-value {
-				font-size: 0.5rem !important;
-			}
-			.goog-te-menu-value span:first-child {
-				font-size: 0.5rem !important;
-			}
-			.goog-te-menu-value span:last-child {
-				font-size: 0.5rem !important;
-			}
-		}
+        @media screen and (min-width: 380px) and (max-width: 480px) {
+            .goog-te-gadget-simple {
+                border-radius: 12px !important;
+                padding: 1px 2px 1px 1px !important;
+                font-size: 4.5pt !important;
+                gap: 0.5px !important;
+            }
+            .translate-card {
+                border-radius: 6px !important;
+                padding: 0.5px 1px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.25rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.2rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.3rem !important;
+            }
+        }
+
+        @media screen and (max-width: 379px) {
+            .goog-te-gadget-simple {
+                border-radius: 8px !important;
+                padding: 0.5px 1px 0.5px 0.5px !important;
+                font-size: 4.5pt !important;
+                font-weight: 700 !important;
+                gap: 0.2px !important;
+            }
+            .translate-card {
+                border-radius: 4px !important;
+                padding: 0.2px 0.5px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.2rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.15rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.25rem !important;
+            }
+
+            .translate-icon {
+                width: 20px !important;
+                height: 15px !important;
+                font-size: 0.6rem !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -564,33 +642,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		});
 	}
-	const logoutButtons = document.querySelectorAll('#nav-logout-link, #header-logout-link');
-	logoutButtons.forEach(button => {
-		button.addEventListener('click', function(e) {
-			e.preventDefault();
-			Swal.fire({
-				title: 'Ready to leave?',
-				text: 'You are about to log out of your account',
-				icon: 'question',
-				showCancelButton: true,
-				confirmButtonColor: '#10B981',
-				cancelButtonColor: '#6b7280',
-				confirmButtonText: 'Yes, logout',
-				cancelButtonText: 'Stay',
-				background: '#ffffff',
-				backdrop: 'rgba(15, 23, 36, 0.3)'
-			}).then((result) => {
-				if (result.isConfirmed) {
-					const form = document.createElement('form');
-					form.method = 'POST';
-					form.action = '{{ route("logout") }}';
-					form.innerHTML = '@csrf';
-					document.body.appendChild(form);
-					form.submit();
-				}
-			});
-		});
-	});
 	const markAllReadBtn = document.getElementById('markAllRead');
 	if (markAllReadBtn) {
 		markAllReadBtn.addEventListener('click', function() {

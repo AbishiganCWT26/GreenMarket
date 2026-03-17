@@ -65,6 +65,7 @@ body {
     text-align: center;
     position: relative;
     animation: slideDown 0.4s ease;
+    margin-bottom: 0rem !important;
 }
 
 .page-subtitle {

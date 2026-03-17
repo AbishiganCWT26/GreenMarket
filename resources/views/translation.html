@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,165 +12,56 @@
     <!-- animate.css (for subtle entrance) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
-        /* ----- GLOBAL RESET / BACKGROUND (just for demo) ----- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(145deg, #f1f5f9 0%, #e6edf5 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 1.5rem;
-        }
-
-        /* mock content card */
-        .demo-card {
-            background: rgba(255,255,255,0.75);
-            backdrop-filter: blur(10px);
-            padding: 2.2rem 2.5rem;
-            border-radius: 42px;
-            box-shadow: 0 30px 50px -20px rgba(5, 70, 50, 0.25);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            max-width: 580px;
-            width: 100%;
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .demo-card h1 {
-            font-weight: 600;
-            font-size: 2.2rem;
-            background: linear-gradient(135deg, #0b3225, #065f46);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.75rem;
-        }
-
-        .demo-card p {
-            color: #1e3b34;
-            font-size: 1.1rem;
-            line-height: 1.5;
-            opacity: 0.85;
-            font-weight: 400;
-            background: rgba(255,255,255,0.5);
-            padding: 1rem 1.8rem;
-            border-radius: 60px;
-            box-shadow: inset 0 1px 5px rgba(0,0,0,0.02);
-        }
-
-        /* center the translate card */
-        .translate-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-
-        /* ----- MAIN TRANSLATE CARD (perfect styling) ----- */
-        .translate-card {
-            background-color: #ffffff;
-            box-shadow: 0 7px 15px rgba(15, 23, 36, 0.08), 0 1px 3px rgba(15, 23, 36, 0.04);
-            border-radius: 28px;
-            padding: 8px 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.25s ease;
-            animation: soft-appear 0.4s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-            border: 1px solid rgba(16, 185, 129, 0.15);
-            backdrop-filter: blur(2px);
-        }
-
-        .translate-card:hover {
-            box-shadow: 0 14px 25px rgba(15, 23, 36, 0.12), 0 4px 8px rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.4);
-            transform: scale(1.01) translateY(-2px);
-        }
-
-        @keyframes soft-appear {
-            0% {
-                opacity: 0;
-                transform: translateY(10px) scale(0.96);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .translate-icon {
-            background: linear-gradient(145deg, #10B981, #059669);
-            width: 32px;
-            height: 32px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.1rem;
-            box-shadow: 0 6px 12px rgba(5, 150, 105, 0.25);
-            transition: 0.2s ease;
-        }
-
-        .translate-card:hover .translate-icon {
-            box-shadow: 0 8px 18px rgba(5, 150, 105, 0.35);
-            transform: rotate(2deg) scale(1.02);
-        }
-
-        .translate-card:active .translate-icon {
-            transform: rotate(4deg) scale(0.98);
-        }
-
-        #google_translate_element {
-            display: flex;
-            align-items: center;
-        }
-
-        /* ----- GOOGLE TRANSLATE GADGET OVERRIDES (crisp) ----- */
         .goog-te-gadget-simple {
             background-color: #f0f4f9 !important;
             border: 1px solid #e2e8f0 !important;
-            border-radius: 60px !important;
-            padding: 4px 10px 4px 8px !important;
+            border-radius: 20px !important;
+            padding: 1px 6px 1px 4px !important;
             display: flex !important;
             align-items: center !important;
-            gap: 4px !important;
+            gap: 1px !important;
             font-family: 'Inter', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 5pt !important;
             transition: all 0.2s ease !important;
             cursor: pointer !important;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
             line-height: 1 !important;
+        }
+
+        .translate-card {
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 5px rgba(15, 23, 36, 0.04), 0 1px 2px rgba(15, 23, 36, 0.02) !important;
+            border-radius: 14px !important;
+            padding: 1px 3px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 1px !important;
+            transition: all 0.25s ease !important;
+            border: 1px solid rgba(16, 185, 129, 0.1) !important;
+            backdrop-filter: blur(1px) !important;
         }
 
         .goog-te-gadget-simple:hover {
             background-color: #e9eef3 !important;
             border-color: #10B981 !important;
-            box-shadow: 0 7px 12px rgba(16, 185, 129, 0.15) !important;
-            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.08) !important;
+            transform: translateY(-0.5px);
         }
 
         .goog-te-gadget-simple:active {
-            transform: scale(0.98) translateY(1px) !important;
-            box-shadow: 0 2px 5px rgba(16, 185, 129, 0.2) !important;
+            transform: scale(0.98) translateY(0.5px) !important;
+            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1) !important;
         }
 
         .goog-te-menu-value {
             color: #0f1724 !important;
-            font-size: 0.75rem !important;
+            font-size: 0.5rem !important;
             font-weight: 500 !important;
             letter-spacing: 0.01em !important;
             display: flex !important;
             align-items: center !important;
-            gap: 2px !important;
+            gap: 0.5px !important;
         }
 
         .goog-te-gadget-icon {
@@ -183,23 +75,23 @@
         .goog-te-menu-value span:first-child {
             color: #0f1724 !important;
             font-weight: 500 !important;
+            font-size: 0.45rem !important;
         }
 
         .goog-te-menu-value span:last-child {
             color: #10B981 !important;
-            font-size: 0.9rem !important;
-            margin-left: 2px !important;
+            font-size: 0.55rem !important;
+            margin-left: 0.5px !important;
             font-weight: 600 !important;
             opacity: 0.9;
             transition: transform 0.2s;
         }
 
         .goog-te-gadget-simple:hover .goog-te-menu-value span:last-child {
-            transform: translateY(2px);
+            transform: translateY(0.5px);
             color: #059669 !important;
         }
 
-        /* hide google top banner & tooltip */
         .VIpgJd-ZVi9od-ORHb,
         .VIpgJd-ZVi9od-ORHb-OEVmcd,
         .goog-te-banner-frame.skiptranslate {
@@ -215,124 +107,376 @@
             box-shadow: none !important;
         }
 
-        /* focus outline */
-        *:focus-visible {
-            outline: 2px solid #10B981;
-            outline-offset: 2px;
-            border-radius: 12px;
+        iframe.goog-te-banner-frame,
+        .goog-te-banner-frame,
+        [class*="VIpgJd-ZVi9od-ORHb"] {
+            display: none !important;
         }
 
-        /* SweetAlert custom compact style */
-        .swal-popup-compact {
-            font-size: 0.9rem !important;
-            padding: 0.75rem 1rem !important;
-            border-radius: 28px !important;
-            box-shadow: 0 15px 30px -8px rgba(5, 105, 75, 0.3) !important;
-            border: 1px solid rgba(16, 185, 129, 0.3) !important;
-            font-family: 'Inter', sans-serif !important;
-            font-weight: 450;
+        body {
+            top: 0 !important;
         }
 
-        .swal2-container {
-            z-index: 9999 !important;
+        @media screen and (min-width: 2560px) and (max-width: 5000px) {
+            .goog-te-gadget-simple {
+                border-radius: 24px !important;
+                padding: 2px 8px 2px 6px !important;
+                font-size: 7pt !important;
+                gap: 2px !important;
+            }
+
+            .translate-card {
+                border-radius: 16px !important;
+                padding: 2px 4px !important;
+                gap: 2px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.6rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.55rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.65rem !important;
+            }
         }
 
-        /* tiny spacer */
-        .attribution {
-            margin-top: 2rem;
-            color: #3b5e4b;
-            font-size: 0.8rem;
-            opacity: 0.6;
+        @media screen and (min-width: 1501px) and (max-width: 2559px) {
+            .goog-te-gadget-simple {
+                border-radius: 22px !important;
+                padding: 2px 7px 2px 5px !important;
+                font-size: 7pt !important;
+            }
+
+            .translate-card {
+                border-radius: 15px !important;
+                padding: 2px 4px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.55rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.5rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.6rem !important;
+            }
+        }
+
+        @media screen and (min-width: 1400px) and (max-width: 1500px) {
+            .goog-te-gadget-simple {
+                border-radius: 21px !important;
+                padding: 2px 6px 2px 5px !important;
+                font-size: 6.5pt !important;
+            }
+
+            .translate-card {
+                border-radius: 14px !important;
+                padding: 1.5px 3px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.5rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.45rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.55rem !important;
+            }
+        }
+
+        @media screen and (min-width: 1200px) and (max-width: 1399px) {
+            .goog-te-gadget-simple {
+                border-radius: 20px !important;
+                padding: 1.5px 5px 1.5px 4px !important;
+                font-size: 6pt !important;
+            }
+
+            .translate-card {
+                border-radius: 13px !important;
+                padding: 1px 3px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.45rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.4rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.5rem !important;
+            }
+        }
+
+        @media screen and (min-width: 1001px) and (max-width: 1199px) {
+            .goog-te-gadget-simple {
+                border-radius: 19px !important;
+                padding: 1px 5px 1px 4px !important;
+                font-size: 10pt !important;
+            }
+
+            .translate-card {
+                border-radius: 12px !important;
+                padding: 1px 3px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.4rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.35rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.45rem !important;
+            }
+        }
+
+        @media screen and (max-width: 1000px) {
+            .goog-te-gadget-simple {
+                border-radius: 18px !important;
+                padding: 1px 4px 1px 3px !important;
+                font-size: 10pt !important;
+            }
+
+            .translate-card {
+                border-radius: 11px !important;
+                padding: 1px 2px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.35rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.3rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.4rem !important;
+            }
+        }
+
+        @media screen and (min-width: 992px) and (max-width: 999px) {
+            .goog-te-gadget-simple {
+                border-radius: 17px !important;
+                padding: 1px 4px 1px 3px !important;
+                font-size: 10pt !important;
+                gap: 1px !important;
+            }
+
+            .translate-card {
+                border-radius: 10px !important;
+                padding: 1px 2px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.3rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.25rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.35rem !important;
+            }
+        }
+
+        @media screen and (min-width: 768px) and (max-width: 991px) {
+            .goog-te-gadget-simple {
+                border-radius: 16px !important;
+                padding: 1px 4px 1px 3px !important;
+                font-size: 8pt !important;
+            }
+
+            .translate-card {
+                border-radius: 9px !important;
+                padding: 1px 2px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.3rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.25rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.35rem !important;
+            }
+        }
+
+        @media screen and (min-width: 576px) and (max-width: 767px) {
+            .goog-te-gadget-simple {
+                border-radius: 15px !important;
+                padding: 1px 3px 1px 2px !important;
+                font-size: 7pt !important;
+                gap: 0.5px !important;
+            }
+
+            .translate-card {
+                border-radius: 8px !important;
+                padding: 0.5px 2px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.3rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.25rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.35rem !important;
+            }
+        }
+
+        @media screen and (min-width: 481px) and (max-width: 575px) {
+            .goog-te-gadget-simple {
+                border-radius: 14px !important;
+                padding: 1px 3px 1px 2px !important;
+                font-size: 4.5pt !important;
+                gap: 0.5px !important;
+            }
+
+            .translate-card {
+                border-radius: 7px !important;
+                padding: 0.5px 2px !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.2rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.3rem !important;
+            }
+        }
+
+        @media screen and (min-width: 380px) and (max-width: 480px) {
+            .goog-te-gadget-simple {
+                border-radius: 12px !important;
+                padding: 1px 2px 1px 1px !important;
+                font-size: 4.5pt !important;
+                gap: 0.5px !important;
+            }
+
+            .translate-card {
+                border-radius: 6px !important;
+                padding: 0.5px 1px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.25rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.2rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.3rem !important;
+            }
+        }
+
+        @media screen and (max-width: 379px) {
+            .goog-te-gadget-simple {
+                border-radius: 8px !important;
+                padding: 0.5px 1px 0.5px 0.5px !important;
+                font-size: 4.5pt !important;
+                font-weight: 700 !important;
+                gap: 0.2px !important;
+            }
+
+            .translate-card {
+                border-radius: 4px !important;
+                padding: 0.2px 0.5px !important;
+            }
+
+            .goog-te-menu-value {
+                font-size: 0.2rem !important;
+            }
+
+            .goog-te-menu-value span:first-child {
+                font-size: 0.15rem !important;
+            }
+
+            .goog-te-menu-value span:last-child {
+                font-size: 0.25rem !important;
+            }
         }
     </style>
-    <!-- Google Translate library will be loaded with callback -->
 </head>
+
 <body>
 
     <!-- nice demo content to translate -->
-    <div class="demo-card">
-        <h1>🌿 sanctuário · lanka</h1>
-        <p>Welcome to the wild heart. / <span style="opacity:0.7">சிறிய உரை</span> / <span style="opacity:0.7">කුඩා පාඨය</span><br>use the compact translator below ⍟</p>
-    </div>
-
-    <!-- THE ACTUAL TRANSLATE CARD (perfectly wrapped) -->
-    <div class="translate-wrapper">
-        <div class="translate-card">
-            <div class="translate-icon">
+    <div class="translate-wrapper" style="display:flex;justify-content:center;margin:10px 0;">
+        <div class="translate-card"
+            style="background-color:#ffffff;box-shadow:0 7px 15px rgba(15,23,36,0.08),0 1px 3px rgba(15,23,36,0.04);border-radius:28px;padding:4px 10px;display:inline-flex;align-items:center;gap:8px;transition:all 0.25s ease;border:1px solid rgba(16,185,129,0.15);backdrop-filter:blur(2px);">
+            <div class="translate-icon"
+                style="background:linear-gradient(145deg,#10B981,#059669);width:28px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;box-shadow:0 6px 12px rgba(5,150,105,0.25);transition:0.2s ease;">
                 <i class="fas fa-language"></i>
             </div>
             <div id="google_translate_element"></div>
         </div>
     </div>
 
-    <!-- tiny credit line (clean) -->
-    <div class="attribution">seamless EN ⇄ SI ⇄ TA • simple & elegant</div>
 
-    <!-- 
-        ALL IN ONE SCRIPT: 
-        - define googleTranslateElementInit 
-        - showWelcomeMessage logic
-        - mutation observer for language change
-        - error handling
-    -->
-    <script type="text/javascript">
-        (function() {
-            // --------------------------------------------------------------
-            // ensure window flags
-            window.welcomeShown = false;
-
-            // define showWelcomeMessage (used inside init & directly)
-            window.showWelcomeMessage = function() {
-                if (!window.welcomeShown) {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'translate ready',
-                        text: 'choose language from the compact menu',
-                        timer: 1500,
-                        showConfirmButton: false,
-                        toast: true,
-                        position: 'bottom-end',
-                        background: '#ffffff',
-                        iconColor: '#3b82f6',
-                        customClass: { popup: 'swal-popup-compact' }
-                    });
-                    window.welcomeShown = true;
-                }
-            };
-
-            // store original if any (none, but we keep pattern)
-            const originalInit = window.googleTranslateElementInit;
-
-            // define googleTranslateElementInit (called by element.js)
-            window.googleTranslateElementInit = function() {
-                // create widget
-                new google.translate.TranslateElement({
-                    pageLanguage: 'en',
-                    includedLanguages: 'en,si,ta',
-                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-                }, 'google_translate_element');
-                
-                // after widget built, show welcome toast with slight delay
-                setTimeout(window.showWelcomeMessage, 600);
-            };
-
-            // load google translate element with callback
+    <script>
+        window.welcomeShown = false;
+        window.showWelcomeMessage = function () {
+            if (!window.welcomeShown) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'translate ready',
+                    text: 'choose language from the compact menu',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'bottom-end',
+                    background: '#ffffff',
+                    iconColor: '#3b82f6',
+                    customClass: { popup: 'swal-popup-compact' }
+                });
+                window.welcomeShown = true;
+            }
+        };
+        window.googleTranslateElementInit = function () {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,si,ta',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+            setTimeout(window.showWelcomeMessage, 600);
+        };
+        (function () {
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
             script.async = true;
             document.head.appendChild(script);
-
-            // --------------------------------------------------------------
-            // setup mutation observer for language change (after widget exists)
-            setTimeout(function() {
+            setTimeout(function () {
                 const gadget = document.querySelector('.goog-te-gadget-simple');
-                if (!gadget) return; // might retry later, but keep trying a bit
-
+                if (!gadget) return;
                 let previousLangText = gadget.innerText || 'en';
-
-                const observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mut) {
+                const observer = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (mut) {
                         if (mut.type === 'characterData' || mut.type === 'childList') {
                             const currentText = gadget.innerText || '';
                             if (currentText !== previousLangText && currentText.trim() !== '') {
@@ -340,7 +484,7 @@
                                     icon: 'success',
                                     title: 'language updated',
                                     text: 'page content will now appear in selected language.',
-                                    timer: 1700,
+                                    timer: 3500,
                                     showConfirmButton: false,
                                     background: '#ffffff',
                                     iconColor: '#10B981',
@@ -348,32 +492,26 @@
                                     position: 'bottom-end',
                                     showClass: { popup: 'animate__animated animate__fadeInUp' },
                                     hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-                                    customClass: {
-                                        popup: 'swal-popup-compact'
-                                    }
+                                    customClass: { popup: 'swal-popup-compact' }
                                 });
                                 previousLangText = currentText;
                             }
                         }
                     });
                 });
-
                 if (gadget) {
                     observer.observe(gadget, { childList: true, subtree: true, characterData: true });
                 }
-            }, 800); // wait for google widget to render
-
-            // additional retry if .goog-te-gadget-simple appears later
-            const observerRetry = new MutationObserver(function(mutations, obs) {
+            }, 800);
+            const observerRetry = new MutationObserver(function (mutations, obs) {
                 if (document.querySelector('.goog-te-gadget-simple')) {
-                    obs.disconnect(); // stop watching
-                    // re-run the observer setup after a tiny delay
-                    setTimeout(function() {
+                    obs.disconnect();
+                    setTimeout(function () {
                         const gadget = document.querySelector('.goog-te-gadget-simple');
                         if (!gadget) return;
                         let previousLangText = gadget.innerText || 'en';
-                        const observer = new MutationObserver(function(mutations) {
-                            mutations.forEach(function(mut) {
+                        const observer = new MutationObserver(function (mutations) {
+                            mutations.forEach(function (mut) {
                                 if (mut.type === 'characterData' || mut.type === 'childList') {
                                     const currentText = gadget.innerText || '';
                                     if (currentText !== previousLangText && currentText.trim() !== '') {
@@ -381,7 +519,7 @@
                                             icon: 'success',
                                             title: 'language updated',
                                             text: 'page content will now appear in selected language.',
-                                            timer: 1700,
+                                            timer: 3500,
                                             showConfirmButton: false,
                                             background: '#ffffff',
                                             iconColor: '#10B981',
@@ -401,10 +539,7 @@
                 }
             });
             observerRetry.observe(document.body, { childList: true, subtree: true });
-
-            // --------------------------------------------------------------
-            // global error handler for translate script
-            window.addEventListener('error', function(e) {
+            window.addEventListener('error', function (e) {
                 if (e.target && (e.target.src || '').includes('translate.google')) {
                     e.preventDefault();
                     Swal.fire({
@@ -417,35 +552,13 @@
                     });
                 }
             }, true);
-
-            // also catch cases where google translate might trigger banner warnings
-            // but we hide them via CSS, no extra needed
         })();
-    </script>
-
-    <!-- tiny style safety for potential Google injected iframes (hide banners) -->
-    <style>
-        /* force hide any google top frame */
-        iframe.goog-te-banner-frame,
-        .goog-te-banner-frame,
-        [class*="VIpgJd-ZVi9od-ORHb"] {
-            display: none !important;
-        }
-        body {
-            top: 0 !important;
-        }
-    </style>
-
-    <!-- ensure body isn't pushed down by google styles -->
-    <script>
-        (function() {
-            // google might add style to body margin top — remove it
+        (function () {
             if (document.body) {
                 document.body.style.marginTop = '0px';
                 document.body.style.position = 'static';
             }
-            // observe attribute changes if google tries to set style
-            const bodyObserver = new MutationObserver(function() {
+            const bodyObserver = new MutationObserver(function () {
                 if (document.body.style.marginTop !== '0px') {
                     document.body.style.marginTop = '0px';
                 }
@@ -457,4 +570,5 @@
         })();
     </script>
 </body>
+
 </html>

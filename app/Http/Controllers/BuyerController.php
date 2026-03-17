@@ -230,8 +230,38 @@ class BuyerController extends Controller
         $commonData = $this->getCommonData();
         $query = $this->buildProductQuery();
         $query = $this->applyFilters($query, $request);
-        $recommended = $query->limit(4)->get();
         $subcategories = $this->getFilteredSubcategories($request->category);
+
+        // Determine the limit based on screen width (from cookie or request input)
+        $screenWidth = request()->cookie('screen_width') ?? request()->input('screen_width', 1200);
+
+        $limit = match(true) {
+            // ultralarge Ultrawide / XXXXL Screens: 2560px - 5000px or above
+            $screenWidth >= 2560 => 20,
+            
+            // large Ultrawide / XXXL Screens: 1501px - 2559px
+            $screenWidth >= 1501 && $screenWidth <= 2559 => 18,
+            
+            // Ultrawide / XXL Screens: 1400px - 1500px
+            $screenWidth >= 1400 && $screenWidth <= 1500 => 16,
+            
+            // Extra Large Screens: 1200px - 1399px
+            // Large Screens: 1001px - 1199px
+            // Normal: 1000px and below down to 768px
+            $screenWidth >= 768 && $screenWidth <= 1399 => 12,
+            
+            // Small Screens: 576px - 767px
+            $screenWidth >= 576 && $screenWidth <= 767 => 9,
+            
+            // Extra Small to ultra Small: 575px and below (approx. 575, 480, 379)
+            $screenWidth <= 575 => 6,
+            
+            // Default fallback
+            default => 12
+        };
+
+        $recommended = $query->limit($limit)->get();
+        
         return view('buyer.dashboard', array_merge([
             'orders_count' => $ordersCount,
             'wishlist_count' => $wishlistCount,

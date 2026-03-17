@@ -443,6 +443,7 @@ body {
     align-items: center;
     gap: 8px;
     color: var(--text-color);
+    margin-bottom: 0rem !important;
 }
 
 .page-title i {
@@ -1118,8 +1119,8 @@ body {
     }
 
     .page-title {
-        font-size: 0.7rem;
-        gap: 3px;
+        font-size: 0.5rem;
+        gap: 2px;
     }
 
     .page-title i {

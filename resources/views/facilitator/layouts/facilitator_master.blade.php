@@ -16,6 +16,378 @@
         .mark-single-read:hover { background: #ecfdf5; color: #059669; text-decoration: underline; }
         .notif-item.read { opacity: 0.6; background-color: #f9fafb; }
         .read-status { font-size: 0.75rem; color: #6b7280; font-weight: 500; }
+        .goog-te-gadget-simple {
+            background-color: #f0f4f9 !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 20px !important;
+            padding: 1px 6px 1px 4px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 1px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 5pt !important;
+            transition: all 0.2s ease !important;
+            cursor: pointer !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+            line-height: 1 !important;
+        }
+
+        .translate-card {
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 5px rgba(15, 23, 36, 0.04), 0 1px 2px rgba(15, 23, 36, 0.02) !important;
+            border-radius: 14px !important;
+            padding: 1px 3px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 1px !important;
+            transition: all 0.25s ease !important;
+            border: 1px solid rgba(16, 185, 129, 0.1) !important;
+            backdrop-filter: blur(1px) !important;
+        }
+
+        .goog-te-gadget-simple:hover {
+            background-color: #e9eef3 !important;
+            border-color: #10B981 !important;
+            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.08) !important;
+            transform: translateY(-0.5px);
+        }
+
+        .goog-te-gadget-simple:active {
+            transform: scale(0.98) translateY(0.5px) !important;
+            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1) !important;
+        }
+
+        .goog-te-menu-value {
+            color: #0f1724 !important;
+            font-size: 0.5rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.01em !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5px !important;
+        }
+
+        .goog-te-gadget-icon {
+            display: none !important;
+        }
+
+        .goog-te-menu-value img {
+            display: none !important;
+        }
+
+        .goog-te-menu-value span:first-child {
+            color: #0f1724 !important;
+            font-weight: 500 !important;
+            font-size: 0.45rem !important;
+        }
+
+        .goog-te-menu-value span:last-child {
+            color: #10B981 !important;
+            font-size: 0.55rem !important;
+            margin-left: 0.5px !important;
+            font-weight: 600 !important;
+            opacity: 0.9;
+            transition: transform 0.2s;
+        }
+
+        .goog-te-gadget-simple:hover .goog-te-menu-value span:last-child {
+            transform: translateY(0.5px);
+            color: #059669 !important;
+        }
+
+        .VIpgJd-ZVi9od-ORHb,
+        .VIpgJd-ZVi9od-ORHb-OEVmcd,
+        .goog-te-banner-frame.skiptranslate {
+            display: none !important;
+        }
+
+        .goog-tooltip,
+        .goog-tooltip:hover,
+        .goog-text-highlight {
+            display: none !important;
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        iframe.goog-te-banner-frame,
+        .goog-te-banner-frame,
+        [class*="VIpgJd-ZVi9od-ORHb"] {
+            display: none !important;
+        }
+
+        body {
+            top: 0 !important;
+        }
+
+        .translate-icon {
+            width: 30px !important;
+            height: 25px !important;
+        }
+
+        @media screen and (min-width: 2560px) and (max-width: 5000px) {
+            .goog-te-gadget-simple {
+                border-radius: 24px !important;
+                padding: 2px 8px 2px 6px !important;
+                font-size: 12pt !important;
+                gap: 2px !important;
+            }
+            .translate-card {
+                border-radius: 16px !important;
+                padding: 2px 4px !important;
+                gap: 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.6rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.55rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.65rem !important;
+            }
+        }
+
+        @media screen and (min-width: 1501px) and (max-width: 2559px) {
+            .goog-te-gadget-simple {
+                border-radius: 22px !important;
+                padding: 2px 7px 2px 5px !important;
+                font-size: 12pt !important;
+            }
+            .translate-card {
+                border-radius: 15px !important;
+                padding: 2px 4px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.55rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.5rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.6rem !important;
+            }
+        }
+
+        @media screen and (min-width: 1400px) and (max-width: 1500px) {
+            .goog-te-gadget-simple {
+                border-radius: 21px !important;
+                padding: 2px 6px 2px 5px !important;
+                font-size: 12pt !important;
+            }
+            .translate-card {
+                border-radius: 14px !important;
+                padding: 1.5px 3px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.5rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.45rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.55rem !important;
+            }
+        }
+
+        @media screen and (min-width: 1200px) and (max-width: 1399px) {
+            .goog-te-gadget-simple {
+                border-radius: 20px !important;
+                padding: 1.5px 5px 1.5px 4px !important;
+                font-size: 12pt !important;
+            }
+            .translate-card {
+                border-radius: 13px !important;
+                padding: 1px 3px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.45rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.4rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.5rem !important;
+            }
+        }
+
+        @media screen and (min-width: 1001px) and (max-width: 1199px) {
+            .goog-te-gadget-simple {
+                border-radius: 19px !important;
+                padding: 1px 5px 1px 4px !important;
+                font-size: 10pt !important;
+            }
+            .translate-card {
+                border-radius: 12px !important;
+                padding: 1px 3px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.4rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.35rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.45rem !important;
+            }
+        }
+
+        @media screen and (max-width: 1000px) {
+            .goog-te-gadget-simple {
+                border-radius: 18px !important;
+                padding: 1px 4px 1px 3px !important;
+                font-size: 10pt !important;
+            }
+            .translate-card {
+                border-radius: 11px !important;
+                padding: 1px 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.35rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.3rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.4rem !important;
+            }
+        }
+
+        @media screen and (min-width: 992px) and (max-width: 999px) {
+            .goog-te-gadget-simple {
+                border-radius: 17px !important;
+                padding: 1px 4px 1px 3px !important;
+                font-size: 10pt !important;
+                gap: 1px !important;
+            }
+            .translate-card {
+                border-radius: 10px !important;
+                padding: 1px 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.3rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.25rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.35rem !important;
+            }
+        }
+
+        @media screen and (min-width: 768px) and (max-width: 991px) {
+            .goog-te-gadget-simple {
+                border-radius: 16px !important;
+                padding: 1px 4px 1px 3px !important;
+                font-size: 8pt !important;
+            }
+            .translate-card {
+                border-radius: 9px !important;
+                padding: 1px 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.3rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.25rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.35rem !important;
+            }
+        }
+
+        @media screen and (min-width: 576px) and (max-width: 767px) {
+            .goog-te-gadget-simple {
+                border-radius: 15px !important;
+                padding: 1px 3px 1px 2px !important;
+                font-size: 7pt !important;
+                gap: 0.5px !important;
+            }
+            .translate-card {
+                border-radius: 8px !important;
+                padding: 0.5px 2px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.3rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.25rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.35rem !important;
+            }
+        }
+
+        @media screen and (min-width: 481px) and (max-width: 575px) {
+            .goog-te-gadget-simple {
+                border-radius: 14px !important;
+                padding: 1px 3px 1px 2px !important;
+                font-size: 4.5pt !important;
+                gap: 0.5px !important;
+            }
+            .translate-card {
+                border-radius: 7px !important;
+                padding: 0.5px 2px !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.2rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.3rem !important;
+            }
+        }
+
+        @media screen and (min-width: 380px) and (max-width: 480px) {
+            .goog-te-gadget-simple {
+                border-radius: 12px !important;
+                padding: 1px 2px 1px 1px !important;
+                font-size: 4.5pt !important;
+                gap: 0.5px !important;
+            }
+            .translate-card {
+                border-radius: 6px !important;
+                padding: 0.5px 1px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.25rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.2rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.3rem !important;
+            }
+        }
+
+        @media screen and (max-width: 379px) {
+            .goog-te-gadget-simple {
+                border-radius: 8px !important;
+                padding: 0.5px 1px 0.5px 0.5px !important;
+                font-size: 4.5pt !important;
+                font-weight: 700 !important;
+                gap: 0.2px !important;
+            }
+            .translate-card {
+                border-radius: 4px !important;
+                padding: 0.2px 0.5px !important;
+            }
+            .goog-te-menu-value {
+                font-size: 0.2rem !important;
+            }
+            .goog-te-menu-value span:first-child {
+                font-size: 0.15rem !important;
+            }
+            .goog-te-menu-value span:last-child {
+                font-size: 0.25rem !important;
+            }
+
+            .translate-icon {
+                width: 20px !important;
+                height: 15px !important;
+                font-size: 0.6rem !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -143,6 +515,16 @@
             </div>
 
             <div class="header-right-group">
+
+                <!-- Google Translate Container -->
+                <div class="translate-wrapper" style="display:inline-flex; align-items:center; margin-right: 0px;">
+                    <div class="translate-card" style="background-color:#ffffff; box-shadow:0 7px 15px rgba(15,23,36,0.08), 0 1px 3px rgba(15,23,36,0.04); border-radius:28px; padding:4px 10px; display:inline-flex; align-items:center; gap:8px; transition:all 0.25s ease; border:1px solid rgba(16,185,129,0.15); backdrop-filter:blur(2px);">
+                        <div class="translate-icon" style="background:linear-gradient(145deg,#10B981,#059669); width:28px; height:28px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:white; font-size:1rem; box-shadow:0 6px 12px rgba(5,150,105,0.25); transition:0.2s ease;">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <div id="google_translate_element"></div>
+                    </div>
+                </div>
                 <div class="notif-wrapper">
                     <div class="notif-btn" id="notifBtn">
                         <i class="fa-regular fa-bell"></i>
@@ -296,32 +678,6 @@
             });
         }
 
-        const logoutButtons = document.querySelectorAll('#nav-logout-link, #header-logout-link');
-        logoutButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                Swal.fire({
-                    title: 'Ready to leave?',
-                    text: 'You are about to log out of your account',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#10B981',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Yes, logout',
-                    cancelButtonText: 'Stay',
-                    background: '#ffffff'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = '{{ route("logout") }}';
-                        form.innerHTML = '@csrf';
-                        document.body.appendChild(form);
-                        form.submit();
-                    }
-                });
-            });
-        });
 
         const markAllReadBtn = document.getElementById('markAllRead');
         if (markAllReadBtn) {
@@ -474,6 +830,138 @@
             });
         }, 5000);
     });
+</script>
+
+<script>
+    window.welcomeShown = false;
+    window.showWelcomeMessage = function () {
+        if (!window.welcomeShown) {
+            Swal.fire({
+                icon: 'info',
+                title: 'translate ready',
+                text: 'choose language from the compact menu',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'bottom-end',
+                background: '#ffffff',
+                iconColor: '#3b82f6',
+                customClass: { popup: 'swal-popup-compact' }
+            });
+            window.welcomeShown = true;
+        }
+    };
+    window.googleTranslateElementInit = function () {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,si,ta',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+        setTimeout(window.showWelcomeMessage, 600);
+    };
+    (function () {
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        script.async = true;
+        document.head.appendChild(script);
+        setTimeout(function () {
+            const gadget = document.querySelector('.goog-te-gadget-simple');
+            if (!gadget) return;
+            let previousLangText = gadget.innerText || 'en';
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mut) {
+                    if (mut.type === 'characterData' || mut.type === 'childList') {
+                        const currentText = gadget.innerText || '';
+                        if (currentText !== previousLangText && currentText.trim() !== '') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'language updated',
+                                text: 'page content will now appear in selected language.',
+                                timer: 3500,
+                                showConfirmButton: false,
+                                background: '#ffffff',
+                                iconColor: '#10B981',
+                                toast: true,
+                                position: 'bottom-end',
+                                showClass: { popup: 'animate__animated animate__fadeInUp' },
+                                hideClass: { popup: 'animate__animated animate__fadeOutDown' },
+                                customClass: { popup: 'swal-popup-compact' }
+                            });
+                            previousLangText = currentText;
+                        }
+                    }
+                });
+            });
+            if (gadget) {
+                observer.observe(gadget, { childList: true, subtree: true, characterData: true });
+            }
+        }, 800);
+        const observerRetry = new MutationObserver(function (mutations, obs) {
+            if (document.querySelector('.goog-te-gadget-simple')) {
+                obs.disconnect();
+                setTimeout(function () {
+                    const gadget = document.querySelector('.goog-te-gadget-simple');
+                    if (!gadget) return;
+                    let previousLangText = gadget.innerText || 'en';
+                    const observer = new MutationObserver(function (mutations) {
+                        mutations.forEach(function (mut) {
+                            if (mut.type === 'characterData' || mut.type === 'childList') {
+                                const currentText = gadget.innerText || '';
+                                if (currentText !== previousLangText && currentText.trim() !== '') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'language updated',
+                                        text: 'page content will now appear in selected language.',
+                                        timer: 3500,
+                                        showConfirmButton: false,
+                                        background: '#ffffff',
+                                        iconColor: '#10B981',
+                                        toast: true,
+                                        position: 'bottom-end',
+                                        showClass: { popup: 'animate__animated animate__fadeInUp' },
+                                        hideClass: { popup: 'animate__animated animate__fadeOutDown' },
+                                        customClass: { popup: 'swal-popup-compact' }
+                                    });
+                                    previousLangText = currentText;
+                                }
+                            }
+                        });
+                    });
+                    observer.observe(gadget, { childList: true, subtree: true, characterData: true });
+                }, 150);
+            }
+        });
+        observerRetry.observe(document.body, { childList: true, subtree: true });
+        window.addEventListener('error', function (e) {
+            if (e.target && (e.target.src || '').includes('translate.google')) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'translation error',
+                    text: 'google translate failed to load. please refresh.',
+                    confirmButtonColor: '#059669',
+                    background: '#ffffff',
+                    iconColor: '#f59e0b'
+                });
+            }
+        }, true);
+    })();
+    (function () {
+        if (document.body) {
+            document.body.style.marginTop = '0px';
+            document.body.style.position = 'static';
+        }
+        const bodyObserver = new MutationObserver(function () {
+            if (document.body.style.marginTop !== '0px') {
+                document.body.style.marginTop = '0px';
+            }
+            if (document.body.style.position !== 'static') {
+                document.body.style.position = 'static';
+            }
+        });
+        bodyObserver.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+    })();
 </script>
 </body>
 </html>

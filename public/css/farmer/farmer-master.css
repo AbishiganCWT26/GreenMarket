@@ -476,6 +476,7 @@ body {
 	align-items: center;
 	gap: 6px;
 	color: var(--text-color);
+	margin-bottom: 0rem !important;
 }
 
 .page-title i {

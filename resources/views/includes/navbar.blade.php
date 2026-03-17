@@ -150,7 +150,7 @@
 								<span>Settings</span>
 							</a>
 							<div class="dropdown-divider"></div>
-							<a href="#" onclick="event.preventDefault(); logoutUser();" class="dropdown-item logout">
+							<a href="{{ route('logout.confirmation') }}" class="dropdown-item logout">
 								<i class="fas fa-sign-out-alt"></i>
 								<span>Logout</span>
 							</a>
@@ -224,7 +224,7 @@
 						<i class="fas fa-cog"></i>
 						<span>Settings</span>
 					</a>
-					<a href="#" onclick="event.preventDefault(); logoutUser();" class="mobile-nav-item logout">
+					<a href="{{ route('logout.confirmation') }}" class="mobile-nav-item logout">
 						<i class="fas fa-sign-out-alt"></i>
 						<span>Logout</span>
 					</a>
@@ -419,36 +419,6 @@
 			@endif
 		});
 
-		function logoutUser() {
-			Swal.fire({
-				title: 'Logout?',
-				text: 'Are you sure you want to logout?',
-				imageUrl: '{{ asset("assets/images/logout btn.png") }}',
-				imageWidth: 64,	
-				imageHeight: 64,
-				imageAlt: 'Logout',
-				showCancelButton: true,
-				confirmButtonColor: '#10B981',
-				cancelButtonColor: '#6b7280',
-				confirmButtonText: 'Yes, Logout',
-				cancelButtonText: 'Cancel',
-				background: '#ffffff',
-				color: '#0f1724'
-			}).then((result) => {
-				if (result.isConfirmed) {
-					document.getElementById('logout-form').submit();
-					Swal.fire({
-						icon: 'success',
-						title: 'Logged Out',
-						text: 'You have been successfully logged out.',
-						showConfirmButton: false,
-						timer: 1500,
-						background: '#ffffff',
-						color: '#0f1724'
-					});
-				}
-			});
-		}
 	</script>
 </body>
 </html>

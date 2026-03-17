@@ -219,32 +219,6 @@
             });
         }
 
-        const logoutButtons = document.querySelectorAll('#nav-logout-link, #header-logout-link');
-        logoutButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                Swal.fire({
-                    title: 'Ready to leave?',
-                    text: 'You are about to log out',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#10B981',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Yes, logout',
-                    cancelButtonText: 'Stay',
-                    background: '#ffffff'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = '{{ route("logout") }}';
-                        form.innerHTML = '@csrf';
-                        document.body.appendChild(form);
-                        form.submit();
-                    }
-                });
-            });
-        });
 
         const markAllReadBtn = document.getElementById('markAllRead');
         if (markAllReadBtn) {
