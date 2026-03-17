@@ -4,7 +4,7 @@
 @section('page-title', 'Dashboard')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/facilitator-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/Facilitator/facilitator-dashboard.css') }}">
 @endsection
 
 @section('content')

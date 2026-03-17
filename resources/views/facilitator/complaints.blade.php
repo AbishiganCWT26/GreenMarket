@@ -3,7 +3,7 @@
 @section('title', 'User Complaints')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/facilitator-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/Facilitator/facilitator-dashboard.css') }}">
 <style>
     .complaints-container {
         padding: 25px;

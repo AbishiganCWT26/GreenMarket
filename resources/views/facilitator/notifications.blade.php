@@ -4,7 +4,7 @@
 @section('page-title', 'Notifications Center')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/facilitator-notifications.css') }}">
+<link rel="stylesheet" href="{{ asset('css/Facilitator/facilitator-notifications.css') }}">
 @endsection
 
 @section('content')
