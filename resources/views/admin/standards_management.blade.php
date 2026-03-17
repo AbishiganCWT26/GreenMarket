@@ -3,7 +3,7 @@
 @section('title', 'Standards Management')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/taxonomy-manager.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/taxonomy-manager.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     .standard-type-badge {
@@ -11,7 +11,7 @@
         border-radius: 20px;
         font-size: 0.75rem;
         font-weight: 500;
-        display: inline-block;
+        display: inline-block;  
     }
 
     .type-unit {

@@ -240,21 +240,6 @@ class ReportController extends Controller
                     ->get();
                 break;
 
-            case 'quality-grade':
-                $data = DB::table('products')
-                    ->select(
-                        'products.quality_grade',
-                        DB::raw("COUNT(products.id) as total_products"),
-                        DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0) as total_sold"),
-                        DB::raw("ROUND(COALESCE(SUM(order_items.quantity_ordered), 0) * 100.0 / NULLIF(COUNT(products.id), 0), 2) as sell_through_rate")
-                    )
-                    ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
-                    ->whereBetween('products.created_at', [$fromDate, $toDate])
-                    ->groupBy('products.quality_grade')
-                    ->orderBy('total_sold', 'desc')
-                    ->get();
-                break;
-
             case 'order-fulfillment':
                 $data = DB::table('orders')
                     ->select(
@@ -271,45 +256,6 @@ class ReportController extends Controller
                     ->orderBy('orders.created_at', 'desc')
                     ->get();
                 break;
-
-            case 'financial-audit':
-                $data = DB::table('payments')
-                    ->select(
-                        'payments.id as transaction_id',
-                        'orders.order_number',
-                        'payments.amount',
-                        'payments.payment_method',
-                        'payments.payment_status',
-                        'payments.payment_date'
-                    )
-                    ->leftJoin('orders', 'payments.order_id', '=', 'orders.id')
-                    ->whereBetween('payments.payment_date', [$fromDate, $toDate])
-                    ->orderBy('payments.payment_date', 'desc')
-                    ->get();
-                break;
-
-            case 'inventory-cash-reconciliation':
-                $data = DB::table('products')
-                    ->select(
-                        'products.product_name',
-                        DB::raw("COALESCE(SUM(order_items.quantity_ordered), 0) as quantity_sold"),
-                        DB::raw("COALESCE(SUM(order_items.item_total), 0) as expected_revenue"),
-                        DB::raw("COALESCE(SUM((order_items.item_total / NULLIF(orders.total_amount, 0)) * payments.amount), 0) as cash_received"),
-                        DB::raw("COALESCE(SUM(order_items.item_total), 0) - COALESCE(SUM((order_items.item_total / NULLIF(orders.total_amount, 0)) * payments.amount), 0) as variance")
-                    )
-                    ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
-                    ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
-                    ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
-                    ->whereBetween('orders.created_at', [$fromDate, $toDate])
-                    ->groupBy('products.id', 'products.product_name')
-                    ->orderBy('variance', 'desc')
-                    ->get();
-                break;
-
-
-
-
-
 
             case 'product-taxonomy':
                 $data = DB::table('product_categories')
@@ -359,10 +305,7 @@ class ReportController extends Controller
             'user-access' => 'User Access & Role Management Report',
             'dispute-feedback' => 'Dispute & Feedback Log Report',
             'regional-performance' => 'Regional Performance & Sales Density Report',
-            'quality-grade' => 'Quality Grade Performance Report',
             'order-fulfillment' => 'Order Fulfillment Timeline Report',
-            'financial-audit' => 'Financial Audit & Transaction Report',
-            'inventory-cash-reconciliation' => 'Inventory vs Cash Reconciliation Report',
             'product-taxonomy' => 'Product Taxonomy Report',
 
         ];
@@ -391,10 +334,7 @@ class ReportController extends Controller
             'user-access' => 'User Access & Role Management Report',
             'dispute-feedback' => 'Dispute & Feedback Log Report',
             'regional-performance' => 'Regional Performance & Sales Density Report',
-            'quality-grade' => 'Quality Grade Performance Report',
             'order-fulfillment' => 'Order Fulfillment Timeline Report',
-            'financial-audit' => 'Financial Audit & Transaction Report',
-            'inventory-cash-reconciliation' => 'Inventory vs Cash Reconciliation Report',
             'product-taxonomy' => 'Product Taxonomy Report',
 
         ];

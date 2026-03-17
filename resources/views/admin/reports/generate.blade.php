@@ -3,7 +3,7 @@
 @section('title', 'Generate Custom Report')
 
 @section('content')
-<link rel="stylesheet" href="{{ asset('css/Admin/report-generate.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/report-generate.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="page-header">
@@ -41,7 +41,6 @@
 									<option value="inventory-stock">Current Inventory Report</option>
 									<option value="category-performance">Category Performance Report</option>
 									<option value="stock-movement">Stock Movement Report</option>
-									<option value="quality-grade">Quality Grade Report</option>
 									<option value="product-taxonomy">Product Category Report</option>
 								</optgroup>
 								<optgroup label="Users & Farmers">
@@ -52,8 +51,6 @@
 									<option value="dispute-feedback">Dispute & Feedback Report</option>
 								</optgroup>
 								<optgroup label="Financial">
-									<option value="financial-audit">Financial Audit Report</option>
-									<option value="inventory-cash-reconciliation">Inventory vs Cash Report</option>
 								</optgroup>
 							</select>
 						</div>
@@ -231,10 +228,7 @@ function getReportName(reportType) {
 		'user-access': 'User Access Report',
 		'dispute-feedback': 'Dispute & Feedback Report',
 		'regional-performance': 'Regional Performance Report',
-		'quality-grade': 'Quality Grade Report',
 		'fulfillment-timeline': 'Fulfillment Timeline Report',
-		'financial-audit': 'Financial Audit Report',
-		'inventory-cash-reconciliation': 'Inventory vs Cash Report',
 		'product-taxonomy': 'Product Category Report'
 	};
 	return names[reportType] || 'Custom Report';

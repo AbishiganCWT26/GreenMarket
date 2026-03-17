@@ -3,7 +3,7 @@
 @section('title', 'System Configuration')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/system-config.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/system-config.css') }}">
 @endsection
 
 @section('content')

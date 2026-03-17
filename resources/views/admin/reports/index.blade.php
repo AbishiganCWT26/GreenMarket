@@ -110,36 +110,12 @@
                     'color' => 'var(--primary-green)'
                 ],
                 [
-                    'id' => 'quality-grade',
-                    'title' => 'Quality Grade',
-                    'description' => 'Grade performance analysis',
-                    'category' => 'inventory',
-                    'icon' => 'fas fa-star',
-                    'color' => 'var(--accent-amber)'
-                ],
-                [
                     'id' => 'order-fulfillment',
                     'title' => 'Fulfillment Timeline',
                     'description' => 'Order fulfillment tracking',
                     'category' => 'sales',
                     'icon' => 'fas fa-calendar-check',
                     'color' => 'var(--blue)'
-                ],
-                [
-                    'id' => 'financial-audit',
-                    'title' => 'Financial Audit',
-                    'description' => 'Transaction audit report',
-                    'category' => 'financial',
-                    'icon' => 'fas fa-search-dollar',
-                    'color' => 'var(--purple)'
-                ],
-                [
-                    'id' => 'inventory-cash-reconciliation',
-                    'title' => 'Inventory vs Cash',
-                    'description' => 'Inventory-cash reconciliation',
-                    'category' => 'financial',
-                    'icon' => 'fas fa-balance-scale',
-                    'color' => 'var(--primary-green)'
                 ],
                 [
                     'id' => 'product-taxonomy',
