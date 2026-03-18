@@ -22,7 +22,7 @@ class AdminMiddleware
         }
 
         if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized access. Admin only.');
+            return redirect()->route('unauthorized')->with('error', 'Admin can only access this page');
         }
 
         return $next($request);

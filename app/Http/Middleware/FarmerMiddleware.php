@@ -15,7 +15,7 @@ class FarmerMiddleware
         }
 
         if (Auth::user()->role !== 'farmer') {
-            abort(403, 'Unauthorized access. Farmer only.');
+            return redirect()->route('unauthorized')->with('error', 'Farmer can only access this page');
         }
 
         return $next($request);

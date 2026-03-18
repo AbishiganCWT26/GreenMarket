@@ -15,7 +15,7 @@ class BuyerMiddleware
         }
 
         if (Auth::user()->role !== 'buyer') {
-            abort(403, 'Unauthorized access. Buyer only.');
+            return redirect()->route('unauthorized')->with('error', 'Buyer can only access this page');
         }
 
         return $next($request);

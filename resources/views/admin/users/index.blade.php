@@ -103,6 +103,7 @@
 		let currentPage = 1;
 		let searchTerm = '';
 		let loading = false;
+		let leadFarmers = @json($leadFarmers);
 
 		function updateStatsCards(stats) {
 			if (stats) {
@@ -157,6 +158,9 @@
 						}
 						if (response.stats) {
 							updateStatsCards(response.stats);
+						}
+						if (response.leadFarmers) {
+							leadFarmers = response.leadFarmers;
 						}
 						Swal.fire({
 							icon: 'success',
@@ -223,6 +227,13 @@
 								html = `
 									<div class="form-section">
 										<h4>Farmer Details</h4>
+										<div class="form-group">
+											<label>Lead Farmer <span class="required">*</span></label>
+											<select id="lead_farmer_id" class="form-select" required>
+												<option value="" disabled selected>Select a lead farmer</option>
+												${leadFarmers.map(lf => `<option value="${lf.id}">${lf.name} - ${lf.district}</option>`).join('')}
+											</select>
+										</div>
 										<div class="form-group">
 											<label>Full Name <span class="required">*</span></label>
 											<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
@@ -391,8 +402,8 @@
 											<textarea id="lead_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
 										</div>
 										<div class="form-group">
-											<label>Grama Niladhari Division</label>
-											<input type="text" id="lead_gnd" class="form-input" placeholder="Enter GND">
+											<label>Grama Niladhari Division <span class="required">*</span></label>
+											<input type="text" id="lead_gnd" class="form-input" placeholder="Enter GND" required>
 										</div>
 										<div class="form-group">
 											<label>District <span class="required">*</span></label>
@@ -639,6 +650,33 @@
 								}
 							});
 						}
+
+						// WhatsApp Auto-fill Logic
+						const roleMap = {
+							'farmer': { mobile: '#farmer_mobile', whatsapp: '#farmer_whatsapp' },
+							'lead_farmer': { mobile: '#lead_mobile', whatsapp: '#lead_whatsapp' },
+							'buyer': { mobile: '#buyer_mobile', whatsapp: '#buyer_whatsapp' },
+							'facilitator': { mobile: '#facilitator_mobile', whatsapp: '#facilitator_whatsapp' }
+						};
+
+						if (roleMap[userType]) {
+							const { mobile, whatsapp } = roleMap[userType];
+							$(mobile).on('input', function() {
+								const mobileVal = $(this).val();
+								const whatsappField = $(whatsapp);
+								if (!whatsappField.val() || whatsappField.val() === $(this).data('prev-mobile')) {
+									whatsappField.val(mobileVal);
+								}
+								$(this).data('prev-mobile', mobileVal);
+							});
+							
+							$(whatsapp).on('input', function() {
+								// If user manually edits WhatsApp, we stop auto-sync if they clear it
+								if (!$(this).val()) {
+									$(mobile).data('prev-mobile', '');
+								}
+							});
+						}
 					});
 				},
 				preConfirm: function() {
@@ -648,6 +686,28 @@
 					const email = $('#email').val();
 					const password = $('#password').val();
 					const passwordConfirmation = $('#password_confirmation').val();
+
+					if (userType === 'farmer') {
+						const leadFarmerId = $('#lead_farmer_id').val();
+						if (!leadFarmerId) {
+							Swal.showValidationMessage('Please select a Lead Farmer');
+							return false;
+						}
+
+						const gnd = $('#farmer_gnd').val();
+						if (!gnd) {
+							Swal.showValidationMessage('Grama Niladhari Division field data is missing');
+							return false;
+						}
+					}
+
+					if (userType === 'lead_farmer') {
+						const gnd = $('#lead_gnd').val();
+						if (!gnd) {
+							Swal.showValidationMessage('Grama Niladhari Division field data is missing');
+							return false;
+						}
+					}
 
 					if (!userType || !name || !username || !password) {
 						Swal.showValidationMessage('Please fill all required fields');
@@ -679,12 +739,13 @@
 					};
 
 					if (userType === 'farmer') {
+						formData.lead_farmer_id = $('#lead_farmer_id').val();
 						formData.nic_no = $('#farmer_nic').val() || '';
 						formData.primary_mobile = $('#farmer_mobile').val() || '';
-						formData.whatsapp_number = $('#farmer_whatsapp').val() || '';
+						formData.whatsapp_number = $('#farmer_whatsapp').val() || formData.primary_mobile;
 						formData.residential_address = $('#farmer_address').val() || '';
 						formData.grama_niladhari_division = $('#farmer_gnd').val() || '';
-						formData.district = $('#farmer_district').val() || 'Colombo';
+						formData.district = $('#farmer_district').val() || '';
 						formData.preferred_payment = $('#farmer_payment').val() || 'bank';
 						
 						const paymentMethod = $('#farmer_payment').val();
@@ -741,7 +802,7 @@
 					} else if (userType === 'lead_farmer') {
 						formData.nic_no = $('#lead_nic').val() || '';
 						formData.primary_mobile = $('#lead_mobile').val() || '';
-						formData.whatsapp_number = $('#lead_whatsapp').val() || '';
+						formData.whatsapp_number = $('#lead_whatsapp').val() || formData.primary_mobile;
 						formData.residential_address = $('#lead_address').val() || '';
 						formData.grama_niladhari_division = $('#lead_gnd').val() || '';
 						formData.district = $('#lead_district').val() || 'Colombo';
@@ -754,14 +815,14 @@
 					} else if (userType === 'buyer') {
 						formData.nic_no = $('#buyer_nic').val() || '';
 						formData.primary_mobile = $('#buyer_mobile').val() || '';
-						formData.whatsapp_number = $('#buyer_whatsapp').val() || '';
+						formData.whatsapp_number = $('#buyer_whatsapp').val() || formData.primary_mobile;
 						formData.residential_address = $('#buyer_address').val() || '';
 						formData.business_name = $('#buyer_business').val() || '';
 						formData.business_type = $('#buyer_type').val() || 'individual';
 					} else if (userType === 'facilitator') {
 						formData.nic_no = $('#facilitator_nic').val() || '';
 						formData.primary_mobile = $('#facilitator_mobile').val() || '';
-						formData.whatsapp_number = $('#facilitator_whatsapp').val() || '';
+						formData.whatsapp_number = $('#facilitator_whatsapp').val() || formData.primary_mobile;
 						formData.assigned_division = $('#facilitator_division').val() || '';
 					} else if (userType === 'admin' || userType === 'subadmin') {
 						formData.nic_no = $('#admin_nic').val() || '';
@@ -803,7 +864,10 @@
 						error: function(xhr) {
 							let error = 'Failed to create user';
 							
-							if (xhr.responseJSON?.message) {
+							if (xhr.status === 422 && xhr.responseJSON?.errors) {
+								const errors = xhr.responseJSON.errors;
+								error = Object.values(errors).flat()[0];
+							} else if (xhr.responseJSON?.message) {
 								error = xhr.responseJSON.message;
 							}
 

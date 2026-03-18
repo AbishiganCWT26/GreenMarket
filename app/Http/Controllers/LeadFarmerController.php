@@ -518,9 +518,6 @@ class LeadFarmerController extends Controller
         $currentFarmerMobile = $product->farmer->primary_mobile ?? '';
 
         $isLocked = false;
-        if ($product->expected_availability_date) {
-            $isLocked = Carbon::parse($product->expected_availability_date)->isPast();
-        }
 
         return view('lead_farmer.edit_product', compact(
             'product',
@@ -676,22 +673,6 @@ class LeadFarmerController extends Controller
             ], 422);
         }
 
-        $isLocked = false;
-        if ($product->expected_availability_date) {
-            $isLocked = Carbon::parse($product->expected_availability_date)->isPast();
-        }
-
-        if ($isLocked) {
-            $hasAvailabilityDateChanged = $request->expected_availability_date != 
-                Carbon::parse($product->expected_availability_date)->format('Y-m-d');
-            
-            if (!$hasAvailabilityDateChanged) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Product editing is locked. Only availability date can be changed.'
-                ], 400);
-            }
-        }
 
         $sensitiveFields = [
             'farmer_id' => $product->farmer_id,

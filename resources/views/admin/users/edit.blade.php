@@ -81,27 +81,9 @@
 								<label class="form-label">
 									<i class="fas fa-user-tag"></i> Role
 								</label>
-								@if($user->id == Auth::id())
 								<input type="text" class="form-input" value="{{ ucfirst(str_replace('_', ' ', $user->role)) }}" readonly>
 								<input type="hidden" name="role" value="{{ $user->role }}">
-								<small class="form-note">You cannot change your own role</small>
-								@elseif(in_array($user->role, ['facilitator', 'buyer', 'admin', 'subadmin']))
-								<input type="text" class="form-input" value="{{ ucfirst(str_replace('_', ' ', $user->role)) }}" readonly>
-								<input type="hidden" name="role" value="{{ $user->role }}">
-								<small class="form-note">Role cannot be changed for {{ ucfirst(str_replace('_', ' ', $user->role)) }}</small>
-								@elseif($user->role == 'farmer')
-								<select name="role" class="form-select">
-									<option value="farmer" {{ $user->role == 'farmer' ? 'selected' : '' }}>Farmer</option>
-									<option value="lead_farmer" {{ $user->role == 'lead_farmer' ? 'selected' : '' }}>Lead Farmer</option>
-								</select>
-								<small class="form-note">Farmer can only be changed to Lead Farmer</small>
-								@elseif($user->role == 'lead_farmer')
-								<select name="role" class="form-select">
-									<option value="lead_farmer" {{ $user->role == 'lead_farmer' ? 'selected' : '' }}>Lead Farmer</option>
-									<option value="farmer" {{ $user->role == 'farmer' ? 'selected' : '' }}>Farmer</option>
-								</select>
-								<small class="form-note">Lead Farmer can only be changed to Farmer</small>
-								@endif
+								<small class="form-note">User role is not editable</small>
 							</div>
 							<div class="form-group">
 								<label class="form-label">
@@ -119,14 +101,17 @@
 					</div>
 				</div>
 
-				@if(in_array($user->role, ['farmer', 'lead_farmer']))
-					@php
-						$userDetails = $user->role == 'farmer'
-							? DB::table('farmers')->where('user_id', $user->id)->first()
-							: DB::table('lead_farmers')->where('user_id', $user->id)->first();
-					@endphp
+				@php
+					$farmerData = DB::table('farmers')->where('user_id', $user->id)->first();
+					$leadFarmerData = DB::table('lead_farmers')->where('user_id', $user->id)->first();
+					$buyerData = DB::table('buyers')->where('user_id', $user->id)->first();
+					$facilitatorData = DB::table('facilitators')->where('user_id', $user->id)->first();
+					
+					// Current user details point to farmer or lead farmer for compatibility
+					$userDetails = ($user->role == 'farmer' ? $farmerData : $leadFarmerData) ?? (object)[];
+				@endphp
 
-					@if($userDetails)
+				<div id="farmer-sections" style="{{ in_array($user->role, ['farmer', 'lead_farmer']) ? '' : 'display: none;' }}">
 					<div class="form-section profile-section">
 						<div class="section-header">
 							<div class="section-icon">
@@ -165,9 +150,31 @@
 										<i class="fas fa-map-marker-alt"></i> District
 									</label>
 									<select name="district" class="form-select">
-										<option value="Colombo" {{ ($userDetails->district ?? '') == 'Colombo' ? 'selected' : '' }}>Colombo</option>
-										<option value="Gampaha" {{ ($userDetails->district ?? '') == 'Gampaha' ? 'selected' : '' }}>Gampaha</option>
-										<option value="Kalutara" {{ ($userDetails->district ?? '') == 'Kalutara' ? 'selected' : '' }}>Kalutara</option>
+												<option value="Ampara" {{ ($userDetails->district ?? '') == 'Ampara' ? 'selected' : '' }}>Ampara</option>
+												<option value="Anuradhapura" {{ ($userDetails->district ?? '') == 'Anuradhapura' ? 'selected' : '' }}>Anuradhapura</option>
+												<option value="Badulla" {{ ($userDetails->district ?? '') == 'Badulla' ? 'selected' : '' }}>Badulla</option>
+												<option value="Batticaloa" {{ ($userDetails->district ?? '') == 'Batticaloa' ? 'selected' : '' }}>Batticaloa</option>
+												<option value="Colombo" {{ ($userDetails->district ?? '') == 'Colombo' ? 'selected' : '' }}>Colombo</option>
+												<option value="Galle" {{ ($userDetails->district ?? '') == 'Galle' ? 'selected' : '' }}>Galle</option>
+												<option value="Gampaha" {{ ($userDetails->district ?? '') == 'Gampaha' ? 'selected' : '' }}>Gampaha</option>
+												<option value="Hambantota" {{ ($userDetails->district ?? '') == 'Hambantota' ? 'selected' : '' }}>Hambantota</option>
+												<option value="Jaffna" {{ ($userDetails->district ?? '') == 'Jaffna' ? 'selected' : '' }}>Jaffna</option>
+												<option value="Kalutara" {{ ($userDetails->district ?? '') == 'Kalutara' ? 'selected' : '' }}>Kalutara</option>
+												<option value="Kandy" {{ ($userDetails->district ?? '') == 'Kandy' ? 'selected' : '' }}>Kandy</option>
+												<option value="Kegalle" {{ ($userDetails->district ?? '') == 'Kegalle' ? 'selected' : '' }}>Kegalle</option>
+												<option value="Kilinochchi" {{ ($userDetails->district ?? '') == 'Kilinochchi' ? 'selected' : '' }}>Kilinochchi</option>
+												<option value="Kurunegala" {{ ($userDetails->district ?? '') == 'Kurunegala' ? 'selected' : '' }}>Kurunegala</option>
+												<option value="Mannar" {{ ($userDetails->district ?? '') == 'Mannar' ? 'selected' : '' }}>Mannar</option>
+												<option value="Matale" {{ ($userDetails->district ?? '') == 'Matale' ? 'selected' : '' }}>Matale</option>
+												<option value="Matara" {{ ($userDetails->district ?? '') == 'Matara' ? 'selected' : '' }}>Matara</option>
+												<option value="Moneragala" {{ ($userDetails->district ?? '') == 'Moneragala' ? 'selected' : '' }}>Moneragala</option>
+												<option value="Mullaitivu" {{ ($userDetails->district ?? '') == 'Mullaitivu' ? 'selected' : '' }}>Mullaitivu</option>
+												<option value="Nuwara Eliya" {{ ($userDetails->district ?? '') == 'Nuwara Eliya' ? 'selected' : '' }}>Nuwara Eliya</option>
+												<option value="Polonnaruwa" {{ ($userDetails->district ?? '') == 'Polonnaruwa' ? 'selected' : '' }}>Polonnaruwa</option>
+												<option value="Puttalam" {{ ($userDetails->district ?? '') == 'Puttalam' ? 'selected' : '' }}>Puttalam</option>
+												<option value="Ratnapura" {{ ($userDetails->district ?? '') == 'Ratnapura' ? 'selected' : '' }}>Ratnapura</option>
+												<option value="Trincomalee" {{ ($userDetails->district ?? '') == 'Trincomalee' ? 'selected' : '' }}>Trincomalee</option>
+												<option value="Vavuniya" {{ ($userDetails->district ?? '') == 'Vavuniya' ? 'selected' : '' }}>Vavuniya</option>
 									</select>
 								</div>
 							</div>
@@ -215,44 +222,46 @@
 								</select>
 							</div>
 
-							<div class="form-row">
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-university"></i> Bank Account Number
-									</label>
-									<input type="text" name="account_number" class="form-input" value="{{ $userDetails->account_number ?? '' }}">
+							<div id="bank-payment-fields" style="{{ in_array($userDetails->preferred_payment, ['bank', 'all']) ? '' : 'display: none;' }}">
+								<div class="form-row">
+									<div class="form-group">
+										<label class="form-label">
+											<i class="fas fa-university"></i> Bank Account Number
+										</label>
+										<input type="text" name="account_number" class="form-input" value="{{ $userDetails->account_number ?? '' }}">
+									</div>
+									<div class="form-group">
+										<label class="form-label">
+											<i class="fas fa-user-tie"></i> Account Holder Name
+										</label>
+										<input type="text" name="account_holder_name" class="form-input" value="{{ $userDetails->account_holder_name ?? '' }}">
+									</div>
 								</div>
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-user-tie"></i> Account Holder Name
-									</label>
-									<input type="text" name="account_holder_name" class="form-input" value="{{ $userDetails->account_holder_name ?? '' }}">
+
+								<div class="form-row">
+									<div class="form-group">
+										<label class="form-label">
+											<i class="fas fa-landmark"></i> Bank Name
+										</label>
+										<input type="text" name="bank_name" class="form-input" value="{{ $userDetails->bank_name ?? '' }}">
+									</div>
+									<div class="form-group">
+										<label class="form-label">
+											<i class="fas fa-map-marker-alt"></i> Bank Branch
+										</label>
+										<input type="text" name="bank_branch" class="form-input" value="{{ $userDetails->bank_branch ?? '' }}">
+									</div>
 								</div>
 							</div>
 
 							<div class="form-row">
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-landmark"></i> Bank Name
-									</label>
-									<input type="text" name="bank_name" class="form-input" value="{{ $userDetails->bank_name ?? '' }}">
-								</div>
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-map-marker-alt"></i> Bank Branch
-									</label>
-									<input type="text" name="bank_branch" class="form-input" value="{{ $userDetails->bank_branch ?? '' }}">
-								</div>
-							</div>
-
-							<div class="form-row">
-								<div class="form-group">
+								<div class="form-group" id="ezcash-payment-fields" style="{{ in_array($userDetails->preferred_payment, ['ezcash', 'all']) ? '' : 'display: none;' }}">
 									<label class="form-label">
 										<i class="fas fa-mobile-alt"></i> Ez Cash Number
 									</label>
 									<input type="text" name="ezcash_mobile" class="form-input" value="{{ $userDetails->ezcash_mobile ?? '' }}">
 								</div>
-								<div class="form-group">
+								<div class="form-group" id="mcash-payment-fields" style="{{ in_array($userDetails->preferred_payment, ['mcash', 'all']) ? '' : 'display: none;' }}">
 									<label class="form-label">
 										<i class="fas fa-phone-alt"></i> mCash Number
 									</label>
@@ -260,33 +269,27 @@
 								</div>
 							</div>
 
-							@if($user->role == 'lead_farmer' && $userDetails)
-							<div class="form-row">
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-users"></i> Group Name
-									</label>
-									<input type="text" name="group_name" class="form-input" value="{{ $userDetails->group_name ?? '' }}">
-								</div>
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-hashtag"></i> Group Number
-									</label>
-									<input type="text" name="group_number" class="form-input" value="{{ $userDetails->group_number ?? '' }}">
+							<div id="lead-farmer-only-fields" style="{{ $user->role == 'lead_farmer' ? '' : 'display: none;' }}">
+								<div class="form-row">
+									<div class="form-group">
+										<label class="form-label">
+											<i class="fas fa-users"></i> Group Name
+										</label>
+										<input type="text" name="group_name" class="form-input" value="{{ $userDetails->group_name ?? '' }}">
+									</div>
+									<div class="form-group">
+										<label class="form-label">
+											<i class="fas fa-hashtag"></i> Group Number
+										</label>
+										<input type="text" name="group_number" class="form-input" value="{{ $userDetails->group_number ?? '' }}">
+									</div>
 								</div>
 							</div>
-							@endif
 						</div>
 					</div>
-					@endif
-				@endif
+				</div>
 
-				@if($user->role == 'buyer')
-					@php
-						$buyerDetails = DB::table('buyers')->where('user_id', $user->id)->first();
-					@endphp
-
-					@if($buyerDetails)
+				<div id="buyer-sections" style="{{ $user->role == 'buyer' ? '' : 'display: none;' }}">
 					<div class="form-section business-section">
 						<div class="section-header">
 							<div class="section-icon">
@@ -299,7 +302,7 @@
 								<label class="form-label">
 									<i class="fas fa-store"></i> Business Name
 								</label>
-								<input type="text" name="business_name" class="form-input" value="{{ $buyerDetails->business_name }}">
+								<input type="text" name="business_name" class="form-input" value="{{ $buyerData->business_name ?? '' }}">
 							</div>
 
 							<div class="form-row">
@@ -308,32 +311,26 @@
 										<i class="fas fa-building"></i> Business Type
 									</label>
 									<select name="business_type" class="form-select">
-										<option value="individual" {{ $buyerDetails->business_type == 'individual' ? 'selected' : '' }}>Individual</option>
-										<option value="restaurant" {{ $buyerDetails->business_type == 'restaurant' ? 'selected' : '' }}>Restaurant</option>
-										<option value="hotel" {{ $buyerDetails->business_type == 'hotel' ? 'selected' : '' }}>Hotel</option>
-										<option value="retailer" {{ $buyerDetails->business_type == 'retailer' ? 'selected' : '' }}>Retailer</option>
-										<option value="wholesaler" {{ $buyerDetails->business_type == 'wholesaler' ? 'selected' : '' }}>Wholesaler</option>
+										<option value="individual" {{ ($buyerData->business_type ?? '') == 'individual' ? 'selected' : '' }}>Individual</option>
+										<option value="restaurant" {{ ($buyerData->business_type ?? '') == 'restaurant' ? 'selected' : '' }}>Restaurant</option>
+										<option value="hotel" {{ ($buyerData->business_type ?? '') == 'hotel' ? 'selected' : '' }}>Hotel</option>
+										<option value="retailer" {{ ($buyerData->business_type ?? '') == 'retailer' ? 'selected' : '' }}>Retailer</option>
+										<option value="wholesaler" {{ ($buyerData->business_type ?? '') == 'wholesaler' ? 'selected' : '' }}>Wholesaler</option>
 									</select>
 								</div>
 								<div class="form-group">
 									<label class="form-label">
 										<i class="fas fa-phone"></i> Contact Number
 									</label>
-									<input type="text" class="form-input" value="{{ $buyerDetails->primary_mobile ?? '' }}" readonly>
+									<input type="text" class="form-input" value="{{ $buyerData->primary_mobile ?? '' }}" readonly>
 									<small class="form-note">Contact number cannot be changed here</small>
 								</div>
 							</div>
 						</div>
 					</div>
-					@endif
-				@endif
+				</div>
 
-				@if($user->role == 'facilitator')
-					@php
-						$facilitatorDetails = DB::table('facilitators')->where('user_id', $user->id)->first();
-					@endphp
-
-					@if($facilitatorDetails)
+				<div id="facilitator-sections" style="{{ $user->role == 'facilitator' ? '' : 'display: none;' }}">
 					<div class="form-section facilitator-section">
 						<div class="section-header">
 							<div class="section-icon">
@@ -346,7 +343,7 @@
 								<label class="form-label">
 									<i class="fas fa-id-card"></i> NIC Number
 								</label>
-								<input type="text" class="form-input" value="{{ $facilitatorDetails->nic_no }}" readonly>
+								<input type="text" name="facilitator_nic_no" class="form-input" value="{{ $facilitatorData->nic_no ?? '' }}">
 							</div>
 
 							<div class="form-row">
@@ -354,19 +351,18 @@
 									<label class="form-label">
 										<i class="fas fa-map-pin"></i> Assigned Division
 									</label>
-									<input type="text" class="form-input" value="{{ $facilitatorDetails->assigned_division }}" readonly>
+									<input type="text" name="assigned_division" class="form-input" value="{{ $facilitatorData->assigned_division ?? '' }}">
 								</div>
 								<div class="form-group">
 									<label class="form-label">
 										<i class="fas fa-phone"></i> Contact Number
 									</label>
-									<input type="text" class="form-input" value="{{ $facilitatorDetails->primary_mobile ?? '' }}" readonly>
+									<input type="text" name="facilitator_primary_mobile" class="form-input" value="{{ $facilitatorData->primary_mobile ?? '' }}">
 								</div>
 							</div>
 						</div>
 					</div>
-					@endif
-				@endif
+				</div>
 			</div>
 
 			<div class="form-actions">
@@ -434,6 +430,30 @@ $(document).ready(function() {
 	let timeLeft = 300;
 	let otpVerified = false;
 	let formDataToSubmit = null;
+
+	// Preferred Payment Method Toggle Logic
+	$('select[name="preferred_payment"]').change(function() {
+		const selectedMethod = $(this).val();
+		
+		// Hide all first
+		$('#bank-payment-fields').hide();
+		$('#ezcash-payment-fields').hide();
+		$('#mcash-payment-fields').hide();
+		
+		// Show based on selection
+		if (selectedMethod === 'bank') {
+			$('#bank-payment-fields').show();
+		} else if (selectedMethod === 'ezcash') {
+			$('#ezcash-payment-fields').show();
+		} else if (selectedMethod === 'mcash') {
+			$('#mcash-payment-fields').show();
+		} else if (selectedMethod === 'all') {
+			$('#bank-payment-fields').show();
+			$('#ezcash-payment-fields').show();
+			$('#mcash-payment-fields').show();
+		}
+	});
+
 
 	function showAlert(icon, title, text) {
 		Swal.fire({

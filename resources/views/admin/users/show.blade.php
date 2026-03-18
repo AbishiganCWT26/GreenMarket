@@ -174,6 +174,37 @@
 				</div>
 			</div>
 
+			@if($user->role == 'farmer' && isset($details->lead_farmer_name))
+			<div class="details-section lead-farmer-section">
+				<div class="section-header">
+					<div class="section-icon">
+						<i class="fas fa-user-tie"></i>
+					</div>
+					<h3>Lead Farmer Information</h3>
+				</div>
+				<div class="section-content">
+						<div class="detail-row">
+							<div class="detail-label">
+								<i class="fas fa-user"></i> Lead Farmer Name
+							</div>
+							<div class="detail-value">{{ $details->lead_farmer_name }}</div>
+						</div>
+						<div class="detail-row">
+							<div class="detail-label">
+								<i class="fas fa-map-marker-alt"></i> Lead Farmer District
+							</div>
+							<div class="detail-value">{{ $details->lead_farmer_district }}</div>
+						</div>
+						<div class="detail-row">
+							<div class="detail-label">
+								<i class="fas fa-phone"></i> Lead Farmer Contact
+							</div>
+							<div class="detail-value">{{ $details->lead_farmer_mobile }}</div>
+						</div>
+				</div>
+			</div>
+			@endif
+
 			<div class="details-section payment-section">
                 <div class="section-header">
                     <div class="section-icon">

@@ -20,6 +20,7 @@ class UserController extends Controller
         $activeUsers = DB::table('users')->where('is_active', true)->count();
         $inactiveUsers = DB::table('users')->where('is_active', false)->count();
         $adminUsers = DB::table('users')->whereIn('role', ['admin', 'subadmin'])->count();
+        $leadFarmerList = DB::table('lead_farmers')->select('id', 'name', 'district')->get();
 
         $query = DB::table('users')
             ->leftJoin('farmers', 'users.id', '=', 'farmers.user_id')
@@ -99,7 +100,8 @@ class UserController extends Controller
                         'inactive' => $inactiveUsers,
                         'admins' => $adminUsers,
                         'total' => $totalUsers
-                    ]
+                    ],
+                    'leadFarmers' => $leadFarmerList
                 ]);
             } catch (\Exception $e) {
                 \Log::error('Error loading users via AJAX: ' . $e->getMessage());
@@ -122,7 +124,8 @@ class UserController extends Controller
             'totalUsers' => $totalUsers,
             'activeUsers' => $activeUsers,
             'inactiveUsers' => $inactiveUsers,
-            'adminUsers' => $adminUsers
+            'adminUsers' => $adminUsers,
+            'leadFarmers' => $leadFarmerList
         ]);
     }
 
@@ -195,7 +198,10 @@ class UserController extends Controller
         // Additional validation for farmer types
         if (in_array($validated['user_type'], ['farmer', 'lead_farmer'])) {
             $request->validate([
-                'nic_no' => 'required|string|max:12'
+                'nic_no' => 'required|string|max:12',
+                'grama_niladhari_division' => 'required|string|max:100'
+            ], [
+                'grama_niladhari_division.required' => 'Grama Niladhari Division field data is missing'
             ]);
             
             // Check if NIC already exists in farmers or lead_farmers table
@@ -291,29 +297,36 @@ class UserController extends Controller
                         'mcash_mobile' => $request->mcash_mobile
                     ]);
 
-                    $defaultLeadFarmer = DB::table('lead_farmers')->first();
-                    if ($defaultLeadFarmer) {
+                    $selectedLeadFarmerId = $request->lead_farmer_id;
+                    if ($selectedLeadFarmerId && DB::table('lead_farmers')->where('id', $selectedLeadFarmerId)->exists()) {
                         DB::table('farmers')->insert(array_merge($farmerData, [
-                            'lead_farmer_id' => $defaultLeadFarmer->id
+                            'lead_farmer_id' => $selectedLeadFarmerId
                         ]));
                     } else {
-                        $defaultLeadFarmerId = DB::table('lead_farmers')->insertGetId([
-                            'user_id' => $userId,
-                            'name' => 'Default Lead Farmer',
-                            'nic_no' => '000000000V',
-                            'primary_mobile' => '0770000000',
-                            'residential_address' => 'Default Address',
-                            'grama_niladhari_division' => 'Default Division',
-                            'group_name' => 'Default Group',
-                            'group_number' => 'GRP-000001',
-                            'preferred_payment' => 'bank',
-                            'created_at' => now(),
-                            'updated_at' => now()
-                        ]);
+                        $defaultLeadFarmer = DB::table('lead_farmers')->first();
+                        if ($defaultLeadFarmer) {
+                            DB::table('farmers')->insert(array_merge($farmerData, [
+                                'lead_farmer_id' => $defaultLeadFarmer->id
+                            ]));
+                        } else {
+                            $defaultLeadFarmerId = DB::table('lead_farmers')->insertGetId([
+                                'user_id' => $userId,
+                                'name' => 'Default Lead Farmer',
+                                'nic_no' => '000000000V',
+                                'primary_mobile' => '0770000000',
+                                'residential_address' => 'Default Address',
+                                'grama_niladhari_division' => 'Default Division',
+                                'group_name' => 'Default Group',
+                                'group_number' => 'GRP-000001',
+                                'preferred_payment' => 'bank',
+                                'created_at' => now(),
+                                'updated_at' => now()
+                            ]);
 
-                        DB::table('farmers')->insert(array_merge($farmerData, [
-                            'lead_farmer_id' => $defaultLeadFarmerId
-                        ]));
+                            DB::table('farmers')->insert(array_merge($farmerData, [
+                                'lead_farmer_id' => $defaultLeadFarmerId
+                            ]));
+                        }
                     }
                 }
             } elseif ($validated['user_type'] == 'buyer') {
@@ -414,7 +427,7 @@ class UserController extends Controller
             // General database error handling to avoid showing raw SQL
             elseif (strpos($errorMessage, 'SQLSTATE') !== false) {
                 \Log::error('Database Error during user creation: ' . $errorMessage);
-                $errorMessage = 'A database error occurred while creating the user. Please try again later.';
+                $errorMessage = 'A database error occurred while creating the user: ' . $errorMessage;
             }
             
             return response()->json(['success' => false, 'message' => $errorMessage], 500);
@@ -442,23 +455,11 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
-        $currentUser = Auth::user();
-
-        if ($user->id == $currentUser->id) {
-            $request->merge(['role' => $user->role]);
+        // Prevent role modification for any user
+        $request->merge(['role' => $user->role]);
+        
+        if ($user->id == Auth::id()) {
             $request->merge(['is_active' => $user->is_active]);
-        }
-
-        if (in_array($user->role, ['facilitator', 'buyer', 'admin', 'subadmin']) && $user->id != $currentUser->id) {
-            $request->merge(['role' => $user->role]);
-        }
-
-        if ($user->role == 'farmer' && $request->role != 'farmer' && $request->role != 'lead_farmer') {
-            $request->merge(['role' => $user->role]);
-        }
-
-        if ($user->role == 'lead_farmer' && $request->role != 'farmer' && $request->role != 'lead_farmer') {
-            $request->merge(['role' => $user->role]);
         }
 
         $validated = $request->validate([
@@ -467,6 +468,16 @@ class UserController extends Controller
             'role' => 'required|in:admin,subadmin,facilitator,lead_farmer,farmer,buyer',
             'is_active' => 'required|boolean'
         ]);
+
+        // Additional validation for farmer types
+        if (in_array($validated['role'], ['farmer', 'lead_farmer'])) {
+            $request->validate([
+                'nic_no' => 'required|string|max:12',
+                'grama_niladhari_division' => 'required|string|max:100'
+            ], [
+                'grama_niladhari_division.required' => 'Grama Niladhari Division field data is missing'
+            ]);
+        }
 
         $roleChanged = $validated['role'] != $user->role;
 
@@ -535,7 +546,7 @@ class UserController extends Controller
             // General database error handling to avoid showing raw SQL
             elseif (strpos($errorMessage, 'SQLSTATE') !== false) {
                 \Log::error('Database Error during user update: ' . $errorMessage);
-                $errorMessage = 'A database error occurred while updating the user. Please try again later.';
+                $errorMessage = 'A database error occurred while updating the user: ' . $errorMessage;
             }
             
             return response()->json(['success' => false, 'message' => $errorMessage], 500);
@@ -645,6 +656,7 @@ class UserController extends Controller
 
         foreach ($profileFields as $field) {
             // Filter fields based on table schema
+            if ($table == 'farmers' && in_array($field, ['group_name', 'group_number'])) continue;
             if ($table == 'lead_farmers' && in_array($field, ['email', 'is_active'])) continue;
 
             if ($request->has($field)) {
@@ -721,16 +733,40 @@ class UserController extends Controller
                 'updated_at' => now()
             ];
 
-            $fields = ['name', 'nic_no', 'primary_mobile', 'whatsapp_number', 'email', 'assigned_division'];
-            foreach ($fields as $field) {
-                if ($request->has($field)) {
-                    $updateData[$field] = $request->$field;
+            $fields = [
+                'name' => 'name',
+                'nic_no' => 'facilitator_nic_no',
+                'primary_mobile' => 'facilitator_primary_mobile',
+                'whatsapp_number' => 'whatsapp_number',
+                'email' => 'email',
+                'assigned_division' => 'assigned_division'
+            ];
+
+            foreach ($fields as $dbField => $requestField) {
+                if ($request->has($requestField)) {
+                    $updateData[$dbField] = $request->$requestField;
+                } elseif ($request->has($dbField)) {
+                    $updateData[$dbField] = $request->$dbField;
                 }
             }
 
             DB::table('facilitators')
                 ->where('user_id', $userId)
                 ->update($updateData);
+        } else {
+            $userRecord = DB::table('users')->find($userId);
+            DB::table('facilitators')->insert([
+                'user_id' => $userId,
+                'name' => $request->name ?? $userRecord->username,
+                'nic_no' => $request->facilitator_nic_no ?? $request->nic_no ?? '',
+                'email' => $request->email ?? $userRecord->email,
+                'primary_mobile' => $request->facilitator_primary_mobile ?? $request->primary_mobile ?? '',
+                'whatsapp_number' => $request->whatsapp_number ?? '',
+                'assigned_division' => $request->assigned_division ?? '',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
         }
     }
 
@@ -1181,7 +1217,16 @@ class UserController extends Controller
 
         switch ($user->role) {
             case 'farmer':
-                $details = DB::table('farmers')->where('user_id', $user->id)->first();
+                $details = DB::table('farmers')
+                    ->leftJoin('lead_farmers', 'farmers.lead_farmer_id', '=', 'lead_farmers.id')
+                    ->where('farmers.user_id', $user->id)
+                    ->select(
+                        'farmers.*',
+                        'lead_farmers.name as lead_farmer_name',
+                        'lead_farmers.district as lead_farmer_district',
+                        'lead_farmers.primary_mobile as lead_farmer_mobile'
+                    )
+                    ->first();
                 break;
             case 'lead_farmer':
                 $details = DB::table('lead_farmers')->where('user_id', $user->id)->first();

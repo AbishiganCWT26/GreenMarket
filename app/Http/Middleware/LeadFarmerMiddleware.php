@@ -15,7 +15,7 @@ class LeadFarmerMiddleware
         }
 
         if (Auth::user()->role !== 'lead_farmer') {
-            abort(403, 'Unauthorized access. Lead Farmer only.');
+            return redirect()->route('unauthorized')->with('error', 'Lead Farmer can only access this page');
         }
 
         return $next($request);

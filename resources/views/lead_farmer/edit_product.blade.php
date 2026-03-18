@@ -21,17 +21,10 @@
             <p class="product-code">Product ID: #{{ $product->id }}</p>
         </div>
         <div class="header-right">
-            @if($isLocked)
-            <div class="lock-status locked">
-                <i class="fa-solid fa-lock"></i>
-                <span>Product Editing Locked (Date Expired)</span>
-            </div>
-            @else
             <div class="lock-status unlocked">
-                <i class="fa-solid fa-lock-open"></i>
-                <span>Product Editing Available</span>
+                <i class="fa-solid fa-edit"></i>
+                <span>Editing Product Details</span>
             </div>
-            @endif
         </div>
     </div>
 
@@ -53,7 +46,7 @@
                             <input type="text" name="product_name" id="product_name" 
                                    class="form-control free-edit @error('product_name') is-invalid @enderror"
                                    value="{{ old('product_name', $product->product_name) }}" 
-                                   @if($isLocked) disabled @endif>
+                                  >
                             @error('product_name')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -66,7 +59,7 @@
                             <input type="text" name="type_variant" id="type_variant" 
                                    class="form-control free-edit @error('type_variant') is-invalid @enderror"
                                    value="{{ old('type_variant', $product->type_variant) }}"
-                                   @if($isLocked) disabled @endif>
+                                  >
                             @error('type_variant')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -78,7 +71,7 @@
                             </label>
                             <textarea name="product_description" id="product_description" 
                                       class="form-control free-edit @error('product_description') is-invalid @enderror"
-                                      rows="3" @if($isLocked) disabled @endif>{{ old('product_description', $product->product_description) }}</textarea>
+                                      rows="3">{{ old('product_description', $product->product_description) }}</textarea>
                             @error('product_description')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -94,7 +87,7 @@
                                 <div class="change-photo-overlay">
                                     <i class="fa-solid fa-camera me-2"></i>Click to Change Photo
                                 </div>
-                                <input type="file" name="product_photo" id="product_photo" class="d-none" accept="image/jpeg,image/png" @if($isLocked) disabled @endif>
+                                <input type="file" name="product_photo" id="product_photo" class="d-none" accept="image/jpeg,image/png">
                             </div>
                             <small class="form-text text-muted">Max file size: 5MB. Supported formats: JPG, PNG</small>
                         </div>
@@ -114,7 +107,7 @@
                             </label>
                             <select name="farmer_id" id="farmer_id" 
                                     class="form-control sensitive-select @error('farmer_id') is-invalid @enderror"
-                                    @if($isLocked) disabled @endif>
+                                   >
                                 <option value="">Select Farmer</option>
                                 @foreach($farmers as $farmer)
                                     <option value="{{ $farmer->id }}" 
@@ -134,7 +127,7 @@
                             </label>
                             <select name="category_id" id="category_id" 
                                     class="form-control sensitive-select @error('category_id') is-invalid @enderror"
-                                    @if($isLocked) disabled @endif>
+                                   >
                                 <option value="">Select Category</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}" 
@@ -154,7 +147,7 @@
                             </label>
                             <select name="subcategory_id" id="subcategory_id" 
                                     class="form-control sensitive-select @error('subcategory_id') is-invalid @enderror"
-                                    @if($isLocked) disabled @endif>
+                                   >
                                 <option value="">Select Subcategory</option>
                                 @foreach($subcategories as $subcategory)
                                     <option value="{{ $subcategory->id }}" 
@@ -174,7 +167,7 @@
                             </label>
                             <select name="product_examples_id" id="product_examples_id" 
                                     class="form-control sensitive-select @error('product_examples_id') is-invalid @enderror"
-                                    @if($isLocked) disabled @endif>
+                                   >
                                 <option value="">Select Product</option>
                                 @foreach($productExamples as $example)
                                     <option value="{{ $example->id }}" 
@@ -204,7 +197,7 @@
                                    class="form-control free-edit @error('quantity') is-invalid @enderror"
                                    value="{{ old('quantity', $product->quantity) }}" 
                                    step="0.01" min="0"
-                                   @if($isLocked) disabled @endif>
+                                  >
                             @error('quantity')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -216,7 +209,7 @@
                             </label>
                             <select name="unit_of_measure" id="unit_of_measure" 
                                     class="form-control free-edit @error('unit_of_measure') is-invalid @enderror"
-                                    @if($isLocked) disabled @endif>
+                                   >
                                 <option value="">Select Unit</option>
                                 @foreach($units as $unit)
                                     <option value="{{ $unit }}" 
@@ -236,7 +229,7 @@
                             </label>
                             <select name="quality_grade" id="quality_grade" 
                                     class="form-control free-edit @error('quality_grade') is-invalid @enderror"
-                                    @if($isLocked) disabled @endif>
+                                   >
                                 <option value="">Select Grade</option>
                                 @foreach($grades as $grade)
                                     <option value="{{ $grade }}" 
@@ -260,7 +253,7 @@
                                        class="form-control @error('selling_price') is-invalid @enderror"
                                        value="{{ old('selling_price', $product->selling_price) }}" 
                                        step="0.01" min="0"
-                                       @if($isLocked) disabled @endif>
+                                      >
                             </div>
                             @error('selling_price')
                                 <span class="invalid-feedback">{{ $message }}</span>
@@ -274,7 +267,7 @@
                             <input type="date" name="expected_availability_date" id="expected_availability_date"
                                    class="form-control @error('expected_availability_date') is-invalid @enderror"
                                    value="{{ old('expected_availability_date', $product->expected_availability_date ? $product->expected_availability_date->format('Y-m-d') : '') }}" 
-                                   @if($isLocked) disabled @endif>
+                                  >
                             @error('expected_availability_date')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -295,7 +288,7 @@
                             </label>
                             <textarea name="pickup_address" id="pickup_address" 
                                       class="form-control free-edit @error('pickup_address') is-invalid @enderror"
-                                      rows="3" @if($isLocked) disabled @endif>{{ old('pickup_address', $product->pickup_address) }}</textarea>
+                                      rows="3">{{ old('pickup_address', $product->pickup_address) }}</textarea>
                             @error('pickup_address')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -309,7 +302,7 @@
                                    class="form-control free-edit @error('pickup_map_link') is-invalid @enderror"
                                    value="{{ old('pickup_map_link', $product->pickup_map_link) }}"
                                    placeholder="https://maps.google.com/?q=..."
-                                   @if($isLocked) disabled @endif>
+                                  >
                             @error('pickup_map_link')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -328,7 +321,7 @@
                             <input class="form-check-input free-edit" type="checkbox" 
                                    name="is_available" id="is_available" value="1"
                                    {{ old('is_available', $product->is_available) ? 'checked' : '' }}
-                                   @if($isLocked) disabled @endif>
+                                  >
                             <label class="form-check-label" for="is_available">
                                 <i class="fa-solid fa-check-circle"></i>
                                 Make product available for purchase
@@ -414,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const otpVerified = document.getElementById('otpVerified');
     const otpCode = document.getElementById('otpCode');
     const productId = {{ $product->id }};
-    const isLocked = {{ $isLocked ? 'true' : 'false' }};
+    const isLocked = false;
     
     let originalValues = {};
     let otpTimer = null;
@@ -426,11 +419,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const sensitiveFields = ['farmer_id', 'category_id', 'subcategory_id', 'product_examples_id', 'selling_price', 'expected_availability_date'];
     
     function initializeForm() {
-        if (isLocked) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Product Locked (Edit Availability Date First)';
-            return;
-        }
         
         sensitiveFields.forEach(field => {
             const element = document.querySelector(`[name="${field}"]`);
@@ -455,9 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         document.getElementById('photoPreviewContainer').addEventListener('click', function() {
-            if (!isLocked) {
-                document.getElementById('product_photo').click();
-            }
+            document.getElementById('product_photo').click();
         });
         
         document.getElementById('category_id').addEventListener('change', function() {

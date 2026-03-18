@@ -15,7 +15,7 @@ class FacilitatorMiddleware
         }
 
         if (Auth::user()->role !== 'facilitator') {
-            abort(403, 'Unauthorized access. Facilitator only.');
+            return redirect()->route('unauthorized')->with('error', 'Facilitator can only access this page');
         }
 
         return $next($request);

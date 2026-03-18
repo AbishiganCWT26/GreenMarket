@@ -5,10 +5,18 @@
                 $statusClass = $user->is_active ? 'status-active' : 'status-inactive';
                 $statusText = $user->is_active ? 'Active' : 'Inactive';
                 $roleText = str_replace('_', ' ', ucfirst($user->role));
+                $defaultAvatar = match($user->role) {
+                    'buyer' => asset('uploads/profile_pictures/default-buyer.png'),
+                    'farmer' => asset('assets/images/farmer.png'),
+                    'admin' => asset('assets/images/Profiles/default-avatar.png'),
+                    'lead_farmer' => asset('assets/images/Profiles/lead-farmer.png'),
+                    'facilitator' => asset('assets/images/Profiles/facilitator.png'),
+                    default => asset('assets/images/Profiles/default-avatar.png')
+                };
+
                 $avatarUrl = $user->profile_photo && $user->profile_photo !== 'default-avatar.png' 
                     ? asset('uploads/profile_pictures/' . $user->profile_photo)
-                    : '';
-                $initials = strtoupper(substr($user->display_name, 0, 2));
+                    : $defaultAvatar;
                 $contactInfo = $user->contact_number ?? 'N/A';
                 $nicInfo = $user->nic_number ?? 'Not provied';
                 $emailInfo = $user->email ?? 'No email';
@@ -16,14 +24,11 @@
             @endphp
             <div class="user-card" data-user-id="{{ $user->id }}" data-status="{{ $user->is_active ? 'active' : 'inactive' }}" data-role="{{ $user->role }}">
                 <div class="card-header">
-                    <div class="avatar {{ $avatarUrl ? '' : 'default' }}">
-                        @if($avatarUrl)
-                            <img src="{{ $avatarUrl }}" alt="{{ $user->display_name }}" 
-                                 class="view-photo"
-                                 data-photo="{{ $avatarUrl }}">
-                        @else
-                            {{ $initials }}
-                        @endif
+                    <div class="avatar">
+                        <img src="{{ $avatarUrl }}" alt="{{ $user->display_name }}" 
+                             class="view-photo"
+                             data-photo="{{ $avatarUrl }}"
+                             onerror="this.src='{{ $defaultAvatar }}';">
                     </div>
                     <div class="user-info">
                         <div class="user-name">
@@ -42,7 +47,7 @@
                         @if($nicInfo)
                             <div class="detail-item">
                                 <i class="fas fa-id-card"></i>
-                                <span>NIC: {{ $nicInfo }}</span>
+                                <span>NIC No: {{ $nicInfo }}</span>
                             </div>
                         @endif
                         <div class="detail-item">

@@ -38,6 +38,10 @@ Route::view('/about-us', 'aboutus')->name('about');
 Route::get('/contact-us', [PublicController::class, 'contactForm'])->name('contact.form');
 Route::post('/contact-us/send', [PublicController::class, 'sendContact'])->name('contact.send');
 
+Route::get('/unauthorized', function () {
+    return view('errors.unauthorized');
+})->name('unauthorized');
+
 Route::get('/register/buyer', [BuyerController::class, 'showRegistrationForm'])->name('buyer.register');
 Route::post('/register/buyer', [BuyerController::class, 'register'])->name('buyer.register.submit');
 
