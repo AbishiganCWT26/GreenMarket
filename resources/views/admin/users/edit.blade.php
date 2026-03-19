@@ -109,10 +109,8 @@
 					$facilitatorData = DB::table('facilitators')->where('user_id', $user->id)->first();
 					$facilitatorAssignments = $facilitatorData ? DB::table('facilitator_assignments')->where('facilitator_id', $facilitatorData->id)->get() : collect();
 					
-					// Current user details point to farmer or lead farmer for compatibility
 					$userDetails = ($user->role == 'farmer' ? $farmerData : ($user->role == 'lead_farmer' ? $leadFarmerData : null)) ?? (object)[];
 					
-					// Ensure common properties exist to avoid "Undefined property" errors
 					if (!isset($userDetails->preferred_payment)) $userDetails->preferred_payment = 'bank';
 					if (!isset($userDetails->nic_no)) $userDetails->nic_no = '';
 					if (!isset($userDetails->primary_mobile)) $userDetails->primary_mobile = '';
@@ -130,7 +128,8 @@
 					if (!isset($userDetails->group_number)) $userDetails->group_number = '';
 				@endphp
 
-				<div id="farmer-sections" style="{{ in_array($user->role, ['farmer', 'lead_farmer']) ? '' : 'display: none;' }}">
+				@if(in_array($user->role, ['farmer', 'lead_farmer']))
+				<div id="farmer-sections">
 					<div class="form-section profile-section">
 						<div class="section-header">
 							<div class="section-icon">
@@ -143,17 +142,34 @@
 						</div>
 						<div class="form-fields">
 							<div class="form-row">
+								<div class="form-group" style="flex: 1 1 100%;">
+									<label class="form-label">
+										<i class="fas fa-user"></i> Full Name
+									</label>
+									<input type="text" name="name" class="form-input" value="{{ $userDetails->name ?? '' }}" {{ in_array($user->role, ['farmer', 'lead_farmer']) ? 'required' : '' }}>
+								</div>
+
 								<div class="form-group">
 									<label class="form-label">
 										<i class="fas fa-id-card"></i> NIC Number
 									</label>
-									<input type="text" name="nic_no" class="form-input" value="{{ $userDetails->nic_no ?? '' }}">
+									<input type="text" name="nic_no" class="form-input" value="{{ $userDetails->nic_no ?? '' }}" {{ in_array($user->role, ['farmer', 'lead_farmer']) ? 'required' : '' }}>
 								</div>
+							</div>
+
+							<div class="form-row">
+								
 								<div class="form-group">
 									<label class="form-label">
 										<i class="fas fa-phone"></i> Primary Mobile
 									</label>
-									<input type="text" name="primary_mobile" class="form-input" value="{{ $userDetails->primary_mobile ?? '' }}">
+									<input type="text" name="primary_mobile" class="form-input" value="{{ $userDetails->primary_mobile ?? '' }}" {{ in_array($user->role, ['farmer', 'lead_farmer']) ? 'required' : '' }}>
+								</div>
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fab fa-whatsapp"></i> WhatsApp Number
+									</label>
+									<input type="text" name="whatsapp_number" class="form-input" value="{{ $userDetails->whatsapp_number ?? '' }}">
 								</div>
 							</div>
 
@@ -220,7 +236,7 @@
 								<label class="form-label">
 									<i class="fas fa-home"></i> Residential Address
 								</label>
-								<textarea name="residential_address" class="form-input" rows="2">{{ $userDetails->residential_address ?? '' }}</textarea>
+								<textarea name="residential_address" class="form-input" rows="2" {{ in_array($user->role, ['farmer', 'lead_farmer']) ? 'required' : '' }}>{{ $userDetails->residential_address ?? '' }}</textarea>
 							</div>
 						</div>
 					</div>
@@ -244,12 +260,18 @@
 								<label class="form-label">
 									<i class="fas fa-credit-card"></i> Preferred Payment Method
 								</label>
-								<select name="preferred_payment" class="form-select">
-									<option value="bank" {{ $userDetails->preferred_payment == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
-									<option value="ezcash" {{ $userDetails->preferred_payment == 'ezcash' ? 'selected' : '' }}>Ez Cash</option>
-									<option value="mcash" {{ $userDetails->preferred_payment == 'mcash' ? 'selected' : '' }}>mCash</option>
-									<option value="all" {{ $userDetails->preferred_payment == 'all' ? 'selected' : '' }}>All Methods</option>
+								<select name="preferred_payment" class="form-select" {{ $user->role == 'lead_farmer' ? 'disabled' : '' }}>
+									<option value="bank" {{ ($userDetails->preferred_payment ?? 'bank') == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
+									@if($user->role != 'lead_farmer')
+									<option value="ezcash" {{ ($userDetails->preferred_payment ?? '') == 'ezcash' ? 'selected' : '' }}>Ez Cash</option>
+									<option value="mcash" {{ ($userDetails->preferred_payment ?? '') == 'mcash' ? 'selected' : '' }}>mCash</option>
+									<option value="all" {{ ($userDetails->preferred_payment ?? '') == 'all' ? 'selected' : '' }}>All Methods</option>
+									@endif
 								</select>
+								@if($user->role == 'lead_farmer')
+								<input type="hidden" name="preferred_payment" value="bank">
+								<small class="form-note">Lead farmers are only allowed bank transfer payment method</small>
+								@endif
 							</div>
 
 							<div id="bank-payment-fields" style="{{ in_array($userDetails->preferred_payment, ['bank', 'all']) ? '' : 'display: none;' }}">
@@ -318,8 +340,10 @@
 						</div>
 					</div>
 				</div>
+				@endif
 
-				<div id="buyer-sections" style="{{ $user->role == 'buyer' ? '' : 'display: none;' }}">
+				@if($user->role == 'buyer')
+				<div id="buyer-sections">
 					<div class="form-section business-section">
 						<div class="section-header">
 							<div class="section-icon">
@@ -356,11 +380,43 @@
 									<small class="form-note">Contact number cannot be changed here</small>
 								</div>
 							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fab fa-whatsapp"></i> WhatsApp Number
+									</label>
+									<input type="text" name="whatsapp_number" class="form-input" value="{{ $buyerData->whatsapp_number ?? '' }}">
+								</div>
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-map-marker-alt"></i> District
+									</label>
+									<select name="district" class="form-select">
+										<option value="" disabled {{ empty($buyerData->district) ? 'selected' : '' }}>Select District</option>
+										@php
+											$districts = ['Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Moneragala', 'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'];
+										@endphp
+										@foreach($districts as $d)
+											<option value="{{ $d }}" {{ ($buyerData->district ?? '') == $d ? 'selected' : '' }}>{{ $d }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label">
+									<i class="fas fa-home"></i> Residential Address
+								</label>
+								<textarea name="residential_address" class="form-input" rows="2" {{ $user->role == 'buyer' ? 'required' : '' }}>{{ $buyerData->residential_address ?? '' }}</textarea>
+							</div>
 						</div>
 					</div>
 				</div>
+				@endif
 
-				<div id="facilitator-sections" style="{{ $user->role == 'facilitator' ? '' : 'display: none;' }}">
+				@if($user->role == 'facilitator')
+				<div id="facilitator-sections">
 					<div class="form-section facilitator-section">
 						<div class="section-header">
 							<div class="section-icon">
@@ -395,8 +451,8 @@
 								<label class="form-label">
 									<i class="fas fa-map-marker-alt"></i> District <span class="required">*</span>
 								</label>
-								<select id="facilitator_district" name="district" class="form-select" required>
-									<option value="" disabled>Select District</option>
+								<select id="facilitator_district" name="district" class="form-select" {{ $user->role == 'facilitator' ? 'required' : '' }}>
+									<option value="" disabled {{ !isset($facilitatorAssignments) && empty($facilitatorData->assigned_division) ? 'selected' : '' }}>Select District</option>
 									@php
 										$districts = ['Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Moneragala', 'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'];
 										$currentDist = (isset($facilitatorAssignments) && $facilitatorAssignments->count() > 0) ? $facilitatorAssignments->first()->district : ($facilitatorData->assigned_division ?? '');
@@ -421,13 +477,13 @@
 											<div class="form-row">
 												<div class="form-group">
 													<label class="form-label">DS Division</label>
-													<select class="form-select assign-ds" required>
+													<select class="form-select assign-ds" {{ $user->role == 'facilitator' ? 'required' : '' }}>
 														<option value="{{ $assignment->divisional_secretariat }}" selected>{{ $assignment->divisional_secretariat }}</option>
 													</select>
 												</div>
 												<div class="form-group">
 													<label class="form-label">GN Division</label>
-													<select class="form-select assign-gn" required>
+													<select class="form-select assign-gn" {{ $user->role == 'facilitator' ? 'required' : '' }}>
 														<option value="{{ $assignment->gn_division }}" data-code="{{ $assignment->gn_division_code }}" selected>{{ $assignment->gn_division }}</option>
 													</select>
 												</div>
@@ -443,13 +499,13 @@
 											<div class="form-row">
 												<div class="form-group">
 													<label class="form-label">DS Division</label>
-													<select class="form-select assign-ds" required disabled>
+													<select class="form-select assign-ds" disabled>
 														<option value="" disabled selected>Select District First</option>
 													</select>
 												</div>
 												<div class="form-group">
 													<label class="form-label">GN Division</label>
-													<select class="form-select assign-gn" required disabled>
+													<select class="form-select assign-gn" disabled>
 														<option value="" disabled selected>Select DS First</option>
 													</select>
 												</div>
@@ -468,6 +524,7 @@
 						</div>
 					</div>
 				</div>
+				@endif
 			</div>
 
 			<div class="form-actions">
@@ -531,21 +588,24 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
+	// Safety check for gnData
+	if (typeof gnData === 'undefined') {
+		console.warn('gnData is not defined. Location dropdowns may not work properly.');
+		window.gnData = {};
+	}
+
 	let otpTimer = null;
 	let timeLeft = 300;
 	let otpVerified = false;
 	let formDataToSubmit = null;
 
-	// Preferred Payment Method Toggle Logic
 	$('select[name="preferred_payment"]').change(function() {
 		const selectedMethod = $(this).val();
 		
-		// Hide all first
 		$('#bank-payment-fields').hide();
 		$('#ezcash-payment-fields').hide();
 		$('#mcash-payment-fields').hide();
 		
-		// Show based on selection
 		if (selectedMethod === 'bank') {
 			$('#bank-payment-fields').show();
 		} else if (selectedMethod === 'ezcash') {
@@ -559,7 +619,61 @@ $(document).ready(function() {
 		}
 	});
 
-	// Facilitator Assignment Logic
+	// Moved form submission handler higher to ensure it's attached
+	$('#editUserForm').submit(function(e) {
+		e.preventDefault();
+
+		try {
+			const userRole = '{{ $user->role }}';
+			const userId = {{ $user->id }};
+			const isPaymentChanged = checkPaymentChanges();
+
+			formDataToSubmit = new FormData(this);
+
+			if (userRole === 'facilitator') {
+				const district = $('#facilitator_district').val();
+				let index = 0;
+				$('.assignment-item').each(function() {
+					const ds = $(this).find('.assign-ds').val();
+					const gn = $(this).find('.assign-gn').val();
+					const code = $(this).find('.assign-code').val();
+					if (district && ds && gn) {
+						formDataToSubmit.append(`assignments[${index}][district]`, district);
+						formDataToSubmit.append(`assignments[${index}][divisional_secretariat]`, ds);
+						formDataToSubmit.append(`assignments[${index}][gn_division]`, gn);
+						formDataToSubmit.append(`assignments[${index}][gn_division_code]`, code);
+						index++;
+					}
+				});
+			}
+
+			if ((userRole === 'farmer' || userRole === 'lead_farmer') && isPaymentChanged && !otpVerified) {
+				Swal.fire({
+					title: 'OTP Verification Required',
+					html: `Changes to payment details require OTP verification.<br><br>
+						  <small class="text-muted">An OTP will be sent to the user's registered mobile number</small>`,
+					icon: 'info',
+					showCancelButton: true,
+					confirmButtonColor: '#10B981',
+					cancelButtonColor: '#6b7280',
+					confirmButtonText: 'Send OTP',
+					cancelButtonText: 'Cancel',
+					background: 'var(--card-bg)',
+					color: 'var(--text-color)'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						sendOtpAndShowModal();
+					}
+				});
+			} else {
+				submitForm();
+			}
+		} catch (err) {
+			console.error('Submit error:', err);
+			showError('An unexpected error occurred: ' + err.message);
+		}
+	});
+
 	const setupAssignment = (container) => {
 		const dsSelect = container.find('.assign-ds');
 		const gnSelect = container.find('.assign-gn');
@@ -596,14 +710,13 @@ $(document).ready(function() {
 				gnData[dist][ds].forEach(gn => {
 					gnSelect.append(`<option value="${gn.name}" data-code="${gn.code}" ${gn.name === currentGN ? 'selected' : ''}>${gn.name}</option>`);
 				});
-				// Ensure code is updated if GN is already selected
 				if (currentGN) {
 					const selectedOption = gnSelect.find(':selected');
 					const code = selectedOption.data('code');
 					if (code) codeInput.val(code);
 				}
 			}
-			initialGN = null; // Clear so subsequent changes don't force the initial value
+			initialGN = null;
 		};
 
 		if (districtSelect.val() && dsSelect.find('option').length <= 1) {
@@ -621,32 +734,36 @@ $(document).ready(function() {
 		});
 	};
 
-	// GN Hierarchy Logic for Farmers/Lead Farmers
 	const setupFarmerGNHierarchy = () => {
 		const districtSelect = $('#farmer_district');
 		const dsSelect = $('#farmer_ds');
 		const gnSelect = $('#farmer_gn');
 		const codeInput = $('#farmer_gn_code');
+		
+		let initialDS = dsSelect.val();
+		let initialGN = gnSelect.val();
 
 		const updateDS = () => {
 			const dist = districtSelect.val();
 			const currentDS = dsSelect.val();
 			
 			dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', !dist);
-			gnSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
 			
 			if (dist && gnData[dist]) {
 				Object.keys(gnData[dist]).forEach(ds => {
-					dsSelect.append(`<option value="${ds}" ${ds === currentDS ? 'selected' : ''}>${ds}</option>`);
+					dsSelect.append(`<option value="${ds}" ${ds === (currentDS || initialDS) ? 'selected' : ''}>${ds}</option>`);
 				});
-				if (currentDS) updateGN();
+				if (currentDS || initialDS) {
+					updateGN();
+				}
 			}
+			initialDS = null;
 		};
 
 		const updateGN = () => {
 			const dist = districtSelect.val();
 			const ds = dsSelect.val();
-			const currentGN = gnSelect.val();
+			const currentGN = gnSelect.val() || initialGN;
 			
 			gnSelect.empty().append('<option value="" disabled selected>Select GN</option>').prop('disabled', !ds);
 			
@@ -655,10 +772,12 @@ $(document).ready(function() {
 					gnSelect.append(`<option value="${gn.name}" data-code="${gn.code}" ${gn.name === currentGN ? 'selected' : ''}>${gn.name}</option>`);
 				});
 				if (currentGN) {
-					const code = gnSelect.find(':selected').data('code');
+					const selectedOption = gnSelect.find(':selected');
+					const code = selectedOption.data('code');
 					if (code) codeInput.val(code);
 				}
 			}
+			initialGN = null;
 		};
 
 		districtSelect.on('change', function() {
@@ -676,7 +795,6 @@ $(document).ready(function() {
 			codeInput.val(code || '');
 		});
 
-		// Initial load
 		if (districtSelect.val()) updateDS();
 	};
 
@@ -741,7 +859,6 @@ $(document).ready(function() {
 	$(document).on('click', '.remove-assignment', function() {
 		$(this).closest('.assignment-item').remove();
 	});
-
 
 	function showAlert(icon, title, text) {
 		Swal.fire({
@@ -828,80 +945,40 @@ $(document).ready(function() {
 		});
 	});
 
-	$('#editUserForm').submit(function(e) {
-		e.preventDefault();
 
-		const userRole = '{{ $user->role }}';
-		const userId = {{ $user->id }};
-		const isPaymentChanged = checkPaymentChanges();
-
-		formDataToSubmit = new FormData(this);
-
-		if (userRole === 'facilitator') {
-			const district = $('#facilitator_district').val();
-			let index = 0;
-			$('.assignment-item').each(function() {
-				const ds = $(this).find('.assign-ds').val();
-				const gn = $(this).find('.assign-gn').val();
-				const code = $(this).find('.assign-code').val();
-				if (district && ds && gn) {
-					formDataToSubmit.append(`assignments[${index}][district]`, district);
-					formDataToSubmit.append(`assignments[${index}][divisional_secretariat]`, ds);
-					formDataToSubmit.append(`assignments[${index}][gn_division]`, gn);
-					formDataToSubmit.append(`assignments[${index}][gn_division_code]`, code);
-					index++;
-				}
-			});
-		}
-
-		if ((userRole === 'farmer' || userRole === 'lead_farmer') && isPaymentChanged && !otpVerified) {
-			Swal.fire({
-				title: 'OTP Verification Required',
-				html: `Changes to payment details require OTP verification.<br><br>
-					  <small class="text-muted">An OTP will be sent to the user's registered mobile number</small>`,
-				icon: 'info',
-				showCancelButton: true,
-				confirmButtonColor: '#10B981',
-				cancelButtonColor: '#6b7280',
-				confirmButtonText: 'Send OTP',
-				cancelButtonText: 'Cancel',
-				background: 'var(--card-bg)',
-				color: 'var(--text-color)'
-			}).then((result) => {
-				if (result.isConfirmed) {
-					sendOtpAndShowModal();
-				}
-			});
-		} else {
-			submitForm();
-		}
-	});
 
 	function checkPaymentChanges() {
-		const originalData = {
-			preferred_payment: '{{ $userDetails->preferred_payment ?? "" }}',
-			account_number: '{{ $userDetails->account_number ?? "" }}',
-			account_holder_name: '{{ $userDetails->account_holder_name ?? "" }}',
-			bank_name: '{{ $userDetails->bank_name ?? "" }}',
-			bank_branch: '{{ $userDetails->bank_branch ?? "" }}',
-			ezcash_mobile: '{{ $userDetails->ezcash_mobile ?? "" }}',
-			mcash_mobile: '{{ $userDetails->mcash_mobile ?? "" }}'
-		};
+		try {
+			const originalData = {
+				preferred_payment: {!! json_encode($userDetails->preferred_payment ?? "bank") !!},
+				account_number: {!! json_encode($userDetails->account_number ?? "") !!},
+				account_holder_name: {!! json_encode($userDetails->account_holder_name ?? "") !!},
+				bank_name: {!! json_encode($userDetails->bank_name ?? "") !!},
+				bank_branch: {!! json_encode($userDetails->bank_branch ?? "") !!},
+				ezcash_mobile: {!! json_encode($userDetails->ezcash_mobile ?? "") !!},
+				mcash_mobile: {!! json_encode($userDetails->mcash_mobile ?? "") !!}
+			};
 
-		const currentData = {
-			preferred_payment: $('select[name="preferred_payment"]').val(),
-			account_number: $('input[name="account_number"]').val(),
-			account_holder_name: $('input[name="account_holder_name"]').val(),
-			bank_name: $('input[name="bank_name"]').val(),
-			bank_branch: $('input[name="bank_branch"]').val(),
-			ezcash_mobile: $('input[name="ezcash_mobile"]').val(),
-			mcash_mobile: $('input[name="mcash_mobile"]').val()
-		};
+			const currentData = {
+				preferred_payment: $('[name="preferred_payment"]').val(),
+				account_number: $('input[name="account_number"]').val() || "",
+				account_holder_name: $('input[name="account_holder_name"]').val() || "",
+				bank_name: $('input[name="bank_name"]').val() || "",
+				bank_branch: $('input[name="bank_branch"]').val() || "",
+				ezcash_mobile: $('input[name="ezcash_mobile"]').val() || "",
+				mcash_mobile: $('input[name="mcash_mobile"]').val() || ""
+			};
 
-		for (const key in originalData) {
-			if (originalData[key] !== currentData[key]) {
-				return true;
+			for (const key in originalData) {
+				const originalVal = (originalData[key] || "").toString().trim();
+				const currentVal = (currentData[key] || "").toString().trim();
+				
+				if (originalVal !== currentVal) {
+					return true;
+				}
 			}
+		} catch (e) {
+			console.error('Error checking payment changes:', e);
 		}
 
 		return false;

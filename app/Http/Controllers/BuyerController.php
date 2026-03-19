@@ -811,6 +811,7 @@ class BuyerController extends Controller
             'business_name' => 'nullable|string|max:100',
             'business_type' => 'nullable|string|in:individual,restaurant,hotel,retailer,wholesaler',
             'residential_address' => 'required|string',
+            'district' => 'required|string',
             'whatsapp_number' => 'nullable|string|max:15',
             'password' => 'required|string|min:8|confirmed',
             'terms' => 'required|accepted'
@@ -843,6 +844,7 @@ class BuyerController extends Controller
                 'primary_mobile' => $request->primary_mobile,
                 'whatsapp_number' => $request->whatsapp_number,
                 'residential_address' => $request->residential_address,
+                'district' => $request->district,
                 'business_name' => $request->business_name,
                 'business_type' => $request->business_type ?? 'individual',
                 'is_verified' => false

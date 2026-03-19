@@ -488,6 +488,13 @@
 											<textarea id="buyer_address" class="form-input" placeholder="Enter address" rows="2"></textarea>
 										</div>
 										<div class="form-group">
+											<label>District <span class="required">*</span></label>
+											<select id="buyer_district" class="form-select" required>
+												<option value="" disabled selected>Select District</option>
+												${typeof gnData !== 'undefined' ? Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('') : ''}
+											</select>
+										</div>
+										<div class="form-group">
 											<label>Business Name</label>
 											<input type="text" id="buyer_business" class="form-input" placeholder="Enter business name">
 										</div>
@@ -980,6 +987,7 @@
 						formData.primary_mobile = $('#buyer_mobile').val() || '';
 						formData.whatsapp_number = $('#buyer_whatsapp').val() || formData.primary_mobile;
 						formData.residential_address = $('#buyer_address').val() || '';
+						formData.district = $('#buyer_district').val() || '';
 						formData.business_name = $('#buyer_business').val() || '';
 						formData.business_type = $('#buyer_type').val() || 'individual';
 					} else if (userType === 'facilitator') {

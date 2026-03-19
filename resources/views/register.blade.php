@@ -186,6 +186,20 @@
 						</div>
 
 						<div class="mb-3">
+							<label for="district" class="form-label required-field">District</label>
+							<div class="input-with-icon">
+								<i class="fas fa-map-marker-alt"></i>
+								<select class="form-select @error('district') is-invalid @enderror"
+										id="district" name="district" required style="padding-left: 2.5rem;">
+									<option value="" disabled selected>Select District</option>
+								</select>
+							</div>
+							@error('district')
+								<div class="invalid-feedback d-block">{{ $message }}</div>
+							@enderror
+						</div>
+
+						<div class="mb-3">
 							<label for="whatsapp_number" class="form-label">WhatsApp Number</label>
 							<div class="input-with-icon">
 								<i class="fab fa-whatsapp"></i>
@@ -296,6 +310,7 @@
 @endsection
 
 @section('scripts')
+<script src="{{ asset('js/gn-data.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -377,6 +392,19 @@
 		const submitBtn = document.getElementById('submitBtn');
 		const nicInput = document.getElementById('nic_no');
 		const nicStatus = document.getElementById('nicStatus');
+
+		const districtSelect = document.getElementById('district');
+		if (districtSelect && typeof gnData !== 'undefined') {
+			Object.keys(gnData).forEach(district => {
+				const option = document.createElement('option');
+				option.value = district;
+				option.textContent = district;
+				if (district === "{{ old('district') }}") {
+					option.selected = true;
+				}
+				districtSelect.appendChild(option);
+			});
+		}
 
 		let currentStep = 1;
 

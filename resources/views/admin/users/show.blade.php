@@ -345,6 +345,42 @@
                             @endif
                         </div>
                     </div>
+                    <div class="detail-row">
+                        <div class="detail-label">
+                            <i class="fab fa-whatsapp"></i> WhatsApp Number
+                        </div>
+                        <div class="detail-value">
+                            @if(isset($details->whatsapp_number) && $details->whatsapp_number)
+                                {{ $details->whatsapp_number }}
+                            @else
+                                Not provided
+                            @endif
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">
+                            <i class="fas fa-map-marker-alt"></i> District
+                        </div>
+                        <div class="detail-value">
+                            @if(isset($details->district) && $details->district)
+                                {{ $details->district }}
+                            @else
+                                Not provided
+                            @endif
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">
+                            <i class="fas fa-home"></i> Residential Address
+                        </div>
+                        <div class="detail-value">
+                            @if(isset($details->residential_address) && $details->residential_address)
+                                {{ $details->residential_address }}
+                            @else
+                                Not provided
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
             @endif

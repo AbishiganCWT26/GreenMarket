@@ -9,7 +9,8 @@
         body {
             margin: 0;
             font-family: 'Inter', Arial, sans-serif;
-            background: #f3f4f6;
+            background: url('https://png.pngtree.com/background/20230517/original/pngtree-abstract-green-background-with-wavy-design-and-hexagon-texture-dynamic-shadow-picture-image_2640998.jpg') no-repeat center center fixed;
+            background-size: cover;
         }
         /* Blur background effect */
         .blur-bg {
@@ -18,7 +19,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(2px);
             background: rgba(0, 0, 0, 0.4);
             z-index: 1;
         }

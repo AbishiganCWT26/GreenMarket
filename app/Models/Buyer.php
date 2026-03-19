@@ -17,6 +17,7 @@ class Buyer extends Model
         'primary_mobile',
         'whatsapp_number',
         'residential_address',
+        'district',
         'business_name',
         'business_type',
         'is_verified',

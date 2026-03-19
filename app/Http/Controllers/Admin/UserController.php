@@ -338,7 +338,11 @@ class UserController extends Controller
                 DB::table('buyers')->insert([
                     'user_id' => $userId,
                     'name' => $request->name,
+                    'nic_no' => $request->nic_no,
                     'primary_mobile' => $request->primary_mobile,
+                    'whatsapp_number' => $request->whatsapp_number,
+                    'residential_address' => $request->residential_address,
+                    'district' => $request->district,
                     'business_name' => $request->business_name,
                     'business_type' => $request->business_type ?? 'individual',
                     'is_verified' => false,
@@ -662,62 +666,68 @@ class UserController extends Controller
 
     private function updateFarmerDetails($user, $role, $request, $userId)
     {
-        $table = $role == 'farmer' ? 'farmers' : 'lead_farmers';
+        $tables = $role == 'farmer' ? ['farmers'] : ['lead_farmers', 'farmers'];
 
-        $details = DB::table($table)->where('user_id', $userId)->first();
+        foreach ($tables as $table) {
+            $details = DB::table($table)->where('user_id', $userId)->first();
 
-        $updateData = [
-            'updated_at' => now()
-        ];
+            $updateData = [
+                'updated_at' => now()
+            ];
 
-        $paymentFields = ['preferred_payment', 'account_number', 'account_holder_name',
-                        'bank_name', 'bank_branch', 'ezcash_mobile', 'mcash_mobile'];
+            $paymentFields = ['preferred_payment', 'account_number', 'account_holder_name',
+                            'bank_name', 'bank_branch', 'ezcash_mobile', 'mcash_mobile'];
 
-        $profileFields = ['nic_no', 'primary_mobile', 'whatsapp_number', 'residential_address', 
-                         'grama_niladhari_division', 'district', 'group_name', 'group_number'];
+            $profileFields = ['name', 'nic_no', 'primary_mobile', 'whatsapp_number', 'residential_address', 
+                             'grama_niladhari_division', 'divisional_secretariat', 'gn_division_code', 'district', 'group_name', 'group_number'];
 
-        foreach ($profileFields as $field) {
-            // Filter fields based on table schema
-            if ($table == 'farmers' && in_array($field, ['group_name', 'group_number'])) continue;
-            if ($table == 'lead_farmers' && in_array($field, ['email', 'is_active'])) continue;
+            foreach ($profileFields as $field) {
+                // Filter fields based on table schema
+                if ($table == 'farmers' && in_array($field, ['group_name', 'group_number'])) continue;
+                if ($table == 'lead_farmers' && in_array($field, ['email', 'is_active'])) continue;
 
-            if ($request->has($field)) {
-                $updateData[$field] = $request->$field;
-            }
-        }
-
-        foreach ($paymentFields as $field) {
-            // Filter fields based on table schema
-            if ($table == 'lead_farmers' && in_array($field, ['ezcash_mobile', 'mcash_mobile'])) continue;
-
-            if ($request->has($field)) {
-                $updateData[$field] = $request->$field;
-            }
-        }
-
-        if ($details) {
-            DB::table($table)->where('user_id', $userId)->update($updateData);
-        } else {
-            $userRecord = DB::table('users')->find($userId);
-
-            $createData = array_merge($updateData, [
-                'user_id' => $userId,
-                'name' => $userRecord->username,
-                'nic_no' => $request->nic_no ?? '',
-                'primary_mobile' => $request->primary_mobile ?? '',
-                'residential_address' => $request->residential_address ?? '',
-                'grama_niladhari_division' => $request->grama_niladhari_division ?? '',
-                'district' => 'Colombo',
-                'is_active' => true,
-                'created_at' => now()
-            ]);
-
-            if ($role == 'lead_farmer') {
-                $createData['group_name'] = $request->group_name ?? ($userRecord->username . "'s Group");
-                $createData['group_number'] = $request->group_number ?? ('GRP-' . strtoupper(Str::random(6)));
+                if ($request->has($field)) {
+                    $updateData[$field] = $request->$field ?? '';
+                }
             }
 
-            DB::table($table)->insert($createData);
+            foreach ($paymentFields as $field) {
+                // Filter fields based on table schema
+                if ($table == 'lead_farmers' && in_array($field, ['ezcash_mobile', 'mcash_mobile'])) continue;
+
+                if ($request->has($field)) {
+                    $updateData[$field] = $request->$field;
+                }
+            }
+
+            if ($details) {
+                DB::table($table)->where('user_id', $userId)->update($updateData);
+            } else {
+                $userRecord = DB::table('users')->find($userId);
+
+                $createData = array_merge($updateData, [
+                    'user_id' => $userId,
+                    'name' => $userRecord->username,
+                    'nic_no' => $request->nic_no ?? '',
+                    'primary_mobile' => $request->primary_mobile ?? '',
+                    'residential_address' => $request->residential_address ?? '',
+                    'grama_niladhari_division' => $request->grama_niladhari_division ?? '',
+                    'district' => 'Colombo',
+                    'created_at' => now()
+                ]);
+
+                // is_active is only in farmers table
+                if ($table == 'farmers') {
+                    $createData['is_active'] = true;
+                }
+
+                if ($table == 'lead_farmers') {
+                    $createData['group_name'] = $request->group_name ?? ($userRecord->username . "'s Group");
+                    $createData['group_number'] = $request->group_number ?? ('GRP-' . strtoupper(Str::random(6)));
+                }
+
+                DB::table($table)->insert($createData);
+            }
         }
     }
 

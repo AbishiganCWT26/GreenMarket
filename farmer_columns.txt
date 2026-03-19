@@ -1,0 +1,1 @@
+id,user_id,lead_farmer_id,name,nic_no,primary_mobile,whatsapp_number,email,residential_address,address_map_link,preferred_payment,payment_details,grama_niladhari_division,is_active,created_at,updated_at,district,account_number,account_holder_name,bank_name,bank_branch,ezcash_mobile,mcash_mobile,divisional_secretariat,gn_division_code

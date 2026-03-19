@@ -796,9 +796,32 @@ class FacilitatorController extends Controller
 
     public function userManagement(Request $request)
     {
+        $user = Auth::user();
+        $facilitator = $user->facilitator;
+        
+        $assignedGnDivisions = \DB::table('facilitator_assignments')
+            ->where('facilitator_id', $facilitator->id)
+            ->pluck('gn_division')
+            ->toArray();
+
+        $assignedDistrict = \DB::table('facilitator_assignments')
+            ->where('facilitator_id', $facilitator->id)
+            ->value('district');
+
         $query = User::with(['farmer', 'leadFarmer', 'buyer', 'facilitator'])
             ->where('role', '!=', 'admin')
-            ->where('is_active', true);
+            ->where('is_active', true)
+            ->where(function ($q) use ($assignedGnDivisions, $assignedDistrict) {
+                $q->whereHas('farmer', function ($qF) use ($assignedGnDivisions) {
+                    $qF->whereIn('grama_niladhari_division', $assignedGnDivisions);
+                })
+                ->orWhereHas('leadFarmer', function ($qLF) use ($assignedGnDivisions) {
+                    $qLF->whereIn('grama_niladhari_division', $assignedGnDivisions);
+                })
+                ->orWhereHas('buyer', function ($qB) use ($assignedDistrict) {
+                    $qB->where('district', $assignedDistrict);
+                });
+            });
 
         // Apply filters if provided
         if ($request->has('role') && $request->role) {
@@ -815,7 +838,18 @@ class FacilitatorController extends Controller
         $users = $query->orderBy('created_at', 'desc')->paginate(15);
 
         // Get counts with the same filters
-        $countQuery = User::where('role', '!=', 'admin')->where('is_active', true);
+        $countQuery = User::where('role', '!=', 'admin')->where('is_active', true)
+            ->where(function ($q) use ($assignedGnDivisions, $assignedDistrict) {
+                $q->whereHas('farmer', function ($qF) use ($assignedGnDivisions) {
+                    $qF->whereIn('grama_niladhari_division', $assignedGnDivisions);
+                })
+                ->orWhereHas('leadFarmer', function ($qLF) use ($assignedGnDivisions) {
+                    $qLF->whereIn('grama_niladhari_division', $assignedGnDivisions);
+                })
+                ->orWhereHas('buyer', function ($qB) use ($assignedDistrict) {
+                    $qB->where('district', $assignedDistrict);
+                });
+            });
 
         if ($request->has('role') && $request->role) {
             $countQuery->where('role', $request->role);
@@ -1118,8 +1152,31 @@ class FacilitatorController extends Controller
     public function exportUsers(Request $request)
     {
         try {
+            $user = Auth::user();
+            $facilitator = $user->facilitator;
+            
+            $assignedGnDivisions = \DB::table('facilitator_assignments')
+                ->where('facilitator_id', $facilitator->id)
+                ->pluck('gn_division')
+                ->toArray();
+
+            $assignedDistrict = \DB::table('facilitator_assignments')
+                ->where('facilitator_id', $facilitator->id)
+                ->value('district');
+
             $query = User::with(['farmer', 'leadFarmer', 'buyer', 'facilitator'])
-                ->where('role', '!=', 'admin');
+                ->where('role', '!=', 'admin')
+                ->where(function ($q) use ($assignedGnDivisions, $assignedDistrict) {
+                    $q->whereHas('farmer', function ($qF) use ($assignedGnDivisions) {
+                        $qF->whereIn('grama_niladhari_division', $assignedGnDivisions);
+                    })
+                    ->orWhereHas('leadFarmer', function ($qLF) use ($assignedGnDivisions) {
+                        $qLF->whereIn('grama_niladhari_division', $assignedGnDivisions);
+                    })
+                    ->orWhereHas('buyer', function ($qB) use ($assignedDistrict) {
+                        $qB->where('district', $assignedDistrict);
+                    });
+                });
 
             if ($request->reportType == 'active') {
                 $query->where('is_active', true);
@@ -1369,6 +1426,14 @@ class FacilitatorController extends Controller
 
     public function products(Request $request)
     {
+        $user = Auth::user();
+        $facilitator = $user->facilitator;
+        
+        $assignedGnDivisions = \DB::table('facilitator_assignments')
+            ->where('facilitator_id', $facilitator->id)
+            ->pluck('gn_division')
+            ->toArray();
+
         $perPage = $request->get('per_page', 12);
         $leadFarmers = DB::table('lead_farmers')->orderBy('group_name')->get();
         $categories = DB::table('product_categories')->orderBy('category_name')->get();
@@ -1391,7 +1456,11 @@ class FacilitatorController extends Controller
                 'u_lf.profile_photo as lead_farmer_photo',
                 'product_categories.category_name as category_name',
                 'product_subcategories.subcategory_name as subcategory_name'
-            );
+            )
+            ->where(function($q) use ($assignedGnDivisions) {
+                $q->whereIn('lead_farmers.grama_niladhari_division', $assignedGnDivisions)
+                  ->orWhereIn('farmers.grama_niladhari_division', $assignedGnDivisions);
+            });
 
         // Apply filters
         if ($request->filled('lead_farmer_id')) {
@@ -1460,12 +1529,21 @@ class FacilitatorController extends Controller
 
     public function sales(Request $request)
     {
+        $user = Auth::user();
+        $facilitator = $user->facilitator;
+        
+        $assignedGnDivisions = \DB::table('facilitator_assignments')
+            ->where('facilitator_id', $facilitator->id)
+            ->pluck('gn_division')
+            ->toArray();
+
         $perPage = $request->get('per_page', 12);
         $query = DB::table('orders')
             ->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
             ->leftJoin('users as u_b', 'buyers.user_id', '=', 'u_b.id')
             ->leftJoin('lead_farmers', 'orders.lead_farmer_id', '=', 'lead_farmers.id')
             ->leftJoin('users as u_lf', 'lead_farmers.user_id', '=', 'u_lf.id')
+            ->leftJoin('farmers', 'orders.farmer_id', '=', 'farmers.id')
             ->select(
                 'orders.*',
                 'buyers.name as buyer_name',
@@ -1474,7 +1552,11 @@ class FacilitatorController extends Controller
                 'u_lf.profile_photo as lead_farmer_photo',
                 'lead_farmers.group_name as group_name'
             )
-            ->whereIn('orders.order_status', ['paid', 'completed']);
+            ->whereIn('orders.order_status', ['paid', 'completed'])
+            ->where(function($q) use ($assignedGnDivisions) {
+                $q->whereIn('lead_farmers.grama_niladhari_division', $assignedGnDivisions)
+                  ->orWhereIn('farmers.grama_niladhari_division', $assignedGnDivisions);
+            });
 
         if ($request->filled('start_date')) {
             $query->whereDate('orders.created_at', '>=', $request->start_date);
@@ -1527,11 +1609,20 @@ class FacilitatorController extends Controller
 
     public function leadFarmerGroups(Request $request)
     {
+        $user = Auth::user();
+        $facilitator = $user->facilitator;
+        
+        $assignedGnDivisions = \DB::table('facilitator_assignments')
+            ->where('facilitator_id', $facilitator->id)
+            ->pluck('gn_division')
+            ->toArray();
+
         $perPage = $request->get('per_page', 12);
         $search = $request->get('search');
 
         $query = DB::table('lead_farmers as lf')
             ->leftJoin('users as u', 'lf.user_id', '=', 'u.id')
+            ->whereIn('lf.grama_niladhari_division', $assignedGnDivisions)
             ->select(
                 'lf.id',
                 'lf.group_name',
@@ -1562,6 +1653,7 @@ class FacilitatorController extends Controller
         
         $allGroupsWithRank = DB::table('lead_farmers as lf')
             ->leftJoin('users as u', 'lf.user_id', '=', 'u.id')
+            ->whereIn('lf.grama_niladhari_division', $assignedGnDivisions)
             ->select(
                 'lf.id',
                 DB::raw('(SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE lead_farmer_id = lf.id AND order_status IN (\'paid\', \'completed\')) as total_sales')
@@ -1593,10 +1685,20 @@ class FacilitatorController extends Controller
 
     public function buyerRequests(Request $request)
     {
+        $user = Auth::user();
+        $facilitator = $user->facilitator;
+        
+        $assignedDistrict = \DB::table('facilitator_assignments')
+            ->where('facilitator_id', $facilitator->id)
+            ->value('district');
+
         $perPage = $request->get('per_page', 12);
         $search = $request->input('search');
 
         $query = BuyerProductRequest::with(['buyer.user'])
+            ->whereHas('buyer', function ($q) use ($assignedDistrict) {
+                $q->where('district', $assignedDistrict);
+            })
             ->orderBy('created_at', 'desc');
 
         if ($search) {
