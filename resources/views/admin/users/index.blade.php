@@ -97,6 +97,7 @@
 @section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+<script src="{{ asset('js/gn-data.js') }}"></script>
 <script>
 	$(document).ready(function() {
 		let currentView = 'card';
@@ -278,39 +279,27 @@
 											<textarea id="farmer_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
 										</div>
 										<div class="form-group">
-											<label>Grama Niladhari Division <span class="required">*</span></label>
-											<input type="text" id="farmer_gnd" class="form-input" placeholder="Enter GND" required>
-										</div>
-										<div class="form-group">
 											<label>District <span class="required">*</span></label>
 											<select id="farmer_district" class="form-select" required>
-												<option value="" disabled selected>Select your district</option>
-												<option value="Ampara">Ampara</option>
-												<option value="Anuradhapura">Anuradhapura</option>
-												<option value="Badulla">Badulla</option>
-												<option value="Batticaloa">Batticaloa</option>
-												<option value="Colombo">Colombo</option>
-												<option value="Galle">Galle</option>
-												<option value="Gampaha">Gampaha</option>
-												<option value="Hambantota">Hambantota</option>
-												<option value="Jaffna">Jaffna</option>
-												<option value="Kalutara">Kalutara</option>
-												<option value="Kandy">Kandy</option>
-												<option value="Kegalle">Kegalle</option>
-												<option value="Kilinochchi">Kilinochchi</option>
-												<option value="Kurunegala">Kurunegala</option>
-												<option value="Mannar">Mannar</option>
-												<option value="Matale">Matale</option>
-												<option value="Matara">Matara</option>
-												<option value="Moneragala">Moneragala</option>
-												<option value="Mullaitivu">Mullaitivu</option>
-												<option value="Nuwara Eliya">Nuwara Eliya</option>
-												<option value="Polonnaruwa">Polonnaruwa</option>
-												<option value="Puttalam">Puttalam</option>
-												<option value="Ratnapura">Ratnapura</option>
-												<option value="Trincomalee">Trincomalee</option>
-												<option value="Vavuniya">Vavuniya</option>
+												<option value="" disabled selected>Select District</option>
+												${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
 											</select>
+										</div>
+										<div class="form-group">
+											<label>Divisional Secretariat <span class="required">*</span></label>
+											<select id="farmer_ds" class="form-select" required disabled>
+												<option value="" disabled selected>Select District First</option>
+											</select>
+										</div>
+										<div class="form-group">
+											<label>Grama Niladhari Division <span class="required">*</span></label>
+											<select id="farmer_gnd" class="form-select" required disabled>
+												<option value="" disabled selected>Select DS First</option>
+											</select>
+										</div>
+										<div class="form-group">
+											<label>GN Division Code</label>
+											<input type="text" id="farmer_gn_code" class="form-input" placeholder="GN Code" readonly>
 										</div>
 										<div class="form-group">
 											<label>Preferred Payment <span class="required">*</span></label>
@@ -402,39 +391,27 @@
 											<textarea id="lead_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
 										</div>
 										<div class="form-group">
-											<label>Grama Niladhari Division <span class="required">*</span></label>
-											<input type="text" id="lead_gnd" class="form-input" placeholder="Enter GND" required>
-										</div>
-										<div class="form-group">
 											<label>District <span class="required">*</span></label>
 											<select id="lead_district" class="form-select" required>
-												<option value="" disabled selected>Select your district</option>
-												<option value="Ampara">Ampara</option>
-												<option value="Anuradhapura">Anuradhapura</option>
-												<option value="Badulla">Badulla</option>
-												<option value="Batticaloa">Batticaloa</option>
-												<option value="Colombo">Colombo</option>
-												<option value="Galle">Galle</option>
-												<option value="Gampaha">Gampaha</option>
-												<option value="Hambantota">Hambantota</option>
-												<option value="Jaffna">Jaffna</option>
-												<option value="Kalutara">Kalutara</option>
-												<option value="Kandy">Kandy</option>
-												<option value="Kegalle">Kegalle</option>
-												<option value="Kilinochchi">Kilinochchi</option>
-												<option value="Kurunegala">Kurunegala</option>
-												<option value="Mannar">Mannar</option>
-												<option value="Matale">Matale</option>
-												<option value="Matara">Matara</option>
-												<option value="Moneragala">Moneragala</option>
-												<option value="Mullaitivu">Mullaitivu</option>
-												<option value="Nuwara Eliya">Nuwara Eliya</option>
-												<option value="Polonnaruwa">Polonnaruwa</option>
-												<option value="Puttalam">Puttalam</option>
-												<option value="Ratnapura">Ratnapura</option>
-												<option value="Trincomalee">Trincomalee</option>
-												<option value="Vavuniya">Vavuniya</option>
+												<option value="" disabled selected>Select District</option>
+												${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
 											</select>
+										</div>
+										<div class="form-group">
+											<label>Divisional Secretariat <span class="required">*</span></label>
+											<select id="lead_ds" class="form-select" required disabled>
+												<option value="" disabled selected>Select District First</option>
+											</select>
+										</div>
+										<div class="form-group">
+											<label>Grama Niladhari Division <span class="required">*</span></label>
+											<select id="lead_gnd" class="form-select" required disabled>
+												<option value="" disabled selected>Select DS First</option>
+											</select>
+										</div>
+										<div class="form-group">
+											<label>GN Division Code</label>
+											<input type="text" id="lead_gn_code" class="form-input" placeholder="GN Code" readonly>
 										</div>
 										<div class="form-group">
 											<label>Group Name <span class="required">*</span></label>
@@ -571,8 +548,32 @@
 											<input type="tel" id="facilitator_whatsapp" class="form-input" placeholder="Enter WhatsApp">
 										</div>
 										<div class="form-group">
-											<label>Assigned Division <span class="required">*</span></label>
-											<input type="text" id="facilitator_division" class="form-input" placeholder="Enter assigned division" required>
+											<label>District <span class="required">*</span></label>
+											<select id="facilitator_district" class="form-select" required>
+												<option value="" disabled selected>Select District</option>
+												${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
+											</select>
+										</div>
+										<div class="form-group">
+											<label>Divisional Secretariat & GN Divisions <span class="required">*</span></label>
+											<div id="facilitator-assignments">
+												<div class="assignment-item" style="border: 1px solid #e5e7eb; padding: 10px; margin-bottom: 10px; border-radius: 6px;">
+													<div class="form-group">
+														<select class="form-select assign-ds" required disabled>
+															<option value="" disabled selected>Select District First</option>
+														</select>
+													</div>
+													<div class="form-group">
+														<select class="form-select assign-gn" required disabled>
+															<option value="" disabled selected>Select DS First</option>
+														</select>
+													</div>
+													<div class="form-group">
+														<input type="text" class="form-input assign-code" placeholder="GN Code" readonly>
+													</div>
+												</div>
+											</div>
+											<button type="button" id="add-assignment" class="btn btn-sm btn-outline-primary" style="font-size: 12px; margin-top: 5px;">+ Add Another Division</button>
 										</div>
 									</div>
 								`;
@@ -648,6 +649,138 @@
 									$('#farmer-bank-fields, #farmer-ezcash-fields, #farmer-mcash-fields').show();
 									$('#account-required, #account-name-required, #bank-required, #branch-required, #ezcash-required, #mcash-required').show();
 								}
+							});
+						}
+
+						// GN Hierarchy Logic
+						const setupGNHierarchy = (prefix) => {
+							const districtSelect = $(`#${prefix}_district`);
+							const dsSelect = $(`#${prefix}_ds`);
+							const gndSelect = $(`#${prefix}_gnd`);
+							const codeInput = $(`#${prefix}_gn_code`);
+
+							districtSelect.on('change', function() {
+								const dist = $(this).val();
+								dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', false);
+								gndSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
+								codeInput.val('');
+								
+								if (gnData[dist]) {
+									Object.keys(gnData[dist]).forEach(ds => {
+										dsSelect.append(`<option value="${ds}">${ds}</option>`);
+									});
+								}
+							});
+
+							dsSelect.on('change', function() {
+								const dist = districtSelect.val();
+								const ds = $(this).val();
+								gndSelect.empty().append('<option value="" disabled selected>Select GN Division</option>').prop('disabled', false);
+								codeInput.val('');
+
+								if (gnData[dist] && gnData[dist][ds]) {
+									gnData[dist][ds].forEach(gn => {
+										gndSelect.append(`<option value="${gn.name}" data-code="${gn.code}">${gn.name}</option>`);
+									});
+								}
+							});
+
+							gndSelect.on('change', function() {
+								const code = $(this).find(':selected').data('code');
+								codeInput.val(code || '');
+							});
+						};
+
+						if (userType === 'farmer') {
+							setupGNHierarchy('farmer');
+						} else if (userType === 'lead_farmer') {
+							setupGNHierarchy('lead');
+						} else if (userType === 'facilitator') {
+							const setupAssignment = (container) => {
+								const dsSelect = container.find('.assign-ds');
+								const gnSelect = container.find('.assign-gn');
+								const codeInput = container.find('.assign-code');
+								const districtSelect = $('#facilitator_district');
+
+								const updateDS = () => {
+									const dist = districtSelect.val();
+									dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', !dist);
+									gnSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
+									codeInput.val('');
+									if (dist && gnData[dist]) {
+										Object.keys(gnData[dist]).forEach(ds => {
+											dsSelect.append(`<option value="${ds}">${ds}</option>`);
+										});
+									}
+								};
+
+								if (districtSelect.val()) {
+									updateDS();
+								}
+
+								dsSelect.on('change', function() {
+									const dist = districtSelect.val();
+									const ds = $(this).val();
+									gnSelect.empty().append('<option value="" disabled selected>Select GN</option>').prop('disabled', false);
+									codeInput.val('');
+									if (gnData[dist] && gnData[dist][ds]) {
+										gnData[dist][ds].forEach(gn => {
+											gnSelect.append(`<option value="${gn.name}" data-code="${gn.code}">${gn.name}</option>`);
+										});
+									}
+								});
+
+								gnSelect.on('change', function() {
+									const code = $(this).find(':selected').data('code');
+									codeInput.val(code || '');
+								});
+							};
+
+							$('#facilitator_district').on('change', function() {
+								$('.assignment-item').each(function() {
+									const dsSelect = $(this).find('.assign-ds');
+									const gnSelect = $(this).find('.assign-gn');
+									const codeInput = $(this).find('.assign-code');
+									const dist = $('#facilitator_district').val();
+									
+									dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', false);
+									gnSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
+									codeInput.val('');
+									
+									if (gnData[dist]) {
+										Object.keys(gnData[dist]).forEach(ds => {
+											dsSelect.append(`<option value="${ds}">${ds}</option>`);
+										});
+									}
+								});
+							});
+
+							setupAssignment($('.assignment-item'));
+
+							$('#add-assignment').on('click', function() {
+								const newItem = $(`
+									<div class="assignment-item" style="border: 1px solid #e5e7eb; padding: 10px; margin-bottom: 10px; border-radius: 6px; position: relative;">
+										<button type="button" class="remove-assignment" style="position: absolute; right: 5px; top: 5px; border: none; background: none; color: #ef4444;">&times;</button>
+										<div class="form-group">
+											<select class="form-select assign-ds" required disabled>
+												<option value="" disabled selected>Select District First</option>
+											</select>
+										</div>
+										<div class="form-group">
+											<select class="form-select assign-gn" required disabled>
+												<option value="" disabled selected>Select DS First</option>
+											</select>
+										</div>
+										<div class="form-group">
+											<input type="text" class="form-input assign-code" placeholder="GN Code" readonly>
+										</div>
+									</div>
+								`);
+								$('#facilitator-assignments').append(newItem);
+								setupAssignment(newItem);
+								newItem.find('.remove-assignment').on('click', function() {
+									newItem.remove();
+								});
 							});
 						}
 
@@ -744,8 +877,10 @@
 						formData.primary_mobile = $('#farmer_mobile').val() || '';
 						formData.whatsapp_number = $('#farmer_whatsapp').val() || formData.primary_mobile;
 						formData.residential_address = $('#farmer_address').val() || '';
-						formData.grama_niladhari_division = $('#farmer_gnd').val() || '';
 						formData.district = $('#farmer_district').val() || '';
+						formData.divisional_secretariat = $('#farmer_ds').val() || '';
+						formData.grama_niladhari_division = $('#farmer_gnd').val() || '';
+						formData.gn_division_code = $('#farmer_gn_code').val() || '';
 						formData.preferred_payment = $('#farmer_payment').val() || 'bank';
 						
 						const paymentMethod = $('#farmer_payment').val();
@@ -804,14 +939,42 @@
 						formData.primary_mobile = $('#lead_mobile').val() || '';
 						formData.whatsapp_number = $('#lead_whatsapp').val() || formData.primary_mobile;
 						formData.residential_address = $('#lead_address').val() || '';
+						formData.district = $('#lead_district').val() || '';
+						formData.divisional_secretariat = $('#lead_ds').val() || '';
 						formData.grama_niladhari_division = $('#lead_gnd').val() || '';
-						formData.district = $('#lead_district').val() || 'Colombo';
+						formData.gn_division_code = $('#lead_gn_code').val() || '';
 						formData.group_name = $('#lead_group_name').val() || '';
 						formData.group_number = $('#lead_group_number').val() || '';
 						formData.account_number = $('#lead_account').val() || '';
 						formData.account_holder_name = $('#lead_account_name').val() || '';
 						formData.bank_name = $('#lead_bank').val() || '';
 						formData.bank_branch = $('#lead_branch').val() || '';
+						formData.preferred_payment = 'bank';
+					} else if (userType === 'facilitator') {
+						formData.nic_no = $('#facilitator_nic').val() || '';
+						formData.primary_mobile = $('#facilitator_mobile').val() || '';
+						formData.whatsapp_number = $('#facilitator_whatsapp').val() || formData.primary_mobile;
+						
+						const district = $('#facilitator_district').val();
+						const assignments = [];
+						$('.assignment-item').each(function() {
+							const ds = $(this).find('.assign-ds').val();
+							const gn = $(this).find('.assign-gn').val();
+							const code = $(this).find('.assign-code').val();
+							if (district && ds && gn) {
+								assignments.push({
+									district: district,
+									divisional_secretariat: ds,
+									gn_division: gn,
+									gn_division_code: code
+								});
+							}
+						});
+						formData.assignments = assignments;
+						formData.district = district;
+						formData.divisional_secretariat = assignments.length > 0 ? assignments[0].divisional_secretariat : '';
+						formData.assigned_division = assignments.length > 0 ? assignments[0].gn_division : '';
+						formData.gn_division_code = assignments.length > 0 ? assignments[0].gn_division_code : '';
 					} else if (userType === 'buyer') {
 						formData.nic_no = $('#buyer_nic').val() || '';
 						formData.primary_mobile = $('#buyer_mobile').val() || '';

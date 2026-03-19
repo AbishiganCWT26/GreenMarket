@@ -263,9 +263,11 @@ class UserController extends Controller
                     'primary_mobile' => $request->primary_mobile,
                     'whatsapp_number' => $request->whatsapp_number,
                     'residential_address' => $request->residential_address,
-                    'grama_niladhari_division' => $request->grama_niladhari_division,
-                    'preferred_payment' => $request->preferred_payment ?? 'bank',
                     'district' => $request->district ?? 'Colombo',
+                    'divisional_secretariat' => $request->divisional_secretariat,
+                    'grama_niladhari_division' => $request->grama_niladhari_division,
+                    'gn_division_code' => $request->gn_division_code,
+                    'preferred_payment' => $request->preferred_payment ?? 'bank',
                     'account_number' => $request->account_number,
                     'account_holder_name' => $request->account_holder_name,
                     'bank_name' => $request->bank_name,
@@ -316,6 +318,9 @@ class UserController extends Controller
                                 'primary_mobile' => '0770000000',
                                 'residential_address' => 'Default Address',
                                 'grama_niladhari_division' => 'Default Division',
+                                'gn_division_code' => '000',
+                                'divisional_secretariat' => 'Default DS',
+                                'district' => 'Colombo',
                                 'group_name' => 'Default Group',
                                 'group_number' => 'GRP-000001',
                                 'preferred_payment' => 'bank',
@@ -341,7 +346,7 @@ class UserController extends Controller
                     'updated_at' => now()
                 ]);
             } elseif ($validated['user_type'] == 'facilitator') {
-                DB::table('facilitators')->insert([
+                $facilitatorId = DB::table('facilitators')->insertGetId([
                     'user_id' => $userId,
                     'name' => $request->name,
                     'nic_no' => $request->nic_no,
@@ -349,10 +354,27 @@ class UserController extends Controller
                     'primary_mobile' => $request->primary_mobile,
                     'whatsapp_number' => $request->whatsapp_number,
                     'assigned_division' => $request->assigned_division,
+                    'divisional_secretariat' => $request->divisional_secretariat,
+                    'gn_division_code' => $request->gn_division_code,
                     'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
+
+                // Handle multiple assignments if present
+                if ($request->has('assignments') && is_array($request->assignments)) {
+                    foreach ($request->assignments as $assignment) {
+                        DB::table('facilitator_assignments')->insert([
+                            'facilitator_id' => $facilitatorId,
+                            'district' => $assignment['district'],
+                            'divisional_secretariat' => $assignment['divisional_secretariat'],
+                            'gn_division' => $assignment['gn_division'],
+                            'gn_division_code' => $assignment['gn_division_code'] ?? null,
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
+                    }
+                }
             } elseif ($validated['user_type'] == 'admin' || $validated['user_type'] == 'subadmin') {
                 // Insert into admins table
                 DB::table('admins')->insert([
@@ -733,29 +755,62 @@ class UserController extends Controller
                 'updated_at' => now()
             ];
 
+            // Map request fields to database columns
             $fields = [
                 'name' => 'name',
-                'nic_no' => 'facilitator_nic_no',
-                'primary_mobile' => 'facilitator_primary_mobile',
+                'nic_no' => 'nic_no',
+                'primary_mobile' => 'primary_mobile',
                 'whatsapp_number' => 'whatsapp_number',
                 'email' => 'email',
-                'assigned_division' => 'assigned_division'
+                'divisional_secretariat' => 'divisional_secretariat',
+                'gn_division_code' => 'gn_division_code'
             ];
 
-            foreach ($fields as $dbField => $requestField) {
-                if ($request->has($requestField)) {
-                    $updateData[$dbField] = $request->$requestField;
-                } elseif ($request->has($dbField)) {
-                    $updateData[$dbField] = $request->$dbField;
+            foreach ($fields as $dbColumn => $requestKey) {
+                // Check both potential request keys (e.g., nic_no vs facilitator_nic_no)
+                $altKey = 'facilitator_' . $requestKey;
+                $value = null;
+                if ($request->has($requestKey)) {
+                    $value = $request->$requestKey;
+                } elseif ($request->has($altKey)) {
+                    $value = $request->$altKey;
                 }
+
+                if ($value !== null) {
+                    $updateData[$dbColumn] = $value;
+                }
+            }
+            
+            // Map the request's district/assigned_division to the DB's assigned_division column
+            $districtValue = $request->input('district') ?? $request->input('facilitator_district') ?? $request->input('assigned_division') ?? $request->input('facilitator_assigned_division');
+            if ($districtValue !== null) {
+                $updateData['assigned_division'] = $districtValue;
             }
 
             DB::table('facilitators')
                 ->where('user_id', $userId)
                 ->update($updateData);
+
+            // Handle multiple assignments if present
+            if ($request->has('assignments') && is_array($request->assignments)) {
+                // Delete existing assignments first
+                DB::table('facilitator_assignments')->where('facilitator_id', $facilitator->id)->delete();
+                
+                foreach ($request->assignments as $assignment) {
+                    DB::table('facilitator_assignments')->insert([
+                        'facilitator_id' => $facilitator->id,
+                        'district' => $assignment['district'],
+                        'divisional_secretariat' => $assignment['divisional_secretariat'],
+                        'gn_division' => $assignment['gn_division'],
+                        'gn_division_code' => $assignment['gn_division_code'] ?? null,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+                }
+            }
         } else {
             $userRecord = DB::table('users')->find($userId);
-            DB::table('facilitators')->insert([
+            $facilitatorId = DB::table('facilitators')->insertGetId([
                 'user_id' => $userId,
                 'name' => $request->name ?? $userRecord->username,
                 'nic_no' => $request->facilitator_nic_no ?? $request->nic_no ?? '',
@@ -763,10 +818,27 @@ class UserController extends Controller
                 'primary_mobile' => $request->facilitator_primary_mobile ?? $request->primary_mobile ?? '',
                 'whatsapp_number' => $request->whatsapp_number ?? '',
                 'assigned_division' => $request->assigned_division ?? '',
+                'district' => $request->district ?? 'Colombo',
+                'divisional_secretariat' => $request->divisional_secretariat ?? '',
+                'gn_division_code' => $request->gn_division_code ?? '',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
+
+            if ($request->has('assignments') && is_array($request->assignments)) {
+                foreach ($request->assignments as $assignment) {
+                    DB::table('facilitator_assignments')->insert([
+                        'facilitator_id' => $facilitatorId,
+                        'district' => $assignment['district'],
+                        'divisional_secretariat' => $assignment['divisional_secretariat'],
+                        'gn_division' => $assignment['gn_division'],
+                        'gn_division_code' => $assignment['gn_division_code'] ?? null,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+                }
+            }
         }
     }
 
@@ -1236,6 +1308,11 @@ class UserController extends Controller
                 break;
             case 'facilitator':
                 $details = DB::table('facilitators')->where('user_id', $user->id)->first();
+                if ($details) {
+                    $details->assignments = DB::table('facilitator_assignments')
+                        ->where('facilitator_id', $details->id)
+                        ->get();
+                }
                 break;
             case 'admin':
             case 'subadmin':

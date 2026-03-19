@@ -149,13 +149,25 @@
 							<div class="detail-label">
 								<i class="fas fa-map-marker-alt"></i> District
 							</div>
-							<div class="detail-value">{{ $details->district ?? 'Colombo' }}</div>
+							<div class="detail-value">{{ $details->district ?? 'Not provided' }}</div>
 						</div>
 						<div class="detail-row">
 							<div class="detail-label">
-								<i class="fas fa-map-marker-alt"></i> Grama Niladhari Division
+								<i class="fas fa-building"></i> Divisional Secretariat
 							</div>
-							<div class="detail-value">{{ $details->grama_niladhari_division }}</div>
+							<div class="detail-value">{{ $details->divisional_secretariat ?? 'Not provided' }}</div>
+						</div>
+						<div class="detail-row">
+							<div class="detail-label">
+								<i class="fas fa-map"></i> Grama Niladhari Division
+							</div>
+							<div class="detail-value">{{ $details->grama_niladhari_division ?? 'Not provided' }}</div>
+						</div>
+						<div class="detail-row">
+							<div class="detail-label">
+								<i class="fas fa-fingerprint"></i> GN Division Code
+							</div>
+							<div class="detail-value">{{ $details->gn_division_code ?? 'Not provided' }}</div>
 						</div>
 						@if($user->role == 'lead_farmer')
 						<div class="detail-row">
@@ -360,9 +372,31 @@
 						</div>
 						<div class="detail-row">
 							<div class="detail-label">
-								<i class="fas fa-map-pin"></i> Assigned Division
+								<i class="fas fa-map-marker-alt"></i> District
 							</div>
-							<div class="detail-value">{{ $details->assigned_division }}</div>
+							<div class="detail-value">{{ (isset($details->assignments) && count($details->assignments) > 0) ? $details->assignments->first()->district : ($details->assigned_division ?? 'Not provided') }}</div>
+						</div>
+						<div class="detail-row" style="display: block;">
+							<div class="detail-label" style="margin-bottom: 10px;">
+								<i class="fas fa-th-list"></i> Assigned Divisions
+							</div>
+							<div class="detail-value">
+								@if(isset($details->assignments) && count($details->assignments) > 0)
+									<div class="assignments-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+										@foreach($details->assignments as $assignment)
+											<div class="assignment-card" style="border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.02);">
+												<div style="font-weight: 600; font-size: 0.9rem; color: var(--primary-color);">{{ $assignment->district }} - {{ $assignment->divisional_secretariat }}</div>
+												<div style="font-size: 0.85rem;">{{ $assignment->gn_division }}</div>
+												<div style="font-size: 0.75rem; color: var(--text-muted);">Code: {{ $assignment->gn_division_code }}</div>
+											</div>
+										@endforeach
+									</div>
+								@else
+									<div class="no-assignments" style="color: var(--text-muted); font-style: italic;">
+										No divisions assigned
+									</div>
+								@endif
+							</div>
 						</div>
 				</div>
 			</div>

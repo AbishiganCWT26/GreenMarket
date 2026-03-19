@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{{ asset('css/Admin/edit-user-management.css') }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="{{ asset('js/gn-data.js') }}"></script>
 @endsection
 
 @section('content')
@@ -106,9 +107,27 @@
 					$leadFarmerData = DB::table('lead_farmers')->where('user_id', $user->id)->first();
 					$buyerData = DB::table('buyers')->where('user_id', $user->id)->first();
 					$facilitatorData = DB::table('facilitators')->where('user_id', $user->id)->first();
+					$facilitatorAssignments = $facilitatorData ? DB::table('facilitator_assignments')->where('facilitator_id', $facilitatorData->id)->get() : collect();
 					
 					// Current user details point to farmer or lead farmer for compatibility
-					$userDetails = ($user->role == 'farmer' ? $farmerData : $leadFarmerData) ?? (object)[];
+					$userDetails = ($user->role == 'farmer' ? $farmerData : ($user->role == 'lead_farmer' ? $leadFarmerData : null)) ?? (object)[];
+					
+					// Ensure common properties exist to avoid "Undefined property" errors
+					if (!isset($userDetails->preferred_payment)) $userDetails->preferred_payment = 'bank';
+					if (!isset($userDetails->nic_no)) $userDetails->nic_no = '';
+					if (!isset($userDetails->primary_mobile)) $userDetails->primary_mobile = '';
+					if (!isset($userDetails->whatsapp_number)) $userDetails->whatsapp_number = '';
+					if (!isset($userDetails->district)) $userDetails->district = '';
+					if (!isset($userDetails->residential_address)) $userDetails->residential_address = '';
+					if (!isset($userDetails->grama_niladhari_division)) $userDetails->grama_niladhari_division = '';
+					if (!isset($userDetails->account_number)) $userDetails->account_number = '';
+					if (!isset($userDetails->account_holder_name)) $userDetails->account_holder_name = '';
+					if (!isset($userDetails->bank_name)) $userDetails->bank_name = '';
+					if (!isset($userDetails->bank_branch)) $userDetails->bank_branch = '';
+					if (!isset($userDetails->ezcash_mobile)) $userDetails->ezcash_mobile = '';
+					if (!isset($userDetails->mcash_mobile)) $userDetails->mcash_mobile = '';
+					if (!isset($userDetails->group_name)) $userDetails->group_name = '';
+					if (!isset($userDetails->group_number)) $userDetails->group_number = '';
 				@endphp
 
 				<div id="farmer-sections" style="{{ in_array($user->role, ['farmer', 'lead_farmer']) ? '' : 'display: none;' }}">
@@ -141,41 +160,59 @@
 							<div class="form-row">
 								<div class="form-group">
 									<label class="form-label">
-										<i class="fab fa-whatsapp"></i> WhatsApp Number
+										<i class="fas fa-map-marker-alt"></i> District
 									</label>
-									<input type="text" name="whatsapp_number" class="form-input" value="{{ $userDetails->whatsapp_number ?? '' }}">
+									<select name="district" id="farmer_district" class="form-select">
+										<option value="" disabled>Select District</option>
+										<option value="Ampara" {{ ($userDetails->district ?? '') == 'Ampara' ? 'selected' : '' }}>Ampara</option>
+										<option value="Anuradhapura" {{ ($userDetails->district ?? '') == 'Anuradhapura' ? 'selected' : '' }}>Anuradhapura</option>
+										<option value="Badulla" {{ ($userDetails->district ?? '') == 'Badulla' ? 'selected' : '' }}>Badulla</option>
+										<option value="Batticaloa" {{ ($userDetails->district ?? '') == 'Batticaloa' ? 'selected' : '' }}>Batticaloa</option>
+										<option value="Colombo" {{ ($userDetails->district ?? '') == 'Colombo' ? 'selected' : '' }}>Colombo</option>
+										<option value="Galle" {{ ($userDetails->district ?? '') == 'Galle' ? 'selected' : '' }}>Galle</option>
+										<option value="Gampaha" {{ ($userDetails->district ?? '') == 'Gampaha' ? 'selected' : '' }}>Gampaha</option>
+										<option value="Hambantota" {{ ($userDetails->district ?? '') == 'Hambantota' ? 'selected' : '' }}>Hambantota</option>
+										<option value="Jaffna" {{ ($userDetails->district ?? '') == 'Jaffna' ? 'selected' : '' }}>Jaffna</option>
+										<option value="Kalutara" {{ ($userDetails->district ?? '') == 'Kalutara' ? 'selected' : '' }}>Kalutara</option>
+										<option value="Kandy" {{ ($userDetails->district ?? '') == 'Kandy' ? 'selected' : '' }}>Kandy</option>
+										<option value="Kegalle" {{ ($userDetails->district ?? '') == 'Kegalle' ? 'selected' : '' }}>Kegalle</option>
+										<option value="Kilinochchi" {{ ($userDetails->district ?? '') == 'Kilinochchi' ? 'selected' : '' }}>Kilinochchi</option>
+										<option value="Kurunegala" {{ ($userDetails->district ?? '') == 'Kurunegala' ? 'selected' : '' }}>Kurunegala</option>
+										<option value="Mannar" {{ ($userDetails->district ?? '') == 'Mannar' ? 'selected' : '' }}>Mannar</option>
+										<option value="Matale" {{ ($userDetails->district ?? '') == 'Matale' ? 'selected' : '' }}>Matale</option>
+										<option value="Matara" {{ ($userDetails->district ?? '') == 'Matara' ? 'selected' : '' }}>Matara</option>
+										<option value="Moneragala" {{ ($userDetails->district ?? '') == 'Moneragala' ? 'selected' : '' }}>Moneragala</option>
+										<option value="Mullaitivu" {{ ($userDetails->district ?? '') == 'Mullaitivu' ? 'selected' : '' }}>Mullaitivu</option>
+										<option value="Nuwara Eliya" {{ ($userDetails->district ?? '') == 'Nuwara Eliya' ? 'selected' : '' }}>Nuwara Eliya</option>
+										<option value="Polonnaruwa" {{ ($userDetails->district ?? '') == 'Polonnaruwa' ? 'selected' : '' }}>Polonnaruwa</option>
+										<option value="Puttalam" {{ ($userDetails->district ?? '') == 'Puttalam' ? 'selected' : '' }}>Puttalam</option>
+										<option value="Ratnapura" {{ ($userDetails->district ?? '') == 'Ratnapura' ? 'selected' : '' }}>Ratnapura</option>
+										<option value="Trincomalee" {{ ($userDetails->district ?? '') == 'Trincomalee' ? 'selected' : '' }}>Trincomalee</option>
+										<option value="Vavuniya" {{ ($userDetails->district ?? '') == 'Vavuniya' ? 'selected' : '' }}>Vavuniya</option>
+									</select>
 								</div>
 								<div class="form-group">
 									<label class="form-label">
-										<i class="fas fa-map-marker-alt"></i> District
+										<i class="fas fa-building"></i> Divisional Secretariat
 									</label>
-									<select name="district" class="form-select">
-												<option value="Ampara" {{ ($userDetails->district ?? '') == 'Ampara' ? 'selected' : '' }}>Ampara</option>
-												<option value="Anuradhapura" {{ ($userDetails->district ?? '') == 'Anuradhapura' ? 'selected' : '' }}>Anuradhapura</option>
-												<option value="Badulla" {{ ($userDetails->district ?? '') == 'Badulla' ? 'selected' : '' }}>Badulla</option>
-												<option value="Batticaloa" {{ ($userDetails->district ?? '') == 'Batticaloa' ? 'selected' : '' }}>Batticaloa</option>
-												<option value="Colombo" {{ ($userDetails->district ?? '') == 'Colombo' ? 'selected' : '' }}>Colombo</option>
-												<option value="Galle" {{ ($userDetails->district ?? '') == 'Galle' ? 'selected' : '' }}>Galle</option>
-												<option value="Gampaha" {{ ($userDetails->district ?? '') == 'Gampaha' ? 'selected' : '' }}>Gampaha</option>
-												<option value="Hambantota" {{ ($userDetails->district ?? '') == 'Hambantota' ? 'selected' : '' }}>Hambantota</option>
-												<option value="Jaffna" {{ ($userDetails->district ?? '') == 'Jaffna' ? 'selected' : '' }}>Jaffna</option>
-												<option value="Kalutara" {{ ($userDetails->district ?? '') == 'Kalutara' ? 'selected' : '' }}>Kalutara</option>
-												<option value="Kandy" {{ ($userDetails->district ?? '') == 'Kandy' ? 'selected' : '' }}>Kandy</option>
-												<option value="Kegalle" {{ ($userDetails->district ?? '') == 'Kegalle' ? 'selected' : '' }}>Kegalle</option>
-												<option value="Kilinochchi" {{ ($userDetails->district ?? '') == 'Kilinochchi' ? 'selected' : '' }}>Kilinochchi</option>
-												<option value="Kurunegala" {{ ($userDetails->district ?? '') == 'Kurunegala' ? 'selected' : '' }}>Kurunegala</option>
-												<option value="Mannar" {{ ($userDetails->district ?? '') == 'Mannar' ? 'selected' : '' }}>Mannar</option>
-												<option value="Matale" {{ ($userDetails->district ?? '') == 'Matale' ? 'selected' : '' }}>Matale</option>
-												<option value="Matara" {{ ($userDetails->district ?? '') == 'Matara' ? 'selected' : '' }}>Matara</option>
-												<option value="Moneragala" {{ ($userDetails->district ?? '') == 'Moneragala' ? 'selected' : '' }}>Moneragala</option>
-												<option value="Mullaitivu" {{ ($userDetails->district ?? '') == 'Mullaitivu' ? 'selected' : '' }}>Mullaitivu</option>
-												<option value="Nuwara Eliya" {{ ($userDetails->district ?? '') == 'Nuwara Eliya' ? 'selected' : '' }}>Nuwara Eliya</option>
-												<option value="Polonnaruwa" {{ ($userDetails->district ?? '') == 'Polonnaruwa' ? 'selected' : '' }}>Polonnaruwa</option>
-												<option value="Puttalam" {{ ($userDetails->district ?? '') == 'Puttalam' ? 'selected' : '' }}>Puttalam</option>
-												<option value="Ratnapura" {{ ($userDetails->district ?? '') == 'Ratnapura' ? 'selected' : '' }}>Ratnapura</option>
-												<option value="Trincomalee" {{ ($userDetails->district ?? '') == 'Trincomalee' ? 'selected' : '' }}>Trincomalee</option>
-												<option value="Vavuniya" {{ ($userDetails->district ?? '') == 'Vavuniya' ? 'selected' : '' }}>Vavuniya</option>
+									<select name="divisional_secretariat" id="farmer_ds" class="form-select">
+										<option value="{{ $userDetails->divisional_secretariat ?? '' }}" selected>{{ $userDetails->divisional_secretariat ?? 'Select DS First' }}</option>
 									</select>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-map"></i> Grama Niladhari Division
+									</label>
+									<select name="grama_niladhari_division" id="farmer_gn" class="form-select">
+										<option value="{{ $userDetails->grama_niladhari_division ?? '' }}" data-code="{{ $userDetails->gn_division_code ?? '' }}" selected>{{ $userDetails->grama_niladhari_division ?? 'Select GN First' }}</option>
+									</select>
+								</div>
+								<div class="form-group" style="padding-left: 0;">
+									<label class="form-label">GN Code</label>
+									<input type="text" name="gn_division_code" id="farmer_gn_code" class="form-input" value="{{ $userDetails->gn_division_code ?? '' }}" readonly>
 								</div>
 							</div>
 
@@ -184,13 +221,6 @@
 									<i class="fas fa-home"></i> Residential Address
 								</label>
 								<textarea name="residential_address" class="form-input" rows="2">{{ $userDetails->residential_address ?? '' }}</textarea>
-							</div>
-
-							<div class="form-group">
-								<label class="form-label">
-									<i class="fas fa-map"></i> Grama Niladhari Division
-								</label>
-								<input type="text" name="grama_niladhari_division" class="form-input" value="{{ $userDetails->grama_niladhari_division ?? '' }}">
 							</div>
 						</div>
 					</div>
@@ -343,22 +373,97 @@
 								<label class="form-label">
 									<i class="fas fa-id-card"></i> NIC Number
 								</label>
-								<input type="text" name="facilitator_nic_no" class="form-input" value="{{ $facilitatorData->nic_no ?? '' }}">
+								<input type="text" name="facilitator_nic_no" id="facilitator_nic" class="form-input" value="{{ $facilitatorData->nic_no ?? '' }}">
 							</div>
 
 							<div class="form-row">
 								<div class="form-group">
 									<label class="form-label">
-										<i class="fas fa-map-pin"></i> Assigned Division
+										<i class="fas fa-phone"></i> Primary Mobile
 									</label>
-									<input type="text" name="assigned_division" class="form-input" value="{{ $facilitatorData->assigned_division ?? '' }}">
+									<input type="text" name="facilitator_primary_mobile" id="facilitator_mobile" class="form-input" value="{{ $facilitatorData->primary_mobile ?? '' }}">
 								</div>
 								<div class="form-group">
 									<label class="form-label">
-										<i class="fas fa-phone"></i> Contact Number
+										<i class="fab fa-whatsapp"></i> WhatsApp Number
 									</label>
-									<input type="text" name="facilitator_primary_mobile" class="form-input" value="{{ $facilitatorData->primary_mobile ?? '' }}">
+									<input type="text" name="facilitator_whatsapp" id="facilitator_whatsapp" class="form-input" value="{{ $facilitatorData->whatsapp_number ?? '' }}">
 								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label">
+									<i class="fas fa-map-marker-alt"></i> District <span class="required">*</span>
+								</label>
+								<select id="facilitator_district" name="district" class="form-select" required>
+									<option value="" disabled>Select District</option>
+									@php
+										$districts = ['Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Moneragala', 'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'];
+										$currentDist = (isset($facilitatorAssignments) && $facilitatorAssignments->count() > 0) ? $facilitatorAssignments->first()->district : ($facilitatorData->assigned_division ?? '');
+									@endphp
+									@foreach($districts as $d)
+										<option value="{{ $d }}" {{ $currentDist == $d ? 'selected' : '' }}>{{ $d }}</option>
+									@endforeach
+								</select>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label">
+									<i class="fas fa-th-list"></i> Assigned Divisions (DS & GN)
+								</label>
+								<div id="facilitator-assignments">
+									@if($facilitatorAssignments->count() > 0)
+										@foreach($facilitatorAssignments as $index => $assignment)
+										<div class="assignment-item" style="border: 1px solid var(--border-color); padding: 15px; margin-bottom: 15px; border-radius: 8px; position: relative; background: var(--bg-light);">
+											@if($index > 0)
+											<button type="button" class="remove-assignment" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #ef4444; font-size: 1.2rem;">&times;</button>
+											@endif
+											<div class="form-row">
+												<div class="form-group">
+													<label class="form-label">DS Division</label>
+													<select class="form-select assign-ds" required>
+														<option value="{{ $assignment->divisional_secretariat }}" selected>{{ $assignment->divisional_secretariat }}</option>
+													</select>
+												</div>
+												<div class="form-group">
+													<label class="form-label">GN Division</label>
+													<select class="form-select assign-gn" required>
+														<option value="{{ $assignment->gn_division }}" data-code="{{ $assignment->gn_division_code }}" selected>{{ $assignment->gn_division }}</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group" style="margin-top: 10px;">
+												<label class="form-label">GN Code</label>
+												<input type="text" class="form-input assign-code" value="{{ $assignment->gn_division_code }}" readonly>
+											</div>
+										</div>
+										@endforeach
+									@else
+										<div class="assignment-item" style="border: 1px solid var(--border-color); padding: 15px; margin-bottom: 15px; border-radius: 8px; background: var(--bg-light);">
+											<div class="form-row">
+												<div class="form-group">
+													<label class="form-label">DS Division</label>
+													<select class="form-select assign-ds" required disabled>
+														<option value="" disabled selected>Select District First</option>
+													</select>
+												</div>
+												<div class="form-group">
+													<label class="form-label">GN Division</label>
+													<select class="form-select assign-gn" required disabled>
+														<option value="" disabled selected>Select DS First</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group" style="margin-top: 10px;">
+												<label class="form-label">GN Code</label>
+												<input type="text" class="form-input assign-code" readonly>
+											</div>
+										</div>
+									@endif
+								</div>
+								<button type="button" id="add-assignment" class="btn-secondary" style="font-size: 0.85rem; padding: 8px 15px;">
+									<i class="fas fa-plus"></i> Add Another Division
+								</button>
 							</div>
 						</div>
 					</div>
@@ -452,6 +557,189 @@ $(document).ready(function() {
 			$('#ezcash-payment-fields').show();
 			$('#mcash-payment-fields').show();
 		}
+	});
+
+	// Facilitator Assignment Logic
+	const setupAssignment = (container) => {
+		const dsSelect = container.find('.assign-ds');
+		const gnSelect = container.find('.assign-gn');
+		const codeInput = container.find('.assign-code');
+		const districtSelect = $('#facilitator_district');
+		
+		let initialGN = gnSelect.val();
+
+		const updateDS = () => {
+			const dist = districtSelect.val();
+			const currentDS = dsSelect.val();
+			
+			dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', !dist);
+			gnSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
+			
+			if (dist && gnData[dist]) {
+				Object.keys(gnData[dist]).forEach(ds => {
+					dsSelect.append(`<option value="${ds}" ${ds === currentDS ? 'selected' : ''}>${ds}</option>`);
+				});
+				if (currentDS && dsSelect.val() === currentDS) {
+					updateGN();
+				}
+			}
+		};
+
+		const updateGN = () => {
+			const dist = districtSelect.val();
+			const ds = dsSelect.val();
+			const currentGN = gnSelect.val() || initialGN;
+			
+			gnSelect.empty().append('<option value="" disabled selected>Select GN</option>').prop('disabled', !ds);
+			
+			if (dist && ds && gnData[dist] && gnData[dist][ds]) {
+				gnData[dist][ds].forEach(gn => {
+					gnSelect.append(`<option value="${gn.name}" data-code="${gn.code}" ${gn.name === currentGN ? 'selected' : ''}>${gn.name}</option>`);
+				});
+				// Ensure code is updated if GN is already selected
+				if (currentGN) {
+					const selectedOption = gnSelect.find(':selected');
+					const code = selectedOption.data('code');
+					if (code) codeInput.val(code);
+				}
+			}
+			initialGN = null; // Clear so subsequent changes don't force the initial value
+		};
+
+		if (districtSelect.val() && dsSelect.find('option').length <= 1) {
+			updateDS();
+		}
+
+		dsSelect.on('change', function() {
+			updateGN();
+			codeInput.val('');
+		});
+
+		gnSelect.on('change', function() {
+			const code = $(this).find(':selected').data('code');
+			codeInput.val(code || '');
+		});
+	};
+
+	// GN Hierarchy Logic for Farmers/Lead Farmers
+	const setupFarmerGNHierarchy = () => {
+		const districtSelect = $('#farmer_district');
+		const dsSelect = $('#farmer_ds');
+		const gnSelect = $('#farmer_gn');
+		const codeInput = $('#farmer_gn_code');
+
+		const updateDS = () => {
+			const dist = districtSelect.val();
+			const currentDS = dsSelect.val();
+			
+			dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', !dist);
+			gnSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
+			
+			if (dist && gnData[dist]) {
+				Object.keys(gnData[dist]).forEach(ds => {
+					dsSelect.append(`<option value="${ds}" ${ds === currentDS ? 'selected' : ''}>${ds}</option>`);
+				});
+				if (currentDS) updateGN();
+			}
+		};
+
+		const updateGN = () => {
+			const dist = districtSelect.val();
+			const ds = dsSelect.val();
+			const currentGN = gnSelect.val();
+			
+			gnSelect.empty().append('<option value="" disabled selected>Select GN</option>').prop('disabled', !ds);
+			
+			if (dist && ds && gnData[dist] && gnData[dist][ds]) {
+				gnData[dist][ds].forEach(gn => {
+					gnSelect.append(`<option value="${gn.name}" data-code="${gn.code}" ${gn.name === currentGN ? 'selected' : ''}>${gn.name}</option>`);
+				});
+				if (currentGN) {
+					const code = gnSelect.find(':selected').data('code');
+					if (code) codeInput.val(code);
+				}
+			}
+		};
+
+		districtSelect.on('change', function() {
+			updateDS();
+			codeInput.val('');
+		});
+		
+		dsSelect.on('change', function() {
+			updateGN();
+			codeInput.val('');
+		});
+
+		gnSelect.on('change', function() {
+			const code = $(this).find(':selected').data('code');
+			codeInput.val(code || '');
+		});
+
+		// Initial load
+		if (districtSelect.val()) updateDS();
+	};
+
+	if ($('#farmer-sections').is(':visible')) {
+		setupFarmerGNHierarchy();
+	}
+
+	$('#facilitator_district').on('change', function() {
+		$('.assignment-item').each(function() {
+			const dsSelect = $(this).find('.assign-ds');
+			const gnSelect = $(this).find('.assign-gn');
+			const codeInput = $(this).find('.assign-code');
+			const dist = $('#facilitator_district').val();
+			
+			dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', !dist);
+			gnSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
+			codeInput.val('');
+			
+			if (dist && gnData[dist]) {
+				Object.keys(gnData[dist]).forEach(ds => {
+					dsSelect.append(`<option value="${ds}">${ds}</option>`);
+				});
+			}
+		});
+	});
+
+	$('.assignment-item').each(function() {
+		setupAssignment($(this));
+	});
+
+	$('#add-assignment').on('click', function() {
+		const newItem = $(`
+			<div class="assignment-item" style="border: 1px solid var(--border-color); padding: 15px; margin-bottom: 15px; border-radius: 8px; position: relative; background: var(--bg-light);">
+				<button type="button" class="remove-assignment" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #ef4444; font-size: 1.2rem;">&times;</button>
+				<div class="form-row">
+					<div class="form-group">
+						<label class="form-label">DS Division</label>
+						<select class="form-select assign-ds" required disabled>
+							<option value="" disabled selected>Select District First</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="form-label">GN Division</label>
+						<select class="form-select assign-gn" required disabled>
+							<option value="" disabled selected>Select DS First</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group" style="margin-top: 10px;">
+					<label class="form-label">GN Code</label>
+					<input type="text" class="form-input assign-code" readonly>
+				</div>
+			</div>
+		`);
+		$('#facilitator-assignments').append(newItem);
+		setupAssignment(newItem);
+		newItem.find('.remove-assignment').on('click', function() {
+			newItem.remove();
+		});
+	});
+
+	$(document).on('click', '.remove-assignment', function() {
+		$(this).closest('.assignment-item').remove();
 	});
 
 
@@ -548,6 +836,23 @@ $(document).ready(function() {
 		const isPaymentChanged = checkPaymentChanges();
 
 		formDataToSubmit = new FormData(this);
+
+		if (userRole === 'facilitator') {
+			const district = $('#facilitator_district').val();
+			let index = 0;
+			$('.assignment-item').each(function() {
+				const ds = $(this).find('.assign-ds').val();
+				const gn = $(this).find('.assign-gn').val();
+				const code = $(this).find('.assign-code').val();
+				if (district && ds && gn) {
+					formDataToSubmit.append(`assignments[${index}][district]`, district);
+					formDataToSubmit.append(`assignments[${index}][divisional_secretariat]`, ds);
+					formDataToSubmit.append(`assignments[${index}][gn_division]`, gn);
+					formDataToSubmit.append(`assignments[${index}][gn_division_code]`, code);
+					index++;
+				}
+			});
+		}
 
 		if ((userRole === 'farmer' || userRole === 'lead_farmer') && isPaymentChanged && !otpVerified) {
 			Swal.fire({
