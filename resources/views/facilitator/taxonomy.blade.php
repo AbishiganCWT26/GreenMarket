@@ -1,7 +1,7 @@
 @extends('facilitator.layouts.facilitator_master')
 
 @section('title', 'Taxonomy Management')
-@section('page-title', 'Category & Standards Management')
+@section('page-title', 'Category Management')
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/Facilitator/taxonomy.css') }}">
@@ -12,7 +12,7 @@
 <div class="taxo-container">
 	<div class="header-bar">
 		<div class="header-left">
-			<h1 class="page-title">
+			<h1 class="page-title1">
 				<i class="fas fa-diagram-project"></i>
 				Category Structure
 			</h1>

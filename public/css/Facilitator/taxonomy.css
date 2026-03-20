@@ -65,7 +65,7 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-.page-title {
+.page-title1 {
     font-size: 1.1rem;
     font-weight: 600;
     display: flex;
@@ -74,7 +74,7 @@ body {
     margin-bottom: 2px;
 }
 
-.page-title i {
+.page-title1 i {
     font-size: 1rem;
 }
 
@@ -853,7 +853,7 @@ textarea.form-control {
         align-items: flex-start;
     }
 
-    .page-title {
+    .page-title1 {
         font-size: 1rem;
     }
 
@@ -919,7 +919,7 @@ textarea.form-control {
         padding: 8px;
     }
 
-    .page-title {
+    .page-title1 {
         font-size: 0.9rem;
     }
 
