@@ -54,7 +54,7 @@
         </div>
         <div class="stat-content">
             <h3>{{ $pendingComplaints ?? 0 }}</h3>
-            <p>Pending</p>
+            <p>Pending Complaints</p>
         </div>
         <div class="stat-arrow">
             <i class="fa-solid fa-arrow-right"></i>

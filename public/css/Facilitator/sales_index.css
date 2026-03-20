@@ -505,6 +505,22 @@ body {
     border: 1px solid var(--border-light);
 }
 
+.person-info-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    line-height: 1.2;
+}
+
+.person-name {
+    font-weight: 600;
+}
+
+.person-subtext {
+    font-size: 10px;
+    color: var(--muted);
+}
+
 .card-footer {
     padding: 12px;
     background: #fafbfc;
@@ -616,6 +632,17 @@ body {
 .table-row:hover .person-avatar {
     border-color: var(--primary-green);
     transform: scale(1.05);
+}
+
+.person-details {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+.person-location {
+    font-size: 11px;
+    color: var(--muted);
 }
 
 .group-wrapper {

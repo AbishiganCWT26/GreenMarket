@@ -1206,51 +1206,145 @@ class FacilitatorController extends Controller
     public function editProfile()
     {
         $user = Auth::user();
-        $facilitator = $user->facilitator;
+        $facilitator = Facilitator::with('assignments')->where('user_id', $user->id)->firstOrFail();
 
         return view('facilitator.profile', compact('facilitator'));
+    }
+
+    public function sendProfileOTP(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $facilitator = $user->facilitator;
+            $type = $request->input('type'); // 'primary_mobile' or 'whatsapp_number'
+            $number = $request->input('number'); // New number being verified
+
+            if (!$type || !$number) {
+                return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
+            }
+
+            $otp = rand(100000, 999999);
+            $action = 'profile_update_' . $type;
+
+            // Store in session
+            session([
+                $action . '_otp' => $otp,
+                $action . '_number' => $number,
+                $action . '_expires_at' => now()->addMinutes(5)
+            ]);
+
+            $message = "Your GreenMarket OTP for updating your $type is: $otp. Valid for 5 minutes.";
+            
+            // Send OTP to the CURRENT primary mobile number as requested
+            $sendTo = $facilitator->primary_mobile;
+            $smsSent = $this->sendSMS($sendTo, $message);
+
+            if (!$smsSent) {
+                return response()->json(['success' => false, 'message' => 'Failed to send SMS'], 500);
+            }
+
+            return response()->json(['success' => true, 'message' => 'OTP sent successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function verifyProfileOTP(Request $request)
+    {
+        try {
+            $type = $request->input('type');
+            $otp = $request->input('otp');
+            $number = $request->input('number');
+            $action = 'profile_update_' . $type;
+
+            $storedOtp = session($action . '_otp');
+            $storedNumber = session($action . '_number');
+            $expiresAt = session($action . '_expires_at');
+
+            if (!$storedOtp || !$expiresAt || now()->gt($expiresAt)) {
+                return response()->json(['success' => false, 'message' => 'OTP expired or not found'], 400);
+            }
+
+            if ($otp != $storedOtp || $number != $storedNumber) {
+                return response()->json(['success' => false, 'message' => 'Invalid OTP or number'], 400);
+            }
+
+            // Mark as verified in session
+            session([$action . '_verified' => true]);
+
+            return response()->json(['success' => true, 'message' => 'OTP verified successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
     public function updateProfile(Request $request)
     {
         try {
-            $user = Auth::user();
+            $user = User::findOrFail(Auth::id());
             $facilitator = $user->facilitator;
 
             $validated = $request->validate([
                 'name' => 'required|string|max:100',
-                'email' => 'required|email|max:100',
+                'username' => 'required|string|max:50|unique:users,username,' . $user->id,
+                'email' => 'required|email|max:100|unique:users,email,' . $user->id,
                 'primary_mobile' => 'required|string|max:15',
                 'whatsapp_number' => 'nullable|string|max:15',
-                'assigned_division' => 'required|string|max:100'
             ]);
 
-            $facilitator->update($validated);
+            DB::beginTransaction();
 
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Profile updated successfully!'
-                ]);
+            // Check if primary mobile changed and needs verification
+            if ($request->primary_mobile !== $facilitator->primary_mobile) {
+                if (!session('profile_update_primary_mobile_verified') || session('profile_update_primary_mobile_number') !== $request->primary_mobile) {
+                    return response()->json(['success' => false, 'message' => 'Primary mobile verification required'], 403);
+                }
             }
 
-            return redirect()->route('facilitator.profile')->with('success', 'Profile updated successfully!');
+            // Check if whatsapp number changed and needs verification
+            if ($request->whatsapp_number !== $facilitator->whatsapp_number) {
+                if ($request->whatsapp_number && (!session('profile_update_whatsapp_number_verified') || session('profile_update_whatsapp_number_number') !== $request->whatsapp_number)) {
+                    return response()->json(['success' => false, 'message' => 'WhatsApp number verification required'], 403);
+                }
+            }
+
+            // Update User table
+            $user->update([
+                'username' => $validated['username'],
+                'email' => $validated['email'],
+            ]);
+
+            // Update Facilitator table
+            $facilitator->update([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'primary_mobile' => $validated['primary_mobile'],
+                'whatsapp_number' => $validated['whatsapp_number'],
+            ]);
+
+            // Clear verification sessions
+            session()->forget([
+                'profile_update_primary_mobile_otp', 'profile_update_primary_mobile_number', 'profile_update_primary_mobile_expires_at', 'profile_update_primary_mobile_verified',
+                'profile_update_whatsapp_number_otp', 'profile_update_whatsapp_number_number', 'profile_update_whatsapp_number_expires_at', 'profile_update_whatsapp_number_verified'
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully!'
+            ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->validator->errors()->first()
-                ], 422);
-            }
-            throw $e;
+            return response()->json([
+                'success' => false,
+                'message' => $e->validator->errors()->first()
+            ], 422);
         } catch (\Exception $e) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'An error occurred while updating the profile.'
-                ], 500);
-            }
-            return redirect()->back()->with('error', 'An error occurred while updating the profile.');
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -1515,10 +1609,12 @@ class FacilitatorController extends Controller
         $user = Auth::user();
         $facilitator = $user->facilitator;
         
-        $assignedGnDivisions = \DB::table('facilitator_assignments')
+        $assignments = \DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
-            ->pluck('gn_division')
-            ->toArray();
+            ->get();
+
+        $assignedGnDivisions = $assignments->pluck('gn_division')->toArray();
+        $assignedDistricts = $assignments->pluck('district')->unique()->toArray();
 
         $perPage = $request->get('per_page', 12);
         $query = DB::table('orders')
@@ -1530,15 +1626,17 @@ class FacilitatorController extends Controller
             ->select(
                 'orders.*',
                 'buyers.name as buyer_name',
+                'buyers.district as buyer_district',
                 'u_b.profile_photo as buyer_photo',
                 'lead_farmers.name as lead_farmer_name',
                 'u_lf.profile_photo as lead_farmer_photo',
                 'lead_farmers.group_name as group_name'
             )
             ->whereIn('orders.order_status', ['paid', 'completed'])
-            ->where(function($q) use ($assignedGnDivisions) {
+            ->where(function($q) use ($assignedGnDivisions, $assignedDistricts) {
                 $q->whereIn('lead_farmers.grama_niladhari_division', $assignedGnDivisions)
-                  ->orWhereIn('farmers.grama_niladhari_division', $assignedGnDivisions);
+                  ->orWhereIn('farmers.grama_niladhari_division', $assignedGnDivisions)
+                  ->orWhereIn('buyers.district', $assignedDistricts);
             });
 
         if ($request->filled('start_date')) {
@@ -1554,6 +1652,7 @@ class FacilitatorController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('orders.order_number', 'ilike', "%{$search}%")
                   ->orWhere('buyers.name', 'ilike', "%{$search}%")
+                  ->orWhere('buyers.district', 'ilike', "%{$search}%")
                   ->orWhere('lead_farmers.group_name', 'ilike', "%{$search}%");
             });
         }

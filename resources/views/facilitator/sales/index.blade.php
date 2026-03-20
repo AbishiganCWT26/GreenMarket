@@ -165,7 +165,10 @@
 							<img src="{{ $sale->buyer_photo ? asset('uploads/profile_pictures/' . $sale->buyer_photo) : asset('assets/images/farmer.png') }}" 
 								 class="avatar-xs" 
 								 onerror="this.src='{{ asset('assets/images/farmer.png') }}'">
-							{{ $sale->buyer_name }}
+							<div class="person-info-column">
+								<span class="person-name">{{ $sale->buyer_name }}</span>
+								<span class="person-subtext">{{ $sale->buyer_district }}</span>
+							</div>
 						</div>
 					</div>
 
@@ -254,7 +257,10 @@
 								<img src="{{ $sale->buyer_photo ? asset('uploads/profile_pictures/' . $sale->buyer_photo) : asset('assets/images/farmer.png') }}" 
 									 class="person-avatar" 
 									 onerror="this.src='{{ asset('assets/images/farmer.png') }}'">
-								<span>{{ $sale->buyer_name }}</span>
+								<div class="person-details">
+									<span class="person-name">{{ $sale->buyer_name }}</span>
+									<span class="person-location">{{ $sale->buyer_district }}</span>
+								</div>
 							</div>
 						</td>
 						<td class="group-cell">
@@ -458,6 +464,7 @@ async function showSaleDetails(id) {
 										<div class="user-block-name">${buyer ? buyer.name : 'N/A'}</div>
 										<div class="user-block-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2"/></svg> ${buyer ? buyer.primary_mobile : 'N/A'}</div>
 										<div class="user-block-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${buyer ? buyer.residential_address : 'N/A'}</div>
+										<div class="user-block-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M3 7h18M3 14h18M12 21V7"/></svg> District: ${buyer ? buyer.district : 'N/A'}</div>
 									</div>
 								</div>
 							</div>
