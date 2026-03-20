@@ -41,10 +41,15 @@
         document.addEventListener("DOMContentLoaded", function () {
             Swal.fire({
                 title: 'Confirm Logout',
-                text: 'Are you sure you want to end your session?',
-                imageUrl: '{{ asset("assets/images/logout btn.png") }}',
-                imageWidth: 80,
-                imageHeight: 80,
+                html: `
+                    <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                        <img src="https://cdn-icons-gif.flaticon.com/7740/7740910.gif" 
+                             onerror="this.onerror=null; this.src='{{ asset('assets/images/logout btn.png') }}';" 
+                             alt="Logout Icon" 
+                             style="width: 80px; height: 80px;">
+                    </div>
+                    <p style="font-size: 1.1rem; color: #374151; margin: 0;">Are you sure you want to end your session?</p>
+                `,
                 showCancelButton: true,
                 confirmButtonText: 'Yes, Logout',
                 cancelButtonText: 'Cancel',
