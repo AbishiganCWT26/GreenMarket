@@ -26,6 +26,10 @@ class LeadFarmer extends Model
         'group_number',
         'preferred_payment',
         'payment_details',
+        'account_number',
+        'account_holder_name',
+        'bank_name',
+        'bank_branch',
     ];
 
     protected $casts = [

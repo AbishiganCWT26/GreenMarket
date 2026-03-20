@@ -14,6 +14,7 @@ class Buyer extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'nic_no',
         'primary_mobile',
         'whatsapp_number',
         'residential_address',

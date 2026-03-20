@@ -563,7 +563,7 @@ class LeadFarmerController extends Controller
                 'used' => false
             ]);
 
-            $message = "Your GreenMarket OTP for updating product details is: $otp. This code is valid for 10 minutes. Please do not share this with anyone.";
+            $message = "Your GreenMarket OTP for updating product details is: $otp. \nThis code is valid for 10 minutes. \nIf Lead Farmer requests OTP, share only the OTP code.\nPlease do not share this with anyone.";
             
             $smsSent = $this->sendSMS($farmerMobile, $message);
 
@@ -1488,7 +1488,7 @@ class LeadFarmerController extends Controller
             ]);
 
             $mobileNumber = $farmer->primary_mobile;
-            $message = "Your GreenMarket OTP for updating your Mobile Number/Payment Info is: $otp. This code is valid for 10 minutes. Please do not share this with anyone.";
+            $message = "Your GreenMarket OTP for updating your Mobile Number/Payment Info is: $otp. \nThis code is valid for 10 minutes. \nIf Lead Farmer requests OTP, share only the OTP code.\nPlease do not share this with anyone.";
             
             $this->sendSMS($mobileNumber, $message);
 

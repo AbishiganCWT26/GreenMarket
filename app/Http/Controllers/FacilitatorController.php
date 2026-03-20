@@ -870,69 +870,11 @@ class FacilitatorController extends Controller
     public function userProfile($id)
     {
         try {
-            $user = User::with(['farmer', 'leadFarmer', 'buyer', 'facilitator'])->findOrFail($id);
-
-            $profileData = [
-                'id' => $user->id,
-                'username' => $user->username,
-                'email' => $user->email ?? 'No email',
-                'profile_photo' => asset('uploads/profile_pictures/' . ($user->profile_photo ?? 'default-avatar.png')),
-                'role' => $user->role,
-                'role_display' => ucwords(str_replace('_', ' ', $user->role)),
-                'is_active' => $user->is_active,
-                'status' => $user->is_active ? 'Active' : 'Inactive',
-                'joined_date' => \Carbon\Carbon::parse($user->created_at)->format('d M Y'),
-                'joined_relative' => \Carbon\Carbon::parse($user->created_at)->diffForHumans(),
-                'last_login' => $user->last_login ? \Carbon\Carbon::parse($user->last_login)->format('d M Y H:i') : 'Never'
-            ];
-
-            $contact = '';
-            $location = '';
-            $additional_info = [];
-
-            if ($user->farmer) {
-                $contact = $user->farmer->primary_mobile ?? '';
-                $location = $user->farmer->district ?? '';
-                $additional_info = [
-                    'NIC' => $user->farmer->nic_no ?? 'N/A',
-                    'Address' => $user->farmer->residential_address ?? 'N/A',
-                    'Grama Niladhari Division' => $user->farmer->grama_niladhari_division ?? 'N/A',
-                    'WhatsApp' => $user->farmer->whatsapp_number ?? 'N/A'
-                ];
-            } elseif ($user->leadFarmer) {
-                $contact = $user->leadFarmer->primary_mobile ?? '';
-                $location = $user->leadFarmer->grama_niladhari_division ?? '';
-                $additional_info = [
-                    'NIC' => $user->leadFarmer->nic_no ?? 'N/A',
-                    'Group Name' => $user->leadFarmer->group_name ?? 'N/A',
-                    'Group Number' => $user->leadFarmer->group_number ?? 'N/A',
-                    'Address' => $user->leadFarmer->residential_address ?? 'N/A'
-                ];
-            } elseif ($user->buyer) {
-                $contact = $user->buyer->primary_mobile ?? '';
-                $additional_info = [
-                    'NIC' => $user->buyer->nic_no ?? 'N/A',
-                    'Business Name' => $user->buyer->business_name ?? 'N/A',
-                    'Business Type' => $user->buyer->business_type ?? 'N/A',
-                    'Address' => $user->buyer->residential_address ?? 'N/A'
-                ];
-            } elseif ($user->facilitator) {
-                $contact = $user->facilitator->primary_mobile ?? '';
-                $location = $user->facilitator->assigned_division ?? '';
-                $additional_info = [
-                    'NIC' => $user->facilitator->nic_no ?? 'N/A',
-                    'Email' => $user->facilitator->email ?? 'N/A',
-                    'Assigned Division' => $user->facilitator->assigned_division ?? 'N/A'
-                ];
-            }
-
-            $profileData['contact'] = $contact;
-            $profileData['location'] = $location;
-            $profileData['additional_info'] = json_encode($additional_info, JSON_PRETTY_PRINT);
+            $user = User::with(['farmer.leadFarmer', 'farmer', 'leadFarmer', 'buyer', 'facilitator'])->findOrFail($id);
 
             return response()->json([
                 'success' => true,
-                'user' => $profileData
+                'user' => $user
             ]);
 
         } catch (\Exception $e) {
@@ -974,11 +916,28 @@ class FacilitatorController extends Controller
                 $contact = $user->facilitator->primary_mobile;
             }
 
+            if (empty($contact)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No mobile number found for this user.'
+                ]);
+            }
+
+            $message = "Your GreenMarket OTP for your profile edit action is: $otp. \nIf facilitator requests OTP, share only the OTP code.\nDo not share with others.";
+            $smsSent = $this->sendSMS($contact, $message);
+
+            if (!$smsSent) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send OTP via SMS. Please try again later.'
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'OTP sent successfully',
                 'otp' => $otp,
-                'contact' => $contact ? substr($contact, -4) : null
+                'contact' => substr($contact, -4)
             ]);
 
         } catch (\Exception $e) {
@@ -1041,7 +1000,9 @@ class FacilitatorController extends Controller
                 'email' => $user->email,
                 'role' => $user->role,
                 'is_active' => $user->is_active,
-                'profile_photo' => $user->profile_photo
+                'profile_photo' => $user->profile_photo,
+                'created_at' => $user->created_at,
+                'last_login' => $user->last_login
             ];
 
             if ($user->farmer) {
@@ -1096,7 +1057,10 @@ class FacilitatorController extends Controller
                     if ($user->farmer) {
                         $roleData = $request->only([
                             'name', 'nic_no', 'primary_mobile', 'whatsapp_number',
-                            'residential_address', 'district', 'grama_niladhari_division'
+                            'residential_address', 'district', 'divisional_secretariat',
+                            'grama_niladhari_division', 'gn_division_code', 'address_map_link',
+                            'preferred_payment', 'bank_name', 'bank_branch', 'account_number',
+                            'account_holder_name', 'ezcash_mobile', 'mcash_mobile'
                         ]);
                         $user->farmer->update($roleData);
                     }
@@ -1105,8 +1069,10 @@ class FacilitatorController extends Controller
                     if ($user->leadFarmer) {
                         $roleData = $request->only([
                             'name', 'nic_no', 'primary_mobile', 'whatsapp_number',
-                            'residential_address', 'grama_niladhari_division',
-                            'group_name', 'group_number'
+                            'residential_address', 'district', 'divisional_secretariat',
+                            'grama_niladhari_division', 'gn_division_code',
+                            'group_name', 'group_number', 'preferred_payment',
+                            'bank_name', 'bank_branch', 'account_number', 'account_holder_name'
                         ]);
                         $user->leadFarmer->update($roleData);
                     }
@@ -1115,7 +1081,7 @@ class FacilitatorController extends Controller
                     if ($user->buyer) {
                         $roleData = $request->only([
                             'name', 'nic_no', 'primary_mobile', 'whatsapp_number',
-                            'residential_address', 'business_name', 'business_type'
+                            'residential_address', 'district', 'business_name', 'business_type'
                         ]);
                         $user->buyer->update($roleData);
                     }
@@ -1134,6 +1100,13 @@ class FacilitatorController extends Controller
             session()->forget(['otp_verified_for_edit', 'otp_verified_user_id', 'edit_otp', 'edit_user_id', 'otp_expires_at']);
 
             DB::commit();
+
+            // Send SMS notification
+            if ($request->primary_mobile) {
+                $facilitatorName = Auth::user()->facilitator ? Auth::user()->facilitator->name : Auth::user()->username;
+                $smsMessage = "Your profile details is changed by Facilitator " . $facilitatorName . ".";
+                $this->sendSMS($request->primary_mobile, $smsMessage);
+            }
 
             return response()->json([
                 'success' => true,
@@ -1206,7 +1179,17 @@ class FacilitatorController extends Controller
 
     public function complaints()
     {
-        $complaints = Complaint::with(['complainant', 'againstUser', 'resolvedBy'])
+        $complaints = Complaint::with([
+            'complainant.farmer',
+            'complainant.buyer',
+            'complainant.leadFarmer',
+            'complainant.facilitator',
+            'againstUser.farmer',
+            'againstUser.buyer',
+            'againstUser.leadFarmer',
+            'againstUser.facilitator',
+            'resolvedBy'
+        ])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -1714,5 +1697,52 @@ class FacilitatorController extends Controller
         $buyerRequests = $query->paginate($perPage)->appends($request->query());
 
         return view('facilitator.buyer-requests.index', compact('buyerRequests'));
+    }
+
+    private function sendSMS($to, $message)
+    {
+        try {
+            $user = env('SMS_USER');
+            $password = env('SMS_PASSWORD');
+            $baseurl = env('SMS_API_URL', 'https://textit.biz/sendmsg');
+
+            $to = preg_replace('/[^0-9]/', '', $to);
+            $text = urlencode($message);
+            
+            $baseurl = rtrim($baseurl, '/') . '/';
+            $url = $baseurl . "?id=" . $user . "&pw=" . $password . "&to=" . $to . "&text=" . $text;
+            
+            $ret = $this->get_web_page($url);
+            $res = explode(":", $ret);
+            
+            if (trim($res[0]) == "OK") {
+                \Log::info("SMS Sent successfully to $to. Response: $ret");
+                return true;
+            } else {
+                \Log::error("SMS Sending Failed to $to. Response: $ret");
+                return false;
+            }
+        } catch (\Exception $e) {
+            \Log::error('SMS Error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function get_web_page($url)
+    {
+        $options = array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => 30,
+        );
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, $options);
+        $content = curl_exec($ch);
+        curl_close($ch);
+
+        return $content;
     }
 }

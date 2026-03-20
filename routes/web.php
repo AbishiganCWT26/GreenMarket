@@ -354,6 +354,14 @@ Route::prefix('facilitator')
 
     // User Management
     Route::get('/users', [FacilitatorController::class, 'userManagement'])->name('facilitator.users');
+
+    Route::get('/users/{id}/profile', [FacilitatorController::class, 'userProfile'])->name('facilitator.users.profile');
+    Route::post('/users/{id}/send-otp', [FacilitatorController::class, 'sendEditOTP'])->name('facilitator.users.send-otp');
+    Route::post('/users/verify-otp', [FacilitatorController::class, 'verifyEditOTP'])->name('facilitator.users.verify-otp');
+    Route::get('/users/{id}/edit-data', [FacilitatorController::class, 'getUserForEdit'])->name('facilitator.users.edit-data');
+    Route::post('/users/{id}/update', [FacilitatorController::class, 'updateUser'])->name('facilitator.users.update');
+    Route::post('/users/export', [FacilitatorController::class, 'exportUsers'])->name('facilitator.users.export');
+
     Route::post('/users/{user}/{action}', function ($userId, $action) {
         $validActions = ['deactivate', 'activate'];
 
@@ -389,13 +397,6 @@ Route::prefix('facilitator')
             ], 500);
         }
     })->name('facilitator.users.status');
-
-    Route::get('/users/{id}/profile', [FacilitatorController::class, 'userProfile'])->name('facilitator.users.profile');
-    Route::post('/users/{id}/send-otp', [FacilitatorController::class, 'sendEditOTP'])->name('facilitator.users.send-otp');
-    Route::post('/users/verify-otp', [FacilitatorController::class, 'verifyEditOTP'])->name('facilitator.users.verify-otp');
-    Route::get('/users/{id}/edit-data', [FacilitatorController::class, 'getUserForEdit'])->name('facilitator.users.edit-data');
-    Route::post('/users/{id}/update', [FacilitatorController::class, 'updateUser'])->name('facilitator.users.update');
-    Route::post('/users/export', [FacilitatorController::class, 'exportUsers'])->name('facilitator.users.export');
 
 
     // Complaints
