@@ -906,7 +906,6 @@ class LeadFarmerController extends Controller
     public function updatePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'current_password' => 'required',
             'new_password' => [
                 'required',
                 'string',
@@ -935,16 +934,25 @@ class LeadFarmerController extends Controller
 
         $user = Auth::user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Current password is incorrect'
-            ], 422);
-        }
-
         try {
-            $user->password = Hash::make($request->new_password);
+            $plainPassword = $request->new_password;
+            $user->password = Hash::make($plainPassword);
             $user->save();
+
+            // Send SMS notification with updated login credentials
+            try {
+                $leadFarmer = $user->leadFarmer;
+                $mobile = $leadFarmer->primary_mobile ?? null;
+                if ($mobile) {
+                    $message = "You update you password.\n"
+                             . "Your login details are:\n"
+                             . "username :- " . $user->username . "\n"
+                             . "Password :- " . $plainPassword;
+                    $this->sendSMS($mobile, $message);
+                }
+            } catch (\Exception $smsEx) {
+                \Log::warning('SMS failed after LF password update: ' . $smsEx->getMessage());
+            }
 
             return response()->json([
                 'success' => true,

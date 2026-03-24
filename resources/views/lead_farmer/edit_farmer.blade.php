@@ -6,6 +6,33 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/lead_farmer/farmer_registation.css') }}">
+<style>
+    .nic-status {
+        margin-top: 5px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: block;
+    }
+    .nic-status.valid {
+        color: #10B981 !important;
+    }
+    .nic-status.invalid {
+        color: #ef4444 !important;
+    }
+    .error-text {
+        color: #ef4444 !important;
+        font-size: 0.85rem !important;
+        margin-top: 5px !important;
+        font-weight: 500 !important;
+        display: block !important;
+    }
+    .text-success {
+        color: #10B981 !important;
+    }
+    .text-danger {
+        color: #ef4444 !important;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -160,7 +187,7 @@
                     <div class="profile-preview-container">
                         <div class="profile-preview" id="profilePreview">
                             @php
-                                $profileUrl = asset('assets/images/default-avatar.png');
+                                $profileUrl = asset('assets/images/farmer.png');
                                 if ($farmer->user && $farmer->user->profile_photo) {
                                     $photoPath = 'uploads/profile_pictures/' . $farmer->user->profile_photo;
                                     if (file_exists(public_path($photoPath))) {
@@ -202,9 +229,7 @@
                         <select class="form-select @error('district') is-invalid @enderror" 
                                 id="district" name="district" required>
                             <option value="">Select District</option>
-                            @foreach($districts as $district)
-                                <option value="{{ $district }}" {{ old('district', $farmer->district) == $district ? 'selected' : '' }}>{{ $district }}</option>
-                            @endforeach
+                            <!-- Options will be populated by JS -->
                         </select>
                         @error('district')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -240,15 +265,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="gn_division_code" class="form-label">
+                        <label for="gn_division_code" class="form-label required-field">
                             <i class="fas fa-barcode"></i> GN Division Code
                         </label>
-                        <div class="input-with-icon">
-                            <input type="text" class="form-control @error('gn_division_code') is-invalid @enderror" 
-                                   id="gn_division_code" name="gn_division_code" 
-                                   value="{{ old('gn_division_code', $farmer->gn_division_code) }}" 
-                                   placeholder="GN Division Code" readonly>
-                        </div>
+                        <select class="form-select @error('gn_division_code') is-invalid @enderror" 
+                                id="gn_division_code" name="gn_division_code" required disabled>
+                            <option value="">Select DS First</option>
+                        </select>
                         @error('gn_division_code')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -361,9 +384,10 @@
                                 <input type="tel" class="form-control @error('ezcash_mobile') is-invalid @enderror" 
                                        id="ezcash_mobile" name="ezcash_mobile" 
                                        value="{{ old('ezcash_mobile', $farmer->ezcash_mobile) }}" 
-                                       placeholder="e.g., 0771234567" pattern="[0-9]{10}">
+                                       placeholder="e.g., 0771234567" pattern="[0-9]{10}"
+                                       maxlength="10" minlength="10" inputmode="numeric">
                             </div>
-                            <div id="ezcash_error" class="error-text" style="display: none;">EzCash number must start with 074, 076 or 077</div>
+                            <div id="ezcash_error" class="error-text" style="display: none;">EzCash number must be exactly 10 digits and start with 074, 076 or 077</div>
                             @error('ezcash_mobile')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -381,9 +405,10 @@
                                 <input type="tel" class="form-control @error('mcash_mobile') is-invalid @enderror" 
                                        id="mcash_mobile" name="mcash_mobile" 
                                        value="{{ old('mcash_mobile', $farmer->mcash_mobile) }}" 
-                                       placeholder="e.g., 0771234567" pattern="[0-9]{10}">
+                                       placeholder="e.g., 0771234567" pattern="[0-9]{10}"
+                                       maxlength="10" minlength="10" inputmode="numeric">
                             </div>
-                            <div id="mcash_error" class="error-text" style="display: none;">mCash number must start with 070 or 071</div>
+                            <div id="mcash_error" class="error-text" style="display: none;">mCash number must be exactly 10 digits and start with 070 or 071</div>
                             @error('mcash_mobile')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -423,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function populateDistricts() {
         if (typeof gnData !== 'undefined') {
             districtSelect.empty().append('<option value="">Select District</option>');
-            Object.keys(gnData).forEach(dist => {
+            Object.keys(gnData).sort().forEach(dist => {
                 const selected = dist === savedDistrict ? 'selected' : '';
                 districtSelect.append(`<option value="${dist}" ${selected}>${dist}</option>`);
             });
@@ -437,9 +462,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function populateDS(dist, selectedDS = '') {
         dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', false);
         gndSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
+        codeInput.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
         
         if (gnData[dist]) {
-            Object.keys(gnData[dist]).forEach(ds => {
+            Object.keys(gnData[dist]).sort().forEach(ds => {
                 const selected = ds === selectedDS ? 'selected' : '';
                 dsSelect.append(`<option value="${ds}" ${selected}>${ds}</option>`);
             });
@@ -452,18 +478,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function populateGND(dist, ds, selectedGND = '') {
         gndSelect.empty().append('<option value="" disabled selected>Select GN Division</option>').prop('disabled', false);
+        codeInput.empty().append('<option value="" disabled selected>Select GN Code</option>').prop('disabled', false);
         
         if (gnData[dist] && gnData[dist][ds]) {
-            gnData[dist][ds].forEach(gn => {
+            const sortedGN = gnData[dist][ds].sort((a,b) => a.name.localeCompare(b.name));
+            sortedGN.forEach(gn => {
                 const selected = gn.name === selectedGND ? 'selected' : '';
                 gndSelect.append(`<option value="${gn.name}" data-code="${gn.code}" ${selected}>${gn.name}</option>`);
+                
+                const codeSelected = gn.name === selectedGND ? 'selected' : '';
+                codeInput.append(`<option value="${gn.code}" data-name="${gn.name}" ${codeSelected}>${gn.code}</option>`);
             });
-            
-            // Set GN Code for initial value
-            const initialGN = gnData[dist][ds].find(gn => gn.name === selectedGND);
-            if (initialGN) {
-                codeInput.val(initialGN.code);
-            }
         }
     }
 
@@ -471,18 +496,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     districtSelect.on('change', function() {
         populateDS($(this).val());
-        codeInput.val('');
     });
 
     dsSelect.on('change', function() {
         populateGND(districtSelect.val(), $(this).val());
-        codeInput.val('');
     });
 
     gndSelect.on('change', function() {
-        const selectedOption = $(this).find('option:selected');
-        const code = selectedOption.data('code');
-        codeInput.val(code || '');
+        const code = $(this).find('option:selected').data('code');
+        codeInput.val(code);
+    });
+
+    codeInput.on('change', function() {
+        const name = $(this).find('option:selected').data('name');
+        gndSelect.val(name);
     });
 
     const nicInput = document.getElementById('nic_no');
@@ -542,6 +569,8 @@ document.addEventListener('DOMContentLoaded', function() {
             nicStatus.className = 'nic-status invalid';
         }
     }
+
+    nicInput.addEventListener('input', updateNICStatus);
 
     function togglePaymentDetails() {
         const value = preferredPayment.value;
@@ -630,14 +659,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const paymentMethod = preferredPayment.value;
 
         if (paymentMethod === 'ezcash' || paymentMethod === 'all') {
-            if (ezcash && !/^(074|076|077)/.test(ezcash)) {
-                Swal.fire({ icon: 'error', title: 'Invalid EzCash', text: 'EzCash number must start with 074, 076, or 077' });
+            if (!ezcash) {
+                Swal.fire({ icon: 'error', title: 'Missing EzCash', text: 'Please enter EzCash mobile number' });
+                return false;
+            }
+            if (!/^(074|076|077)[0-9]{7}$/.test(ezcash)) {
+                Swal.fire({ icon: 'error', title: 'Invalid EzCash', text: 'EzCash number must be exactly 10 digits and start with 074, 076, or 077' });
                 return false;
             }
         }
         if (paymentMethod === 'mcash' || paymentMethod === 'all') {
-            if (mcash && !/^(070|071)/.test(mcash)) {
-                Swal.fire({ icon: 'error', title: 'Invalid mCash', text: 'mCash number must start with 070 or 071' });
+            if (!mcash) {
+                Swal.fire({ icon: 'error', title: 'Missing mCash', text: 'Please enter mCash mobile number' });
+                return false;
+            }
+            if (!/^(070|071)[0-9]{7}$/.test(mcash)) {
+                Swal.fire({ icon: 'error', title: 'Invalid mCash', text: 'mCash number must be exactly 10 digits and start with 070 or 071' });
                 return false;
             }
         }
@@ -694,8 +731,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('ezcash_mobile').addEventListener('input', function() {
-        const val = this.value.trim();
-        if (val && !/^(074|076|077)/.test(val)) {
+        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10); // Remove non-digits and limit to 10
+        const val = this.value;
+        if (val && (val.length !== 10 || !/^(074|076|077)/.test(val))) {
             document.getElementById('ezcash_error').style.display = 'block';
         } else {
             document.getElementById('ezcash_error').style.display = 'none';
@@ -703,15 +741,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('mcash_mobile').addEventListener('input', function() {
-        const val = this.value.trim();
-        if (val && !/^(070|071)/.test(val)) {
+        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10); // Remove non-digits and limit to 10
+        const val = this.value;
+        if (val && (val.length !== 10 || !/^(070|071)/.test(val))) {
             document.getElementById('mcash_error').style.display = 'block';
         } else {
             document.getElementById('mcash_error').style.display = 'none';
         }
     });
 
-    nicInput.addEventListener('input', updateNICStatus);
     preferredPayment.addEventListener('change', togglePaymentDetails);
     
     async function submitForm(otp = null) {

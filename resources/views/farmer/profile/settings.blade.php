@@ -37,21 +37,7 @@
                 <form action="{{ route('farmer.profile.settings.update-password') }}" method="POST" id="securityForm" class="security-form">
                     @csrf
 
-                    <div class="form-section">
-                        <div class="input-group">
-                            <label for="current_password">
-                                <i class="fas fa-unlock-alt"></i> Current Password
-                            </label>
-                            <div class="field-wrapper">
-                                <input type="password" id="current_password" name="current_password" class="form-input" placeholder="Enter current password" required>
-                                <button type="button" class="eye-toggle" onclick="toggleView('current_password', 'icon1')">
-                                    <i class="far fa-eye" id="icon1"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
 
-                    <hr class="form-divider">
 
                     <div class="input-grid">
                         <div class="input-group">
@@ -77,19 +63,24 @@
                             <div class="password-requirements-grid mt-3">
                                 <style>
                                     .password-requirements-grid {
-                                        display: grid;
-                                        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-                                        gap: 10px;
                                         background: #f8fafc;
                                         padding: 15px;
                                         border-radius: 8px;
                                         border: 1px solid #e2e8f0;
                                     }
+                                    .requirements-list {
+                                        display: grid;
+                                        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                                        gap: 8px;
+                                        margin: 0;
+                                        padding: 0;
+                                        list-style: none;
+                                    }
                                     .rule-item {
                                         font-size: 0.75rem;
                                         display: flex;
                                         align-items: center;
-                                        gap: 8px;
+                                        gap: 6px;
                                         color: #64748b;
                                         transition: all 0.3s ease;
                                     }
@@ -97,17 +88,19 @@
                                     .rule-item.invalid { color: #ef4444; }
                                     .rule-item i { font-size: 0.8rem; width: 12px; }
                                 </style>
-                                <div class="rule-item" id="rule-length"><i class="fas fa-circle"></i> 8+ Characters</div>
-                                <div class="rule-item" id="rule-number"><i class="fas fa-circle"></i> 1+ Number</div>
-                                <div class="rule-item" id="rule-capital"><i class="fas fa-circle"></i> 1+ Capital</div>
-                                <div class="rule-item" id="rule-lowercase"><i class="fas fa-circle"></i> 1+ Lowercase</div>
-                                <div class="rule-item" id="rule-special"><i class="fas fa-circle"></i> 1+ Special</div>
-                                <div class="rule-item" id="rule-no-space"><i class="fas fa-circle"></i> No Spaces</div>
-                                <div class="rule-item" id="rule-no-repeat"><i class="fas fa-circle"></i> No 3x Repeat</div>
-                                <div class="rule-item" id="rule-no-sequence"><i class="fas fa-circle"></i> No Sequence</div>
-                                <div class="rule-item" id="rule-not-common"><i class="fas fa-circle"></i> Not Common</div>
-                                <div class="rule-item" id="rule-no-links"><i class="fas fa-circle"></i> No Links</div>
-                                <div class="rule-item" id="rule-no-personal"><i class="fas fa-circle"></i> No Personal Info</div>
+                                <ul class="requirements-list">
+                                    <li class="rule-item invalid" id="rule-length"><i class="fas fa-times-circle"></i> 8+ Characters</li>
+                                    <li class="rule-item invalid" id="rule-number"><i class="fas fa-times-circle"></i> 1+ Number</li>
+                                    <li class="rule-item invalid" id="rule-capital"><i class="fas fa-times-circle"></i> 1+ Capital</li>
+                                    <li class="rule-item invalid" id="rule-lowercase"><i class="fas fa-times-circle"></i> 1+ Lowercase</li>
+                                    <li class="rule-item invalid" id="rule-special"><i class="fas fa-times-circle"></i> 1+ Special</li>
+                                    <li class="rule-item invalid" id="rule-no-space"><i class="fas fa-times-circle"></i> No Spaces</li>
+                                    <li class="rule-item invalid" id="rule-no-repeat"><i class="fas fa-times-circle"></i> No 3x Repeat</li>
+                                    <li class="rule-item invalid" id="rule-no-sequence"><i class="fas fa-times-circle"></i> No Sequence</li>
+                                    <li class="rule-item invalid" id="rule-not-common"><i class="fas fa-times-circle"></i> Not Common</li>
+                                    <li class="rule-item invalid" id="rule-no-links"><i class="fas fa-times-circle"></i> No Links</li>
+                                    <li class="rule-item invalid" id="rule-no-personal"><i class="fas fa-times-circle"></i> No Personal Info</li>
+                                </ul>
                             </div>
                         </div>
 
@@ -116,10 +109,18 @@
                                 <i class="fas fa-check-double"></i> Confirm New Password
                             </label>
                             <div class="field-wrapper">
-                                <input type="password" id="new_password_confirmation" name="new_password_confirmation" class="form-input" placeholder="••••••••" required>
+                                <input type="password" id="new_password_confirmation" name="new_password_confirmation" class="form-input" placeholder="••••••••" oninput="validatePasswordMatch()" required>
                                 <button type="button" class="eye-toggle" onclick="toggleView('new_password_confirmation', 'icon3')">
                                     <i class="far fa-eye" id="icon3"></i>
                                 </button>
+                            </div>
+                            <div id="passwordMatch" class="mt-2" style="display: none; font-size: 0.8rem;">
+                                <div class="match-success" style="color: #10B981; display: none;">
+                                    <i class="fas fa-check-circle"></i> Passwords match
+                                </div>
+                                <div class="match-error" style="color: #ef4444; display: none;">
+                                    <i class="fas fa-times-circle"></i> Passwords don't match
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -174,7 +175,39 @@
         updatePasswordRuleFeedback(result);
 
         currentStrength = result.isValid ? 5 : 0; // Maintain internal logic for submit check
-        btn.disabled = !result.isValid;
+        validatePasswordMatch();
+    }
+    
+    function validatePasswordMatch() {
+        const password = document.getElementById('new_password').value;
+        const confirmPassword = document.getElementById('new_password_confirmation').value;
+        const matchIndicator = document.getElementById('passwordMatch');
+        const success = matchIndicator.querySelector('.match-success');
+        const error = matchIndicator.querySelector('.match-error');
+        
+        if (password && confirmPassword) {
+            matchIndicator.style.display = 'block';
+            if (password === confirmPassword) {
+                success.style.display = 'block';
+                error.style.display = 'none';
+            } else {
+                success.style.display = 'none';
+                error.style.display = 'block';
+            }
+        } else {
+            matchIndicator.style.display = 'none';
+            success.style.display = 'none';
+            error.style.display = 'none';
+        }
+        
+        checkSubmitButton();
+    }
+    
+    function checkSubmitButton() {
+        const password = document.getElementById('new_password').value;
+        const confirmPassword = document.getElementById('new_password_confirmation').value;
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = !(currentStrength === 5 && password === confirmPassword && password.length > 0);
     }
 
     document.getElementById('securityForm').addEventListener('submit', async function(e)

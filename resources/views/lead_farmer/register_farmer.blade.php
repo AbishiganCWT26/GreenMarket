@@ -7,6 +7,43 @@
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/lead_farmer/farmer_registation.css') }}">
 <script src="{{ asset('js/form-validation.js') }}"></script>
+<style>
+    .nic-status {
+        margin-top: 5px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: block;
+    }
+    .nic-status.valid {
+        color: #10B981 !important;
+    }
+    .nic-status.invalid {
+        color: #ef4444 !important;
+    }
+    .error-text {
+        color: #ef4444 !important;
+        font-size: 0.85rem !important;
+        margin-top: 5px !important;
+        font-weight: 500 !important;
+        display: block !important;
+    }
+    .text-success {
+        color: #10B981 !important;
+    }
+    .text-danger {
+        color: #ef4444 !important;
+    }
+    #passwordMatch {
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    .rule-item.valid {
+        color: #10B981 !important;
+    }
+    .rule-item.invalid {
+        color: #ef4444 !important;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -142,6 +179,7 @@
                             </div>
                             <i class="fa-regular fa-eye password-toggle" id="confirm-password-toggle-icon" onclick="toggleConfirmPasswordVisibility()"></i>
                         </div>
+                        <div id="passwordMatch" class="mt-3"></div>
                     </div>
                 </div>
 
@@ -397,7 +435,8 @@
                                 <input type="tel" class="form-control @error('ezcash_mobile') is-invalid @enderror" 
                                        id="ezcash_mobile" name="ezcash_mobile" 
                                        value="{{ old('ezcash_mobile') }}" 
-                                       placeholder="e.g., 0771234567" pattern="[0-9]{10}">
+                                       placeholder="e.g., 0771234567" pattern="[0-9]{10}"
+                                       maxlength="10" minlength="10" inputmode="numeric">
                             </div>
                             <div id="ezcash_error" class="error-text" style="display: none;">EzCash number must start with 074, 076 or 077</div>
                             @error('ezcash_mobile')
@@ -417,7 +456,8 @@
                                 <input type="tel" class="form-control @error('mcash_mobile') is-invalid @enderror" 
                                        id="mcash_mobile" name="mcash_mobile" 
                                        value="{{ old('mcash_mobile') }}" 
-                                       placeholder="e.g., 0771234567" pattern="[0-9]{10}">
+                                       placeholder="e.g., 0771234567" pattern="[0-9]{10}"
+                                       maxlength="10" minlength="10" inputmode="numeric">
                             </div>
                             <div id="mcash_error" class="error-text" style="display: none;">mCash number must start with 070 or 071</div>
                             @error('mcash_mobile')
@@ -705,14 +745,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const paymentMethod = preferredPayment.value;
 
         if (paymentMethod === 'ezcash' || paymentMethod === 'all') {
-            if (ezcash && !/^(074|076|077)/.test(ezcash)) {
-                Swal.fire({ icon: 'error', title: 'Invalid EzCash', text: 'EzCash number must start with 074, 076, or 077' });
+            if (!ezcash) {
+                Swal.fire({ icon: 'error', title: 'Missing EzCash', text: 'Please enter EzCash mobile number' });
+                return false;
+            }
+            if (!/^(074|076|077)[0-9]{7}$/.test(ezcash)) {
+                Swal.fire({ icon: 'error', title: 'Invalid EzCash', text: 'EzCash number must be exactly 10 digits and start with 074, 076, or 077' });
                 return false;
             }
         }
         if (paymentMethod === 'mcash' || paymentMethod === 'all') {
-            if (mcash && !/^(070|071)/.test(mcash)) {
-                Swal.fire({ icon: 'error', title: 'Invalid mCash', text: 'mCash number must start with 070 or 071' });
+            if (!mcash) {
+                Swal.fire({ icon: 'error', title: 'Missing mCash', text: 'Please enter mCash mobile number' });
+                return false;
+            }
+            if (!/^(070|071)[0-9]{7}$/.test(mcash)) {
+                Swal.fire({ icon: 'error', title: 'Invalid mCash', text: 'mCash number must be exactly 10 digits and start with 070 or 071' });
                 return false;
             }
         }
@@ -720,8 +768,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!validatePasswordStrength()) {
             Swal.fire({
                 icon: 'error',
-                title: 'Weak Password',
-                text: 'Password must be at least 8 characters with letters and numbers.',
+                title: 'Password Does Not Meet Requirements',
+                html: 'Your password must satisfy all 11 security rules:<br><ul style="text-align:left;margin-top:8px;"><li>At least 8 characters</li><li>One number, one capital, one lowercase, one special character</li><li>No spaces, no 3× repeated chars, no sequences</li><li>Not a common password, no URLs, no personal info</li></ul>',
                 confirmButtonColor: '#10B981'
             });
             return false;
@@ -789,8 +837,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('ezcash_mobile').addEventListener('input', function() {
-        const val = this.value.trim();
-        if (val && !/^(074|076|077)/.test(val)) {
+        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10); // Remove non-digits and limit to 10
+        const val = this.value;
+        if (val && (val.length !== 10 || !/^(074|076|077)/.test(val))) {
             document.getElementById('ezcash_error').style.display = 'block';
         } else {
             document.getElementById('ezcash_error').style.display = 'none';
@@ -798,8 +847,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('mcash_mobile').addEventListener('input', function() {
-        const val = this.value.trim();
-        if (val && !/^(070|071)/.test(val)) {
+        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10); // Remove non-digits and limit to 10
+        const val = this.value;
+        if (val && (val.length !== 10 || !/^(070|071)/.test(val))) {
             document.getElementById('mcash_error').style.display = 'block';
         } else {
             document.getElementById('mcash_error').style.display = 'none';
@@ -809,6 +859,26 @@ document.addEventListener('DOMContentLoaded', function() {
     nicInput.addEventListener('input', updateNICStatus);
     password.addEventListener('input', validatePasswordStrength);
     preferredPayment.addEventListener('change', togglePaymentDetails);
+
+    confirmPassword.addEventListener('input', function() {
+        const matchDiv = document.getElementById('passwordMatch');
+        if (!matchDiv) return;
+        if (!confirmPassword.value) {
+            matchDiv.innerHTML = '';
+            return;
+        }
+        if (password.value === confirmPassword.value) {
+            matchDiv.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Passwords match</span>';
+        } else {
+            matchDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> Passwords do not match</span>';
+        }
+    });
+
+    password.addEventListener('input', function() {
+        if (confirmPassword.value) {
+            confirmPassword.dispatchEvent(new Event('input'));
+        }
+    });
     
     form.addEventListener('submit', function(e) {
         e.preventDefault();

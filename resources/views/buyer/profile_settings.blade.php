@@ -65,7 +65,7 @@
                 <input type="password" name="new_password_confirmation" id="new_password_confirmation" class="form-control" required>
                 <i class="fa-regular fa-eye password-toggle" id="confirm-password-toggle-icon" onclick="togglePasswordVisibility('new_password_confirmation', 'confirm-password-toggle-icon')"></i>
             </div>
-            <div id="passwordMatch" class="mt-2">
+            <div id="passwordMatch" class="mt-3">
                 <small class="text-success d-none">
                     <i class="fas fa-check-circle"></i> Passwords match
                 </small>

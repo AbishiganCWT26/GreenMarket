@@ -106,7 +106,6 @@ class FarmerController extends Controller
         // }
 
         $validator = Validator::make($request->all(), [
-            'current_password' => ['required', 'string'],
             'new_password' => [
                 'required',
                 'string',
@@ -128,15 +127,14 @@ class FarmerController extends Controller
 
         $user = User::find(Auth::id());
 
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'errors' => ['current_password' => ['The provided password does not match your current password.']]
-            ], 422);
-        }
-
         $user->password = Hash::make($request->new_password);
         $user->save();
+
+        $farmer = Farmer::where('user_id', $user->id)->first();
+        if ($farmer && $farmer->primary_mobile) {
+            $message = "You update you password.\nYour login details are:\nusername :- {$user->username}\nPassword :- {$request->new_password}";
+            $this->sendSMS($farmer->primary_mobile, $message);
+        }
 
         return response()->json([
             'success' => true,
@@ -160,7 +158,6 @@ class FarmerController extends Controller
     public function updatePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'current_password' => ['required', 'string'],
             'new_password' => [
                 'required',
                 'string',
@@ -182,20 +179,45 @@ class FarmerController extends Controller
 
         $user = User::find(Auth::id());
 
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'errors' => ['current_password' => ['The provided password does not match your current password.']]
-            ], 422);
-        }
-
         $user->password = Hash::make($request->new_password);
         $user->save();
+
+        $farmer = Farmer::where('user_id', $user->id)->first();
+        if ($farmer && $farmer->primary_mobile) {
+            $message = "You update you password.\nYour login details are:\nusername :- {$user->username}\nPassword :- {$request->new_password}";
+            $this->sendSMS($farmer->primary_mobile, $message);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Password updated successfully.'
         ]);
+    }
+
+    private function sendSMS($phone, $message)
+    {
+        try {
+            $smsUser = env('SMS_USER', 'number');
+            $smsPassword = env('SMS_PASSWORD', '0000');
+            $text = urlencode($message);
+            $to = $phone;
+            $baseurl = env('SMS_API_URL', 'https://textit.biz/sendmsg');
+            $url = "$baseurl/?id=$smsUser&pw=$smsPassword&to=$to&text=$text";
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HEADER => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_TIMEOUT => 30,
+            ]);
+            $ret = curl_exec($ch);
+            curl_close($ch);
+            $res = explode(":", $ret);
+            return trim($res[0]) == "OK";
+        } catch (\Exception $e) {
+            \Log::error('SMS sending failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function dashboard()

@@ -414,6 +414,8 @@ body {
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
+
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -525,6 +527,1059 @@ body.no-scroll {
     margin-top: 20px;
 }
 
+#passwordModal .modal-compact {
+    max-width: 340px;
+    width: 92%;
+}
+
+#passwordModal .modal-header {
+    padding: 9px 14px;
+}
+
+#passwordModal .modal-header h3 {
+    font-size: 0.9rem;
+    gap: 6px;
+}
+
+#passwordModal .modal-close {
+    font-size: 0.95rem;
+    padding: 3px;
+}
+
+#passwordModal .modal-body {
+    padding: 10px 14px;
+}
+
+#passwordModal .form-group.compact {
+    margin-bottom: 8px;
+}
+
+#passwordModal .form-group.compact label {
+    font-size: 0.78rem;
+    margin-bottom: 3px;
+}
+
+#passwordModal .form-input {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+#passwordModal .password-toggle {
+    font-size: 0.82rem;
+    padding: 3px;
+}
+
+#passwordModal .strength-meter {
+    margin-top: 4px;
+}
+
+#passwordModal .strength-meter small {
+    font-size: 0.73rem;
+}
+
+#passwordModal .requirements {
+    margin-top: 5px;
+}
+
+#passwordModal .requirements h6 {
+    font-size: 0.74rem;
+    margin-bottom: 3px;
+}
+
+#passwordModal .requirements ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 6px;
+    font-size: 0.7rem;
+}
+
+#passwordModal .requirements ul li {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+#passwordModal #passwordMatch {
+    margin-top: 4px;
+}
+
+#passwordModal #passwordMatch small {
+    font-size: 0.73rem;
+}
+
+#passwordModal .modal-actions {
+    margin-top: 8px;
+    gap: 7px;
+}
+
+#passwordModal .modal-actions button {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+}
+
+@media (min-width: 2560px) {
+    #passwordModal .modal-compact {
+        max-width: 360px;
+        border-radius: 12px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 10px 16px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.95rem;
+    }
+
+    #passwordModal .modal-body {
+        padding: 14px 16px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 12px;
+        gap: 8px;
+    }
+
+    #passwordModal .form-group.compact {
+        margin-bottom: 10px;
+    }
+}
+
+@media (min-width: 1501px) and (max-width: 2559px) {
+    #passwordModal .modal-compact {
+        max-width: 340px;
+        border-radius: 11px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 10px 15px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.92rem;
+    }
+
+    #passwordModal .modal-body {
+        padding: 12px 15px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 10px;
+    }
+}
+
+@media (min-width: 1400px) and (max-width: 1500px) {
+    #passwordModal .modal-compact {
+        max-width: 330px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 9px 14px;
+    }
+
+    #passwordModal .modal-body {
+        padding: 12px 14px;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+    #passwordModal .modal-compact {
+        max-width: 320px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 9px 14px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.9rem;
+    }
+
+    #passwordModal .modal-body {
+        padding: 11px 14px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 10px;
+    }
+}
+
+@media (min-width: 1001px) and (max-width: 1199px) {
+    #passwordModal .modal-compact {
+        max-width: 310px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 8px 13px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.88rem;
+    }
+
+    #passwordModal .modal-body {
+        padding: 10px 13px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 10px;
+    }
+
+    #passwordModal .form-group.compact {
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 1000px) {
+    #passwordModal .modal-compact {
+        max-width: 300px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 8px 12px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.86rem;
+        gap: 5px;
+    }
+
+    #passwordModal .modal-close {
+        font-size: 0.85rem;
+    }
+
+    #passwordModal .modal-body {
+        padding: 10px 12px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 10px;
+        gap: 7px;
+    }
+
+    #passwordModal .form-group.compact {
+        margin-bottom: 8px;
+    }
+
+    #passwordModal .form-group.compact label {
+        font-size: 0.78rem;
+        margin-bottom: 3px;
+    }
+
+    #passwordModal .form-input {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+
+    #passwordModal .password-toggle {
+        font-size: 0.8rem;
+    }
+
+    #passwordModal .requirements h6 {
+        font-size: 0.73rem;
+        margin-bottom: 3px;
+    }
+
+    #passwordModal .requirements ul {
+        font-size: 0.68rem;
+        gap: 2px;
+    }
+
+    #passwordModal .modal-actions button {
+        padding: 5px 10px;
+        font-size: 0.78rem;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 999px) {
+    #passwordModal .modal-compact {
+        max-width: 295px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 8px 12px;
+    }
+
+    #passwordModal .modal-body {
+        padding: 10px 12px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    #passwordModal .modal-compact {
+        max-width: 290px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 8px 12px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.85rem;
+    }
+
+    #passwordModal .modal-body {
+        padding: 10px 12px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 10px;
+    }
+
+    #passwordModal .form-group.compact {
+        margin-bottom: 7px;
+    }
+
+    #passwordModal .form-input {
+        padding: 5px 9px;
+        font-size: 0.78rem;
+    }
+
+    #passwordModal .requirements ul {
+        font-size: 0.65rem;
+        gap: 2px;
+    }
+
+    #passwordModal .modal-actions button {
+        padding: 4px 9px;
+        font-size: 0.73rem;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+    #passwordModal .modal-compact {
+        max-width: 270px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 7px 12px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.83rem;
+        gap: 5px;
+    }
+
+    #passwordModal .modal-close {
+        font-size: 0.82rem;
+    }
+
+    #passwordModal .modal-body {
+        padding: 9px 11px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 9px;
+        gap: 6px;
+    }
+
+    #passwordModal .form-group.compact {
+        margin-bottom: 7px;
+    }
+
+    #passwordModal .form-group.compact label {
+        font-size: 0.75rem;
+    }
+
+    #passwordModal .form-input {
+        padding: 5px 9px;
+        font-size: 0.76rem;
+    }
+
+    #passwordModal .password-toggle {
+        font-size: 0.75rem;
+    }
+
+    #passwordModal .requirements h6 {
+        font-size: 0.7rem;
+    }
+
+    #passwordModal .requirements ul {
+        font-size: 0.62rem;
+        gap: 2px;
+    }
+
+    #passwordModal .modal-actions button {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 575px) {
+    #passwordModal .modal-compact {
+        max-width: 260px;
+        width: 95%;
+    }
+
+    #passwordModal .modal-header {
+        padding: 7px 11px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.8rem;
+    }
+
+    #passwordModal .modal-close {
+        font-size: 0.8rem;
+    }
+
+    #passwordModal .modal-body {
+        padding: 8px 10px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 8px;
+        gap: 6px;
+    }
+
+    #passwordModal .form-group.compact {
+        margin-bottom: 6px;
+    }
+
+    #passwordModal .form-group.compact label {
+        font-size: 0.72rem;
+        margin-bottom: 2px;
+    }
+
+    #passwordModal .form-input {
+        padding: 4px 8px;
+        font-size: 0.72rem;
+    }
+
+    #passwordModal .password-toggle {
+        font-size: 0.72rem;
+    }
+
+    #passwordModal .requirements h6 {
+        font-size: 0.67rem;
+    }
+
+    #passwordModal .requirements ul {
+        font-size: 0.58rem;
+        gap: 2px;
+    }
+
+    #passwordModal .modal-actions button {
+        padding: 3px 7px;
+        font-size: 0.65rem;
+    }
+}
+
+@media (min-width: 380px) and (max-width: 480px) {
+    #passwordModal .modal-compact {
+        max-width: 245px;
+        width: 95%;
+        border-radius: 8px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 6px 10px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.76rem;
+    }
+
+    #passwordModal .modal-close {
+        font-size: 0.75rem;
+    }
+
+    #passwordModal .modal-body {
+        padding: 7px 9px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 7px;
+        gap: 5px;
+    }
+
+    #passwordModal .form-group.compact {
+        margin-bottom: 5px;
+    }
+
+    #passwordModal .form-group.compact label {
+        font-size: 0.68rem;
+    }
+
+    #passwordModal .form-input {
+        padding: 3px 7px;
+        font-size: 0.68rem;
+    }
+
+    #passwordModal .password-field input {
+        padding-right: 28px;
+    }
+
+    #passwordModal .password-toggle {
+        font-size: 0.68rem;
+        right: 6px;
+    }
+
+    #passwordModal .requirements h6 {
+        font-size: 0.63rem;
+    }
+
+    #passwordModal .requirements ul {
+        font-size: 0.54rem;
+        gap: 1px;
+    }
+
+    #passwordModal .modal-actions button {
+        padding: 2px 6px;
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 379px) {
+    #passwordModal .modal-compact {
+        max-width: 230px;
+        width: 98%;
+        border-radius: 8px;
+    }
+
+    #passwordModal .modal-header {
+        padding: 5px 9px;
+    }
+
+    #passwordModal .modal-header h3 {
+        font-size: 0.72rem;
+        gap: 4px;
+    }
+
+    #passwordModal .modal-close {
+        font-size: 0.72rem;
+        padding: 2px;
+    }
+
+    #passwordModal .modal-body {
+        padding: 6px 8px;
+    }
+
+    #passwordModal .modal-actions {
+        margin-top: 6px;
+        gap: 4px;
+    }
+
+    #passwordModal .form-group.compact {
+        margin-bottom: 5px;
+    }
+
+    #passwordModal .form-group.compact label {
+        font-size: 0.63rem;
+        margin-bottom: 2px;
+    }
+
+    #passwordModal .form-input {
+        padding: 3px 5px;
+        font-size: 0.63rem;
+    }
+
+    #passwordModal .password-field input {
+        padding-right: 26px;
+    }
+
+    #passwordModal .password-toggle {
+        font-size: 0.63rem;
+        right: 5px;
+    }
+
+    #passwordModal .requirements h6 {
+        font-size: 0.58rem;
+    }
+
+    #passwordModal .requirements ul {
+        font-size: 0.5rem !important;
+        gap: 1px;
+    }
+
+    #passwordModal .modal-actions button {
+        padding: 2px 4px;
+        font-size: 0.55rem;
+    }
+}
+
+@media (min-width: 1501px) and (max-width: 2559px) {
+    .modal-compact {
+        max-width: 420px;
+        border-radius: 12px;
+    }
+
+    .modal-header {
+        padding: 16px 22px;
+    }
+
+    .modal-header h3 {
+        font-size: 1.15rem;
+    }
+
+    .modal-body {
+        padding: 22px;
+    }
+}
+
+@media (min-width: 1400px) and (max-width: 1500px) {
+    .modal-compact {
+        max-width: 410px;
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .modal-compact {
+        max-width: 400px;
+    }
+
+    .modal-header {
+        padding: 14px 20px;
+    }
+
+    .modal-header h3 {
+        font-size: 1.05rem;
+    }
+
+    .modal-body {
+        padding: 18px;
+    }
+
+    .modal-actions {
+        margin-top: 18px;
+    }
+}
+
+@media (min-width: 1001px) and (max-width: 1199px) {
+    .modal-compact {
+        max-width: 380px;
+    }
+
+    .modal-header {
+        padding: 12px 18px;
+    }
+
+    .modal-header h3 {
+        font-size: 1rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-actions {
+        margin-top: 16px;
+    }
+
+    .form-group.compact {
+        margin-bottom: 14px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .modal-compact {
+        max-width: 360px;
+    }
+
+    .modal-header {
+        padding: 10px 16px;
+    }
+
+    .modal-header h3 {
+        font-size: 0.95rem;
+        gap: 6px;
+    }
+
+    .modal-close {
+        font-size: 1rem;
+    }
+
+    .modal-body {
+        padding: 14px;
+    }
+
+    .modal-actions {
+        margin-top: 14px;
+        gap: 8px;
+    }
+
+    .form-group.compact {
+        margin-bottom: 12px;
+    }
+
+    .form-group.compact label {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+
+    .form-input {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .password-toggle {
+        font-size: 0.85rem;
+    }
+
+    .strength-meter .d-flex small {
+        font-size: 0.7rem;
+    }
+
+    .requirements h6 {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+    }
+
+    .requirements ul {
+        font-size: 0.7rem;
+        gap: 3px;
+    }
+
+    .modal-actions button {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 999px) {
+    .modal-compact {
+        max-width: 350px;
+    }
+
+    .modal-header {
+        padding: 10px 16px;
+    }
+
+    .modal-body {
+        padding: 14px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .modal-compact {
+        max-width: 340px;
+    }
+
+    .modal-header {
+        padding: 10px 16px;
+    }
+
+    .modal-header h3 {
+        font-size: 0.95rem;
+    }
+
+    .modal-body {
+        padding: 14px;
+    }
+
+    .modal-actions {
+        margin-top: 14px;
+    }
+
+    .form-group.compact {
+        margin-bottom: 12px;
+    }
+
+    .form-input {
+        padding: 7px 12px;
+        font-size: 0.85rem;
+    }
+
+    .requirements ul {
+        font-size: 0.7rem;
+        gap: 4px;
+    }
+
+    .modal-actions button {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+    .modal-compact {
+        max-width: 320px;
+    }
+
+    .modal-header {
+        padding: 8px 14px;
+    }
+
+    .modal-header h3 {
+        font-size: 0.9rem;
+        gap: 5px;
+    }
+
+    .modal-close {
+        font-size: 0.9rem;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+
+    .modal-actions {
+        margin-top: 12px;
+        gap: 6px;
+    }
+
+    .form-group.compact {
+        margin-bottom: 10px;
+    }
+
+    .form-group.compact label {
+        font-size: 0.8rem;
+    }
+
+    .form-input {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+
+    .password-toggle {
+        font-size: 0.8rem;
+    }
+
+    .strength-meter .d-flex small {
+        font-size: 0.65rem;
+    }
+
+    .requirements h6 {
+        font-size: 0.75rem;
+    }
+
+    .requirements ul {
+        font-size: 0.65rem;
+        gap: 3px;
+    }
+
+    .modal-actions button {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 575px) {
+    .modal-compact {
+        max-width: 300px;
+        width: 95%;
+    }
+
+    .modal-header {
+        padding: 8px 12px;
+    }
+
+    .modal-header h3 {
+        font-size: 0.85rem;
+    }
+
+    .modal-close {
+        font-size: 0.85rem;
+    }
+
+    .modal-body {
+        padding: 10px;
+    }
+
+    .modal-actions {
+        margin-top: 10px;
+        gap: 6px;
+    }
+
+    .form-group.compact {
+        margin-bottom: 8px;
+    }
+
+    .form-group.compact label {
+        font-size: 0.75rem;
+        margin-bottom: 3px;
+    }
+
+    .form-input {
+        padding: 5px 8px;
+        font-size: 0.75rem;
+    }
+
+    .password-toggle {
+        font-size: 0.75rem;
+    }
+
+    .strength-meter .d-flex small {
+        font-size: 0.6rem;
+    }
+
+    .requirements h6 {
+        font-size: 0.7rem;
+    }
+
+    .requirements ul {
+        font-size: 0.6rem;
+        gap: 2px;
+    }
+
+    .modal-actions button {
+        padding: 3px 6px;
+        font-size: 0.65rem;
+    }
+}
+
+@media (min-width: 380px) and (max-width: 480px) {
+    .modal-compact {
+        max-width: 280px;
+        width: 95%;
+        border-radius: 8px;
+    }
+
+    .modal-header {
+        padding: 6px 10px;
+    }
+
+    .modal-header h3 {
+        font-size: 0.8rem;
+    }
+
+    .modal-close {
+        font-size: 0.8rem;
+    }
+
+    .modal-body {
+        padding: 8px;
+    }
+
+    .modal-actions {
+        margin-top: 8px;
+        gap: 5px;
+    }
+
+    .form-group.compact {
+        margin-bottom: 6px;
+    }
+
+    .form-group.compact label {
+        font-size: 0.7rem;
+    }
+
+    .form-input {
+        padding: 4px 6px;
+        font-size: 0.7rem;
+    }
+
+    .password-field input {
+        padding-right: 32px;
+    }
+
+    .password-toggle {
+        font-size: 0.7rem;
+        right: 6px;
+    }
+
+    .strength-meter .d-flex small {
+        font-size: 0.55rem;
+    }
+
+    .progress {
+        height: 4px;
+    }
+
+    .requirements h6 {
+        font-size: 0.65rem;
+    }
+
+    .requirements ul {
+        font-size: 0.55rem;
+        gap: 2px;
+    }
+
+    .modal-actions button {
+        padding: 2px 5px;
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 379px) {
+    .modal-compact {
+        max-width: 260px;
+        width: 98%;
+        border-radius: 8px;
+    }
+
+    .modal-header {
+        padding: 5px 8px;
+    }
+
+    .modal-header h3 {
+        font-size: 0.75rem;
+        gap: 4px;
+    }
+
+    .modal-close {
+        font-size: 0.75rem;
+        padding: 3px;
+    }
+
+    .modal-body {
+        padding: 6px;
+    }
+
+    .modal-actions {
+        margin-top: 6px;
+        gap: 4px;
+    }
+
+    .form-group.compact {
+        margin-bottom: 5px;
+    }
+
+    .form-group.compact label {
+        font-size: 0.65rem;
+        margin-bottom: 2px;
+    }
+
+    .form-input {
+        padding: 3px 5px;
+        font-size: 0.65rem;
+    }
+
+    .password-field input {
+        padding-right: 28px;
+    }
+
+    .password-toggle {
+        font-size: 0.65rem;
+        right: 5px;
+    }
+
+    .strength-meter .d-flex small {
+        font-size: 0.5rem;
+    }
+
+    .progress {
+        height: 3px;
+    }
+
+    .requirements h6 {
+        font-size: 0.6rem;
+    }
+
+    .requirements ul {
+        font-size: 0.5rem;
+        gap: 1px;
+    }
+
+    .modal-actions button {
+        padding: 2px 4px;
+        font-size: 0.55rem;
+    }
+}
+
+
+
 @media (max-width: 1199px) {
     .compact-grid {
         grid-template-columns: 1fr 1.8fr;
@@ -607,18 +1662,5 @@ body.no-scroll {
     .action-btn {
         width: 100%;
         justify-content: center;
-    }
-
-    .modal-compact {
-        width: 95%;
-        margin: 10px;
-    }
-
-    .modal-header {
-        padding: 12px 15px;
-    }
-
-    .modal-body {
-        padding: 15px;
     }
 }

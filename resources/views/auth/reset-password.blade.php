@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +23,10 @@
 			--shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 		}
 
-		.password-strength { margin-bottom: 1rem; }
+		.password-strength {
+			margin-bottom: 1rem;
+		}
+
 		.strength-bar {
 			height: 6px;
 			background-color: #e2e8f0;
@@ -30,12 +34,13 @@
 			overflow: hidden;
 			margin-top: 5px;
 		}
+
 		.strength-fill {
 			height: 100%;
 			width: 0%;
 			transition: all 0.3s ease;
 		}
-		
+
 		.requirements-grid {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
@@ -46,7 +51,7 @@
 			border-radius: var(--radius-md);
 			border: 1px solid var(--border);
 		}
-		
+
 		.rule-item {
 			font-size: 0.75rem;
 			display: flex;
@@ -54,10 +59,15 @@
 			gap: 6px;
 			color: #64748b;
 		}
-		
-		.rule-item.valid { color: #10B981; }
-		.rule-item.invalid { color: #ef4444; }
-		
+
+		.rule-item.valid {
+			color: #10B981;
+		}
+
+		.rule-item.invalid {
+			color: #ef4444;
+		}
+
 		#passwordMatch small {
 			font-size: 0.75rem;
 			display: flex;
@@ -65,32 +75,77 @@
 			gap: 5px;
 		}
 
-		.d-none { display: none !important; }
-		.text-success { color: #10B981 !important; }
-		.text-danger { color: #ef4444 !important; }
-		.mt-1 { margin-top: 0.25rem !important; }
-		.mt-2 { margin-top: 0.5rem !important; }
-		.mt-3 { margin-top: 1rem !important; }
-		.mt-4 { margin-top: 1.5rem !important; }
-		.mb-1 { margin-bottom: 0.25rem !important; }
-		.mb-2 { margin-bottom: 0.5rem !important; }
-		.mb-3 { margin-bottom: 1rem !important; }
-		.d-flex { display: flex !important; }
-		.justify-content-between { justify-content: space-between !important; }
-		.align-items-center { align-items: center !important; }
+		.d-none {
+			display: none !important;
+		}
+
+		.text-success {
+			color: #10B981 !important;
+		}
+
+		.text-danger {
+			color: #ef4444 !important;
+		}
+
+		.mt-1 {
+			margin-top: 0.25rem !important;
+		}
+
+		.mt-2 {
+			margin-top: 0.5rem !important;
+		}
+
+		.mt-3 {
+			margin-top: 1rem !important;
+		}
+
+		.mt-4 {
+			margin-top: 1.5rem !important;
+		}
+
+		.mb-1 {
+			margin-bottom: 0.25rem !important;
+		}
+
+		.mb-2 {
+			margin-bottom: 0.5rem !important;
+		}
+
+		.mb-3 {
+			margin-bottom: 1rem !important;
+		}
+
+		.d-flex {
+			display: flex !important;
+		}
+
+		.justify-content-between {
+			justify-content: space-between !important;
+		}
+
+		.align-items-center {
+			align-items: center !important;
+		}
 
 		.info-box {
-			background: rgba(59,130,246,0.05);
-			border: 1px solid rgba(59,130,246,0.1);
+			background: rgba(59, 130, 246, 0.05);
+			border: 1px solid rgba(59, 130, 246, 0.1);
 			border-radius: var(--radius-sm);
 			padding: 10px;
 			margin-bottom: 20px;
 			text-align: center;
 			font-size: 0.85rem;
 		}
-		.info-box i { color: #3b82f6; margin-right: 6px; }
-		
-		.password-wrapper { position: relative; }
+
+		.info-box i {
+			color: #3b82f6;
+			margin-right: 6px;
+		}
+
+		.password-wrapper {
+			position: relative;
+		}
+
 		.password-toggle {
 			position: absolute;
 			right: 12px;
@@ -103,9 +158,13 @@
 			padding: 4px;
 			z-index: 10;
 		}
-		.password-toggle:hover { color: var(--primary); }
+
+		.password-toggle:hover {
+			color: var(--primary);
+		}
 	</style>
 </head>
+
 <body>
 	<div class="auth-container">
 		<div class="auth-card">
@@ -134,15 +193,17 @@
 					<div class="input-field">
 						<label><i class="fas fa-key"></i> New Password</label>
 						<div class="password-wrapper">
-							<input type="password" id="password" name="password" placeholder="Enter new password" required>
+							<input type="password" id="password" name="password" placeholder="Enter new password"
+								required>
 							<button type="button" class="password-toggle" data-target="password">
 								<i class="fas fa-eye"></i>
 							</button>
 						</div>
-						
+
 						<div class="password-strength mt-3">
 							<div class="d-flex justify-content-between align-items-center mb-1">
-								<small style="font-size: 0.75rem;">Strength: <span id="strengthText" style="font-weight: 600;">None</span></small>
+								<small style="font-size: 0.75rem;">Strength: <span id="strengthText"
+										style="font-weight: 600;">None</span></small>
 							</div>
 							<div class="strength-bar" id="strengthBar">
 								<div class="strength-fill"></div>
@@ -152,17 +213,28 @@
 						<div class="requirements mt-3">
 							<h6 class="mb-2" style="font-size: 0.85rem; font-weight: 600;">Security Requirements:</h6>
 							<div class="requirements-grid">
-								<div id="rule-length" class="rule-item invalid"><i class="fas fa-times-circle"></i> 8+ characters</div>
-								<div id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 number</div>
-								<div id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 Uppercase</div>
-								<div id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 Lowercase</div>
-								<div id="rule-special" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 Special char</div>
-								<div id="rule-no-space" class="rule-item invalid"><i class="fas fa-times-circle"></i> No spaces</div>
-								<div id="rule-no-repeat" class="rule-item invalid"><i class="fas fa-times-circle"></i> No repetition</div>
-								<div id="rule-no-sequence" class="rule-item invalid"><i class="fas fa-times-circle"></i> No sequence</div>
-								<div id="rule-not-common" class="rule-item invalid"><i class="fas fa-times-circle"></i> Not common</div>
-								<div id="rule-no-links" class="rule-item invalid"><i class="fas fa-times-circle"></i> No links</div>
-								<div id="rule-no-personal" class="rule-item invalid"><i class="fas fa-times-circle"></i> No personal info</div>
+								<div id="rule-length" class="rule-item invalid"><i class="fas fa-times-circle"></i> 8+
+									characters</div>
+								<div id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> At
+									least 1 number</div>
+								<div id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1
+									Uppercase</div>
+								<div id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1
+									Lowercase</div>
+								<div id="rule-special" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1
+									Special char</div>
+								<div id="rule-no-space" class="rule-item invalid"><i class="fas fa-times-circle"></i> No
+									spaces</div>
+								<div id="rule-no-repeat" class="rule-item invalid"><i class="fas fa-times-circle"></i>
+									No repetition</div>
+								<div id="rule-no-sequence" class="rule-item invalid"><i class="fas fa-times-circle"></i>
+									No sequence</div>
+								<div id="rule-not-common" class="rule-item invalid"><i class="fas fa-times-circle"></i>
+									Not common</div>
+								<div id="rule-no-links" class="rule-item invalid"><i class="fas fa-times-circle"></i> No
+									links</div>
+								<div id="rule-no-personal" class="rule-item invalid"><i class="fas fa-times-circle"></i>
+									No personal info</div>
 							</div>
 						</div>
 					</div>
@@ -170,7 +242,8 @@
 					<div class="input-field mt-4">
 						<label><i class="fas fa-key"></i> Confirm Password</label>
 						<div class="password-wrapper">
-							<input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm password" required>
+							<input type="password" id="password_confirmation" name="password_confirmation"
+								placeholder="Confirm password" required>
 							<button type="button" class="password-toggle" data-target="password_confirmation">
 								<i class="fas fa-eye"></i>
 							</button>
@@ -198,7 +271,7 @@
 	</div>
 
 	<script>
-		document.addEventListener('DOMContentLoaded', function() {
+		document.addEventListener('DOMContentLoaded', function () {
 			const passInput = document.getElementById('password');
 			const confirmInput = document.getElementById('password_confirmation');
 			const strengthBar = document.getElementById('strengthBar');
@@ -212,7 +285,7 @@
 
 			// Password toggle functionality
 			document.querySelectorAll('.password-toggle').forEach(btn => {
-				btn.addEventListener('click', function() {
+				btn.addEventListener('click', function () {
 					const target = document.getElementById(this.dataset.target);
 					const icon = this.querySelector('i');
 					if (target.type === 'password') {
@@ -234,18 +307,18 @@
 					strengthText.textContent = 'None';
 					strengthText.style.color = '#cbd5e1';
 					strengthBar.querySelector('.strength-fill').style.width = '0%';
-					
+
 					// Reset rules UI
-					updatePasswordRuleFeedback({ 
-						rules: { 
-							'length': false, 'number': false, 'capital': false, 'lowercase': false, 
-							'special': false, 'no-space': false, 'no-repeat': false, 'no-sequence': false, 
-							'not-common': false, 'no-links': false, 'no-personal': false 
-						} 
+					updatePasswordRuleFeedback({
+						rules: {
+							'length': false, 'number': false, 'capital': false, 'lowercase': false,
+							'special': false, 'no-space': false, 'no-repeat': false, 'no-sequence': false,
+							'not-common': false, 'no-links': false, 'no-personal': false
+						}
 					});
 				} else {
 					const result = validateAdvancedPassword(passValue, { username, email });
-					
+
 					// Update Strength Bar
 					strengthText.textContent = result.strengthText;
 					strengthText.style.color = result.color;
@@ -281,7 +354,7 @@
 			passInput.addEventListener('input', validateUI);
 			confirmInput.addEventListener('input', validateUI);
 
-			resetForm.addEventListener('submit', function(e) {
+			resetForm.addEventListener('submit', function (e) {
 				const passValue = passInput.value;
 				const confirmValue = confirmInput.value;
 				const result = validateAdvancedPassword(passValue, { username, email });
@@ -317,5 +390,5 @@
 		});
 	</script>
 </body>
+
 </html>
-/html>

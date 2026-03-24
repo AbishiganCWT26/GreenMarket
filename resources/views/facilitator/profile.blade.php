@@ -139,24 +139,6 @@
 						<input type="text" name="nic_no" id="nic_no" value="{{ $facilitator->nic_no ?? '' }}" placeholder="Enter NIC number" required>
 						<div id="nicStatus" class="nic-status" style="font-size: 0.75rem; margin-top: 4px;"></div>
 					</div>
-
-					<div class="form-field">
-						<label>
-							<i class="fa-solid fa-mobile-screen"></i>
-							EzCash Number
-						</label>
-						<input type="text" name="ezcash_mobile" id="ezcash_mobile" value="{{ $facilitator->ezcash_mobile ?? '' }}" placeholder="074/076/077...">
-						<div id="ezcash_error" style="color: #ef4444; font-size: 0.75rem; margin-top: 4px; display: none;">Must start with 074, 076, or 077</div>
-					</div>
-
-					<div class="form-field">
-						<label>
-							<i class="fa-solid fa-mobile-screen"></i>
-							mCash Number
-						</label>
-						<input type="text" name="mcash_mobile" id="mcash_mobile" value="{{ $facilitator->mcash_mobile ?? '' }}" placeholder="070/071...">
-						<div id="mcash_error" style="color: #ef4444; font-size: 0.75rem; margin-top: 4px; display: none;">Must start with 070 or 071</div>
-					</div>
 				</div>
 
 				<div class="form-footer">
@@ -475,6 +457,20 @@ function sendOTP(type) {
 	.catch(err => Swal.fire('Error', 'Something went wrong', 'error'));
 }
 
+function togglePasswordVisibility(fieldId, iconId) {
+	const passwordField = document.getElementById(fieldId);
+	const toggleIcon = document.getElementById(iconId);
+	if (passwordField.type === 'password') {
+		passwordField.type = 'text';
+		toggleIcon.classList.remove('fa-eye');
+		toggleIcon.classList.add('fa-eye-slash');
+	} else {
+		passwordField.type = 'password';
+		toggleIcon.classList.remove('fa-eye-slash');
+		toggleIcon.classList.add('fa-eye');
+	}
+}
+
 function changePassword() {
 	Swal.fire({
 		title: 'Change Password',
@@ -486,17 +482,16 @@ function changePassword() {
 						<input type="password" class="form-control" id="newPassword" placeholder="New Password" required oninput="updateStrength(this.value)">
 						<i class="fa-regular fa-eye password-toggle" id="toggleNewPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" onclick="togglePasswordVisibility('newPassword', 'toggleNewPassword')"></i>
 					</div>
-					<div class="strength-meter mt-2">
+					<div class="password-strength mt-3">
 						<div class="d-flex justify-content-between align-items-center mb-1">
-							<small>Strength: <span id="strength-text">None</span></small>
+							<small>Strength: <span id="strengthText">None</span></small>
 						</div>
-						<div class="progress" style="height: 5px;">
-							<div id="strength-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+						<div class="strength-bar" id="strengthBar" style="height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+							<div class="strength-fill" style="width: 0%; height: 100%; transition: width 0.3s;"></div>
 						</div>
 					</div>
 					<div class="requirements mt-3">
 						<h6 class="mb-2" style="font-size: 0.9rem;">Requirements:</h6>
-						<ul class="list-unstyled mb-0" style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
 						<ul class="list-unstyled mb-0" style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
 							<li id="rule-length" class="text-danger"><i class="fas fa-times me-1"></i> 8+ chars</li>
 							<li id="rule-number" class="text-danger"><i class="fas fa-times me-1"></i> Number</li>
@@ -508,8 +503,7 @@ function changePassword() {
 							<li id="rule-no-sequence" class="text-danger"><i class="fas fa-times me-1"></i> No sequence</li>
 							<li id="rule-not-common" class="text-danger"><i class="fas fa-times me-1"></i> Not common</li>
 							<li id="rule-no-links" class="text-danger"><i class="fas fa-times me-1"></i> No links</li>
-							<li id="rule-no-personal" class="text-danger"><i class="fas fa-times me-1"></i> Personal</li>
-						</ul>
+							<li id="rule-no-personal" class="text-danger"><i class="fas fa-times me-1"></i> No Personal Info</li>
 						</ul>
 					</div>
 				</div>
@@ -519,7 +513,14 @@ function changePassword() {
 						<input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
 						<i class="fa-regular fa-eye password-toggle" id="toggleConfirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword')"></i>
 					</div>
-					<div id="match-status" class="mt-1" style="font-size: 0.8rem;"></div>
+					<div id="passwordMatch" class="mt-3">
+						<small class="form-text text-success d-none">
+							<i class="fas fa-check-circle"></i> Passwords match
+						</small>
+						<small class="form-text text-danger d-none">
+							<i class="fas fa-times-circle"></i> Passwords don't match
+						</small>
+					</div>
 				</div>
 			</div>
 		`,
@@ -533,15 +534,20 @@ function changePassword() {
 			confirmInput.addEventListener('input', () => {
 				const pass = document.getElementById('newPassword').value;
 				const confirm = confirmInput.value;
-				const status = document.getElementById('match-status');
-				if (confirm) {
+				const matchIndicator = document.getElementById('passwordMatch');
+				const success = matchIndicator.querySelector('.text-success');
+				const error = matchIndicator.querySelector('.text-danger');
+				if (pass && confirm) {
 					if (pass === confirm) {
-						status.innerHTML = '<span class="text-success"><i class="fas fa-check"></i> Passwords match</span>';
+						success.classList.remove('d-none');
+						error.classList.add('d-none');
 					} else {
-						status.innerHTML = '<span class="text-danger"><i class="fas fa-times"></i> Passwords mismatch</span>';
+						success.classList.add('d-none');
+						error.classList.remove('d-none');
 					}
 				} else {
-					status.innerHTML = '';
+					success.classList.add('d-none');
+					error.classList.add('d-none');
 				}
 			});
 		},
@@ -598,13 +604,20 @@ function calculateStrength(password) {
 
 function updateStrength(password) {
     const result = calculateStrength(password);
-    const strengthText = document.getElementById('strength-text');
-    const strengthBar = document.getElementById('strength-bar');
+    const strengthText = document.getElementById('strengthText');
+    const strengthBar = document.getElementById('strengthBar');
     
-    strengthText.textContent = result.strengthText;
-    strengthText.style.color = result.color;
-    strengthBar.style.backgroundColor = result.color;
-    strengthBar.style.width = result.percent + '%';
+    if (strengthText) {
+        strengthText.textContent = result.strengthText;
+        strengthText.style.color = result.color;
+    }
+    if (strengthBar) {
+        const fill = strengthBar.querySelector('.strength-fill');
+        if (fill) {
+            fill.style.backgroundColor = result.color;
+            fill.style.width = result.percent + '%';
+        }
+    }
 }
 
 function validateNIC(nic) {
@@ -630,24 +643,6 @@ document.getElementById('nic_no').addEventListener('input', function() {
         status.innerHTML = '<span style="color: #10B981;"><i class="fas fa-check-circle"></i> Valid NIC</span>';
     } else {
         status.innerHTML = '<span style="color: #ef4444;"><i class="fas fa-times-circle"></i> Invalid NIC format</span>';
-    }
-});
-
-document.getElementById('ezcash_mobile').addEventListener('input', function() {
-    const err = document.getElementById('ezcash_error');
-    if (this.value && !/^(074|076|077)/.test(this.value)) {
-        err.style.display = 'block';
-    } else {
-        err.style.display = 'none';
-    }
-});
-
-document.getElementById('mcash_mobile').addEventListener('input', function() {
-    const err = document.getElementById('mcash_error');
-    if (this.value && !/^(070|071)/.test(this.value)) {
-        err.style.display = 'block';
-    } else {
-        err.style.display = 'none';
     }
 });
 </script>

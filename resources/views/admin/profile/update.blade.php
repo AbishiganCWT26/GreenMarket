@@ -1019,7 +1019,7 @@
 
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('assets/js/form-validation.js') }}"></script>
+<script src="{{ asset('js/form-validation.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const toggleCurrentPassword = document.getElementById('toggleCurrentPassword');
@@ -1269,15 +1269,25 @@ let currentStrength = 0;
 
 function checkPasswordStrength(password) {
     if (!password) {
-        // Reset feedback if password is empty
-        updatePasswordRuleFeedback(validateAdvancedPassword('', {}));
+        // Reset UI if password is empty
         const strengthText = document.getElementById('strengthText');
         const strengthFill = document.getElementById('strengthFill');
+        const submitBtn = document.getElementById('securitySubmit');
         strengthText.textContent = 'None';
         strengthText.style.color = '#e5e7eb';
         strengthFill.style.width = '0%';
         strengthFill.style.backgroundColor = '#e5e7eb';
-        document.getElementById('securitySubmit').disabled = true;
+        
+        // Reset all 11 rules
+        updatePasswordRuleFeedback({
+            rules: {
+                'length': false, 'number': false, 'capital': false, 'lowercase': false,
+                'special': false, 'no-space': false, 'no-repeat': false, 'no-sequence': false,
+                'not-common': false, 'no-links': false, 'no-personal': false
+            }
+        });
+        
+        if (submitBtn) submitBtn.disabled = true;
         checkPasswordMatch();
         return;
     }
@@ -1298,8 +1308,9 @@ function checkPasswordStrength(password) {
     strengthFill.style.width = result.percent + '%';
     strengthFill.style.backgroundColor = result.color;
 
-    const confirmPassword = document.getElementById('confirm_password').value;
-    submitBtn.disabled = !result.isValid || (confirmPassword && password !== confirmPassword);
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
+    if (submitBtn) submitBtn.disabled = !result.isValid || (confirmPassword && password !== confirmPassword);
 
     checkPasswordMatch();
 }

@@ -870,19 +870,16 @@ function checkPasswordStrength(password) {
         strengthText.style.color = '#e5e7eb';
         strengthFill.style.width = '0%';
         strengthFill.style.backgroundColor = '#e5e7eb';
+        
+        // Reset all 11 rules
         updatePasswordRuleFeedback({
-            isValid: false,
             rules: {
-                length: false,
-                uppercase: false,
-                lowercase: false,
-                number: false,
-                special: false,
-                notCommon: false,
-                noLinks: false,
-                noPersonal: false
+                'length': false, 'number': false, 'capital': false, 'lowercase': false,
+                'special': false, 'no-space': false, 'no-repeat': false, 'no-sequence': false,
+                'not-common': false, 'no-links': false, 'no-personal': false
             }
         });
+        
         submitBtn.disabled = true;
         checkPasswordMatch();
         return;
