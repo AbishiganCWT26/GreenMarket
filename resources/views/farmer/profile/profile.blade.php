@@ -4,189 +4,152 @@
 @section('page-title', 'My Profile')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/farmer/profile.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	<link rel="stylesheet" href="{{ asset('css/farmer/profile.css') }}">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 @endsection
 
 @section('content')
-<div class="profile-container">
-	<div class="profile-header">
-		<div class="profile-avatar">
-			<img src="{{ Auth::user()->profile_photo ? asset('uploads/profile_pictures/' . Auth::user()->profile_photo) : asset('assets/images/default-avatar.png') }}"
-				 alt="Profile Photo" class="avatar-img" id="profileAvatar">
-		</div>
-		<div class="profile-info">
-			<h2>{{ $farmer->name ?? Auth::user()->username }}</h2>
-			<p>
-				<i class="fa-solid fa-envelope"></i> {{ Auth::user()->email ?? 'Not set' }}
-			</p>
-			<p>
-				<i class="fa-solid fa-phone"></i> {{ $farmer->primary_mobile ?? 'Not set' }}
-			</p>
-		</div>
-	</div>
+	<div class="profile-wrap">
+		<div class="profile-container">
+			<div class="profile-card">
+				<div class="profile-head">
+					<div class="profile-avatar">
+						<img src="{{ Auth::user()->profile_photo ? asset('uploads/profile_pictures/' . Auth::user()->profile_photo) : asset('assets/images/default-avatar.png') }}"
+							alt="Profile" id="profileAvatar">
+					</div>
+					<div class="profile-info">
+						<h2>{{ $farmer->name ?? Auth::user()->username }}</h2>
+						<p><i class="fa-solid fa-envelope"></i> {{ Auth::user()->email ?? 'Not set' }}</p>
+						<p><i class="fa-solid fa-phone"></i> {{ $farmer->primary_mobile ?? 'Not set' }}</p>
+					</div>
+				</div>
 
-	<div class="profile-tabs">
-		<div class="nav-tabs">
-			<button class="nav-link active" data-tab="personal">
-				<i class="fa-solid fa-user-pen"></i> Personal Details
-			</button>
-		</div>
-
-		<div class="tab-content">
-			<div class="tab-pane active" id="personal">
-				<form action="{{ route('farmer.profile.update') }}" method="POST" id="profileForm" class="form-section">
-					@csrf
-					<h4><i class="fa-solid fa-user-gear"></i> Personal Information</h4>
-					<div class="row">
-						<div class="col-md-6 mb-3">
-							<label class="form-label">
-								<i class="fa-solid fa-signature"></i> Full Name *
-							</label>
-							<input type="text" class="form-control @error('name') is-invalid @enderror"
-								   name="name" value="{{ old('name', $farmer->name ?? Auth::user()->username) }}" required>
-							@error('name')
-								<div class="invalid-feedback">
-									<i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-								</div>
-							@enderror
-						</div>
-						<div class="col-md-6 mb-3">
-							<label class="form-label">
-								<i class="fa-solid fa-at"></i> Email *
-							</label>
-							<input type="email" class="form-control @error('email') is-invalid @enderror"
-								   name="email" value="{{ old('email', Auth::user()->email) }}" required>
-							@error('email')
-								<div class="invalid-feedback">
-									<i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-								</div>
-							@enderror
-						</div>
-						<div class="col-md-6 mb-3">
-							<label class="form-label">
-								<i class="fa-solid fa-mobile-screen-button"></i> Mobile *
-							</label>
-							<input type="tel" class="form-control @error('primary_mobile') is-invalid @enderror"
-								   name="primary_mobile" value="{{ old('primary_mobile', $farmer->primary_mobile ?? '') }}" required>
-							@error('primary_mobile')
-								<div class="invalid-feedback">
-									<i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-								</div>
-							@enderror
-						</div>
-						<div class="col-md-6 mb-3">
-							<label class="form-label">
-								<i class="fa-brands fa-whatsapp"></i> WhatsApp
-							</label>
-							<input type="tel" class="form-control @error('whatsapp_number') is-invalid @enderror"
-								   name="whatsapp_number" value="{{ old('whatsapp_number', $farmer->whatsapp_number ?? '') }}">
-							@error('whatsapp_number')
-								<div class="invalid-feedback">
-									<i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-								</div>
-							@enderror
-						</div>
-						<div class="col-12 mb-3">
-							<label class="form-label">
-								<i class="fa-solid fa-user-tag"></i> Username *
-							</label>
-							<input type="text" class="form-control @error('username') is-invalid @enderror"
-								   name="username" value="{{ old('username', Auth::user()->username) }}" required>
-							@error('username')
-								<div class="invalid-feedback">
-									<i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-								</div>
-							@enderror
-						</div>
+				<div class="profile-tabs">
+					<div class="tabs-nav">
+						<button class="tab-btn active" data-tab="personal">
+							<i class="fa-solid fa-user"></i>
+							<span>Personal</span>
+						</button>
 					</div>
 
-					<h4><i class="fa-solid fa-map-location-dot"></i> Address Information</h4>
-					<div class="row">
-						<div class="col-md-6 mb-3">
-							<label class="form-label">
-								<i class="fa-solid fa-earth-asia"></i> District *
-							</label>
-							<select class="form-select @error('district') is-invalid @enderror" name="district" required>
-								<option value="">Select District</option>
-								<option value="Colombo" {{ ($farmer->district ?? '') == 'Colombo' ? 'selected' : '' }}>Colombo</option>
-								<option value="Gampaha" {{ ($farmer->district ?? '') == 'Gampaha' ? 'selected' : '' }}>Gampaha</option>
-								<option value="Kalutara" {{ ($farmer->district ?? '') == 'Kalutara' ? 'selected' : '' }}>Kalutara</option>
-								<option value="Kandy" {{ ($farmer->district ?? '') == 'Kandy' ? 'selected' : '' }}>Kandy</option>
-								<option value="Matale" {{ ($farmer->district ?? '') == 'Matale' ? 'selected' : '' }}>Matale</option>
-								<option value="Nuwara Eliya" {{ ($farmer->district ?? '') == 'Nuwara Eliya' ? 'selected' : '' }}>Nuwara Eliya</option>
-								<option value="Galle" {{ ($farmer->district ?? '') == 'Galle' ? 'selected' : '' }}>Galle</option>
-								<option value="Matara" {{ ($farmer->district ?? '') == 'Matara' ? 'selected' : '' }}>Matara</option>
-								<option value="Hambantota" {{ ($farmer->district ?? '') == 'Hambantota' ? 'selected' : '' }}>Hambantota</option>
-								<option value="Jaffna" {{ ($farmer->district ?? '') == 'Jaffna' ? 'selected' : '' }}>Jaffna</option>
-								<option value="Kilinochchi" {{ ($farmer->district ?? '') == 'Kilinochchi' ? 'selected' : '' }}>Kilinochchi</option>
-								<option value="Mannar" {{ ($farmer->district ?? '') == 'Mannar' ? 'selected' : '' }}>Mannar</option>
-								<option value="Vavuniya" {{ ($farmer->district ?? '') == 'Vavuniya' ? 'selected' : '' }}>Vavuniya</option>
-								<option value="Mullaitivu" {{ ($farmer->district ?? '') == 'Mullaitivu' ? 'selected' : '' }}>Mullaitivu</option>
-								<option value="Batticaloa" {{ ($farmer->district ?? '') == 'Batticaloa' ? 'selected' : '' }}>Batticaloa</option>
-								<option value="Ampara" {{ ($farmer->district ?? '') == 'Ampara' ? 'selected' : '' }}>Ampara</option>
-								<option value="Trincomalee" {{ ($farmer->district ?? '') == 'Trincomalee' ? 'selected' : '' }}>Trincomalee</option>
-								<option value="Kurunegala" {{ ($farmer->district ?? '') == 'Kurunegala' ? 'selected' : '' }}>Kurunegala</option>
-								<option value="Puttalam" {{ ($farmer->district ?? '') == 'Puttalam' ? 'selected' : '' }}>Puttalam</option>
-								<option value="Anuradhapura" {{ ($farmer->district ?? '') == 'Anuradhapura' ? 'selected' : '' }}>Anuradhapura</option>
-								<option value="Polonnaruwa" {{ ($farmer->district ?? '') == 'Polonnaruwa' ? 'selected' : '' }}>Polonnaruwa</option>
-								<option value="Badulla" {{ ($farmer->district ?? '') == 'Badulla' ? 'selected' : '' }}>Badulla</option>
-								<option value="Monaragala" {{ ($farmer->district ?? '') == 'Monaragala' ? 'selected' : '' }}>Monaragala</option>
-								<option value="Ratnapura" {{ ($farmer->district ?? '') == 'Ratnapura' ? 'selected' : '' }}>Ratnapura</option>
-								<option value="Kegalle" {{ ($farmer->district ?? '') == 'Kegalle' ? 'selected' : '' }}>Kegalle</option>
-							</select>
-							@error('district')
-								<div class="invalid-feedback">
-									<i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-								</div>
-							@enderror
-						</div>
-						<div class="col-md-6 mb-3">
-							<label class="form-label">
-								<i class="fa-solid fa-landmark"></i> Grama Niladhari Division *
-							</label>
-							<input type="text" class="form-control @error('grama_niladhari_division') is-invalid @enderror"
-								   name="grama_niladhari_division" value="{{ old('grama_niladhari_division', $farmer->grama_niladhari_division ?? '') }}" required>
-							@error('grama_niladhari_division')
-								<div class="invalid-feedback">
-									<i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-								</div>
-							@enderror
-						</div>
-							<div class="col-12 mb-3">
-								<label class="form-label">
-									<i class="fa-solid fa-house"></i> Residential Address *
-								</label>
-								<textarea class="form-control @error('residential_address') is-invalid @enderror"
-										  name="residential_address" rows="3" required>{{ old('residential_address', $farmer->residential_address ?? '') }}</textarea>
-								@error('residential_address')
-									<div class="invalid-feedback">
-										<i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+					<div class="tabs-content">
+						<div class="tab-pane active" id="personal">
+							<form action="{{ route('farmer.profile.update') }}" method="POST" id="profileForm">
+								@csrf
+								<div class="form-section">
+									<h3><i class="fa-solid fa-id-card"></i> Personal Details</h3>
+									<div class="form-row">
+										<div class="form-field">
+											<label><i class="fa-solid fa-signature"></i> Full Name <span
+													class="required">*</span></label>
+											<input type="text" name="name"
+												value="{{ old('name', $farmer->name ?? Auth::user()->username) }}" required>
+											@error('name')<span class="error">{{ $message }}</span>@enderror
+										</div>
+										<div class="form-field">
+											<label><i class="fa-solid fa-at"></i> Email <span
+													class="required">*</span></label>
+											<input type="email" name="email" value="{{ old('email', Auth::user()->email) }}"
+												required>
+											@error('email')<span class="error">{{ $message }}</span>@enderror
+										</div>
+										<div class="form-field">
+											<label><i class="fa-solid fa-mobile"></i> Mobile <span
+													class="required">*</span></label>
+											<input type="tel" name="primary_mobile"
+												value="{{ old('primary_mobile', $farmer->primary_mobile ?? '') }}" required>
+											@error('primary_mobile')<span class="error">{{ $message }}</span>@enderror
+										</div>
+										<div class="form-field">
+											<label><i class="fa-brands fa-whatsapp"></i> WhatsApp</label>
+											<input type="tel" name="whatsapp_number"
+												value="{{ old('whatsapp_number', $farmer->whatsapp_number ?? '') }}">
+											@error('whatsapp_number')<span class="error">{{ $message }}</span>@enderror
+										</div>
+										<div class="form-field">
+											<label><i class="fa-solid fa-id-card"></i> NIC No. <span
+													class="required">*</span></label>
+											<div class="nic-field" id="nicWrapper">
+												<input type="text" name="nic_no" value="{{ $farmer->nic_no ?? '' }}"
+													readonly>
+												<i class="fa-solid fa-lock"></i>
+											</div>
+										</div>
+										<div class="form-field">
+											<label><i class="fa-solid fa-user"></i> Username <span
+													class="required">*</span></label>
+											<input type="text" name="username"
+												value="{{ old('username', Auth::user()->username) }}" required>
+											@error('username')<span class="error">{{ $message }}</span>@enderror
+										</div>
 									</div>
-								@enderror
-							</div>
-							<div class="col-12 mb-3">
-								<label class="form-label">
-									<i class="fa-solid fa-map-pin"></i> Google Maps Link *
-								</label>
-								<input type="url" class="form-control @error('address_map_link') is-invalid @enderror"
-									   name="address_map_link" value="{{ old('address_map_link', $farmer->address_map_link ?? '') }}" required placeholder="https://maps.google.com/...">
-								@error('address_map_link')
-									<div class="invalid-feedback">
-										<i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-									</div>
-								@enderror
-								<div class="form-hint">
-									<i class="fa-solid fa-circle-info"></i>
-									Copy your location from Google Maps for accurate pickup location.
 								</div>
-							</div>
-						</div>
 
-						<button type="submit" class="btn-submit">
-							<i class="fa-solid fa-floppy-disk"></i> Update Profile Information
-						</button>
-					</form>
+								<div class="form-section">
+									<h3><i class="fa-solid fa-location-dot"></i> Address Details</h3>
+									<div class="form-row">
+										<div class="form-field">
+											<label><i class="fa-solid fa-globe"></i> District <span
+													class="required">*</span></label>
+											<select name="district" id="district" required>
+												<option value="">Select District</option>
+											</select>
+											@error('district')<span class="error">{{ $message }}</span>@enderror
+										</div>
+										<div class="form-field">
+											<label><i class="fa-solid fa-building"></i> Divisional Secretariat <span
+													class="required">*</span></label>
+											<select name="divisional_secretariat" id="divisional_secretariat" required
+												disabled>
+												<option value="">Select DS</option>
+											</select>
+											@error('divisional_secretariat')<span
+											class="error">{{ $message }}</span>@enderror
+										</div>
+										<div class="form-field">
+											<label><i class="fa-solid fa-landmark"></i> GN Division <span
+													class="required">*</span></label>
+											<select name="grama_niladhari_division" id="grama_niladhari_division" required
+												disabled>
+												<option value="">Select GN Division</option>
+											</select>
+											@error('grama_niladhari_division')<span
+											class="error">{{ $message }}</span>@enderror
+										</div>
+										<div class="form-field">
+											<label><i class="fa-solid fa-hashtag"></i> GN Code</label>
+											<input type="text" name="gn_division_code" id="gn_division_code"
+												value="{{ old('gn_division_code', $farmer->gn_division_code ?? '') }}"
+												readonly>
+										</div>
+										<div class="form-field full-width">
+											<label><i class="fa-solid fa-house"></i> Address <span
+													class="required">*</span></label>
+											<textarea name="residential_address" rows="3"
+												required>{{ old('residential_address', $farmer->residential_address ?? '') }}</textarea>
+											@error('residential_address')<span class="error">{{ $message }}</span>@enderror
+										</div>
+										<div class="form-field full-width">
+											<label><i class="fa-solid fa-map"></i> Google Maps Link <span
+													class="required">*</span></label>
+											<input type="url" name="address_map_link"
+												value="{{ old('address_map_link', $farmer->address_map_link ?? '') }}"
+												placeholder="https://maps.google.com/..." required>
+											@error('address_map_link')<span class="error">{{ $message }}</span>@enderror
+											<small>Copy your location from Google Maps for accurate pickup</small>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-actions">
+									<button type="submit" class="btn-submit">
+										<i class="fa-solid fa-floppy-disk"></i>
+										<span>Update Profile</span>
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -194,164 +157,169 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-	document.addEventListener('DOMContentLoaded', function() {
-		@if(session('success'))
-			Swal.fire({
-				icon: 'success',
-				title: 'Success!',
-				text: '{{ session('success') }}',
-				toast: true,
-				position: 'top-end',
-				showConfirmButton: false,
-				timer: 3000,
-				timerProgressBar: true,
-				background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-				color: 'white',
-				iconColor: 'white',
-				customClass: {
-					popup: 'sweetalert-success'
-				}
-			});
-		@endif
-
-		@if(session('error'))
-			Swal.fire({
-				icon: 'error',
-				title: 'Error!',
-				text: '{{ session('error') }}',
-				toast: true,
-				position: 'top-end',
-				showConfirmButton: false,
-				timer: 4000,
-				timerProgressBar: true,
-				background: '#ef4444',
-				color: 'white',
-				iconColor: 'white',
-				customClass: {
-					popup: 'sweetalert-error'
-				}
-			});
-		@endif
-
-		document.querySelectorAll('.nav-link').forEach(button => {
-			button.addEventListener('click', function() {
-				const tabId = this.getAttribute('data-tab');
-				document.querySelectorAll('.nav-link').forEach(btn => {
-					btn.classList.remove('active');
-					btn.style.transform = '';
-				});
-				document.querySelectorAll('.tab-pane').forEach(pane => {
-					pane.classList.remove('active');
-					pane.style.animation = '';
-				});
-				this.classList.add('active');
-				this.style.transform = 'translateY(-2px)';
-				const activePane = document.getElementById(tabId);
-				activePane.classList.add('active');
-				activePane.style.animation = 'fadeInUp 0.4s ease-out';
-			});
-		});
-
-		const profileForm = document.getElementById('profileForm');
-		if (profileForm) {
-			profileForm.addEventListener('submit', function(e) {
-				e.preventDefault();
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="{{ asset('js/gn-data.js') }}"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			@if(session('success'))
 				Swal.fire({
-					title: 'Updating Profile...',
-					text: 'Please wait while we update your information.',
-					allowOutsideClick: false,
+					icon: 'success',
+					title: 'Success!',
+					text: '{{ session('success') }}',
+					toast: true,
+					position: 'top-end',
 					showConfirmButton: false,
-					willOpen: () => {
-						Swal.showLoading();
-					},
-					didOpen: () => {
-						setTimeout(() => {
-							profileForm.submit();
-						}, 500);
-					}
+					timer: 3000,
+					timerProgressBar: true,
+					background: '#10B981',
+					color: 'white'
+				});
+			@endif
+
+			@if(session('error'))
+				Swal.fire({
+					icon: 'error',
+					title: 'Error!',
+					text: '{{ session('error') }}',
+					toast: true,
+					position: 'top-end',
+					showConfirmButton: false,
+					timer: 4000,
+					timerProgressBar: true,
+					background: '#ef4444',
+					color: 'white'
+				});
+			@endif
+
+					const tabBtns = document.querySelectorAll('.tab-btn');
+			tabBtns.forEach(btn => {
+				btn.addEventListener('click', function () {
+					tabBtns.forEach(b => b.classList.remove('active'));
+					this.classList.add('active');
+					document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+					document.getElementById(this.dataset.tab).classList.add('active');
 				});
 			});
-		}
 
-		const inputs = document.querySelectorAll('.form-control, .form-select');
-		inputs.forEach(input => {
-			input.addEventListener('focus', function() {
-				this.parentElement.style.transform = 'translateY(-5px)';
-			});
-
-			input.addEventListener('blur', function() {
-				this.parentElement.style.transform = '';
-			});
-
-			input.addEventListener('mouseenter', function() {
-				this.style.boxShadow = '0 5px 20px rgba(16, 185, 129, 0.15)';
-			});
-
-			input.addEventListener('mouseleave', function() {
-				if (!this.matches(':focus')) {
-					this.style.boxShadow = '';
-				}
-			});
-		});
-
-		const profileAvatar = document.getElementById('profileAvatar');
-		if (profileAvatar) {
-			profileAvatar.addEventListener('error', function() {
-				this.src = '{{ asset('assets/images/default-avatar.png') }}';
-			});
-
-			profileAvatar.addEventListener('mouseenter', function() {
-				this.style.transform = 'scale(1.1)';
-			});
-
-			profileAvatar.addEventListener('mouseleave', function() {
-				this.style.transform = 'scale(1)';
-			});
-		}
-
-		const labels = document.querySelectorAll('.form-label');
-		labels.forEach(label => {
-			label.addEventListener('mouseenter', function() {
-				const icon = this.querySelector('i');
-				if (icon) {
-					icon.style.transform = 'scale(1.2) rotate(10deg)';
-				}
-			});
-
-			label.addEventListener('mouseleave', function() {
-				const icon = this.querySelector('i');
-				if (icon) {
-					icon.style.transform = '';
-				}
-			});
-		});
-
-		window.addEventListener('resize', function() {
-			if (window.innerWidth <= 767) {
-				document.querySelectorAll('.btn-submit').forEach(btn => {
-					btn.style.width = '100%';
-					btn.style.justifyContent = 'center';
-				});
-			} else {
-				document.querySelectorAll('.btn-submit').forEach(btn => {
-					btn.style.width = '';
-					btn.style.justifyContent = '';
+			const profileForm = document.getElementById('profileForm');
+			if (profileForm) {
+				profileForm.addEventListener('submit', function (e) {
+					e.preventDefault();
+					Swal.fire({
+						title: 'Updating...',
+						html: '<div class="spinner"></div>',
+						showConfirmButton: false,
+						allowOutsideClick: false
+					});
+					setTimeout(() => {
+						this.submit();
+					}, 500);
 				});
 			}
+
+			const nicWrapper = document.getElementById('nicWrapper');
+			if (nicWrapper) {
+				nicWrapper.addEventListener('click', function () {
+					Swal.fire({
+						title: 'NIC Cannot Be Changed',
+						text: 'Please contact your assigned Lead Farmer to update your NIC number.',
+						imageUrl: 'https://i.pinimg.com/originals/64/4b/0f/644b0f12e3f1dcb3890db07459e13e4c.gif',
+						imageWidth: 80,
+						imageHeight: 80,
+						imageAlt: 'Alert Icon',
+						confirmButtonColor: '#10B981'
+					});
+				});
+			}
+
+			const profileAvatar = document.getElementById('profileAvatar');
+			if (profileAvatar) {
+				profileAvatar.addEventListener('error', function () {
+					this.src = '{{ asset('assets/images/default-avatar.png') }}';
+				});
+			}
+
+			const districtSelect = document.getElementById('district');
+			const dsSelect = document.getElementById('divisional_secretariat');
+			const gnSelect = document.getElementById('grama_niladhari_division');
+			const gnCodeInput = document.getElementById('gn_division_code');
+
+			const initialDistrict = "{{ old('district', $farmer->district ?? '') }}";
+			const initialDS = "{{ old('divisional_secretariat', $farmer->divisional_secretariat ?? '') }}";
+			const initialGN = "{{ old('grama_niladhari_division', $farmer->grama_niladhari_division ?? '') }}";
+
+			function populateDistricts() {
+				if (typeof gnData !== 'undefined') {
+					Object.keys(gnData).sort().forEach(dist => {
+						const option = new Option(dist, dist);
+						if (dist === initialDistrict) option.selected = true;
+						districtSelect.add(option);
+					});
+					if (initialDistrict) populateDS(initialDistrict);
+				}
+			}
+
+			function populateDS(dist) {
+				dsSelect.innerHTML = '<option value="">Select DS</option>';
+				dsSelect.disabled = !dist;
+				gnSelect.innerHTML = '<option value="">Select GN Division</option>';
+				gnSelect.disabled = true;
+				gnCodeInput.value = '';
+
+				if (dist && gnData[dist]) {
+					Object.keys(gnData[dist]).sort().forEach(ds => {
+						const option = new Option(ds, ds);
+						if (ds === initialDS) option.selected = true;
+						dsSelect.add(option);
+					});
+					if (initialDS) populateGN(dist, initialDS);
+				}
+			}
+
+			function populateGN(dist, ds) {
+				gnSelect.innerHTML = '<option value="">Select GN Division</option>';
+				gnSelect.disabled = !ds;
+				gnCodeInput.value = '';
+
+				if (dist && ds && gnData[dist][ds]) {
+					gnData[dist][ds].forEach(gn => {
+						const option = new Option(gn.name, gn.name);
+						option.dataset.code = gn.code;
+						if (gn.name === initialGN) {
+							option.selected = true;
+							gnCodeInput.value = gn.code;
+						}
+						gnSelect.add(option);
+					});
+				}
+			}
+
+			districtSelect.addEventListener('change', function () {
+				populateDS(this.value);
+			});
+
+			dsSelect.addEventListener('change', function () {
+				populateGN(districtSelect.value, this.value);
+			});
+
+			gnSelect.addEventListener('change', function () {
+				const selected = this.options[this.selectedIndex];
+				gnCodeInput.value = selected.dataset.code || '';
+			});
+
+			populateDistricts();
+
+			window.addEventListener('resize', function () {
+				if (window.innerWidth <= 576) {
+					document.querySelectorAll('.form-actions .btn-submit').forEach(btn => {
+						btn.style.width = '100%';
+					});
+				} else {
+					document.querySelectorAll('.form-actions .btn-submit').forEach(btn => {
+						btn.style.width = '';
+					});
+				}
+			});
 		});
-
-		const submitButton = document.querySelector('.btn-submit');
-		if (submitButton) {
-			submitButton.addEventListener('mouseenter', function() {
-				this.style.letterSpacing = '1px';
-			});
-
-			submitButton.addEventListener('mouseleave', function() {
-				this.style.letterSpacing = '0.5px';
-			});
-		}
-	});
-</script>
+	</script>
 @endsection

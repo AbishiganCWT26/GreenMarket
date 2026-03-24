@@ -1126,7 +1126,9 @@ class FarmerController extends Controller
             'username' => 'required|string|max:50|unique:users,username,' . $user->id,
             'residential_address' => 'required|string',
             'district' => 'required|string',
+            'divisional_secretariat' => 'required|string',
             'grama_niladhari_division' => 'required|string|max:100',
+            'gn_division_code' => 'nullable|string|max:20',
             'address_map_link' => 'nullable|url',
         ]);
 
@@ -1142,7 +1144,9 @@ class FarmerController extends Controller
             'email' => $request->email,
             'residential_address' => $request->residential_address,
             'district' => $request->district,
+            'divisional_secretariat' => $request->divisional_secretariat,
             'grama_niladhari_division' => $request->grama_niladhari_division,
+            'gn_division_code' => $request->gn_division_code,
             'address_map_link' => $request->address_map_link,
         ]);
 
