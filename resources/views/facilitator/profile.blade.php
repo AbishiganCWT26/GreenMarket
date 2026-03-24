@@ -130,6 +130,33 @@
 							@endif
 						</div>
 					</div>
+
+					<div class="form-field">
+						<label>
+							<i class="fa-solid fa-id-card"></i>
+							NIC Number
+						</label>
+						<input type="text" name="nic_no" id="nic_no" value="{{ $facilitator->nic_no ?? '' }}" placeholder="Enter NIC number" required>
+						<div id="nicStatus" class="nic-status" style="font-size: 0.75rem; margin-top: 4px;"></div>
+					</div>
+
+					<div class="form-field">
+						<label>
+							<i class="fa-solid fa-mobile-screen"></i>
+							EzCash Number
+						</label>
+						<input type="text" name="ezcash_mobile" id="ezcash_mobile" value="{{ $facilitator->ezcash_mobile ?? '' }}" placeholder="074/076/077...">
+						<div id="ezcash_error" style="color: #ef4444; font-size: 0.75rem; margin-top: 4px; display: none;">Must start with 074, 076, or 077</div>
+					</div>
+
+					<div class="form-field">
+						<label>
+							<i class="fa-solid fa-mobile-screen"></i>
+							mCash Number
+						</label>
+						<input type="text" name="mcash_mobile" id="mcash_mobile" value="{{ $facilitator->mcash_mobile ?? '' }}" placeholder="070/071...">
+						<div id="mcash_error" style="color: #ef4444; font-size: 0.75rem; margin-top: 4px; display: none;">Must start with 070 or 071</div>
+					</div>
 				</div>
 
 				<div class="form-footer">
@@ -179,6 +206,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('js/form-validation.js') }}"></script>
 <script>
 document.getElementById('profile_photo').addEventListener('change', function(e) {
 	const file = e.target.files[0];
@@ -447,21 +475,6 @@ function sendOTP(type) {
 	.catch(err => Swal.fire('Error', 'Something went wrong', 'error'));
 }
 
-function togglePasswordVisibility(fieldId, iconId) {
-	const passwordField = document.getElementById(fieldId);
-	const toggleIcon = document.getElementById(iconId);
-	
-	if (passwordField.type === 'password') {
-		passwordField.type = 'text';
-		toggleIcon.classList.remove('fa-eye');
-		toggleIcon.classList.add('fa-eye-slash');
-	} else {
-		passwordField.type = 'password';
-		toggleIcon.classList.remove('fa-eye-slash');
-		toggleIcon.classList.add('fa-eye');
-	}
-}
-
 function changePassword() {
 	Swal.fire({
 		title: 'Change Password',
@@ -469,17 +482,44 @@ function changePassword() {
 			<div class="text-start">
 				<div class="mb-3">
 					<label class="form-label">New Password</label>
-					<div class="password-container">
-						<input type="password" class="form-control" id="newPassword" placeholder="New Password" required>
-						<i class="fa-regular fa-eye password-toggle" id="toggleNewPassword" onclick="togglePasswordVisibility('newPassword', 'toggleNewPassword')"></i>
+					<div class="password-container" style="position: relative;">
+						<input type="password" class="form-control" id="newPassword" placeholder="New Password" required oninput="updateStrength(this.value)">
+						<i class="fa-regular fa-eye password-toggle" id="toggleNewPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" onclick="togglePasswordVisibility('newPassword', 'toggleNewPassword')"></i>
+					</div>
+					<div class="strength-meter mt-2">
+						<div class="d-flex justify-content-between align-items-center mb-1">
+							<small>Strength: <span id="strength-text">None</span></small>
+						</div>
+						<div class="progress" style="height: 5px;">
+							<div id="strength-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+						</div>
+					</div>
+					<div class="requirements mt-3">
+						<h6 class="mb-2" style="font-size: 0.9rem;">Requirements:</h6>
+						<ul class="list-unstyled mb-0" style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+						<ul class="list-unstyled mb-0" style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+							<li id="rule-length" class="text-danger"><i class="fas fa-times me-1"></i> 8+ chars</li>
+							<li id="rule-number" class="text-danger"><i class="fas fa-times me-1"></i> Number</li>
+							<li id="rule-capital" class="text-danger"><i class="fas fa-times me-1"></i> Capital</li>
+							<li id="rule-lowercase" class="text-danger"><i class="fas fa-times me-1"></i> Lowercase</li>
+							<li id="rule-special" class="text-danger"><i class="fas fa-times me-1"></i> Special</li>
+							<li id="rule-no-space" class="text-danger"><i class="fas fa-times me-1"></i> No spaces</li>
+							<li id="rule-no-repeat" class="text-danger"><i class="fas fa-times me-1"></i> No repeat</li>
+							<li id="rule-no-sequence" class="text-danger"><i class="fas fa-times me-1"></i> No sequence</li>
+							<li id="rule-not-common" class="text-danger"><i class="fas fa-times me-1"></i> Not common</li>
+							<li id="rule-no-links" class="text-danger"><i class="fas fa-times me-1"></i> No links</li>
+							<li id="rule-no-personal" class="text-danger"><i class="fas fa-times me-1"></i> Personal</li>
+						</ul>
+						</ul>
 					</div>
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Confirm Password</label>
-					<div class="password-container">
+					<div class="password-container" style="position: relative;">
 						<input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
-						<i class="fa-regular fa-eye password-toggle" id="toggleConfirmPassword" onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword')"></i>
+						<i class="fa-regular fa-eye password-toggle" id="toggleConfirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword')"></i>
 					</div>
+					<div id="match-status" class="mt-1" style="font-size: 0.8rem;"></div>
 				</div>
 			</div>
 		`,
@@ -488,20 +528,36 @@ function changePassword() {
 		confirmButtonColor: '#10B981',
 		cancelButtonColor: '#6b7280',
 		showLoaderOnConfirm: true,
+		didOpen: () => {
+			const confirmInput = document.getElementById('confirmPassword');
+			confirmInput.addEventListener('input', () => {
+				const pass = document.getElementById('newPassword').value;
+				const confirm = confirmInput.value;
+				const status = document.getElementById('match-status');
+				if (confirm) {
+					if (pass === confirm) {
+						status.innerHTML = '<span class="text-success"><i class="fas fa-check"></i> Passwords match</span>';
+					} else {
+						status.innerHTML = '<span class="text-danger"><i class="fas fa-times"></i> Passwords mismatch</span>';
+					}
+				} else {
+					status.innerHTML = '';
+				}
+			});
+		},
 		preConfirm: () => {
 			const newPass = document.getElementById('newPassword').value;
 			const confirm = document.getElementById('confirmPassword').value;
 
-			if (!newPass || !confirm) {
-				Swal.showValidationMessage('All fields are required');
-				return false;
-			}
 			if (newPass !== confirm) {
 				Swal.showValidationMessage('Passwords do not match');
 				return false;
 			}
-			if (newPass.length < 8) {
-				Swal.showValidationMessage('Password must be at least 8 characters');
+			
+			// Re-verify strength
+			const result = calculateStrength(newPass);
+			if (!result.allValid) {
+				Swal.showValidationMessage('Please meet all password requirements');
 				return false;
 			}
 
@@ -512,9 +568,7 @@ function changePassword() {
 					'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
 					'Accept': 'application/json'
 				},
-				body: JSON.stringify({
-					new_password: newPass
-				})
+				body: JSON.stringify({ new_password: newPass })
 			})
 			.then(response => {
 				if (!response.ok) {
@@ -525,18 +579,76 @@ function changePassword() {
 			.catch(error => {
 				Swal.showValidationMessage(`Request failed: ${error}`);
 			});
-		},
-		allowOutsideClick: () => !Swal.isLoading()
+		}
 	}).then(result => {
 		if (result.isConfirmed) {
-			Swal.fire({
-				icon: 'success',
-				title: 'Success!',
-				text: 'Password changed successfully.',
-				confirmButtonColor: '#10B981'
-			}).then(() => location.reload());
+			Swal.fire({ icon: 'success', title: 'Success!', text: 'Password changed successfully.', confirmButtonColor: '#10B981' }).then(() => location.reload());
 		}
 	});
 }
+
+function calculateStrength(password) {
+    const username = "{{ Auth::user()->username }}";
+    const email = "{{ Auth::user()->email }}";
+    
+    const result = validateAdvancedPassword(password, { username, email });
+    updatePasswordRuleFeedback(result);
+    return result;
+}
+
+function updateStrength(password) {
+    const result = calculateStrength(password);
+    const strengthText = document.getElementById('strength-text');
+    const strengthBar = document.getElementById('strength-bar');
+    
+    strengthText.textContent = result.strengthText;
+    strengthText.style.color = result.color;
+    strengthBar.style.backgroundColor = result.color;
+    strengthBar.style.width = result.percent + '%';
+}
+
+function validateNIC(nic) {
+    if (!nic) return false;
+    nic = nic.trim().toUpperCase();
+    const oldNicPattern = /^[0-9]{9}[VX]$/;
+    const newNicPattern = /^[0-9]{12}$/;
+    if (oldNicPattern.test(nic)) {
+        const days = parseInt(nic.substr(2, 3));
+        return (days > 0 && days <= 366) || (days > 500 && days <= 866);
+    }
+    if (newNicPattern.test(nic)) {
+        const year = parseInt(nic.substr(0, 4));
+        const days = parseInt(nic.substr(4, 3));
+        return year >= 1900 && year <= 2100 && ((days > 0 && days <= 366) || (days > 500 && days <= 866));
+    }
+    return false;
+}
+
+document.getElementById('nic_no').addEventListener('input', function() {
+    const status = document.getElementById('nicStatus');
+    if (validateNIC(this.value)) {
+        status.innerHTML = '<span style="color: #10B981;"><i class="fas fa-check-circle"></i> Valid NIC</span>';
+    } else {
+        status.innerHTML = '<span style="color: #ef4444;"><i class="fas fa-times-circle"></i> Invalid NIC format</span>';
+    }
+});
+
+document.getElementById('ezcash_mobile').addEventListener('input', function() {
+    const err = document.getElementById('ezcash_error');
+    if (this.value && !/^(074|076|077)/.test(this.value)) {
+        err.style.display = 'block';
+    } else {
+        err.style.display = 'none';
+    }
+});
+
+document.getElementById('mcash_mobile').addEventListener('input', function() {
+    const err = document.getElementById('mcash_error');
+    if (this.value && !/^(070|071)/.test(this.value)) {
+        err.style.display = 'block';
+    } else {
+        err.style.display = 'none';
+    }
+});
 </script>
 @endsection

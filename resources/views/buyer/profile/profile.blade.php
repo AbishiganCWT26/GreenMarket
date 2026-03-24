@@ -6,6 +6,15 @@
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/buyer/profile.css') }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    .strength-bar { height: 5px; background: #e2e8f0; border-radius: 3px; margin-top: 5px; overflow: hidden; }
+    .strength-fill { height: 100%; width: 0; transition: all 0.3s; }
+    .password-container { position: relative; }
+    .password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: none; cursor: pointer; color: #64748b; }
+    .requirements li { margin-bottom: 5px; transition: all 0.3s; }
+    .text-success { color: #10B981 !important; }
+    .text-danger { color: #ef4444 !important; }
+</style>
 @endsection
 
 @section('content')
@@ -94,6 +103,34 @@
 					@enderror
 				</div>
 
+				<div class="row">
+					<div class="col-md-6 mb-3">
+						<label for="district" class="form-label">District *</label>
+						<select class="form-select @error('district') is-invalid @enderror" id="district" name="district" required>
+							<option value="{{ $buyer->district ?? '' }}" selected>{{ $buyer->district ?? 'Select District' }}</option>
+						</select>
+					</div>
+					<div class="col-md-6 mb-3">
+						<label for="ds_division" class="form-label">DS Division *</label>
+						<select class="form-select @error('ds_division') is-invalid @enderror" id="ds_division" name="ds_division" required>
+							<option value="{{ $buyer->ds_division ?? '' }}" selected>{{ $buyer->ds_division ?? 'Select DS' }}</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-6 mb-3">
+						<label for="grama_niladhari_division" class="form-label">GN Division *</label>
+						<select class="form-select @error('grama_niladhari_division') is-invalid @enderror" id="grama_niladhari_division" name="grama_niladhari_division" required>
+							<option value="{{ $buyer->grama_niladhari_division ?? '' }}" selected>{{ $buyer->grama_niladhari_division ?? 'Select GN' }}</option>
+						</select>
+					</div>
+					<div class="col-md-6 mb-3">
+						<label for="gn_code" class="form-label">GN Code</label>
+						<input type="text" class="form-control" id="gn_code" name="gn_code" value="{{ $buyer->gn_code ?? '' }}" readonly>
+					</div>
+				</div>
+
 				<button type="submit" class="btn btn-success">
 					<i class="fa-solid fa-save me-2"></i> Update Personal Details
 				</button>
@@ -156,24 +193,11 @@
 				@csrf
 				@method('PUT')
 
-				<div class="mb-3">
-					<label for="current_password" class="form-label">Current Password *</label>
-					<div class="password-container">
-						<input type="password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" required>
-						<button type="button" class="password-toggle" onclick="togglePasswordVisibility('current_password', 'current_password_icon')">
-							<i class="fa-regular fa-eye" id="current_password_icon"></i>
-						</button>
-					</div>
-					@error('current_password')
-						<div class="invalid-feedback">{{ $message }}</div>
-					@enderror
-				</div>
-
 				<div class="row">
 					<div class="col-md-6 mb-3">
 						<label for="new_password" class="form-label">New Password *</label>
 						<div class="password-container">
-							<input type="password" class="form-control @error('new_password') is-invalid @enderror" id="new_password" name="new_password" required oninput="checkPasswordStrength(this.value)">
+							<input type="password" class="form-control @error('new_password') is-invalid @enderror" id="new_password" name="new_password" required>
 							<button type="button" class="password-toggle" onclick="togglePasswordVisibility('new_password', 'new_password_icon')">
 								<i class="fa-regular fa-eye" id="new_password_icon"></i>
 							</button>
@@ -181,10 +205,12 @@
 						@error('new_password')
 							<div class="invalid-feedback">{{ $message }}</div>
 						@enderror
-						<div class="password-strength">
-							<div class="password-strength-text">Password strength: <span id="strength-text">None</span></div>
-							<div class="strength-bar">
-								<div class="strength-fill" id="strength-bar"></div>
+						<div class="password-strength mt-3">
+							<div class="d-flex justify-content-between align-items-center mb-1">
+								<small>Strength: <span id="strengthText">None</span></small>
+							</div>
+							<div class="strength-bar" id="strengthBar">
+								<div class="strength-fill" style="width: 0%; height: 100%; transition: width 0.3s;"></div>
 							</div>
 						</div>
 					</div>
@@ -196,12 +222,32 @@
 								<i class="fa-regular fa-eye" id="confirm_password_icon"></i>
 							</button>
 						</div>
+						<div id="passwordMatch" class="mt-2">
+							<small class="text-success d-none">
+								<i class="fas fa-check-circle"></i> Passwords match
+							</small>
+							<small class="text-danger d-none">
+								<i class="fas fa-times-circle"></i> Passwords don't match
+							</small>
+						</div>
 					</div>
 				</div>
 
-				<div class="alert alert-info mb-4">
-					<i class="fa-solid fa-info-circle me-2"></i>
-					Password must be at least 8 characters long and contain uppercase, lowercase, and numbers.
+				<div class="requirements mt-3">
+					<h6 class="mb-2">Password Requirements:</h6>
+					<ul class="list-unstyled" style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+						<li id="rule-length" class="text-danger"><i class="fas fa-times me-2"></i> Minimum 8 characters</li>
+						<li id="rule-number" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 number (0–9)</li>
+						<li id="rule-capital" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 capital (A–Z)</li>
+						<li id="rule-lowercase" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 lowercase (a–z)</li>
+						<li id="rule-special" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 special char</li>
+						<li id="rule-no-space" class="text-danger"><i class="fas fa-times me-2"></i> No spaces allowed</li>
+						<li id="rule-no-repeat" class="text-danger"><i class="fas fa-times me-2"></i> No consecutive repeat</li>
+						<li id="rule-no-sequence" class="text-danger"><i class="fas fa-times me-2"></i> No sequential chars</li>
+						<li id="rule-not-common" class="text-danger"><i class="fas fa-times me-2"></i> No common passwords</li>
+						<li id="rule-no-links" class="text-danger"><i class="fas fa-times me-2"></i> No links or URLs</li>
+						<li id="rule-no-personal" class="text-danger"><i class="fas fa-times me-2"></i> No personal info</li>
+					</ul>
 				</div>
 
 				<button type="submit" class="btn btn-success">
@@ -221,6 +267,8 @@
 
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('js/form-validation.js') }}"></script>
+<script src="{{ asset('js/gn-data.js') }}"></script>
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
 		@if(session('success'))
@@ -333,34 +381,137 @@
 		}
 	}
 
-	function checkPasswordStrength(password) {
-		let strength = 0;
-		const strengthText = document.getElementById('strength-text');
-		const strengthBar = document.getElementById('strength-bar');
-
-		if (password.length >= 8) strength++;
-		if (/[A-Z]/.test(password)) strength++;
-		if (/[a-z]/.test(password)) strength++;
-		if (/[0-9]/.test(password)) strength++;
-		if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-		let strengthClass = 'strength-weak';
-		let text = 'Weak';
-		let width = '20%';
-
-		if (strength >= 4) {
-			strengthClass = 'strength-strong';
-			text = 'Strong';
-			width = '100%';
-		} else if (strength >= 3) {
-			strengthClass = 'strength-medium';
-			text = 'Medium';
-			width = '60%';
+	function validatePasswordStrength(passwordValue) {
+		const strengthText = document.getElementById('strengthText');
+		const strengthBar = document.getElementById('strengthBar');
+		const fill = strengthBar.querySelector('.strength-fill');
+		
+		if (!passwordValue) {
+			strengthText.textContent = 'None';
+			strengthText.style.color = '#cbd5e1';
+			fill.style.width = '0%';
+			updatePasswordRuleFeedback({ rules: { length: false, number: false, capital: false, lowercase: false, special: false, 'no-space': false, 'no-repeat': false, 'no-sequence': false, 'not-common': false, 'no-links': false, 'no-personal': false } });
+			return false;
 		}
 
-		strengthText.textContent = text;
-		strengthBar.className = 'strength-fill ' + strengthClass;
-		strengthBar.style.width = width;
+		const username = "{{ Auth::user()->username }}";
+		const email = "{{ Auth::user()->email }}";
+		
+		const result = validateAdvancedPassword(passwordValue, { username, email });
+		updatePasswordRuleFeedback(result);
+
+		strengthText.textContent = result.strengthText;
+		strengthText.style.color = result.color;
+		fill.style.backgroundColor = result.color;
+		fill.style.width = result.percent + '%';
+        
+		return result.isValid;
+	}
+
+	document.addEventListener('DOMContentLoaded', function () {
+		const passwordInput = document.getElementById('new_password');
+		const confirmInput = document.getElementById('new_password_confirmation');
+		const submitBtn = document.querySelector('#passwordForm button[type="submit"]');
+		const passwordMatch = document.getElementById('passwordMatch');
+
+		if (passwordInput && confirmInput && submitBtn) {
+			submitBtn.disabled = true;
+
+			function validatePasswordMatch() {
+				const match = passwordInput.value === confirmInput.value;
+				const successMsg = passwordMatch.querySelector('.text-success');
+				const errorMsg = passwordMatch.querySelector('.text-danger');
+				
+				if (passwordInput.value && confirmInput.value) {
+					if (match) {
+						successMsg.classList.remove('d-none');
+						errorMsg.classList.add('d-none');
+					} else {
+						successMsg.classList.add('d-none');
+						errorMsg.classList.remove('d-none');
+					}
+				} else {
+					successMsg.classList.add('d-none');
+					errorMsg.classList.add('d-none');
+				}
+				return match;
+			}
+
+			function updateSubmitState() {
+				const isStrengthValid = validatePasswordStrength(passwordInput.value);
+				const isMatchValid = validatePasswordMatch();
+				submitBtn.disabled = !(isStrengthValid && isMatchValid);
+			}
+
+			passwordInput.addEventListener('input', updateSubmitState);
+			confirmInput.addEventListener('input', updateSubmitState);
+		}
+	});
+
+	// GN Data dropdowns
+	if (typeof gnData !== 'undefined') {
+		const distSelect = document.getElementById('district');
+		const dsSelect = document.getElementById('ds_division');
+		const gnSelect = document.getElementById('grama_niladhari_division');
+		const codeInput = document.getElementById('gn_code');
+
+		const initialDist = "{{ $buyer->district ?? '' }}";
+		const initialDS = "{{ $buyer->ds_division ?? '' }}";
+		const initialGN = "{{ $buyer->grama_niladhari_division ?? '' }}";
+
+		// Populate Districts
+		distSelect.innerHTML = '<option value="" disabled>Select District</option>';
+		Object.keys(gnData).forEach(dist => {
+			distSelect.append(new Option(dist, dist, dist === initialDist, dist === initialDist));
+		});
+
+		const updateDS = () => {
+			const dist = distSelect.value;
+			dsSelect.innerHTML = '<option value="" disabled selected>Select DS</option>';
+			if (dist && gnData[dist]) {
+				Object.keys(gnData[dist]).forEach(ds => {
+					dsSelect.append(new Option(ds, ds, ds === (dsSelect.dataset.initial || initialDS), ds === (dsSelect.dataset.initial || initialDS)));
+				});
+				dsSelect.disabled = false;
+				if (dsSelect.value) updateGN();
+			} else {
+				dsSelect.disabled = true;
+			}
+		};
+
+		const updateGN = () => {
+			const dist = distSelect.value;
+			const ds = dsSelect.value;
+			gnSelect.innerHTML = '<option value="" disabled selected>Select GN</option>';
+			if (dist && ds && gnData[dist][ds]) {
+				gnData[dist][ds].forEach(gn => {
+					const opt = new Option(gn.name, gn.name, gn.name === (gnSelect.dataset.initial || initialGN), gn.name === (gnSelect.dataset.initial || initialGN));
+					opt.dataset.code = gn.code;
+					gnSelect.append(opt);
+				});
+				gnSelect.disabled = false;
+				const selected = gnSelect.options[gnSelect.selectedIndex];
+				if (selected && selected.dataset.code) codeInput.value = selected.dataset.code;
+			} else {
+				gnSelect.disabled = true;
+			}
+		};
+
+		distSelect.addEventListener('change', () => {
+			dsSelect.dataset.initial = '';
+			gnSelect.dataset.initial = '';
+			updateDS();
+		});
+		dsSelect.addEventListener('change', () => {
+			gnSelect.dataset.initial = '';
+			updateGN();
+		});
+		gnSelect.addEventListener('change', function() {
+			const code = this.options[this.selectedIndex].dataset.code;
+			codeInput.value = code || '';
+		});
+
+		updateDS();
 	}
 </script>
 @endsection

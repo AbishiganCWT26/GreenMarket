@@ -93,7 +93,7 @@ class UserController extends Controller
                     'html' => view($viewName, [
                         'users' => $usersPaginator->getCollection()
                     ])->render(),
-                    'pagination' => $usersPaginator->links('vendor.pagination.simple-unique')->render(),
+                    'pagination' => $usersPaginator->links('vendor.pagination.simple-unique')->toHtml(),
                     'total' => $usersPaginator->total(),
                     'stats' => [
                         'active' => $activeUsers,
@@ -507,6 +507,19 @@ class UserController extends Controller
 
         $roleChanged = $validated['role'] != $user->role;
 
+        // Check for sensitive data changes and verify OTP
+        $sensitiveDataCheck = $this->checkSensitiveDataChanges($user, $request);
+        if ($sensitiveDataCheck['changed']) {
+            if (!$this->isOtpVerified($user->id, $sensitiveDataCheck['actions'])) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'OTP verification required for updating sensitive ' . 
+                                ($sensitiveDataCheck['actions'] == ['verify_nic'] ? 'NIC' : 
+                                ($sensitiveDataCheck['actions'] == ['edit_payment'] ? 'payment' : 'NIC and payment')) . ' data.'
+                ], 403);
+            }
+        }
+
         if ($roleChanged && in_array($user->role, ['farmer', 'lead_farmer']) && in_array($validated['role'], ['farmer', 'lead_farmer'])) {
             return $this->handleFarmerRoleChange($user, $validated, $request, $id);
         }
@@ -738,6 +751,7 @@ class UserController extends Controller
         $updateData = [
             'business_name' => $request->business_name ?? ($buyer->business_name ?? ''),
             'business_type' => $request->business_type ?? ($buyer->business_type ?? 'individual'),
+            'nic_no' => $request->buyer_nic_no ?? $request->nic_no ?? ($buyer->nic_no ?? ''),
             'updated_at' => now()
         ];
 
@@ -1052,16 +1066,16 @@ class UserController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'action' => 'required|in:edit_payment'
+            'action' => 'required|in:edit_payment,verify_nic'
         ]);
 
         $user = DB::table('users')->find($request->user_id);
 
-        if (!in_array($user->role, ['farmer', 'lead_farmer'])) {
-            return response()->json(['success' => false, 'message' => 'OTP only required for farmers'], 400);
+        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer'])) {
+            return response()->json(['success' => false, 'message' => 'OTP only required for sensitive roles'], 400);
         }
 
-        $table = $user->role == 'farmer' ? 'farmers' : 'lead_farmers';
+        $table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : 'buyers')));
         $details = DB::table($table)->where('user_id', $user->id)->first();
 
         if (!$details || !$details->primary_mobile) {
@@ -1079,7 +1093,11 @@ class UserController extends Controller
             'created_at' => now()
         ]);
 
-        $smsSent = $this->sendSmsOtp($details->primary_mobile, $otp);
+        $message = $request->action == 'verify_nic' 
+            ? "Your OTP for NIC update is: $otp. Valid for 5 minutes."
+            : "Your OTP for payment details update is: $otp. Valid for 5 minutes.";
+
+        $smsSent = $this->sendSmsOtpCustom($details->primary_mobile, $otp, $message);
 
         if ($smsSent) {
             return response()->json(['success' => true, 'message' => 'OTP sent successfully']);
@@ -1093,7 +1111,7 @@ class UserController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'otp' => 'required|digits:6',
-            'action' => 'required|in:edit_payment'
+            'action' => 'required|in:edit_payment,verify_nic'
         ]);
 
         $otpRecord = DB::table('otp_verifications')
@@ -1123,11 +1141,11 @@ class UserController extends Controller
 
         $user = DB::table('users')->find($request->user_id);
 
-        if (!in_array($user->role, ['farmer', 'lead_farmer'])) {
-            return response()->json(['success' => false, 'message' => 'OTP only required for farmers'], 400);
+        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer'])) {
+            return response()->json(['success' => false, 'message' => 'OTP only required for sensitive roles'], 400);
         }
 
-        $table = $user->role == 'farmer' ? 'farmers' : 'lead_farmers';
+        $table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : 'buyers')));
         $details = DB::table($table)->where('user_id', $user->id)->first();
 
         if (!$details || !$details->primary_mobile) {
@@ -1142,15 +1160,21 @@ class UserController extends Controller
         $otp = rand(100000, 999999);
         $expiresAt = now()->addMinutes(5);
 
+        $action = $request->action ?? 'edit_payment';
+        
         DB::table('otp_verifications')->insert([
             'user_id' => $user->id,
             'otp' => $otp,
-            'action' => 'edit_payment',
+            'action' => $action,
             'expires_at' => $expiresAt,
             'created_at' => now()
         ]);
 
-        $smsSent = $this->sendSmsOtp($details->primary_mobile, $otp);
+        $message = $action == 'verify_nic' 
+            ? "Your OTP for NIC update is: $otp. Valid for 5 minutes."
+            : "Your OTP for payment details update is: $otp. Valid for 5 minutes.";
+
+        $smsSent = $this->sendSmsOtpCustom($details->primary_mobile, $otp, $message);
 
         if ($smsSent) {
             return response()->json(['success' => true, 'message' => 'OTP resent successfully']);
@@ -1181,6 +1205,61 @@ class UserController extends Controller
         ]);
 
         return response()->json(['success' => true, 'message' => 'Notification sent']);
+    }
+
+    private function sendSmsOtpCustom($mobile, $otp, $message)
+    {
+        try {
+            $user = env('SMS_USER');
+            $password = env('SMS_PASSWORD');
+            $baseurl = env('SMS_API_URL');
+
+            if (!$user || !$password || !$baseurl) {
+                \Log::info("SMS OTP for {$mobile}: {$otp} (SMS not configured). Msg: {$message}");
+                return true;
+            }
+
+            // Format mobile number: remove non-digits, remove leading '0', prepend '94'
+            $mobile = preg_replace('/[^0-9]/', '', $mobile);
+            if (strpos($mobile, '0') === 0) {
+                $mobile = '94' . substr($mobile, 1);
+            } elseif (strpos($mobile, '94') !== 0) {
+                $mobile = '94' . $mobile;
+            }
+
+            $text = urlencode($message);
+
+            $baseurl = rtrim($baseurl, '/');
+            $url = "{$baseurl}/?id={$user}&pw={$password}&to={$mobile}&text={$text}";
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($response !== false) {
+                $result = explode(":", $response);
+                if (trim($result[0]) == "OK") {
+                    \Log::info("SMS OTP sent successfully to {$mobile}. Response: {$response}");
+                    return true;
+                } else {
+                    \Log::error("SMS OTP failed for {$mobile}. Response: {$response}");
+                }
+            } else {
+                \Log::error("Curl error sending SMS OTP to {$mobile}. HTTP Code: {$httpCode}");
+            }
+
+            return false;
+
+        } catch (\Exception $e) {
+            \Log::error("SMS sending failed: " . $e->getMessage());
+            return false;
+        }
     }
 
     private function sendSmsOtp($mobile, $otp)
@@ -1395,6 +1474,58 @@ class UserController extends Controller
         if ($mobile && !empty($changes)) {
             $this->sendSms($mobile, "Your account details have been updated.");
         }
+    }
+
+    private function checkSensitiveDataChanges($user, $request)
+    {
+        $changed = false;
+        $actions = [];
+
+        $details = $this->getUserDetails($user);
+        if (!$details) return ['changed' => false, 'actions' => []];
+
+        // Check NIC change
+        $currentNic = null;
+        if (in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer', 'admin', 'subadmin'])) {
+            $currentNic = $details->nic_no ?? '';
+        }
+
+        $newNic = $request->nic_no ?? $request->facilitator_nic_no ?? $request->buyer_nic_no ?? '';
+        if ($currentNic !== null && $newNic && (string)$currentNic !== (string)$newNic) {
+            $changed = true;
+            $actions[] = 'verify_nic';
+        }
+
+        // Check payment data change
+        if (in_array($user->role, ['farmer', 'lead_farmer'])) {
+            $paymentFields = ['preferred_payment', 'account_number', 'account_holder_name', 'bank_name', 'bank_branch', 'ezcash_mobile', 'mcash_mobile'];
+            foreach ($paymentFields as $field) {
+                $oldVal = (string)($details->$field ?? '');
+                $newVal = (string)($request->$field ?? '');
+                if ($oldVal !== $newVal) {
+                    $changed = true;
+                    if (!in_array('edit_payment', $actions)) $actions[] = 'edit_payment';
+                }
+            }
+        }
+
+        return ['changed' => $changed, 'actions' => $actions];
+    }
+
+    private function isOtpVerified($userId, $requiredActions)
+    {
+        // For security, an OTP is valid for 15 minutes after being used
+        foreach ($requiredActions as $action) {
+            $verified = DB::table('otp_verifications')
+                ->where('user_id', $userId)
+                ->where('action', $action)
+                ->where('used', true)
+                ->where('used_at', '>=', now()->subMinutes(15))
+                ->exists();
+            
+            if (!$verified) return false;
+        }
+        return true;
     }
 
     private function sendDeactivationNotification($userId)

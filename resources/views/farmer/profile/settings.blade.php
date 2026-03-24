@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{{ asset('css/farmer/settings.css') }}">
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="{{ asset('js/form-validation.js') }}"></script>
 @endsection
 
 @section('content')
@@ -72,6 +73,42 @@
                                     <div id="meter-fill" class="meter-fill"></div>
                                 </div>
                             </div>
+
+                            <div class="password-requirements-grid mt-3">
+                                <style>
+                                    .password-requirements-grid {
+                                        display: grid;
+                                        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                                        gap: 10px;
+                                        background: #f8fafc;
+                                        padding: 15px;
+                                        border-radius: 8px;
+                                        border: 1px solid #e2e8f0;
+                                    }
+                                    .rule-item {
+                                        font-size: 0.75rem;
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 8px;
+                                        color: #64748b;
+                                        transition: all 0.3s ease;
+                                    }
+                                    .rule-item.valid { color: #10B981; }
+                                    .rule-item.invalid { color: #ef4444; }
+                                    .rule-item i { font-size: 0.8rem; width: 12px; }
+                                </style>
+                                <div class="rule-item" id="rule-length"><i class="fas fa-circle"></i> 8+ Characters</div>
+                                <div class="rule-item" id="rule-number"><i class="fas fa-circle"></i> 1+ Number</div>
+                                <div class="rule-item" id="rule-capital"><i class="fas fa-circle"></i> 1+ Capital</div>
+                                <div class="rule-item" id="rule-lowercase"><i class="fas fa-circle"></i> 1+ Lowercase</div>
+                                <div class="rule-item" id="rule-special"><i class="fas fa-circle"></i> 1+ Special</div>
+                                <div class="rule-item" id="rule-no-space"><i class="fas fa-circle"></i> No Spaces</div>
+                                <div class="rule-item" id="rule-no-repeat"><i class="fas fa-circle"></i> No 3x Repeat</div>
+                                <div class="rule-item" id="rule-no-sequence"><i class="fas fa-circle"></i> No Sequence</div>
+                                <div class="rule-item" id="rule-not-common"><i class="fas fa-circle"></i> Not Common</div>
+                                <div class="rule-item" id="rule-no-links"><i class="fas fa-circle"></i> No Links</div>
+                                <div class="rule-item" id="rule-no-personal"><i class="fas fa-circle"></i> No Personal Info</div>
+                            </div>
                         </div>
 
                         <div class="input-group">
@@ -118,35 +155,26 @@
     }
 
     function updateStrength(password) {
-        let score = 0;
+        const result = validateAdvancedPassword(password, {
+            username: "{{ Auth::user()->username }}",
+            email: "{{ Auth::user()->email }}"
+        });
+
         const label = document.getElementById('strength-label');
         const fill = document.getElementById('meter-fill');
         const btn = document.getElementById('submitBtn');
 
-        if (password.length >= 8) score++;
-        if (/[A-Z]/.test(password)) score++;
-        if (/[a-z]/.test(password)) score++;
-        if (/[0-9]/.test(password)) score++;
-        if (/[@$!%*#?&]/.test(password)) score++;
+        // Update overall meter
+        label.textContent = result.strengthText;
+        label.style.color = result.color;
+        fill.style.width = result.percent + '%';
+        fill.style.backgroundColor = result.color;
 
-        currentStrength = score;
+        // Update individual rules
+        updatePasswordRuleFeedback(result);
 
-        const config = [
-            { text: 'None', color: '#cbd5e1', width: '0%' },
-            { text: 'Very Weak', color: '#ef4444', width: '20%' },
-            { text: 'Weak', color: '#f59e0b', width: '40%' },
-            { text: 'Fair', color: '#3b82f6', width: '60%' },
-            { text: 'Good', color: '#8b5cf6', width: '80%' },
-            { text: 'Strong', color: '#10B981', width: '100%' }
-        ];
-
-        const state = config[score];
-        label.textContent = state.text;
-        label.style.color = state.color;
-        fill.style.width = state.width;
-        fill.style.backgroundColor = state.color;
-
-        btn.disabled = score < 5;
+        currentStrength = result.isValid ? 5 : 0; // Maintain internal logic for submit check
+        btn.disabled = !result.isValid;
     }
 
     document.getElementById('securityForm').addEventListener('submit', async function(e)

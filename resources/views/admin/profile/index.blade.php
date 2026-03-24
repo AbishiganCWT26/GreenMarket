@@ -5,6 +5,7 @@
 @section('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="{{ asset('js/form-validation.js') }}"></script>
 <style>
 :root {
     --primary-green: #10B981;
@@ -292,27 +293,53 @@
 }
 
 .password-container {
-    position: relative;
+    position: relative; 
+    display: flex;
+    align-items: center; 
+}
+
+.password-container input[type="password"] {
+    width: 100%;
+    padding-right: 40px; 
 }
 
 .password-toggle {
     position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
+    right: 12px; 
     cursor: pointer;
-    color: var(--muted);
-    font-size: 16px;
-    padding: 5px;
-    transition: all 0.3s ease;
+    font-size: 1.1rem; 
+    color: #6c757d; 
+    padding: 5px; 
+    transition: color 0.2s ease;
     z-index: 10;
 }
 
 .password-toggle:hover {
-    color: var(--primary-green);
-    transform: translateY(-50%) scale(1.2);
+    color: var(--primary-green); 
+}
+
+input[type="text"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    color: #333;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+select:focus {
+    border-color: var(--primary-green);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--focus-shadow);
 }
 
 .strength-meter {
@@ -746,11 +773,17 @@
                     <div class="requirements">
                         <h5><i class="fas fa-lightbulb"></i> Password Requirements</h5>
                         <ul>
-                            <li id="req-length" class="invalid">At least 8 characters</li>
-                            <li id="req-uppercase" class="invalid">One uppercase letter</li>
-                            <li id="req-lowercase" class="invalid">One lowercase letter</li>
-                            <li id="req-number" class="invalid">One number</li>
-                            <li id="req-special" class="invalid">One special character</li>
+                            <li id="rule-length" class="rule-item invalid"><i class="fas fa-times-circle"></i> Minimum 8 characters</li>
+                            <li id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 number (0–9)</li>
+                            <li id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 capital letter (A–Z)</li>
+                            <li id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 lowercase letter (a–z)</li>
+                            <li id="rule-special" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 special character</li>
+                            <li id="rule-no-space" class="rule-item invalid"><i class="fas fa-times-circle"></i> No spaces allowed</li>
+                            <li id="rule-no-repeat" class="rule-item invalid"><i class="fas fa-times-circle"></i> No consecutive repeated characters</li>
+                            <li id="rule-no-sequence" class="rule-item invalid"><i class="fas fa-times-circle"></i> No sequential characters</li>
+                            <li id="rule-not-common" class="rule-item invalid"><i class="fas fa-times-circle"></i> No common passwords</li>
+                            <li id="rule-no-links" class="rule-item invalid"><i class="fas fa-times-circle"></i> No links or URLs</li>
+                            <li id="rule-no-personal" class="rule-item invalid"><i class="fas fa-times-circle"></i> No personal info</li>
                         </ul>
                     </div>
 
@@ -762,7 +795,7 @@
                             <input type="password" name="current_password" id="current_password"
                                    class="form-control @error('current_password') is-invalid @enderror"
                                    placeholder="Enter current password" required>
-                            <i class="fas fa-eye password-toggle" id="toggleCurrentPassword"></i>
+                             <i class="fa-regular fa-eye password-toggle" id="toggleCurrentPassword" onclick="togglePasswordVisibility('current_password', 'toggleCurrentPassword')"></i>
                         </div>
                         @error('current_password')
                             <div class="invalid-feedback">
@@ -780,7 +813,7 @@
                                    class="form-control @error('new_password') is-invalid @enderror"
                                    placeholder="Enter new password"
                                    oninput="checkPasswordStrength(this.value)" required>
-                            <i class="fas fa-eye password-toggle" id="toggleNewPassword"></i>
+                            <i class="fa-regular fa-eye password-toggle" id="toggleNewPassword" onclick="togglePasswordVisibility('new_password', 'toggleNewPassword')"></i>
                         </div>
 
                         <div class="strength-meter">
@@ -806,7 +839,7 @@
                         <div class="password-container">
                             <input type="password" name="new_password_confirmation" id="confirm_password"
                                    class="form-control" placeholder="Confirm new password" required>
-                            <i class="fas fa-eye password-toggle" id="toggleConfirmPassword"></i>
+                            <i class="fa-regular fa-eye password-toggle" id="toggleConfirmPassword" onclick="togglePasswordVisibility('confirm_password', 'toggleConfirmPassword')"></i>
                         </div>
                         <div class="error-text" id="passwordMatchError" style="display: none;">
                             <i class="fas fa-exclamation-circle"></i> Passwords do not match
@@ -893,96 +926,93 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    const toggleCurrentPassword = document.getElementById('toggleCurrentPassword');
-    const toggleNewPassword = document.getElementById('toggleNewPassword');
-    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-
-    toggleCurrentPassword.addEventListener('click', function() {
-        togglePasswordVisibility('current_password', this);
-    });
-
-    toggleNewPassword.addEventListener('click', function() {
-        togglePasswordVisibility('new_password', this);
-    });
-
-    toggleConfirmPassword.addEventListener('click', function() {
-        togglePasswordVisibility('confirm_password', this);
-    });
+    // Global function for password visibility toggle as per user request
+    window.togglePasswordVisibility = function(fieldId, iconId) {
+        const passwordField = document.getElementById(fieldId);
+        const toggleIcon = document.getElementById(iconId);
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    };
 
     const newPasswordInput = document.getElementById('new_password');
     const confirmPasswordInput = document.getElementById('confirm_password');
 
-    newPasswordInput.addEventListener('input', function() {
-        checkPasswordMatch();
-    });
+    if (newPasswordInput) {
+        newPasswordInput.addEventListener('input', function() {
+            checkPasswordMatch();
+        });
+    }
 
-    confirmPasswordInput.addEventListener('input', function() {
-        checkPasswordMatch();
-    });
+    if (confirmPasswordInput) {
+        confirmPasswordInput.addEventListener('input', function() {
+            checkPasswordMatch();
+        });
+    }
 
     const profileForm = document.getElementById('profileForm');
     const securityForm = document.getElementById('securityForm');
 
-    profileForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        showLoading();
-        this.submit();
-    });
-
-    securityForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const newPassword = document.getElementById('new_password').value;
-        const confirmPassword = document.getElementById('confirm_password').value;
-
-        if (newPassword !== confirmPassword) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Password Mismatch',
-                text: 'New password and confirmation password do not match.',
-                background: '#ef4444',
-                color: 'white',
-                iconColor: 'white',
-                toast: true,
-                position: 'top-end',
-                timer: 3000,
-                timerProgressBar: true
-            });
-            return;
-        }
-
-        if (currentStrength < 5) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Weak Password',
-                text: 'Please use a stronger password for better security.',
-                background: '#f59e0b',
-                color: 'white',
-                iconColor: 'white',
-                toast: true,
-                position: 'top-end',
-                timer: 3000,
-                timerProgressBar: true
-            });
-            return;
-        }
-
-        showLoading();
-        this.submit();
-    });
-
-    function togglePasswordVisibility(inputId, toggleIcon) {
-        const input = document.getElementById(inputId);
-        if (input.type === 'password') {
-            input.type = 'text';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        } else {
-            input.type = 'password';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
-        }
+    if (profileForm) {
+        profileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoading();
+            this.submit();
+        });
     }
+
+    if (securityForm) {
+        securityForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (newPassword !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password Mismatch',
+                    text: 'New password and confirmation password do not match.',
+                    background: '#ef4444',
+                    color: 'white',
+                    iconColor: 'white',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                return;
+            }
+
+            if (currentStrength < 5) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Weak Password',
+                    text: 'Please use a stronger password for better security.',
+                    background: '#f59e0b',
+                    color: 'white',
+                    iconColor: 'white',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                return;
+            }
+
+            showLoading();
+            this.submit();
+        });
+    }
+
+
 
     function checkPasswordMatch() {
         const newPassword = newPasswordInput.value;
@@ -1088,54 +1118,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
 let currentStrength = 0;
 
-function checkPasswordStrength(password) {
-    let strength = 0;
-    const requirements = {
-        length: password.length >= 8,
-        uppercase: /[A-Z]/.test(password),
-        lowercase: /[a-z]/.test(password),
-        number: /[0-9]/.test(password),
-        special: /[@$!%*#?&]/.test(password)
-    };
+function isSequential(str) {
+    for (let i = 0; i < str.length - 2; i++) {
+        const c1 = str.toLowerCase().charCodeAt(i);
+        const c2 = str.toLowerCase().charCodeAt(i + 1);
+        const c3 = str.toLowerCase().charCodeAt(i + 2);
+        if ((c1 + 1 === c2 && c2 + 1 === c3) || (c1 - 1 === c2 && c2 - 1 === c3)) return true;
+    }
+    return false;
+}
 
-    Object.values(requirements).forEach(req => {
-        if (req) strength++;
+function checkPasswordStrength(password) {
+    if (!password) return;
+    const result = validateAdvancedPassword(password, {
+        username: "{{ Auth::user()->username }}",
+        email: "{{ Auth::user()->email }}"
     });
 
-    currentStrength = strength;
+    updatePasswordRuleFeedback(result);
 
     const strengthText = document.getElementById('strengthText');
     const strengthFill = document.getElementById('strengthFill');
     const submitBtn = document.getElementById('securitySubmit');
 
-    const strengthLevels = [
-        { text: 'None', color: '#e5e7eb', width: '0%' },
-        { text: 'Very Weak', color: '#ef4444', width: '20%' },
-        { text: 'Weak', color: '#f59e0b', width: '40%' },
-        { text: 'Fair', color: '#3b82f6', width: '60%' },
-        { text: 'Good', color: '#8b5cf6', width: '80%' },
-        { text: 'Strong', color: '#10B981', width: '100%' }
-    ];
-
-    const level = strengthLevels[strength];
-    strengthText.textContent = level.text;
-    strengthText.style.color = level.color;
-    strengthFill.style.width = level.width;
-    strengthFill.style.backgroundColor = level.color;
-
-    Object.keys(requirements).forEach((key, index) => {
-        const reqElement = document.getElementById(`req-${key}`);
-        if (requirements[key]) {
-            reqElement.classList.remove('invalid');
-            reqElement.classList.add('valid');
-        } else {
-            reqElement.classList.remove('valid');
-            reqElement.classList.add('invalid');
-        }
-    });
+    strengthText.textContent = result.strengthText;
+    strengthText.style.color = result.color;
+    strengthFill.style.width = result.percent + '%';
+    strengthFill.style.backgroundColor = result.color;
 
     const confirmPassword = document.getElementById('confirm_password').value;
-    submitBtn.disabled = strength < 5 || (confirmPassword && password !== confirmPassword);
+    submitBtn.disabled = !result.isValid || (confirmPassword && password !== confirmPassword);
 
     checkPasswordMatch();
 }

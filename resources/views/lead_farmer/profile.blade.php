@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{{ asset('css/lead_farmer/Profile.css') }}">
 <link rel="stylesheet" href="{{ asset('css/lead_farmer/sweetalert_custom1.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="{{ asset('js/form-validation.js') }}"></script>
 @endsection
 
 @section('content')
@@ -202,40 +203,40 @@
                         <div class="form-section">
                             <div class="section-heading">
                                 <i class="fas fa-wallet"></i>
-                                <span>Bank Details</span>
+                                <span>Payment Details</span>
                             </div>
                             <div class="form-grid">
                                 <div class="form-group compact">
                                     <label><i class="fas fa-user-tie"></i>Account Holder</label>
                                     <input type="text" name="account_holder_name" class="form-input @error('account_holder_name') error-input @enderror" 
                                            value="{{ old('account_holder_name', $leadFarmer->account_holder_name) }}" required>
-                                    @error('account_holder_name')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
                                 </div>
                                 <div class="form-group compact">
                                     <label><i class="fas fa-hashtag"></i>Account Number</label>
                                     <input type="text" name="account_number" class="form-input @error('account_number') error-input @enderror" 
                                            value="{{ old('account_number', $leadFarmer->account_number) }}" required>
-                                    @error('account_number')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
                                 </div>
                                 <div class="form-group compact">
                                     <label><i class="fas fa-university"></i>Bank Name</label>
                                     <input type="text" name="bank_name" class="form-input @error('bank_name') error-input @enderror" 
                                            value="{{ old('bank_name', $leadFarmer->bank_name) }}" required>
-                                    @error('bank_name')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
                                 </div>
                                 <div class="form-group compact">
                                     <label><i class="fas fa-code-branch"></i>Bank Branch</label>
                                     <input type="text" name="bank_branch" class="form-input @error('bank_branch') error-input @enderror" 
                                            value="{{ old('bank_branch', $leadFarmer->bank_branch) }}" required>
-                                    @error('bank_branch')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
+                                </div>
+                                <div class="form-group compact">
+                                    <label><i class="fas fa-mobile-alt"></i>EzCash Number</label>
+                                    <input type="text" name="ezcash_mobile" id="ezcash_mobile" class="form-input" 
+                                           value="{{ old('ezcash_mobile', $leadFarmer->ezcash_mobile) }}" placeholder="074/076/077...">
+                                    <div id="ezcash_error" style="color: #ef4444; font-size: 0.75rem; margin-top: 4px; display: none;">Must start with 074, 076, or 077</div>
+                                </div>
+                                <div class="form-group compact">
+                                    <label><i class="fas fa-mobile-alt"></i>mCash Number</label>
+                                    <input type="text" name="mcash_mobile" id="mcash_mobile" class="form-input" 
+                                           value="{{ old('mcash_mobile', $leadFarmer->mcash_mobile) }}" placeholder="070/071...">
+                                    <div id="mcash_error" style="color: #ef4444; font-size: 0.75rem; margin-top: 4px; display: none;">Must start with 070 or 071</div>
                                 </div>
                             </div>
                         </div>
@@ -256,7 +257,7 @@
 </div>
 
 <div class="modal-overlay" id="passwordModal">
-    <div class="modal-compact">
+    <div class="modal-compact" style="max-width: 500px;">
         <div class="modal-header">
             <h3><i class="fas fa-key"></i>Change Password</h3>
             <button class="modal-close" onclick="hidePasswordModal()">
@@ -276,8 +277,32 @@
                 <div class="form-group compact">
                     <label><i class="fas fa-lock"></i>New Password</label>
                     <div class="password-field">
-                        <input type="password" name="new_password" class="form-input" id="newPassword" required>
+                        <input type="password" name="new_password" class="form-input" id="newPassword" required oninput="updateStrength(this.value)">
                         <i class="fas fa-eye password-toggle" id="toggleNewPassword" onclick="togglePasswordVisibility('newPassword', 'toggleNewPassword')"></i>
+                    </div>
+                    <div class="strength-meter mt-2">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small>Strength: <span id="strength-text">None</span></small>
+                        </div>
+                        <div class="progress" style="height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                            <div id="strength-bar" class="progress-bar" style="width: 0%; height: 100%; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+                    <div class="requirements mt-3">
+                        <h6 class="mb-2" style="font-size: 0.9rem;">Requirements:</h6>
+                        <ul class="list-unstyled mb-0" style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 0;">
+                            <li id="rule-length" class="text-danger"><i class="fas fa-times me-1"></i> 8+ characters</li>
+                            <li id="rule-number" class="text-danger"><i class="fas fa-times me-1"></i> 1+ number</li>
+                            <li id="rule-capital" class="text-danger"><i class="fas fa-times me-1"></i> Uppercase</li>
+                            <li id="rule-lowercase" class="text-danger"><i class="fas fa-times me-1"></i> Lowercase</li>
+                            <li id="rule-special" class="text-danger"><i class="fas fa-times me-1"></i> Special char</li>
+                            <li id="rule-no-space" class="text-danger"><i class="fas fa-times me-1"></i> No spaces</li>
+                            <li id="rule-no-repeat" class="text-danger"><i class="fas fa-times me-1"></i> No repeated</li>
+                            <li id="rule-no-sequence" class="text-danger"><i class="fas fa-times me-1"></i> No sequence</li>
+                            <li id="rule-not-common" class="text-danger"><i class="fas fa-times me-1"></i> Not common</li>
+                            <li id="rule-no-links" class="text-danger"><i class="fas fa-times me-1"></i> No links</li>
+                            <li id="rule-no-personal" class="text-danger"><i class="fas fa-times me-1"></i> No Personal Info</li>
+                        </ul>
                     </div>
                 </div>
                 <div class="form-group compact">
@@ -286,12 +311,13 @@
                         <input type="password" name="new_password_confirmation" class="form-input" id="confirmPassword" required>
                         <i class="fas fa-eye password-toggle" id="toggleConfirmPassword" onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword')"></i>
                     </div>
+                    <div id="match-status" class="mt-1" style="font-size: 0.8rem;"></div>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="action-btn cancel-btn" onclick="hidePasswordModal()">
                         <i class="fas fa-times"></i>Cancel
                     </button>
-                    <button type="submit" class="action-btn save-btn">
+                    <button type="submit" class="action-btn save-btn" id="passUpdateBtn" disabled>
                         <i class="fas fa-check"></i>Update
                     </button>
                 </div>
@@ -299,6 +325,12 @@
         </div>
     </div>
 </div>
+
+<style>
+.text-success { color: #10B981 !important; }
+.text-danger { color: #ef4444 !important; }
+.list-unstyled { list-style: none; }
+</style>
 @endsection
 
 @section('scripts')
@@ -383,6 +415,101 @@
         });
     }
 
+    window.calculateStrength = function(password) {
+        const result = validateAdvancedPassword(password, {
+            username: "{{ Auth::user()->username }}",
+            email: "{{ Auth::user()->email }}"
+        });
+
+        updatePasswordRuleFeedback(result);
+
+        return result;
+    };
+
+    window.updateStrength = function(password) {
+        const result = calculateStrength(password);
+        const strengthText = document.getElementById('strength-text');
+        const strengthBar = document.getElementById('strength-bar');
+        const updateBtn = document.getElementById('passUpdateBtn');
+        
+        strengthText.textContent = result.strengthText;
+        strengthText.style.color = result.color;
+        strengthBar.style.backgroundColor = result.color;
+        strengthBar.style.width = result.percent + '%';
+        
+        updateBtn.disabled = !result.isValid;
+    };
+
+    const confirmInput = document.getElementById('confirmPassword');
+    if (confirmInput) {
+        confirmInput.addEventListener('input', () => {
+            const pass = document.getElementById('newPassword').value;
+            const confirm = confirmInput.value;
+            const status = document.getElementById('match-status');
+            if (confirm) {
+                if (pass === confirm) {
+                    status.innerHTML = '<span class="text-success"><i class="fas fa-check"></i> Passwords match</span>';
+                } else {
+                    status.innerHTML = '<span class="text-danger"><i class="fas fa-times"></i> Passwords mismatch</span>';
+                }
+            } else {
+                status.innerHTML = '';
+            }
+        });
+    }
+
+    window.validateNIC = function(nic) {
+        if (!nic) return false;
+        nic = nic.trim().toUpperCase();
+        const oldNicPattern = /^[0-9]{9}[VX]$/;
+        const newNicPattern = /^[0-9]{12}$/;
+        if (oldNicPattern.test(nic)) {
+            const days = parseInt(nic.substr(2, 3));
+            return (days > 0 && days <= 366) || (days > 500 && days <= 866);
+        }
+        if (newNicPattern.test(nic)) {
+            const year = parseInt(nic.substr(0, 4));
+            const days = parseInt(nic.substr(4, 3));
+            return year >= 1900 && year <= 2100 && ((days > 0 && days <= 366) || (days > 500 && days <= 866));
+        }
+        return false;
+    };
+
+    const nicInp = document.querySelector('input[name="nic_no"]');
+    if (nicInp) {
+        const nicStatusEl = document.createElement('div');
+        nicStatusEl.id = 'nicStatus';
+        nicStatusEl.style.fontSize = '0.75rem';
+        nicStatusEl.style.marginTop = '4px';
+        nicInp.parentNode.appendChild(nicStatusEl);
+
+        nicInp.addEventListener('input', function() {
+            if (validateNIC(this.value)) {
+                nicStatusEl.innerHTML = '<span style="color: #10B981;"><i class="fas fa-check-circle"></i> Valid NIC</span>';
+            } else {
+                nicStatusEl.innerHTML = '<span style="color: #ef4444;"><i class="fas fa-times-circle"></i> Invalid NIC format</span>';
+            }
+        });
+    }
+
+    document.getElementById('ezcash_mobile').addEventListener('input', function() {
+        const err = document.getElementById('ezcash_error');
+        if (this.value && !/^(074|076|077)/.test(this.value)) {
+            err.style.display = 'block';
+        } else {
+            err.style.display = 'none';
+        }
+    });
+
+    document.getElementById('mcash_mobile').addEventListener('input', function() {
+        const err = document.getElementById('mcash_error');
+        if (this.value && !/^(070|071)/.test(this.value)) {
+            err.style.display = 'block';
+        } else {
+            err.style.display = 'none';
+        }
+    });
+
     if (changePasswordForm) {
         changePasswordForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -402,11 +529,11 @@
                 return;
             }
             
-            if (!validatePassword(newPassword)) {
+            if (calculateStrength(newPassword).isValid === false) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Password Requirements',
-                    html: 'Password must contain:<br>• At least 8 characters<br>• One uppercase letter<br>• One number<br>• One special character',
+                    text: 'Please meet all password requirements',
                     background: '#f6f8fa',
                     color: '#0f1724'
                 });
@@ -433,6 +560,7 @@
                         color: '#0f1724'
                     }).then(() => {
                         hidePasswordModal();
+                        location.reload();
                     });
                 } else {
                     Swal.fire({

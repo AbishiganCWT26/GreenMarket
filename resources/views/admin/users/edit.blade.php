@@ -153,7 +153,13 @@
 									<label class="form-label">
 										<i class="fas fa-id-card"></i> NIC Number
 									</label>
-									<input type="text" name="nic_no" class="form-input" value="{{ $userDetails->nic_no ?? '' }}" {{ in_array($user->role, ['farmer', 'lead_farmer']) ? 'required' : '' }}>
+									<div class="nic-input-wrapper">
+										<input type="text" name="nic_no" id="farmer_nic" class="form-input" value="{{ $userDetails->nic_no ?? '' }}" {{ in_array($user->role, ['farmer', 'lead_farmer']) ? 'required' : '' }}>
+										<div id="farmer_nic_status" class="nic-status mt-1" style="font-size: 11px; min-height: 16px;"></div>
+									</div>
+									<small class="form-note mt-1" style="display: block; color: var(--text-muted);">
+										<i class="fas fa-info-circle"></i> Updating NIC requires OTP verification
+									</small>
 								</div>
 							</div>
 
@@ -311,13 +317,15 @@
 									<label class="form-label">
 										<i class="fas fa-mobile-alt"></i> Ez Cash Number
 									</label>
-									<input type="text" name="ezcash_mobile" class="form-input" value="{{ $userDetails->ezcash_mobile ?? '' }}">
+									<input type="text" name="ezcash_mobile" id="farmer_ezcash" class="form-input" value="{{ $userDetails->ezcash_mobile ?? '' }}">
+									<div id="ezcash_error" style="color: #EF4444; font-size: 11px; display: none;">Must start with 074, 076, or 077</div>
 								</div>
 								<div class="form-group" id="mcash-payment-fields" style="{{ in_array($userDetails->preferred_payment, ['mcash', 'all']) ? '' : 'display: none;' }}">
 									<label class="form-label">
 										<i class="fas fa-phone-alt"></i> mCash Number
 									</label>
-									<input type="text" name="mcash_mobile" class="form-input" value="{{ $userDetails->mcash_mobile ?? '' }}">
+									<input type="text" name="mcash_mobile" id="farmer_mcash" class="form-input" value="{{ $userDetails->mcash_mobile ?? '' }}">
+									<div id="mcash_error" style="color: #EF4444; font-size: 11px; display: none;">Must start with 070 or 071</div>
 								</div>
 							</div>
 
@@ -384,10 +392,25 @@
 							<div class="form-row">
 								<div class="form-group">
 									<label class="form-label">
+										<i class="fas fa-id-card"></i> NIC Number
+									</label>
+									<div class="nic-input-wrapper">
+										<input type="text" name="buyer_nic_no" id="buyer_nic" class="form-input" value="{{ $buyerData->nic_no ?? '' }}">
+										<div id="buyer_nic_status" class="nic-status mt-1" style="font-size: 11px; min-height: 16px;"></div>
+									</div>
+									<small class="form-note mt-1" style="display: block; color: var(--text-muted);">
+										<i class="fas fa-info-circle"></i> Updating NIC requires OTP verification
+									</small>
+								</div>
+								<div class="form-group">
+									<label class="form-label">
 										<i class="fab fa-whatsapp"></i> WhatsApp Number
 									</label>
 									<input type="text" name="whatsapp_number" class="form-input" value="{{ $buyerData->whatsapp_number ?? '' }}">
 								</div>
+							</div>
+
+							<div class="form-row">
 								<div class="form-group">
 									<label class="form-label">
 										<i class="fas fa-map-marker-alt"></i> District
@@ -429,7 +452,13 @@
 								<label class="form-label">
 									<i class="fas fa-id-card"></i> NIC Number
 								</label>
-								<input type="text" name="facilitator_nic_no" id="facilitator_nic" class="form-input" value="{{ $facilitatorData->nic_no ?? '' }}">
+								<div class="nic-input-wrapper">
+									<input type="text" name="facilitator_nic_no" id="facilitator_nic" class="form-input" value="{{ $facilitatorData->nic_no ?? '' }}">
+									<div id="facilitator_nic_status" class="nic-status mt-1" style="font-size: 11px; min-height: 16px;"></div>
+								</div>
+								<small class="form-note mt-1" style="display: block; color: var(--text-muted);">
+									<i class="fas fa-info-circle"></i> Updating NIC requires OTP verification
+								</small>
 							</div>
 
 							<div class="form-row">
@@ -587,6 +616,42 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+function formatNIC(nic) {
+	if (!nic) return '';
+	nic = nic.trim().toUpperCase();
+	if (nic.length === 10 && /^[0-9]{9}[VX]$/.test(nic)) {
+		return nic;
+	}
+	if (nic.length === 12 && /^[0-9]{12}$/.test(nic)) {
+		return nic;
+	}
+	return nic;
+}
+
+function validateNIC(nic) {
+	if (!nic) return false;
+	nic = nic.trim().toUpperCase();
+	const oldNicPattern = /^[0-9]{9}[VX]$/;
+	const newNicPattern = /^[0-9]{12}$/;
+	if (oldNicPattern.test(nic)) {
+		const year = parseInt(nic.substr(0, 2));
+		const days = parseInt(nic.substr(2, 3));
+		if (days > 500) {
+			return days <= 866;
+		}
+		return days > 0 && days <= 366;
+	}
+	if (newNicPattern.test(nic)) {
+		const year = parseInt(nic.substr(0, 4));
+		const days = parseInt(nic.substr(4, 3));
+		if (days > 500) {
+			return days <= 866;
+		}
+		return year >= 1900 && year <= 2100 && days > 0 && days <= 366;
+	}
+	return false;
+}
+
 $(document).ready(function() {
 	// Safety check for gnData
 	if (typeof gnData === 'undefined') {
@@ -619,6 +684,53 @@ $(document).ready(function() {
 		}
 	});
 
+	// NIC Validation
+	const setupNICListener = (selector, statusSelector) => {
+		$(selector).on('input', function() {
+			const originalVal = $(this).val();
+			const formattedVal = formatNIC(originalVal);
+			if (originalVal !== formattedVal) {
+				$(this).val(formattedVal);
+			}
+			
+			const nic = formattedVal.trim().toUpperCase();
+			const statusDiv = $(statusSelector);
+			
+			if (!nic) {
+				statusDiv.html('');
+			} else if (validateNIC(nic)) {
+				statusDiv.html('<span style="color: #10B981"><i class="fas fa-check-circle"></i> Valid NIC format</span>');
+			} else {
+				statusDiv.html('<span style="color: #EF4444"><i class="fas fa-times-circle"></i> Invalid NIC format</span>');
+			}
+		});
+		// Initial check
+		if ($(selector).val()) $(selector).trigger('input');
+	};
+
+	setupNICListener('#farmer_nic', '#farmer_nic_status');
+	setupNICListener('#facilitator_nic', '#facilitator_nic_status');
+	setupNICListener('#buyer_nic', '#buyer_nic_status');
+
+	// EzCash / mCash validation
+	$('#farmer_ezcash').on('input', function() {
+		const val = $(this).val();
+		if (val && !/^(074|076|077)/.test(val)) {
+			$('#ezcash_error').show();
+		} else {
+			$('#ezcash_error').hide();
+		}
+	});
+
+	$('#farmer_mcash').on('input', function() {
+		const val = $(this).val();
+		if (val && !/^(070|071)/.test(val)) {
+			$('#mcash_error').show();
+		} else {
+			$('#mcash_error').hide();
+		}
+	});
+
 	// Moved form submission handler higher to ensure it's attached
 	$('#editUserForm').submit(function(e) {
 		e.preventDefault();
@@ -627,6 +739,37 @@ $(document).ready(function() {
 			const userRole = '{{ $user->role }}';
 			const userId = {{ $user->id }};
 			const isPaymentChanged = checkPaymentChanges();
+
+			// New validation checks
+			if (userRole === 'farmer' || userRole === 'lead_farmer') {
+				const nic = $('#farmer_nic').val();
+				if (nic && !validateNIC(nic)) {
+					showError('Please enter a valid NIC number.');
+					return;
+				}
+				const ezcash = $('#farmer_ezcash').val();
+				const mcash = $('#farmer_mcash').val();
+				if (ezcash && !/^(074|076|077)/.test(ezcash)) {
+					showError('EzCash number must start with 074, 076, or 077');
+					return;
+				}
+				if (mcash && !/^(070|071)/.test(mcash)) {
+					showError('mCash number must start with 070 or 071');
+					return;
+				}
+			} else if (userRole === 'facilitator') {
+				const nic = $('#facilitator_nic').val();
+				if (nic && !validateNIC(nic)) {
+					showError('Please enter a valid NIC number.');
+					return;
+				}
+			} else if (userRole === 'buyer') {
+				const nic = $('#buyer_nic').val();
+				if (nic && !validateNIC(nic)) {
+					showError('Please enter a valid NIC number.');
+					return;
+				}
+			}
 
 			formDataToSubmit = new FormData(this);
 
@@ -647,11 +790,35 @@ $(document).ready(function() {
 				});
 			}
 
-			if ((userRole === 'farmer' || userRole === 'lead_farmer') && isPaymentChanged && !otpVerified) {
+			const isNicChanged = checkNicChanges();
+
+			if (isNicChanged || isPaymentChanged) {
+				if (otpVerified) {
+					submitForm();
+					return;
+				}
+
+				let alertTitle = 'OTP Verification Required';
+				let alertHtml = '';
+				let actionToTrigger = 'edit_payment';
+
+				if (isNicChanged && isPaymentChanged) {
+					alertHtml = `Changes to NIC and payment details require OTP verification.<br><br>
+								<small class="text-muted">An OTP will be sent to the user's registered mobile number</small>`;
+					actionToTrigger = 'verify_nic'; // For simplicity, we can use one sensitive action if both changed
+				} else if (isNicChanged) {
+					alertHtml = `Changes to NIC number require OTP verification.<br><br>
+								<small class="text-muted">An OTP will be sent to the user's registered mobile number</small>`;
+					actionToTrigger = 'verify_nic';
+				} else {
+					alertHtml = `Changes to payment details require OTP verification.<br><br>
+								<small class="text-muted">An OTP will be sent to the user's registered mobile number</small>`;
+					actionToTrigger = 'edit_payment';
+				}
+
 				Swal.fire({
-					title: 'OTP Verification Required',
-					html: `Changes to payment details require OTP verification.<br><br>
-						  <small class="text-muted">An OTP will be sent to the user's registered mobile number</small>`,
+					title: alertTitle,
+					html: alertHtml,
 					icon: 'info',
 					showCancelButton: true,
 					confirmButtonColor: '#10B981',
@@ -662,7 +829,7 @@ $(document).ready(function() {
 					color: 'var(--text-color)'
 				}).then((result) => {
 					if (result.isConfirmed) {
-						sendOtpAndShowModal();
+						sendOtpAndShowModal(actionToTrigger);
 					}
 				});
 			} else {
@@ -984,7 +1151,34 @@ $(document).ready(function() {
 		return false;
 	}
 
-	function sendOtpAndShowModal() {
+	function checkNicChanges() {
+		try {
+			const userRole = '{{ $user->role }}';
+			let originalNic = '';
+			let currentNic = '';
+
+			if (userRole === 'farmer' || userRole === 'lead_farmer') {
+				originalNic = {!! json_encode($userDetails->nic_no ?? "") !!};
+				currentNic = $('#farmer_nic').val();
+			} else if (userRole === 'facilitator') {
+				originalNic = {!! json_encode($facilitatorData->nic_no ?? "") !!};
+				currentNic = $('#facilitator_nic').val();
+			} else if (userRole === 'buyer') {
+				originalNic = {!! json_encode($buyerData->nic_no ?? "") !!};
+				currentNic = $('#buyer_nic').val();
+			}
+
+			return originalNic.toString().trim() !== currentNic.toString().trim();
+		} catch (e) {
+			console.error('Error checking NIC changes:', e);
+			return false;
+		}
+	}
+
+	let currentOtpAction = 'edit_payment';
+
+	function sendOtpAndShowModal(action = 'edit_payment') {
+		currentOtpAction = action;
 		const userId = {{ $user->id }};
 
 		Swal.fire({
@@ -1002,11 +1196,11 @@ $(document).ready(function() {
 			data: {
 				_token: '{{ csrf_token() }}',
 				user_id: userId,
-				action: 'edit_payment'
+				action: currentOtpAction
 			},
 			success: function(response) {
 				Swal.close();
-				$('#otpModal').fadeIn();
+				$('#otpModal').css('display', 'flex').hide().fadeIn();
 				$('.otp-input').val('');
 				startOtpTimer();
 				showSuccess('OTP sent successfully to user');
@@ -1110,7 +1304,7 @@ $(document).ready(function() {
 				_token: '{{ csrf_token() }}',
 				user_id: userId,
 				otp: otp,
-				action: 'edit_payment'
+				action: currentOtpAction
 			},
 			success: function(response) {
 				Swal.close();
@@ -1147,7 +1341,8 @@ $(document).ready(function() {
 			method: 'POST',
 			data: {
 				_token: '{{ csrf_token() }}',
-				user_id: userId
+				user_id: userId,
+				action: currentOtpAction
 			},
 			success: function(response) {
 				Swal.close();

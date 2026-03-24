@@ -5,6 +5,7 @@
 @section('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="{{ asset('js/form-validation.js') }}"></script>
 <style>
 :root {
     --primary-green: #10B981;
@@ -651,11 +652,17 @@
                 <div class="requirements">
                     <h5><i class="fas fa-lightbulb"></i> Password Requirements</h5>
                     <ul>
-                        <li id="req-length" class="invalid">At least 8 characters</li>
-                        <li id="req-uppercase" class="invalid">One uppercase letter</li>
-                        <li id="req-lowercase" class="invalid">One lowercase letter</li>
-                        <li id="req-number" class="invalid">One number</li>
-                        <li id="req-special" class="invalid">One special character</li>
+                        <li id="rule-length" class="rule-item invalid"><i class="fas fa-times-circle"></i> Minimum 8 characters</li>
+                        <li id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 number (0–9)</li>
+                        <li id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 capital letter (A–Z)</li>
+                        <li id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 lowercase letter (a–z)</li>
+                        <li id="rule-special" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 special character</li>
+                        <li id="rule-no-space" class="rule-item invalid"><i class="fas fa-times-circle"></i> No spaces allowed</li>
+                        <li id="rule-no-repeat" class="rule-item invalid"><i class="fas fa-times-circle"></i> No consecutive repeated characters</li>
+                        <li id="rule-no-sequence" class="rule-item invalid"><i class="fas fa-times-circle"></i> No sequential characters</li>
+                        <li id="rule-not-common" class="rule-item invalid"><i class="fas fa-times-circle"></i> No common passwords</li>
+                        <li id="rule-no-links" class="rule-item invalid"><i class="fas fa-times-circle"></i> No links or URLs</li>
+                        <li id="rule-no-personal" class="rule-item invalid"><i class="fas fa-times-circle"></i> No personal info</li>
                     </ul>
                 </div>
 
@@ -853,56 +860,52 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-let currentStrength = 0;
-
 function checkPasswordStrength(password) {
-    let strength = 0;
-    const requirements = {
-        length: password.length >= 8,
-        uppercase: /[A-Z]/.test(password),
-        lowercase: /[a-z]/.test(password),
-        number: /[0-9]/.test(password),
-        special: /[@$!%*#?&]/.test(password)
-    };
+    if (!password) {
+        // Reset UI if password is empty
+        const strengthText = document.getElementById('strengthText');
+        const strengthFill = document.getElementById('strengthFill');
+        const submitBtn = document.getElementById('securitySubmit');
+        strengthText.textContent = 'None';
+        strengthText.style.color = '#e5e7eb';
+        strengthFill.style.width = '0%';
+        strengthFill.style.backgroundColor = '#e5e7eb';
+        updatePasswordRuleFeedback({
+            isValid: false,
+            rules: {
+                length: false,
+                uppercase: false,
+                lowercase: false,
+                number: false,
+                special: false,
+                notCommon: false,
+                noLinks: false,
+                noPersonal: false
+            }
+        });
+        submitBtn.disabled = true;
+        checkPasswordMatch();
+        return;
+    }
 
-    Object.values(requirements).forEach(req => {
-        if (req) strength++;
+    const result = validateAdvancedPassword(password, {
+        username: "{{ Auth::user()->username }}",
+        email: "{{ Auth::user()->email }}"
     });
 
-    currentStrength = strength;
+    updatePasswordRuleFeedback(result);
 
     const strengthText = document.getElementById('strengthText');
     const strengthFill = document.getElementById('strengthFill');
     const submitBtn = document.getElementById('securitySubmit');
 
-    const strengthLevels = [
-        { text: 'None', color: '#e5e7eb', width: '0%' },
-        { text: 'Very Weak', color: '#ef4444', width: '20%' },
-        { text: 'Weak', color: '#f59e0b', width: '40%' },
-        { text: 'Fair', color: '#3b82f6', width: '60%' },
-        { text: 'Good', color: '#8b5cf6', width: '80%' },
-        { text: 'Strong', color: '#10B981', width: '100%' }
-    ];
-
-    const level = strengthLevels[strength];
-    strengthText.textContent = level.text;
-    strengthText.style.color = level.color;
-    strengthFill.style.width = level.width;
-    strengthFill.style.backgroundColor = level.color;
-
-    Object.keys(requirements).forEach((key, index) => {
-        const reqElement = document.getElementById(`req-${key}`);
-        if (requirements[key]) {
-            reqElement.classList.remove('invalid');
-            reqElement.classList.add('valid');
-        } else {
-            reqElement.classList.remove('valid');
-            reqElement.classList.add('invalid');
-        }
-    });
+    strengthText.textContent = result.strengthText;
+    strengthText.style.color = result.color;
+    strengthFill.style.width = result.percent + '%';
+    strengthFill.style.backgroundColor = result.color;
 
     const confirmPassword = document.getElementById('confirm_password').value;
-    submitBtn.disabled = strength < 5 || (confirmPassword && password !== confirmPassword);
+    submitBtn.disabled = !result.isValid || (confirmPassword && password !== confirmPassword);
 
     checkPasswordMatch();
 }

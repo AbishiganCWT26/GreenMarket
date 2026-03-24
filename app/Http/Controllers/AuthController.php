@@ -109,26 +109,26 @@ class AuthController extends Controller
 
         if (!$user) {
             $user = DB::table('users')
-                ->whereIn('id', function($query) use ($username) {
-                    $query->select('user_id')
-                        ->from('farmers')
-                        ->where('nic_no', $username);
-                })
-                ->orWhereIn('id', function($query) use ($username) {
-                    $query->select('user_id')
-                        ->from('buyers')
-                        ->where('nic_no', $username);
-                })
-                ->orWhereIn('id', function($query) use ($username) {
-                    $query->select('user_id')
-                        ->from('lead_farmers')
-                        ->where('nic_no', $username);
-                })
-                ->orWhereIn('id', function($query) use ($username) {
-                    $query->select('user_id')
-                        ->from('facilitators')
-                        ->where('nic_no', $username);
-                })
+                ->whereIn('id', function ($query) use ($username) {
+                $query->select('user_id')
+                    ->from('farmers')
+                    ->where('nic_no', $username);
+            })
+                ->orWhereIn('id', function ($query) use ($username) {
+                $query->select('user_id')
+                    ->from('buyers')
+                    ->where('nic_no', $username);
+            })
+                ->orWhereIn('id', function ($query) use ($username) {
+                $query->select('user_id')
+                    ->from('lead_farmers')
+                    ->where('nic_no', $username);
+            })
+                ->orWhereIn('id', function ($query) use ($username) {
+                $query->select('user_id')
+                    ->from('facilitators')
+                    ->where('nic_no', $username);
+            })
                 ->first();
         }
 
@@ -164,7 +164,8 @@ class AuthController extends Controller
         if ($email) {
             try {
                 Mail::to($email)->send(new PasswordResetOTP($otp));
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 \Log::error('Failed to send OTP email: ' . $e->getMessage());
             }
         }
@@ -239,9 +240,9 @@ class AuthController extends Controller
         DB::table('otp_verifications')
             ->where('id', $otpRecord->id)
             ->update([
-                'used' => true,
-                'used_at' => now()
-            ]);
+            'used' => true,
+            'used_at' => now()
+        ]);
 
         session([
             'otp_verified' => true,
@@ -279,9 +280,9 @@ class AuthController extends Controller
         DB::table('users')
             ->where('id', $userId)
             ->update([
-                'password' => $hashedPassword,
-                'updated_at' => now()
-            ]);
+            'password' => $hashedPassword,
+            'updated_at' => now()
+        ]);
 
         if (DB::getSchemaBuilder()->hasTable('password_history')) {
             try {
@@ -292,7 +293,8 @@ class AuthController extends Controller
                     'changed_by' => $userId,
                     'change_reason' => 'password_reset'
                 ]);
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 \Log::warning('Could not insert into password_history: ' . $e->getMessage());
             }
         }
@@ -394,11 +396,13 @@ class AuthController extends Controller
             if (strpos($response, 'OK') === 0) {
                 \Log::info('SMS sent successfully to ' . $phone);
                 return true;
-            } else {
+            }
+            else {
                 \Log::error('SMS failed: ' . $response);
                 return false;
             }
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             \Log::error('SMS error: ' . $e->getMessage());
             return false;
         }
@@ -437,7 +441,8 @@ class AuthController extends Controller
             $mail->send();
             \Log::info('Password reset email sent to: ' . $email);
             return true;
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             \Log::error('Failed to send password reset email: ' . $e->getMessage());
             return false;
         }
@@ -479,11 +484,13 @@ class AuthController extends Controller
             if (strpos($response, 'OK') === 0) {
                 \Log::info('Password reset SMS sent to ' . $phone);
                 return true;
-            } else {
+            }
+            else {
                 \Log::error('Password reset SMS failed: ' . $response);
                 return false;
             }
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             \Log::error('SMS error: ' . $e->getMessage());
             return false;
         }

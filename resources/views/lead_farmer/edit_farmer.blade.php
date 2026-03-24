@@ -212,16 +212,44 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="divisional_secretariat" class="form-label required-field">
+                            <i class="fas fa-building"></i> Divisional Secretariat
+                        </label>
+                        <select class="form-select @error('divisional_secretariat') is-invalid @enderror" 
+                                id="divisional_secretariat" name="divisional_secretariat" required>
+                            <option value="">Select Divisional Secretariat</option>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                        @error('divisional_secretariat')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
                         <label for="grama_niladhari_division" class="form-label required-field">
                             <i class="fas fa-landmark"></i> Grama Niladhari Division
                         </label>
-                        <div class="input-with-icon">
-                            <input type="text" class="form-control @error('grama_niladhari_division') is-invalid @enderror" 
-                                   id="grama_niladhari_division" name="grama_niladhari_division" 
-                                   value="{{ old('grama_niladhari_division', $farmer->grama_niladhari_division) }}" 
-                                   placeholder="Enter GN Division" required>
-                        </div>
+                        <select class="form-select @error('grama_niladhari_division') is-invalid @enderror" 
+                                id="grama_niladhari_division" name="grama_niladhari_division" required>
+                            <option value="">Select GN Division</option>
+                            <!-- Options will be populated by JS -->
+                        </select>
                         @error('grama_niladhari_division')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gn_division_code" class="form-label">
+                            <i class="fas fa-barcode"></i> GN Division Code
+                        </label>
+                        <div class="input-with-icon">
+                            <input type="text" class="form-control @error('gn_division_code') is-invalid @enderror" 
+                                   id="gn_division_code" name="gn_division_code" 
+                                   value="{{ old('gn_division_code', $farmer->gn_division_code) }}" 
+                                   placeholder="GN Division Code" readonly>
+                        </div>
+                        @error('gn_division_code')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -335,6 +363,7 @@
                                        value="{{ old('ezcash_mobile', $farmer->ezcash_mobile) }}" 
                                        placeholder="e.g., 0771234567" pattern="[0-9]{10}">
                             </div>
+                            <div id="ezcash_error" class="error-text" style="display: none;">EzCash number must start with 074, 076 or 077</div>
                             @error('ezcash_mobile')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -354,6 +383,7 @@
                                        value="{{ old('mcash_mobile', $farmer->mcash_mobile) }}" 
                                        placeholder="e.g., 0771234567" pattern="[0-9]{10}">
                             </div>
+                            <div id="mcash_error" class="error-text" style="display: none;">mCash number must start with 070 or 071</div>
                             @error('mcash_mobile')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -376,8 +406,85 @@
 @endsection
 
 @section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ asset('js/gn-data.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // GN Hierarchy Logic
+    const districtSelect = $('#district');
+    const dsSelect = $('#divisional_secretariat');
+    const gndSelect = $('#grama_niladhari_division');
+    const codeInput = $('#gn_division_code');
+
+    const savedDistrict = "{{ old('district', $farmer->district) }}";
+    const savedDS = "{{ old('divisional_secretariat', $farmer->divisional_secretariat) }}";
+    const savedGND = "{{ old('grama_niladhari_division', $farmer->grama_niladhari_division) }}";
+
+    function populateDistricts() {
+        if (typeof gnData !== 'undefined') {
+            districtSelect.empty().append('<option value="">Select District</option>');
+            Object.keys(gnData).forEach(dist => {
+                const selected = dist === savedDistrict ? 'selected' : '';
+                districtSelect.append(`<option value="${dist}" ${selected}>${dist}</option>`);
+            });
+            
+            if (savedDistrict) {
+                populateDS(savedDistrict, savedDS);
+            }
+        }
+    }
+
+    function populateDS(dist, selectedDS = '') {
+        dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', false);
+        gndSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
+        
+        if (gnData[dist]) {
+            Object.keys(gnData[dist]).forEach(ds => {
+                const selected = ds === selectedDS ? 'selected' : '';
+                dsSelect.append(`<option value="${ds}" ${selected}>${ds}</option>`);
+            });
+            
+            if (selectedDS) {
+                populateGND(dist, selectedDS, savedGND);
+            }
+        }
+    }
+
+    function populateGND(dist, ds, selectedGND = '') {
+        gndSelect.empty().append('<option value="" disabled selected>Select GN Division</option>').prop('disabled', false);
+        
+        if (gnData[dist] && gnData[dist][ds]) {
+            gnData[dist][ds].forEach(gn => {
+                const selected = gn.name === selectedGND ? 'selected' : '';
+                gndSelect.append(`<option value="${gn.name}" data-code="${gn.code}" ${selected}>${gn.name}</option>`);
+            });
+            
+            // Set GN Code for initial value
+            const initialGN = gnData[dist][ds].find(gn => gn.name === selectedGND);
+            if (initialGN) {
+                codeInput.val(initialGN.code);
+            }
+        }
+    }
+
+    populateDistricts();
+
+    districtSelect.on('change', function() {
+        populateDS($(this).val());
+        codeInput.val('');
+    });
+
+    dsSelect.on('change', function() {
+        populateGND(districtSelect.val(), $(this).val());
+        codeInput.val('');
+    });
+
+    gndSelect.on('change', function() {
+        const selectedOption = $(this).find('option:selected');
+        const code = selectedOption.data('code');
+        codeInput.val(code || '');
+    });
+
     const nicInput = document.getElementById('nic_no');
     const nicStatus = document.getElementById('nicStatus');
     const preferredPayment = document.getElementById('preferred_payment');
@@ -428,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (validateNIC(formattedNIC)) {
-            nicStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid NIC';
+            nicStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid NIC format';
             nicStatus.className = 'nic-status valid';
         } else {
             nicStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid NIC format';
@@ -518,7 +625,23 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
+        const ezcash = document.getElementById('ezcash_mobile').value.trim();
+        const mcash = document.getElementById('mcash_mobile').value.trim();
         const paymentMethod = preferredPayment.value;
+
+        if (paymentMethod === 'ezcash' || paymentMethod === 'all') {
+            if (ezcash && !/^(074|076|077)/.test(ezcash)) {
+                Swal.fire({ icon: 'error', title: 'Invalid EzCash', text: 'EzCash number must start with 074, 076, or 077' });
+                return false;
+            }
+        }
+        if (paymentMethod === 'mcash' || paymentMethod === 'all') {
+            if (mcash && !/^(070|071)/.test(mcash)) {
+                Swal.fire({ icon: 'error', title: 'Invalid mCash', text: 'mCash number must start with 070 or 071' });
+                return false;
+            }
+        }
+
         if (paymentMethod === 'bank') {
             const bankFields = ['bank_name', 'bank_branch', 'account_holder_name', 'account_number'];
             for (const field of bankFields) {
@@ -533,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } else if (paymentMethod === 'ezcash') {
-            if (!document.getElementById('ezcash_mobile').value.trim()) {
+            if (!ezcash) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Missing Information',
@@ -543,7 +666,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         } else if (paymentMethod === 'mcash') {
-            if (!document.getElementById('mcash_mobile').value.trim()) {
+            if (!mcash) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Missing Information',
@@ -569,6 +692,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return true;
     }
+
+    document.getElementById('ezcash_mobile').addEventListener('input', function() {
+        const val = this.value.trim();
+        if (val && !/^(074|076|077)/.test(val)) {
+            document.getElementById('ezcash_error').style.display = 'block';
+        } else {
+            document.getElementById('ezcash_error').style.display = 'none';
+        }
+    });
+
+    document.getElementById('mcash_mobile').addEventListener('input', function() {
+        const val = this.value.trim();
+        if (val && !/^(070|071)/.test(val)) {
+            document.getElementById('mcash_error').style.display = 'block';
+        } else {
+            document.getElementById('mcash_error').style.display = 'none';
+        }
+    });
 
     nicInput.addEventListener('input', updateNICStatus);
     preferredPayment.addEventListener('change', togglePaymentDetails);

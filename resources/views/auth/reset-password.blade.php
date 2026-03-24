@@ -7,56 +7,103 @@
 	<link rel="stylesheet" href="{{ asset('css/login.css') }}" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="{{ asset('js/form-validation.js') }}"></script>
 	<style>
-		.pass-meter {
-			height: 2px;
-			background: #e5e7eb;
-			border-radius: 1px;
-			margin-top: 3px;
+		:root {
+			--primary: #10B981;
+			--primary-hover: #059669;
+			--bg-light: #f8fafc;
+			--border: #e2e8f0;
+			--text-main: #1e293b;
+			--text-muted: #64748b;
+			--radius-lg: 12px;
+			--radius-md: 8px;
+			--radius-sm: 6px;
+			--shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		}
+
+		.password-strength { margin-bottom: 1rem; }
+		.strength-bar {
+			height: 6px;
+			background-color: #e2e8f0;
+			border-radius: 3px;
 			overflow: hidden;
+			margin-top: 5px;
 		}
-		.meter-bar {
+		.strength-fill {
 			height: 100%;
-			width: 0;
-			transition: width 0.2s ease;
+			width: 0%;
+			transition: all 0.3s ease;
 		}
-		.meter-text {
-			font-size: 0.6rem;
-			text-align: right;
-			margin-top: 2px;
+		
+		.requirements-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 8px;
+			margin-top: 10px;
+			padding: 12px;
+			background: #f8fafc;
+			border-radius: var(--radius-md);
+			border: 1px solid var(--border);
 		}
-		.pass-rules {
-			background: rgba(16,185,129,0.02);
-			border: 1px solid rgba(16,185,129,0.1);
-			border-radius: var(--radius-sm);
-			padding: 6px;
-			margin: 8px 0 12px;
-			font-size: 0.65rem;
-		}
-		.pass-rules ul {
-			list-style: none;
-			padding: 0;
-			margin: 0;
-		}
-		.pass-rules li {
+		
+		.rule-item {
+			font-size: 0.75rem;
 			display: flex;
 			align-items: center;
-			gap: 4px;
-			margin-bottom: 2px;
+			gap: 6px;
+			color: #64748b;
 		}
-		.pass-rules i { font-size: 0.55rem; width: 12px; }
-		.rule-valid { color: var(--primary); }
-		.rule-invalid { color: #9ca3af; }
+		
+		.rule-item.valid { color: #10B981; }
+		.rule-item.invalid { color: #ef4444; }
+		
+		#passwordMatch small {
+			font-size: 0.75rem;
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+
+		.d-none { display: none !important; }
+		.text-success { color: #10B981 !important; }
+		.text-danger { color: #ef4444 !important; }
+		.mt-1 { margin-top: 0.25rem !important; }
+		.mt-2 { margin-top: 0.5rem !important; }
+		.mt-3 { margin-top: 1rem !important; }
+		.mt-4 { margin-top: 1.5rem !important; }
+		.mb-1 { margin-bottom: 0.25rem !important; }
+		.mb-2 { margin-bottom: 0.5rem !important; }
+		.mb-3 { margin-bottom: 1rem !important; }
+		.d-flex { display: flex !important; }
+		.justify-content-between { justify-content: space-between !important; }
+		.align-items-center { align-items: center !important; }
+
 		.info-box {
 			background: rgba(59,130,246,0.05);
 			border: 1px solid rgba(59,130,246,0.1);
 			border-radius: var(--radius-sm);
-			padding: 6px;
-			margin-bottom: 10px;
+			padding: 10px;
+			margin-bottom: 20px;
 			text-align: center;
-			font-size: 0.7rem;
+			font-size: 0.85rem;
 		}
-		.info-box i { color: var(--blue); margin-right: 4px; }
+		.info-box i { color: #3b82f6; margin-right: 6px; }
+		
+		.password-wrapper { position: relative; }
+		.password-toggle {
+			position: absolute;
+			right: 12px;
+			top: 50%;
+			transform: translateY(-50%);
+			background: none;
+			border: none;
+			color: #94a3b8;
+			cursor: pointer;
+			padding: 4px;
+			z-index: 10;
+		}
+		.password-toggle:hover { color: var(--primary); }
 	</style>
 </head>
 <body>
@@ -92,13 +139,35 @@
 								<i class="fas fa-eye"></i>
 							</button>
 						</div>
-						<div class="pass-meter">
-							<div class="meter-bar" id="strengthBar"></div>
+						
+						<div class="password-strength mt-3">
+							<div class="d-flex justify-content-between align-items-center mb-1">
+								<small style="font-size: 0.75rem;">Strength: <span id="strengthText" style="font-weight: 600;">None</span></small>
+							</div>
+							<div class="strength-bar" id="strengthBar">
+								<div class="strength-fill"></div>
+							</div>
 						</div>
-						<div class="meter-text" id="strengthText"></div>
+
+						<div class="requirements mt-3">
+							<h6 class="mb-2" style="font-size: 0.85rem; font-weight: 600;">Security Requirements:</h6>
+							<div class="requirements-grid">
+								<div id="rule-length" class="rule-item invalid"><i class="fas fa-times-circle"></i> 8+ characters</div>
+								<div id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 number</div>
+								<div id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 Uppercase</div>
+								<div id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 Lowercase</div>
+								<div id="rule-special" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 Special char</div>
+								<div id="rule-no-space" class="rule-item invalid"><i class="fas fa-times-circle"></i> No spaces</div>
+								<div id="rule-no-repeat" class="rule-item invalid"><i class="fas fa-times-circle"></i> No repetition</div>
+								<div id="rule-no-sequence" class="rule-item invalid"><i class="fas fa-times-circle"></i> No sequence</div>
+								<div id="rule-not-common" class="rule-item invalid"><i class="fas fa-times-circle"></i> Not common</div>
+								<div id="rule-no-links" class="rule-item invalid"><i class="fas fa-times-circle"></i> No links</div>
+								<div id="rule-no-personal" class="rule-item invalid"><i class="fas fa-times-circle"></i> No personal info</div>
+							</div>
+						</div>
 					</div>
 
-					<div class="input-field">
+					<div class="input-field mt-4">
 						<label><i class="fas fa-key"></i> Confirm Password</label>
 						<div class="password-wrapper">
 							<input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm password" required>
@@ -106,19 +175,17 @@
 								<i class="fas fa-eye"></i>
 							</button>
 						</div>
+						<div id="passwordMatch" class="mt-2">
+							<small class="text-success d-none">
+								<i class="fas fa-check-circle"></i> Passwords match
+							</small>
+							<small class="text-danger d-none">
+								<i class="fas fa-times-circle"></i> Passwords don't match
+							</small>
+						</div>
 					</div>
 
-					<div class="pass-rules">
-						<ul>
-							<li id="rule-length"><i class="fas fa-circle rule-invalid"></i> <span>8+ characters</span></li>
-							<li id="rule-upper"><i class="fas fa-circle rule-invalid"></i> <span>Uppercase letter</span></li>
-							<li id="rule-lower"><i class="fas fa-circle rule-invalid"></i> <span>Lowercase letter</span></li>
-							<li id="rule-number"><i class="fas fa-circle rule-invalid"></i> <span>Number</span></li>
-							<li id="rule-special"><i class="fas fa-circle rule-invalid"></i> <span>Special character</span></li>
-						</ul>
-					</div>
-
-					<button type="submit" class="auth-btn" id="resetBtn">
+					<button type="submit" class="auth-btn mt-4" id="resetBtn">
 						<i class="fas fa-sync-alt"></i> Reset Password
 					</button>
 				</form>
@@ -131,72 +198,124 @@
 	</div>
 
 	<script>
-		function checkStrength(pass) {
-			let score = 0;
-			const rules = {
-				length: pass.length >= 8,
-				upper: /[A-Z]/.test(pass),
-				lower: /[a-z]/.test(pass),
-				number: /[0-9]/.test(pass),
-				special: /[^A-Za-z0-9]/.test(pass)
-			};
-
-			Object.values(rules).forEach(v => v && (score += 20));
-
-			document.getElementById('rule-length').querySelector('i').className = rules.length ? 'fas fa-check-circle rule-valid' : 'fas fa-circle rule-invalid';
-			document.getElementById('rule-upper').querySelector('i').className = rules.upper ? 'fas fa-check-circle rule-valid' : 'fas fa-circle rule-invalid';
-			document.getElementById('rule-lower').querySelector('i').className = rules.lower ? 'fas fa-check-circle rule-valid' : 'fas fa-circle rule-invalid';
-			document.getElementById('rule-number').querySelector('i').className = rules.number ? 'fas fa-check-circle rule-valid' : 'fas fa-circle rule-invalid';
-			document.getElementById('rule-special').querySelector('i').className = rules.special ? 'fas fa-check-circle rule-valid' : 'fas fa-circle rule-invalid';
-
-			let color = '#ef4444', text = 'Very Weak';
-			if (score >= 20) { color = '#f59e0b'; text = 'Weak'; }
-			if (score >= 40) { color = '#f59e0b'; text = 'Fair'; }
-			if (score >= 60) { color = '#3b82f6'; text = 'Good'; }
-			if (score >= 80) { color = '#10B981'; text = 'Strong'; }
-			if (score >= 100) { color = '#059669'; text = 'Very Strong'; }
-
-			document.getElementById('strengthBar').style.width = score + '%';
-			document.getElementById('strengthBar').style.backgroundColor = color;
-			document.getElementById('strengthText').textContent = text;
-			document.getElementById('strengthText').style.color = color;
-
-			return { score, rules };
-		}
-
 		document.addEventListener('DOMContentLoaded', function() {
+			const passInput = document.getElementById('password');
+			const confirmInput = document.getElementById('password_confirmation');
+			const strengthBar = document.getElementById('strengthBar');
+			const strengthText = document.getElementById('strengthText');
+			const matchIndicator = document.getElementById('passwordMatch');
+			const resetForm = document.getElementById('resetForm');
+			const resetBtn = document.getElementById('resetBtn');
+
+			const username = "{{ session('reset_username') }}";
+			const email = "{{ session('reset_email') }}";
+
+			// Password toggle functionality
 			document.querySelectorAll('.password-toggle').forEach(btn => {
 				btn.addEventListener('click', function() {
 					const target = document.getElementById(this.dataset.target);
-					const type = target.type === 'password' ? 'text' : 'password';
-					target.type = type;
-					this.querySelector('i').classList.toggle('fa-eye');
-					this.querySelector('i').classList.toggle('fa-eye-slash');
+					const icon = this.querySelector('i');
+					if (target.type === 'password') {
+						target.type = 'text';
+						icon.classList.replace('fa-eye', 'fa-eye-slash');
+					} else {
+						target.type = 'password';
+						icon.classList.replace('fa-eye-slash', 'fa-eye');
+					}
 				});
 			});
 
-			const passInput = document.getElementById('password');
-			const confirmInput = document.getElementById('password_confirmation');
+			function validateUI() {
+				const passValue = passInput.value;
+				const confirmValue = confirmInput.value;
 
-			passInput.addEventListener('input', () => checkStrength(passInput.value));
-			confirmInput.addEventListener('input', () => checkStrength(passInput.value));
+				// 1. Password Strength and Rules
+				if (!passValue) {
+					strengthText.textContent = 'None';
+					strengthText.style.color = '#cbd5e1';
+					strengthBar.querySelector('.strength-fill').style.width = '0%';
+					
+					// Reset rules UI
+					updatePasswordRuleFeedback({ 
+						rules: { 
+							'length': false, 'number': false, 'capital': false, 'lowercase': false, 
+							'special': false, 'no-space': false, 'no-repeat': false, 'no-sequence': false, 
+							'not-common': false, 'no-links': false, 'no-personal': false 
+						} 
+					});
+				} else {
+					const result = validateAdvancedPassword(passValue, { username, email });
+					
+					// Update Strength Bar
+					strengthText.textContent = result.strengthText;
+					strengthText.style.color = result.color;
+					const fill = strengthBar.querySelector('.strength-fill');
+					fill.style.width = result.percent + '%';
+					fill.style.backgroundColor = result.color;
 
-			document.getElementById('resetForm').addEventListener('submit', function(e) {
-				const pass = passInput.value;
-				const conf = confirmInput.value;
-				const { score, rules } = checkStrength(pass);
-
-				if (pass !== conf) {
-					e.preventDefault();
-					Swal.fire({ icon: 'error', title: 'Passwords Mismatch', text: 'Please match both passwords' });
-				} else if (score < 80 || !Object.values(rules).every(v => v)) {
-					e.preventDefault();
-					Swal.fire({ icon: 'warning', title: 'Weak Password', text: 'Use a stronger password' });
+					// Update Rules Checklist
+					updatePasswordRuleFeedback(result);
 				}
+
+				// 2. Password Matching
+				const success = matchIndicator.querySelector('.text-success');
+				const error = matchIndicator.querySelector('.text-danger');
+
+				if (passValue && confirmValue) {
+					if (passValue === confirmValue) {
+						success.classList.remove('d-none');
+						error.classList.add('d-none');
+					} else {
+						success.classList.add('d-none');
+						error.classList.remove('d-none');
+					}
+				} else {
+					success.classList.add('d-none');
+					error.classList.add('d-none');
+				}
+
+				// Update Button State (Optional, but good for UX)
+				// resetBtn.disabled = !status.isValid || passValue !== confirmValue;
+			}
+
+			passInput.addEventListener('input', validateUI);
+			confirmInput.addEventListener('input', validateUI);
+
+			resetForm.addEventListener('submit', function(e) {
+				const passValue = passInput.value;
+				const confirmValue = confirmInput.value;
+				const result = validateAdvancedPassword(passValue, { username, email });
+
+				if (!result.isValid) {
+					e.preventDefault();
+					Swal.fire({
+						icon: 'warning',
+						title: 'Weak Password',
+						text: 'Please meet all 11 security requirements for a strong password.',
+						confirmButtonColor: '#10B981'
+					});
+					return;
+				}
+
+				if (passValue !== confirmValue) {
+					e.preventDefault();
+					Swal.fire({
+						icon: 'error',
+						title: 'Passwords Mismatch',
+						text: 'New password and confirmation do not match.',
+						confirmButtonColor: '#10B981'
+					});
+					return;
+				}
+
+				resetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+				resetBtn.disabled = true;
 			});
 
-			checkStrength('');
+			// Initial validation
+			validateUI();
 		});
 	</script>
 </body>
 </html>
+/html>

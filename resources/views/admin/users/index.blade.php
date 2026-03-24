@@ -7,6 +7,45 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/Admin/index-user-management.css') }}">
+<style>
+	.password-strength-container {
+		height: 5px;
+		width: 100%;
+		background-color: #e5e7eb;
+		border-radius: 3px;
+		overflow: hidden;
+	}
+	.password-strength-bar {
+		height: 100%;
+		width: 0;
+		transition: all 0.3s ease;
+	}
+	.password-feedback {
+		font-size: 11px;
+		line-height: 1.4;
+	}
+	.nic-status {
+		font-weight: 500;
+	}
+	.password-container {
+		position: relative;
+	}
+	.password-toggle {
+		position: absolute;
+		right: 15px;
+		top: 50%;
+		transform: translateY(-50%);
+		cursor: pointer;
+		color: #6b7280;
+	}
+	.error-text {
+		color: #ef4444 !important;
+		font-size: 0.85rem !important;
+		margin-top: 5px !important;
+		font-weight: 500 !important;
+		display: block !important;
+	}
+</style>
 @endsection
 
 @section('content')
@@ -98,6 +137,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 <script src="{{ asset('js/gn-data.js') }}"></script>
+<script src="{{ asset('js/form-validation.js') }}"></script>
 <script>
 	$(document).ready(function() {
 		let currentView = 'card';
@@ -192,6 +232,73 @@
 			});
 		}
 
+		const passwordRequirementsHtml = `
+			<div id="password-validation-rules" class="password-requirements-grid mt-2 p-3 bg-light rounded shadow-sm border" style="display: none;">
+				<h6 class="mb-2 text-dark" style="font-size: 0.8rem; font-weight: 600;"><i class="fas fa-shield-alt" style="margin-right: 8px;"></i>Security Standards</h6>
+				
+				<div class="password-strength mb-3">
+					<div class="d-flex justify-content-between align-items-center mb-1">
+						<small style="font-size: 11px; font-weight: 600; color: #64748b;">Strength: <span id="strengthText">None</span></small>
+					</div>
+					<div class="strength-bar" id="strengthBar" style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+						<div class="strength-fill" style="width: 0%; height: 100%; transition: width 0.3s; background: #cbd5e1;"></div>
+					</div>
+				</div>
+
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+					<div id="rule-length" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>8+ characters</div>
+					<div id="rule-number" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Number</div>
+					<div id="rule-capital" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Capital</div>
+					<div id="rule-lowercase" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Lowercase</div>
+					<div id="rule-special" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Special</div>
+					<div id="rule-no-space" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No spaces</div>
+					<div id="rule-no-repeat" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No 3x repeats</div>
+					<div id="rule-no-sequence" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No sequences</div>
+					<div id="rule-not-common" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Not common</div>
+					<div id="rule-no-links" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No links</div>
+					<div id="rule-no-personal" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No personal</div>
+				</div>
+				<style>
+					.rule-item.valid { color: #10B981 !important; font-weight: 600; }
+					.rule-item.invalid { color: #ef4444 !important; }
+					.rule-item.valid i { color: #10B981 !important; margin-right: 8px; }
+					.rule-item.invalid i { color: #ef4444 !important; margin-right: 8px; }
+				</style>
+			</div>
+		`;
+
+		function updatePasswordRules(password, username, email) {
+			const result = validateAdvancedPassword(password, username, email);
+			const rulesContainer = $('#password-validation-rules');
+			
+			if (password) {
+				rulesContainer.fadeIn();
+			} else {
+				rulesContainer.hide();
+			}
+
+			Object.keys(result.rules).forEach(rule => {
+				const el = $(`#rule-${rule}`);
+				if (el.length) {
+					const icon = el.find('i');
+					if (result.rules[rule]) {
+						el.addClass('valid').removeClass('invalid');
+						icon.attr('class', 'fas fa-check-circle me-2');
+					} else {
+						if (password) {
+							el.addClass('invalid').removeClass('valid');
+							icon.attr('class', 'fas fa-times-circle me-2');
+						} else {
+							el.removeClass('valid invalid');
+							icon.attr('class', 'fas fa-circle me-2');
+						}
+					}
+				}
+			});
+			
+			window.passwordValid = result.allValid;
+		}
+
 		function showAddUserModal() {
 			Swal.fire({
 				title: 'Add New User',
@@ -250,10 +357,10 @@
 										<div class="form-group">
 											<label>Password <span class="required">*</span></label>
 											<div class="password-container">
-												<input type="password" id="password" class="form-input" placeholder="Enter password" required>
+												<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
 											</div>
-											<small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+											${passwordRequirementsHtml}
 										</div>
 										<div class="form-group">
 											<label>Confirm Password <span class="required">*</span></label>
@@ -261,10 +368,12 @@
 												<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
 											</div>
+											<div id="passwordMatch" class="mt-2"></div>
 										</div>
 										<div class="form-group">
 											<label>NIC Number <span class="required">*</span></label>
 											<input type="text" id="farmer_nic" class="form-input" placeholder="Enter NIC" required>
+											<div id="farmer_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 										</div>
 										<div class="form-group">
 											<label>Primary Mobile <span class="required">*</span></label>
@@ -331,13 +440,15 @@
 										<div id="farmer-ezcash-fields" style="display:none;">
 											<div class="form-group">
 												<label>EzCash Mobile Number <span id="ezcash-required" class="required" style="display:none;">*</span></label>
-												<input type="tel" id="farmer_ezcash" class="form-input" placeholder="Enter EzCash mobile">
+												<input type="tel" id="farmer_ezcash" class="form-input" placeholder="e.g., 074/076/077xxxxxxx" maxlength="10">
+												<div id="ezcash-error" class="error-text" style="display:none;">EzCash number must start with 074, 076 or 077</div>
 											</div>
 										</div>
 										<div id="farmer-mcash-fields" style="display:none;">
 											<div class="form-group">
 												<label>mCash Mobile Number <span id="mcash-required" class="required" style="display:none;">*</span></label>
-												<input type="tel" id="farmer_mcash" class="form-input" placeholder="Enter mCash mobile">
+												<input type="tel" id="farmer_mcash" class="form-input" placeholder="e.g., 070/071xxxxxxx" maxlength="10">
+												<div id="mcash-error" class="error-text" style="display:none;">mCash number must start with 070 or 071</div>
 											</div>
 										</div>
 									</div>
@@ -362,10 +473,10 @@
 										<div class="form-group">
 											<label>Password <span class="required">*</span></label>
 											<div class="password-container">
-												<input type="password" id="password" class="form-input" placeholder="Enter password" required>
+												<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
 											</div>
-											<small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+											${passwordRequirementsHtml}
 										</div>
 										<div class="form-group">
 											<label>Confirm Password <span class="required">*</span></label>
@@ -373,10 +484,12 @@
 												<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
 											</div>
+											<div id="passwordMatch" class="mt-2"></div>
 										</div>
 										<div class="form-group">
 											<label>NIC Number <span class="required">*</span></label>
 											<input type="text" id="lead_nic" class="form-input" placeholder="Enter NIC" required>
+											<div id="lead_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 										</div>
 										<div class="form-group">
 											<label>Primary Mobile <span class="required">*</span></label>
@@ -459,10 +572,10 @@
 										<div class="form-group">
 											<label>Password <span class="required">*</span></label>
 											<div class="password-container">
-												<input type="password" id="password" class="form-input" placeholder="Enter password" required>
+												<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
 											</div>
-											<small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+											${passwordRequirementsHtml}
 										</div>
 										<div class="form-group">
 											<label>Confirm Password <span class="required">*</span></label>
@@ -470,10 +583,12 @@
 												<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
 											</div>
+											<div id="passwordMatch" class="mt-2"></div>
 										</div>
 										<div class="form-group">
 											<label>NIC Number</label>
 											<input type="text" id="buyer_nic" class="form-input" placeholder="Enter NIC">
+											<div id="buyer_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 										</div>
 										<div class="form-group">
 											<label>Primary Mobile <span class="required">*</span></label>
@@ -530,10 +645,10 @@
 										<div class="form-group">
 											<label>Password <span class="required">*</span></label>
 											<div class="password-container">
-												<input type="password" id="password" class="form-input" placeholder="Enter password" required>
+												<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
 											</div>
-											<small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+											${passwordRequirementsHtml}
 										</div>
 										<div class="form-group">
 											<label>Confirm Password <span class="required">*</span></label>
@@ -541,10 +656,12 @@
 												<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
 											</div>
+											<div id="passwordMatch" class="mt-2"></div>
 										</div>
 										<div class="form-group">
 											<label>NIC Number <span class="required">*</span></label>
 											<input type="text" id="facilitator_nic" class="form-input" placeholder="Enter NIC" required>
+											<div id="facilitator_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 										</div>
 										<div class="form-group">
 											<label>Primary Mobile <span class="required">*</span></label>
@@ -605,10 +722,10 @@
 										<div class="form-group">
 											<label>Password <span class="required">*</span></label>
 											<div class="password-container">
-												<input type="password" id="password" class="form-input" placeholder="Enter password" required>
+												<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
 											</div>
-											<small class="password-hint">Minimum 8 characters with uppercase, number & special character</small>
+											${passwordRequirementsHtml}
 										</div>
 										<div class="form-group">
 											<label>Confirm Password <span class="required">*</span></label>
@@ -616,10 +733,12 @@
 												<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
 												<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
 											</div>
+											<div id="passwordMatch" class="mt-2"></div>
 										</div>
 										<div class="form-group">
 											<label>NIC Number</label>
 											<input type="text" id="admin_nic" class="form-input" placeholder="Enter NIC">
+											<div id="admin_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 										</div>
 										<div class="form-group">
 											<label>Phone Number <span class="required">*</span></label>
@@ -817,6 +936,87 @@
 								}
 							});
 						}
+						// Real-time validation listeners
+						// Real-time validation listeners are handled by global updatePasswordRules for password
+						// and specific listeners for match and other fields
+
+						$(document).on('input', '#password_confirmation', function() {
+							const pwd = $('#password').val();
+							const confirm = $(this).val();
+							const matchDiv = $('#passwordMatch');
+							if (!confirm) {
+								matchDiv.html('');
+							} else if (pwd === confirm) {
+								matchDiv.html('<small style="color: #10B981; font-weight: 600;"><i class="fas fa-check-circle"></i> Passwords match</small>');
+							} else {
+								matchDiv.html('<small style="color: #EF4444; font-weight: 600;"><i class="fas fa-times-circle"></i> Passwords do not match</small>');
+							}
+						});
+
+						$(document).on('input', '#username, #email', function() {
+							const pwd = $('#password').val();
+							if (pwd) {
+								updatePasswordRules(pwd, $('#username').val(), $('#email').val());
+							}
+						});
+
+						const setupNICListener = (selector, statusSelector) => {
+							$(document).on('input', selector, function() {
+								const originalVal = $(this).val();
+								const formattedVal = formatNIC(originalVal);
+								if (originalVal !== formattedVal) {
+									$(this).val(formattedVal);
+								}
+								
+								const nic = formattedVal.trim().toUpperCase();
+								const statusDiv = $(statusSelector);
+								
+								if (!nic) {
+									statusDiv.html('');
+								} else if (validateNIC(nic)) {
+									statusDiv.html('<span style="color: #10B981; font-weight: 600;"><i class="fas fa-check-circle"></i> Valid NIC format</span>');
+								} else {
+									statusDiv.html('<span style="color: #EF4444; font-weight: 600;"><i class="fas fa-times-circle"></i> Invalid NIC format</span>');
+								}
+							});
+						};
+
+						setupNICListener('#farmer_nic', '#farmer_nic_status');
+						setupNICListener('#lead_nic', '#lead_nic_status');
+						setupNICListener('#facilitator_nic', '#facilitator_nic_status');
+						setupNICListener('#buyer_nic', '#buyer_nic_status');
+						setupNICListener('#admin_nic', '#admin_nic_status');
+
+						const validateWallet = (fieldId, errorId, prefixes) => {
+							$(document).on('input', fieldId, function() {
+								const val = $(this).val();
+								const error = $(errorId);
+								if (val.length >= 3) {
+									const prefix = val.substring(0, 3);
+									if (!prefixes.includes(prefix)) {
+										error.show();
+									} else {
+										error.hide();
+									}
+								} else if (val.length > 0) {
+									if (!'07'.startsWith(val.substring(0, val.length))) {
+										error.show();
+									} else {
+										error.hide();
+									}
+								} else {
+									error.hide();
+								}
+							});
+						};
+
+						validateWallet('#farmer_ezcash', '#ezcash-error', ['074', '076', '077']);
+						validateWallet('#farmer_mcash', '#mcash-error', ['070', '071']);
+
+						$(document).on('input', '#primary_mobile', function() {
+							const val = $(this).val();
+							if (val && val.length > 10) $(this).val(val.substr(0, 10));
+						});
 					});
 				},
 				preConfirm: function() {
@@ -826,6 +1026,33 @@
 					const email = $('#email').val();
 					const password = $('#password').val();
 					const passwordConfirmation = $('#password_confirmation').val();
+
+					if (!userType || !name || !username || !password) {
+						Swal.showValidationMessage('Please fill all required fields');
+						return false;
+					}
+
+					if (password !== passwordConfirmation) {
+						Swal.showValidationMessage('Passwords do not match');
+						return false;
+					}
+
+					const advancedResult = validateAdvancedPassword(password, username, email);
+					if (!advancedResult.allValid) {
+						Swal.showValidationMessage('Your password must meet all 11 security standards listed.');
+						const rulesContainer = $('#password-validation-rules');
+						rulesContainer.fadeIn();
+						return false;
+					}
+
+					let formData = {
+						user_type: userType,
+						name: name,
+						username: username,
+						email: email,
+						password: password,
+						password_confirmation: passwordConfirmation
+					};
 
 					if (userType === 'farmer') {
 						const leadFarmerId = $('#lead_farmer_id').val();
@@ -839,116 +1066,100 @@
 							Swal.showValidationMessage('Grama Niladhari Division field data is missing');
 							return false;
 						}
-					}
 
-					if (userType === 'lead_farmer') {
-						const gnd = $('#lead_gnd').val();
-						if (!gnd) {
-							Swal.showValidationMessage('Grama Niladhari Division field data is missing');
+						const nic = $('#farmer_nic').val();
+						if (!nic) {
+							Swal.showValidationMessage('NIC Number is required for Farmers');
 							return false;
 						}
-					}
+						if (!validateNIC(nic)) {
+							Swal.showValidationMessage('Invalid NIC format');
+							return false;
+						}
 
-					if (!userType || !name || !username || !password) {
-						Swal.showValidationMessage('Please fill all required fields');
-						return false;
-					}
-
-					if (password !== passwordConfirmation) {
-						Swal.showValidationMessage('Passwords do not match');
-						return false;
-					}
-
-					if (password.length < 8) {
-						Swal.showValidationMessage('Password must be at least 8 characters');
-						return false;
-					}
-
-					if (!/(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(password)) {
-						Swal.showValidationMessage('Password must include uppercase, number and special character');
-						return false;
-					}
-
-					const formData = {
-						user_type: userType,
-						name: name,
-						username: username,
-						email: email,
-						password: password,
-						password_confirmation: passwordConfirmation
-					};
-
-					if (userType === 'farmer') {
-						formData.lead_farmer_id = $('#lead_farmer_id').val();
-						formData.nic_no = $('#farmer_nic').val() || '';
+						const paymentMethod = $('#farmer_payment').val() || 'bank';
+						formData.lead_farmer_id = leadFarmerId;
+						formData.nic_no = nic;
 						formData.primary_mobile = $('#farmer_mobile').val() || '';
 						formData.whatsapp_number = $('#farmer_whatsapp').val() || formData.primary_mobile;
 						formData.residential_address = $('#farmer_address').val() || '';
 						formData.district = $('#farmer_district').val() || '';
 						formData.divisional_secretariat = $('#farmer_ds').val() || '';
-						formData.grama_niladhari_division = $('#farmer_gnd').val() || '';
+						formData.grama_niladhari_division = gnd;
 						formData.gn_division_code = $('#farmer_gn_code').val() || '';
-						formData.preferred_payment = $('#farmer_payment').val() || 'bank';
-						
-						const paymentMethod = $('#farmer_payment').val();
-						
+						formData.preferred_payment = paymentMethod;
+
 						if (paymentMethod === 'bank' || paymentMethod === 'all') {
 							const account = $('#farmer_account').val() || '';
 							const accountName = $('#farmer_account_name').val() || '';
 							const bankName = $('#farmer_bank').val() || '';
 							const bankBranch = $('#farmer_branch').val() || '';
 							
-							if (!account) {
-								Swal.showValidationMessage('Account Number is required for Bank Transfer');
+							if (!account || !accountName || !bankName || !bankBranch) {
+								Swal.showValidationMessage('All bank details are required for bank transfer');
 								return false;
 							}
-							if (!accountName) {
-								Swal.showValidationMessage('Account Holder Name is required for Bank Transfer');
-								return false;
-							}
-							if (!bankName) {
-								Swal.showValidationMessage('Bank Name is required for Bank Transfer');
-								return false;
-							}
-							if (!bankBranch) {
-								Swal.showValidationMessage('Bank Branch is required for Bank Transfer');
-								return false;
-							}
-							
 							formData.account_number = account;
 							formData.account_holder_name = accountName;
 							formData.bank_name = bankName;
 							formData.bank_branch = bankBranch;
 						}
-						
+
 						if (paymentMethod === 'ezcash' || paymentMethod === 'all') {
-							const ezcashMobile = $('#farmer_ezcash').val() || '';
-							if (!ezcashMobile) {
-								Swal.showValidationMessage('EzCash Mobile Number is required for EzCash payment');
+							const ezcash = $('#farmer_ezcash').val();
+							if (!ezcash) {
+								Swal.showValidationMessage('EzCash number is required');
 								return false;
 							}
-							formData.ezcash_mobile = ezcashMobile;
+							if (!/^(074|076|077)/.test(ezcash)) {
+								Swal.showValidationMessage('EzCash number must start with 074, 076, or 077');
+								return false;
+							}
+							if (ezcash.length !== 10) {
+								Swal.showValidationMessage('EzCash number must be 10 digits');
+								return false;
+							}
+							formData.ezcash_mobile = ezcash;
 						}
-						
+
 						if (paymentMethod === 'mcash' || paymentMethod === 'all') {
-							const mcashMobile = $('#farmer_mcash').val() || '';
-							if (!mcashMobile) {
-								Swal.showValidationMessage('mCash Mobile Number is required for mCash payment');
+							const mcash = $('#farmer_mcash').val();
+							if (!mcash) {
+								Swal.showValidationMessage('mCash number is required');
 								return false;
 							}
-							formData.mcash_mobile = mcashMobile;
+							if (!/^(070|071)/.test(mcash)) {
+								Swal.showValidationMessage('mCash number must start with 070 or 071');
+								return false;
+							}
+							if (mcash.length !== 10) {
+								Swal.showValidationMessage('mCash number must be 10 digits');
+								return false;
+							}
+							formData.mcash_mobile = mcash;
 						}
-						
-						if ($('#farmer_ezcash').val()) formData.ezcash_mobile = $('#farmer_ezcash').val();
-						if ($('#farmer_mcash').val()) formData.mcash_mobile = $('#farmer_mcash').val();                   
 					} else if (userType === 'lead_farmer') {
-						formData.nic_no = $('#lead_nic').val() || '';
+						const gnd = $('#lead_gnd').val();
+						if (!gnd) {
+							Swal.showValidationMessage('Grama Niladhari Division is required');
+							return false;
+						}
+						const nic = $('#lead_nic').val();
+						if (!nic) {
+							Swal.showValidationMessage('NIC Number is required for Lead Farmers');
+							return false;
+						}
+						if (!validateNIC(nic)) {
+							Swal.showValidationMessage('Invalid NIC format');
+							return false;
+						}
+						formData.nic_no = nic || '';
 						formData.primary_mobile = $('#lead_mobile').val() || '';
 						formData.whatsapp_number = $('#lead_whatsapp').val() || formData.primary_mobile;
 						formData.residential_address = $('#lead_address').val() || '';
 						formData.district = $('#lead_district').val() || '';
 						formData.divisional_secretariat = $('#lead_ds').val() || '';
-						formData.grama_niladhari_division = $('#lead_gnd').val() || '';
+						formData.grama_niladhari_division = gnd;
 						formData.gn_division_code = $('#lead_gn_code').val() || '';
 						formData.group_name = $('#lead_group_name').val() || '';
 						formData.group_number = $('#lead_group_number').val() || '';
@@ -958,11 +1169,12 @@
 						formData.bank_branch = $('#lead_branch').val() || '';
 						formData.preferred_payment = 'bank';
 					} else if (userType === 'facilitator') {
-						formData.nic_no = $('#facilitator_nic').val() || '';
-						formData.primary_mobile = $('#facilitator_mobile').val() || '';
-						formData.whatsapp_number = $('#facilitator_whatsapp').val() || formData.primary_mobile;
-						
 						const district = $('#facilitator_district').val();
+						const nic = $('#facilitator_nic').val();
+						if (!nic || !validateNIC(nic)) {
+							Swal.showValidationMessage('Valid NIC is required for Facilitators');
+							return false;
+						}
 						const assignments = [];
 						$('.assignment-item').each(function() {
 							const ds = $(this).find('.assign-ds').val();
@@ -977,26 +1189,38 @@
 								});
 							}
 						});
+						if (assignments.length === 0) {
+							Swal.showValidationMessage('At least one division assignment is required');
+							return false;
+						}
+						formData.nic_no = nic;
+						formData.primary_mobile = $('#facilitator_mobile').val() || '';
+						formData.whatsapp_number = $('#facilitator_whatsapp').val() || formData.primary_mobile;
 						formData.assignments = assignments;
 						formData.district = district;
-						formData.divisional_secretariat = assignments.length > 0 ? assignments[0].divisional_secretariat : '';
-						formData.assigned_division = assignments.length > 0 ? assignments[0].gn_division : '';
-						formData.gn_division_code = assignments.length > 0 ? assignments[0].gn_division_code : '';
+						formData.divisional_secretariat = assignments[0].divisional_secretariat;
+						formData.assigned_division = assignments[0].gn_division;
+						formData.gn_division_code = assignments[0].gn_division_code;
 					} else if (userType === 'buyer') {
-						formData.nic_no = $('#buyer_nic').val() || '';
+						const nic = $('#buyer_nic').val();
+						if (nic && !validateNIC(nic)) {
+							Swal.showValidationMessage('Invalid NIC format');
+							return false;
+						}
+						formData.nic_no = nic || '';
 						formData.primary_mobile = $('#buyer_mobile').val() || '';
 						formData.whatsapp_number = $('#buyer_whatsapp').val() || formData.primary_mobile;
 						formData.residential_address = $('#buyer_address').val() || '';
 						formData.district = $('#buyer_district').val() || '';
 						formData.business_name = $('#buyer_business').val() || '';
 						formData.business_type = $('#buyer_type').val() || 'individual';
-					} else if (userType === 'facilitator') {
-						formData.nic_no = $('#facilitator_nic').val() || '';
-						formData.primary_mobile = $('#facilitator_mobile').val() || '';
-						formData.whatsapp_number = $('#facilitator_whatsapp').val() || formData.primary_mobile;
-						formData.assigned_division = $('#facilitator_division').val() || '';
 					} else if (userType === 'admin' || userType === 'subadmin') {
-						formData.nic_no = $('#admin_nic').val() || '';
+						const nic = $('#admin_nic').val();
+						if (nic && !validateNIC(nic)) {
+							Swal.showValidationMessage('Invalid NIC format');
+							return false;
+						}
+						formData.nic_no = nic || '';
 						formData.phone_number = $('#admin_phone').val() || '';
 					}
 
@@ -1065,8 +1289,10 @@
 		}
 
 		window.togglePasswordVisibility = function(fieldId) {
-			const field = $('#' + fieldId);
-			const toggleIcon = field.next('.password-toggle');
+			const field = $(`#${fieldId}`);
+			// Find the toggle icon relative to the field container to be more precise
+			const container = field.closest('.password-container');
+			const toggleIcon = container.find('.password-toggle');
 			
 			if (field.attr('type') === 'password') {
 				field.attr('type', 'text');
@@ -1075,7 +1301,80 @@
 				field.attr('type', 'password');
 				toggleIcon.removeClass('fa-eye-slash').addClass('fa-eye');
 			}
+		};
+
+		window.updatePasswordRules = function(password, username, email) {
+			const rulesContainer = $('#password-validation-rules');
+			if (!password) {
+				rulesContainer.hide();
+				return;
+			}
+			
+			const result = validateAdvancedPassword(password, { username, email });
+			rulesContainer.fadeIn();
+			
+			// Update strength bar
+			const strengthBar = $('#strengthBar .strength-fill');
+			const strengthText = $('#strengthText');
+			
+			strengthBar.css({
+				'width': result.percent + '%',
+				'background-color': result.color
+			});
+			strengthText.text(result.strengthText).css('color', result.color);
+			
+			// Update 11 rules grid
+			updatePasswordRuleFeedback(result);
+			
+			window.passwordValid = result.allValid;
+		};
+
+		function isSequential(str) {
+			for (let i = 0; i < str.length - 2; i++) {
+				const c1 = str.toLowerCase().charCodeAt(i);
+				const c2 = str.toLowerCase().charCodeAt(i + 1);
+				const c3 = str.toLowerCase().charCodeAt(i + 2);
+				if ((c1 + 1 === c2 && c2 + 1 === c3) || (c1 - 1 === c2 && c2 - 1 === c3)) return true;
+			}
+			return false;
 		}
+
+		function formatNIC(nic) {
+			if (!nic) return '';
+			nic = nic.trim().toUpperCase();
+			if (nic.length === 10 && /^[0-9]{9}[VX]$/.test(nic)) {
+				return nic;
+			}
+			if (nic.length === 12 && /^[0-9]{12}$/.test(nic)) {
+				return nic;
+			}
+			return nic;
+		}
+
+		function validateNIC(nic) {
+			if (!nic) return false;
+			nic = nic.trim().toUpperCase();
+			const oldNicPattern = /^[0-9]{9}[VX]$/;
+			const newNicPattern = /^[0-9]{12}$/;
+			if (oldNicPattern.test(nic)) {
+				const year = parseInt(nic.substr(0, 2));
+				const days = parseInt(nic.substr(2, 3));
+				if (days > 500) {
+					return days <= 866;
+				}
+				return days > 0 && days <= 366;
+			}
+			if (newNicPattern.test(nic)) {
+				const year = parseInt(nic.substr(0, 4));
+				const days = parseInt(nic.substr(4, 3));
+				if (days > 500) {
+					return days <= 866;
+				}
+				return year >= 1900 && year <= 2100 && days > 0 && days <= 366;
+			}
+			return false;
+		}
+
 
 		$('#search-input').on('input', function() {
 			const search = $(this).val();

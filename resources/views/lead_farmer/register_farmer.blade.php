@@ -6,6 +6,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/lead_farmer/farmer_registation.css') }}">
+<script src="{{ asset('js/form-validation.js') }}"></script>
 @endsection
 
 @section('content')
@@ -97,6 +98,35 @@
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+
+                        <div class="password-strength-container">
+                            <div class="strength-meta">
+                                <span>Strength: <span id="strength-text">None</span></span>
+                                <span id="strength-percent">0%</span>
+                            </div>
+                            <div class="strength-bar">
+                                <div id="strength-fill" class="strength-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="password-requirements">
+                            <div class="requirements-title">
+                                <i class="fas fa-shield-alt"></i> Security Requirements
+                            </div>
+                            <ul class="requirements-grid">
+                                <li id="rule-length" class="rule-item invalid"><i class="fas fa-times-circle"></i> 8+ Characters</li>
+                                <li id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> One Number</li>
+                                <li id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> Capital Letter</li>
+                                <li id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> Lowercase Letter</li>
+                                <li id="rule-special" class="rule-item invalid"><i class="fas fa-times-circle"></i> Special Character</li>
+                                <li id="rule-no-space" class="rule-item invalid"><i class="fas fa-times-circle"></i> No Spaces</li>
+                                <li id="rule-no-repeat" class="rule-item invalid"><i class="fas fa-times-circle"></i> No 3x Repeats</li>
+                                <li id="rule-no-sequence" class="rule-item invalid"><i class="fas fa-times-circle"></i> No Sequences</li>
+                                <li id="rule-not-common" class="rule-item invalid"><i class="fas fa-times-circle"></i> Not Common</li>
+                                <li id="rule-no-links" class="rule-item invalid"><i class="fas fa-times-circle"></i> No Links</li>
+                                <li id="rule-no-personal" class="rule-item invalid"><i class="fas fa-times-circle"></i> No Personal Info</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -214,33 +244,22 @@
                         <select class="form-select @error('district') is-invalid @enderror" 
                                 id="district" name="district" required>
                             <option value="">Select District</option>
-                            <option value="Ampara" {{ old('district') == 'Ampara' ? 'selected' : '' }}>Ampara</option>
-                            <option value="Anuradhapura" {{ old('district') == 'Anuradhapura' ? 'selected' : '' }}>Anuradhapura</option>
-                            <option value="Badulla" {{ old('district') == 'Badulla' ? 'selected' : '' }}>Badulla</option>
-                            <option value="Batticaloa" {{ old('district') == 'Batticaloa' ? 'selected' : '' }}>Batticaloa</option>
-                            <option value="Colombo" {{ old('district') == 'Colombo' ? 'selected' : '' }}>Colombo</option>
-                            <option value="Galle" {{ old('district') == 'Galle' ? 'selected' : '' }}>Galle</option>
-                            <option value="Gampaha" {{ old('district') == 'Gampaha' ? 'selected' : '' }}>Gampaha</option>
-                            <option value="Hambantota" {{ old('district') == 'Hambantota' ? 'selected' : '' }}>Hambantota</option>
-                            <option value="Jaffna" {{ old('district') == 'Jaffna' ? 'selected' : '' }}>Jaffna</option>
-                            <option value="Kalutara" {{ old('district') == 'Kalutara' ? 'selected' : '' }}>Kalutara</option>
-                            <option value="Kandy" {{ old('district') == 'Kandy' ? 'selected' : '' }}>Kandy</option>
-                            <option value="Kegalle" {{ old('district') == 'Kegalle' ? 'selected' : '' }}>Kegalle</option>
-                            <option value="Kilinochchi" {{ old('district') == 'Kilinochchi' ? 'selected' : '' }}>Kilinochchi</option>
-                            <option value="Kurunegala" {{ old('district') == 'Kurunegala' ? 'selected' : '' }}>Kurunegala</option>
-                            <option value="Mannar" {{ old('district') == 'Mannar' ? 'selected' : '' }}>Mannar</option>                            
-                            <option value="Matale" {{ old('district') == 'Matale' ? 'selected' : '' }}>Matale</option>
-                            <option value="Matara" {{ old('district') == 'Matara' ? 'selected' : '' }}>Matara</option>
-                            <option value="Monaragala" {{ old('district') == 'Monaragala' ? 'selected' : '' }}>Monaragala</option>
-                            <option value="Mullaitivu" {{ old('district') == 'Mullaitivu' ? 'selected' : '' }}>Mullaitivu</option>
-                            <option value="Nuwara Eliya" {{ old('district') == 'Nuwara Eliya' ? 'selected' : '' }}>Nuwara Eliya</option>
-                            <option value="Polonnaruwa" {{ old('district') == 'Polonnaruwa' ? 'selected' : '' }}>Polonnaruwa</option>
-                            <option value="Puttalam" {{ old('district') == 'Puttalam' ? 'selected' : '' }}>Puttalam</option>
-                            <option value="Ratnapura" {{ old('district') == 'Ratnapura' ? 'selected' : '' }}>Ratnapura</option>
-                            <option value="Trincomalee" {{ old('district') == 'Trincomalee' ? 'selected' : '' }}>Trincomalee</option>
-                            <option value="Vavuniya" {{ old('district') == 'Vavuniya' ? 'selected' : '' }}>Vavuniya</option>
+                            <!-- Options will be populated by JS -->
                         </select>
                         @error('district')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="divisional_secretariat" class="form-label required-field">
+                            <i class="fas fa-building"></i> Divisional Secretariat
+                        </label>
+                        <select class="form-select @error('divisional_secretariat') is-invalid @enderror" 
+                                id="divisional_secretariat" name="divisional_secretariat" required disabled>
+                            <option value="">Select District First</option>
+                        </select>
+                        @error('divisional_secretariat')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -249,13 +268,26 @@
                         <label for="grama_niladhari_division" class="form-label required-field">
                             <i class="fas fa-landmark"></i> Grama Niladhari Division
                         </label>
-                        <div class="input-with-icon">
-                            <input type="text" class="form-control @error('grama_niladhari_division') is-invalid @enderror" 
-                                   id="grama_niladhari_division" name="grama_niladhari_division" 
-                                   value="{{ old('grama_niladhari_division') }}" 
-                                   placeholder="Enter GN Division" required>
-                        </div>
+                        <select class="form-select @error('grama_niladhari_division') is-invalid @enderror" 
+                                id="grama_niladhari_division" name="grama_niladhari_division" required disabled>
+                            <option value="">Select DS First</option>
+                        </select>
                         @error('grama_niladhari_division')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gn_division_code" class="form-label">
+                            <i class="fas fa-barcode"></i> GN Division Code
+                        </label>
+                        <div class="input-with-icon">
+                            <input type="text" class="form-control @error('gn_division_code') is-invalid @enderror" 
+                                   id="gn_division_code" name="gn_division_code" 
+                                   value="{{ old('gn_division_code') }}" 
+                                   placeholder="GN Division Code" readonly>
+                        </div>
+                        @error('gn_division_code')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -367,6 +399,7 @@
                                        value="{{ old('ezcash_mobile') }}" 
                                        placeholder="e.g., 0771234567" pattern="[0-9]{10}">
                             </div>
+                            <div id="ezcash_error" class="error-text" style="display: none;">EzCash number must start with 074, 076 or 077</div>
                             @error('ezcash_mobile')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -386,6 +419,7 @@
                                        value="{{ old('mcash_mobile') }}" 
                                        placeholder="e.g., 0771234567" pattern="[0-9]{10}">
                             </div>
+                            <div id="mcash_error" class="error-text" style="display: none;">mCash number must start with 070 or 071</div>
                             @error('mcash_mobile')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -408,8 +442,55 @@
 @endsection
 
 @section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ asset('js/gn-data.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // GN Hierarchy Logic
+    const districtSelect = $('#district');
+    const dsSelect = $('#divisional_secretariat');
+    const gndSelect = $('#grama_niladhari_division');
+    const codeInput = $('#gn_division_code');
+
+    // Populate Districts
+    if (typeof gnData !== 'undefined') {
+        Object.keys(gnData).forEach(dist => {
+            districtSelect.append(`<option value="${dist}">${dist}</option>`);
+        });
+    }
+
+    districtSelect.on('change', function() {
+        const dist = $(this).val();
+        dsSelect.empty().append('<option value="" disabled selected>Select DS</option>').prop('disabled', false);
+        gndSelect.empty().append('<option value="" disabled selected>Select DS First</option>').prop('disabled', true);
+        codeInput.val('');
+        
+        if (gnData[dist]) {
+            Object.keys(gnData[dist]).forEach(ds => {
+                dsSelect.append(`<option value="${ds}">${ds}</option>`);
+            });
+        }
+    });
+
+    dsSelect.on('change', function() {
+        const dist = districtSelect.val();
+        const ds = $(this).val();
+        gndSelect.empty().append('<option value="" disabled selected>Select GN Division</option>').prop('disabled', false);
+        codeInput.val('');
+
+        if (gnData[dist] && gnData[dist][ds]) {
+            gnData[dist][ds].forEach(gn => {
+                gndSelect.append(`<option value="${gn.name}" data-code="${gn.code}">${gn.name}</option>`);
+            });
+        }
+    });
+
+    gndSelect.on('change', function() {
+        const selectedOption = $(this).find('option:selected');
+        const code = selectedOption.data('code');
+        codeInput.val(code || '');
+    });
+
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('password_confirmation');
     const nicInput = document.getElementById('nic_no');
@@ -453,12 +534,26 @@ document.addEventListener('DOMContentLoaded', function() {
     function validatePasswordStrength() {
         const passwordValue = password.value;
         if (!passwordValue) return false;
-        let strength = 0;
-        if (passwordValue.length >= 8) strength++;
-        if (/[A-Z]/.test(passwordValue)) strength++;
-        if (/[0-9]/.test(passwordValue)) strength++;
-        if (/[^A-Za-z0-9]/.test(passwordValue)) strength++;
-        return strength >= 2;
+        
+        const result = validateAdvancedPassword(passwordValue, {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value
+        });
+
+        updatePasswordRuleFeedback(result);
+
+        const strengthText = document.getElementById('strength-text');
+        const strengthPercent = document.getElementById('strength-percent');
+        const strengthFill = document.getElementById('strength-fill');
+
+        if (strengthText) strengthText.innerText = result.strengthText;
+        if (strengthPercent) strengthPercent.innerText = result.percent + '%';
+        if (strengthFill) {
+            strengthFill.style.width = result.percent + '%';
+            strengthFill.style.backgroundColor = result.color;
+        }
+
+        return result.isValid;
     }
 
     function validatePasswordMatch() {
@@ -515,7 +610,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (validateNIC(formattedNIC)) {
-            nicStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid NIC';
+            nicStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid NIC format';
             nicStatus.className = 'nic-status valid';
         } else {
             nicStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid NIC format';
@@ -605,6 +700,23 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
+        const ezcash = document.getElementById('ezcash_mobile').value.trim();
+        const mcash = document.getElementById('mcash_mobile').value.trim();
+        const paymentMethod = preferredPayment.value;
+
+        if (paymentMethod === 'ezcash' || paymentMethod === 'all') {
+            if (ezcash && !/^(074|076|077)/.test(ezcash)) {
+                Swal.fire({ icon: 'error', title: 'Invalid EzCash', text: 'EzCash number must start with 074, 076, or 077' });
+                return false;
+            }
+        }
+        if (paymentMethod === 'mcash' || paymentMethod === 'all') {
+            if (mcash && !/^(070|071)/.test(mcash)) {
+                Swal.fire({ icon: 'error', title: 'Invalid mCash', text: 'mCash number must start with 070 or 071' });
+                return false;
+            }
+        }
+
         if (!validatePasswordStrength()) {
             Swal.fire({
                 icon: 'error',
@@ -625,7 +737,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
-        const paymentMethod = preferredPayment.value;
         if (paymentMethod === 'bank') {
             const bankFields = ['bank_name', 'bank_branch', 'account_holder_name', 'account_number'];
             for (const field of bankFields) {
@@ -640,7 +751,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } else if (paymentMethod === 'ezcash') {
-            if (!document.getElementById('ezcash_mobile').value.trim()) {
+            if (!ezcash) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Missing Information',
@@ -650,7 +761,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         } else if (paymentMethod === 'mcash') {
-            if (!document.getElementById('mcash_mobile').value.trim()) {
+            if (!mcash) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Missing Information',
@@ -677,7 +788,26 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
+    document.getElementById('ezcash_mobile').addEventListener('input', function() {
+        const val = this.value.trim();
+        if (val && !/^(074|076|077)/.test(val)) {
+            document.getElementById('ezcash_error').style.display = 'block';
+        } else {
+            document.getElementById('ezcash_error').style.display = 'none';
+        }
+    });
+
+    document.getElementById('mcash_mobile').addEventListener('input', function() {
+        const val = this.value.trim();
+        if (val && !/^(070|071)/.test(val)) {
+            document.getElementById('mcash_error').style.display = 'block';
+        } else {
+            document.getElementById('mcash_error').style.display = 'none';
+        }
+    });
+
     nicInput.addEventListener('input', updateNICStatus);
+    password.addEventListener('input', validatePasswordStrength);
     preferredPayment.addEventListener('change', togglePaymentDetails);
     
     form.addEventListener('submit', function(e) {
