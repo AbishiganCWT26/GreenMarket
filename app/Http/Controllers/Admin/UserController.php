@@ -680,6 +680,20 @@ class UserController extends Controller
     private function updateFarmerDetails($user, $role, $request, $userId)
     {
         $tables = $role == 'farmer' ? ['farmers'] : ['lead_farmers', 'farmers'];
+        $currentLeadFarmerId = null;
+
+        // Pre-fetch lead_farmer_id if it exists
+        if ($role == 'lead_farmer') {
+            $lf = DB::table('lead_farmers')->where('user_id', $userId)->select('id')->first();
+            if ($lf) {
+                $currentLeadFarmerId = $lf->id;
+            }
+        } else {
+            $f = DB::table('farmers')->where('user_id', $userId)->select('lead_farmer_id')->first();
+            if ($f) {
+                $currentLeadFarmerId = $f->lead_farmer_id;
+            }
+        }
 
         foreach ($tables as $table) {
             $details = DB::table($table)->where('user_id', $userId)->first();
@@ -715,31 +729,54 @@ class UserController extends Controller
 
             if ($details) {
                 DB::table($table)->where('user_id', $userId)->update($updateData);
+                
+                // If we just updated lead_farmer record, ensure we have its ID for the next iteration
+                if ($table == 'lead_farmers') {
+                    $currentLeadFarmerId = $details->id;
+                }
             } else {
                 $userRecord = DB::table('users')->find($userId);
 
                 $createData = array_merge($updateData, [
                     'user_id' => $userId,
-                    'name' => $userRecord->username,
+                    'name' => $request->name ?? $userRecord->username,
                     'nic_no' => $request->nic_no ?? '',
                     'primary_mobile' => $request->primary_mobile ?? '',
+                    'whatsapp_number' => $request->whatsapp_number ?? null,
                     'residential_address' => $request->residential_address ?? '',
                     'grama_niladhari_division' => $request->grama_niladhari_division ?? '',
-                    'district' => 'Colombo',
+                    'gn_division_code' => $request->gn_division_code ?? '',
+                    'divisional_secretariat' => $request->divisional_secretariat ?? '',
+                    'district' => $request->district ?? 'Colombo',
                     'created_at' => now()
                 ]);
 
-                // is_active is only in farmers table
+                // Handle table-specific fields for insertion
                 if ($table == 'farmers') {
                     $createData['is_active'] = true;
+                    
+                    // If this is a lead farmer, they are their own lead farmer
+                    // If regular farmer, get from request or use existing/default
+                    if ($role == 'lead_farmer') {
+                        $createData['lead_farmer_id'] = $currentLeadFarmerId;
+                    } else {
+                        if (!$currentLeadFarmerId) {
+                            $defaultLF = DB::table('lead_farmers')->first();
+                            $currentLeadFarmerId = $defaultLF ? $defaultLF->id : null;
+                        }
+                        $createData['lead_farmer_id'] = $currentLeadFarmerId;
+                    }
                 }
 
                 if ($table == 'lead_farmers') {
                     $createData['group_name'] = $request->group_name ?? ($userRecord->username . "'s Group");
                     $createData['group_number'] = $request->group_number ?? ('GRP-' . strtoupper(Str::random(6)));
+                    
+                    $newId = DB::table($table)->insertGetId($createData);
+                    $currentLeadFarmerId = $newId;
+                } else {
+                    DB::table($table)->insert($createData);
                 }
-
-                DB::table($table)->insert($createData);
             }
         }
     }

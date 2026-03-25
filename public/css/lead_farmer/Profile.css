@@ -8,10 +8,13 @@
     --accent-amber: #f59e0b;
     --blue: #3b82f6;
     --purple: #8b5cf6;
-    --yellow: #f59e0b;
+    --red: #ef4444;
     --shadow-sm: 0 1px 3px rgba(15, 23, 36, 0.04);
     --shadow-md: 0 7px 15px rgba(15, 23, 36, 0.08);
-    --transition: all 0.3s ease;
+    --border: #e5e7eb;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
 }
 
 * {
@@ -22,17 +25,29 @@
 
 body {
     background: var(--body-bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
     color: var(--text-color);
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 12px;
-    overflow-x: hidden;
+    line-height: 1.4;
 }
 
-.profile-compact-container {
-    max-width: 1200px;
-    margin: 10px auto;
-    padding: 0 10px;
-    animation: fadeIn 0.5s ease;
+.profile-wrap {
+    min-height: 100vh;
+    padding: 16px;
+}
+
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
@@ -47,53 +62,172 @@ body {
     }
 }
 
-.compact-header {
-    background: var(--card-bg);
-    border-radius: 8px;
-    padding: 15px 20px;
-    margin-bottom: 15px;
-    box-shadow: var(--shadow-sm);
-    border-left: 4px solid var(--primary-green);
-    transition: var(--transition);
-}
-
-.compact-header:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
-
-.header-main h1 {
-    font-size: 1.4rem;
-    color: var(--text-color);
+.profile-head {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+    padding: 20px 24px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 20px;
 }
 
-.header-main h1 i {
-    color: var(--primary-green);
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 80px;
+    overflow: hidden;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.header-sub {
-    font-size: 0.85rem;
-    color: var(--muted);
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.profile-avatar:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.avatar-overlay i {
+    color: white;
+    font-size: 20px;
+}
+
+.profile-info h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 6px;
+}
+
+.profile-info p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
     display: flex;
     align-items: center;
     gap: 6px;
     margin-top: 4px;
 }
 
-.compact-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 15px;
-    animation: slideUp 0.6s ease;
+.profile-stats {
+    display: flex;
+    gap: 16px;
+    padding: 12px 24px;
+    background: #fafbfc;
+    border-bottom: 1px solid var(--border);
 }
 
-@keyframes slideUp {
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.stat-item i {
+    font-size: 20px;
+    color: var(--primary-green);
+}
+
+.stat-item div {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.stat-label {
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.profile-tabs {
+    border-top: 1px solid var(--border);
+}
+
+.tabs-nav {
+    display: flex;
+    background: #fafbfc;
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    gap: 4px;
+}
+
+.tab-btn {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-btn i {
+    font-size: 13px;
+}
+
+.tab-btn:hover {
+    color: var(--primary-green);
+}
+
+.tab-btn.active {
+    color: var(--primary-green);
+    position: relative;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary-green);
+}
+
+.tabs-content {
+    padding: 20px 24px;
+}
+
+.tab-pane {
+    display: none;
+    animation: fadeSlide 0.25s ease;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeSlide {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(-5px);
     }
 
     to {
@@ -102,319 +236,234 @@ body {
     }
 }
 
-.grid-left {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.form-section {
+    margin-bottom: 24px;
 }
 
-.grid-right {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.compact-card {
-    background: var(--card-bg);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-    animation: cardAppear 0.4s ease backwards;
-}
-
-@keyframes cardAppear {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.compact-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
-}
-
-.card-top {
-    background: linear-gradient(90deg, var(--primary-green), var(--blue));
-    color: white;
-    padding: 12px 15px;
+.form-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.card-top h3 {
-    font-size: 1rem;
+.form-section h3 i {
+    color: var(--primary-green);
+    font-size: 14px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field.full-width {
+    grid-column: span 2;
+}
+
+.form-field label {
+    font-size: 11px;
     font-weight: 600;
-}
-
-.card-content {
-    padding: 15px;
-}
-
-.compact-photo-wrapper {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 12px;
-    border-radius: 50%;
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-    border: 3px solid var(--primary-green);
-    transition: var(--transition);
-}
-
-.compact-photo-wrapper:hover {
-    border-color: var(--dark-green);
-    transform: rotate(5deg);
-}
-
-.compact-profile-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: var(--transition);
-}
-
-.compact-photo-hover {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(16, 185, 129, 0.8);
+    color: var(--muted);
     display: flex;
     align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: var(--transition);
+    gap: 5px;
 }
 
-.compact-photo-wrapper:hover .compact-photo-hover {
-    opacity: 1;
+.form-field label i {
+    color: var(--primary-green);
+    font-size: 11px;
 }
 
-.compact-photo-hover i {
-    font-size: 1.8rem;
-    color: white;
+.required {
+    color: var(--red);
 }
 
-.photo-actions {
-    text-align: center;
+.form-field input,
+.form-field select,
+.form-field textarea {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    transition: all 0.2s ease;
+    background: white;
+    font-family: inherit;
+    width: 100%;
 }
 
-.compact-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.85rem;
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+}
+
+.form-field input:hover:not(:focus),
+.form-field select:hover:not(:focus),
+.form-field textarea:hover:not(:focus) {
+    border-color: #cbd5e1;
+}
+
+.readonly-field {
+    position: relative;
+}
+
+.readonly-field input {
+    background: #f8fafc;
+    padding-right: 32px;
     cursor: pointer;
+}
+
+.readonly-field i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.readonly-field:hover i {
+    color: var(--primary-green);
+}
+
+.form-field textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+.form-field .error {
+    color: var(--red);
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+}
+
+.btn-reset,
+.btn-save,
+.btn-password,
+.btn-cancel,
+.btn-update {
+    padding: 8px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: var(--transition);
-    font-weight: 500;
+    gap: 8px;
+    border: none;
 }
 
-.photo-btn {
+.btn-reset {
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--muted);
+}
+
+.btn-reset:hover {
+    background: #f8fafc;
+    border-color: var(--muted);
+    color: var(--text-color);
+    transform: translateY(-1px);
+}
+
+.btn-save,
+.btn-update {
     background: var(--primary-green);
     color: white;
 }
 
-.photo-btn:hover {
+.btn-save:hover,
+.btn-update:hover {
     background: var(--dark-green);
-    transform: scale(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
-.password-btn {
+.btn-password {
     background: var(--purple);
     color: white;
     width: 100%;
-    margin-top: 10px;
+    justify-content: center;
 }
 
-.password-btn:hover {
+.btn-password:hover {
     background: #7c3aed;
-    transform: scale(1.03);
+    transform: translateY(-1px);
 }
 
-.compact-info-row {
+.btn-cancel {
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--muted);
+}
+
+.btn-cancel:hover {
+    background: #f8fafc;
+}
+
+.security-info {
+    background: #f0fdf4;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid #f1f1f1;
+    font-size: 12px;
+    color: var(--primary-green);
 }
 
-.compact-info-row:last-child {
+.security-info i {
+    font-size: 16px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
     border-bottom: none;
 }
 
-.info-icon {
-    width: 30px;
-    height: 30px;
-    background: #eef2ff;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--blue);
-    font-size: 0.9rem;
-}
-
-.info-details {
-    flex: 1;
-}
-
 .info-label {
-    font-size: 0.75rem;
+    font-size: 12px;
     color: var(--muted);
-    margin-bottom: 2px;
 }
 
 .info-value {
-    font-size: 0.9rem;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-color);
 }
-
-.compact-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.form-section {
-    background: #fafbfc;
-    border-radius: 6px;
-    padding: 12px;
-    border-left: 3px solid var(--accent-amber);
-}
-
-.section-heading {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.section-heading i {
-    color: var(--accent-amber);
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-.full-width {
-    grid-column: 1 / -1;
-}
-
-.form-group.compact {
-    margin-bottom: 0;
-}
-
-.form-group.compact label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
-    margin-bottom: 4px;
-    color: var(--text-color);
-    font-weight: 500;
-}
-
-.form-group.compact label i {
-    color: var(--primary-green);
-    font-size: 0.9rem;
-}
-
-.form-input {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 5px;
-    font-size: 0.85rem;
-    transition: var(--transition);
-    background: white;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: var(--primary-green);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-}
-
-.textarea-input {
-    min-height: 60px;
-    resize: vertical;
-}
-
-.error-input {
-    border-color: #ef4444;
-}
-
-.error-message {
-    color: #ef4444;
-    font-size: 0.75rem;
-    margin-top: 3px;
-}
-
-.form-actions.compact {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.action-btn {
-    padding: 8px 18px;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: var(--transition);
-    font-weight: 500;
-}
-
-.cancel-btn {
-    background: #f3f4f6;
-    color: var(--text-color);
-    border: 1px solid #d1d5db;
-}
-
-.cancel-btn:hover {
-    background: #e5e7eb;
-    transform: translateY(-2px);
-}
-
-.save-btn {
-    background: var(--primary-green);
-    color: white;
-}
-
-.save-btn:hover {
-    background: var(--dark-green);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-
 
 .modal-overlay {
     position: fixed;
@@ -427,8 +476,6 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    backdrop-filter: blur(4px);
-    animation: fadeIn 0.3s ease;
 }
 
 .modal-overlay.active {
@@ -439,19 +486,19 @@ body.no-scroll {
     overflow: hidden;
 }
 
-.modal-compact {
+.modal-container {
     background: var(--card-bg);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     width: 90%;
-    max-width: 400px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    animation: modalSlide 0.4s ease;
+    max-width: 380px;
+    box-shadow: var(--shadow-md);
+    animation: modalSlide 0.25s ease;
 }
 
 @keyframes modalSlide {
     from {
         opacity: 0;
-        transform: translateY(-30px);
+        transform: translateY(-20px);
     }
 
     to {
@@ -460,18 +507,19 @@ body.no-scroll {
     }
 }
 
-.modal-header {
+.modal-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background: linear-gradient(90deg, var(--purple), var(--blue));
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--blue) 100%);
     color: white;
-    border-radius: 10px 10px 0 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
-.modal-header h3 {
-    font-size: 1.1rem;
+.modal-head h3 {
+    font-size: 14px;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -481,10 +529,9 @@ body.no-scroll {
     background: transparent;
     border: none;
     color: white;
-    font-size: 1.2rem;
+    font-size: 14px;
     cursor: pointer;
-    transition: var(--transition);
-    padding: 5px;
+    transition: all 0.2s ease;
 }
 
 .modal-close:hover {
@@ -497,1170 +544,575 @@ body.no-scroll {
 
 .password-field {
     position: relative;
-    display: flex;
-    align-items: center;
 }
 
 .password-field input {
-    padding-right: 40px;
-    width: 100%;
+    padding-right: 35px;
 }
 
-.password-toggle {
+.toggle-password {
     position: absolute;
-    right: 10px;
-    cursor: pointer;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--muted);
-    font-size: 1rem;
-    padding: 5px;
-    transition: var(--transition);
+    cursor: pointer;
+    font-size: 12px;
 }
 
-.password-toggle:hover {
+.toggle-password:hover {
     color: var(--primary-green);
+}
+
+.strength-meter {
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+.strength-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.strength-progress {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+}
+
+.strength-text {
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.match-status {
+    font-size: 10px;
+    margin-top: 4px;
+    display: block;
+}
+
+.match-status.success {
+    color: var(--primary-green);
+}
+
+.match-status.error {
+    color: var(--red);
+}
+
+.password-requirements {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: var(--radius-sm);
+}
+
+.password-requirements p {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.password-requirements ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.password-requirements li {
+    font-size: 10px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.password-requirements li.valid {
+    color: var(--primary-green);
+}
+
+.password-requirements li.invalid {
+    color: var(--red);
+}
+
+.password-requirements li i {
+    font-size: 9px;
 }
 
 .modal-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 12px;
     margin-top: 20px;
 }
 
-#passwordModal .modal-compact {
-    max-width: 340px;
-    width: 92%;
+.swal-compact {
+    padding: 16px !important;
+    border-radius: var(--radius-md) !important;
 }
 
-#passwordModal .modal-header {
-    padding: 9px 14px;
+.swal-title {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
 }
 
-#passwordModal .modal-header h3 {
-    font-size: 0.9rem;
-    gap: 6px;
-}
-
-#passwordModal .modal-close {
-    font-size: 0.95rem;
-    padding: 3px;
-}
-
-#passwordModal .modal-body {
-    padding: 10px 14px;
-}
-
-#passwordModal .form-group.compact {
-    margin-bottom: 8px;
-}
-
-#passwordModal .form-group.compact label {
-    font-size: 0.78rem;
-    margin-bottom: 3px;
-}
-
-#passwordModal .form-input {
-    padding: 5px 10px;
-    font-size: 0.8rem;
-}
-
-#passwordModal .password-toggle {
-    font-size: 0.82rem;
-    padding: 3px;
-}
-
-#passwordModal .strength-meter {
-    margin-top: 4px;
-}
-
-#passwordModal .strength-meter small {
-    font-size: 0.73rem;
-}
-
-#passwordModal .requirements {
-    margin-top: 5px;
-}
-
-#passwordModal .requirements h6 {
-    font-size: 0.74rem;
-    margin-bottom: 3px;
-}
-
-#passwordModal .requirements ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px 6px;
-    font-size: 0.7rem;
-}
-
-#passwordModal .requirements ul li {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-
-#passwordModal #passwordMatch {
-    margin-top: 4px;
-}
-
-#passwordModal #passwordMatch small {
-    font-size: 0.73rem;
-}
-
-#passwordModal .modal-actions {
-    margin-top: 8px;
-    gap: 7px;
-}
-
-#passwordModal .modal-actions button {
-    padding: 5px 12px;
-    font-size: 0.8rem;
+.swal-text {
+    font-size: 12px !important;
+    color: var(--muted) !important;
 }
 
 @media (min-width: 2560px) {
-    #passwordModal .modal-compact {
-        max-width: 360px;
-        border-radius: 12px;
+    .profile-container {
+        max-width: 1400px;
     }
 
-    #passwordModal .modal-header {
-        padding: 10px 16px;
-    }
-
-    #passwordModal .modal-header h3 {
-        font-size: 0.95rem;
-    }
-
-    #passwordModal .modal-body {
-        padding: 14px 16px;
-    }
-
-    #passwordModal .modal-actions {
-        margin-top: 12px;
-        gap: 8px;
-    }
-
-    #passwordModal .form-group.compact {
-        margin-bottom: 10px;
+    .form-row {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (min-width: 1501px) and (max-width: 2559px) {
-    #passwordModal .modal-compact {
-        max-width: 340px;
-        border-radius: 11px;
-    }
-
-    #passwordModal .modal-header {
-        padding: 10px 15px;
-    }
-
-    #passwordModal .modal-header h3 {
-        font-size: 0.92rem;
-    }
-
-    #passwordModal .modal-body {
-        padding: 12px 15px;
-    }
-
-    #passwordModal .modal-actions {
-        margin-top: 10px;
+    .profile-container {
+        max-width: 1200px;
     }
 }
 
 @media (min-width: 1400px) and (max-width: 1500px) {
-    #passwordModal .modal-compact {
-        max-width: 330px;
-    }
-
-    #passwordModal .modal-header {
-        padding: 9px 14px;
-    }
-
-    #passwordModal .modal-body {
-        padding: 12px 14px;
+    .profile-container {
+        max-width: 1100px;
     }
 }
 
 @media (min-width: 1200px) and (max-width: 1399px) {
-    #passwordModal .modal-compact {
-        max-width: 320px;
-    }
-
-    #passwordModal .modal-header {
-        padding: 9px 14px;
-    }
-
-    #passwordModal .modal-header h3 {
-        font-size: 0.9rem;
-    }
-
-    #passwordModal .modal-body {
-        padding: 11px 14px;
-    }
-
-    #passwordModal .modal-actions {
-        margin-top: 10px;
+    .profile-container {
+        max-width: 1000px;
     }
 }
 
 @media (min-width: 1001px) and (max-width: 1199px) {
-    #passwordModal .modal-compact {
-        max-width: 310px;
-    }
-
-    #passwordModal .modal-header {
-        padding: 8px 13px;
-    }
-
-    #passwordModal .modal-header h3 {
-        font-size: 0.88rem;
-    }
-
-    #passwordModal .modal-body {
-        padding: 10px 13px;
-    }
-
-    #passwordModal .modal-actions {
-        margin-top: 10px;
-    }
-
-    #passwordModal .form-group.compact {
-        margin-bottom: 8px;
+    .profile-container {
+        max-width: 900px;
     }
 }
 
 @media (max-width: 1000px) {
-    #passwordModal .modal-compact {
-        max-width: 300px;
-    }
-
-    #passwordModal .modal-header {
-        padding: 8px 12px;
-    }
-
-    #passwordModal .modal-header h3 {
-        font-size: 0.86rem;
-        gap: 5px;
-    }
-
-    #passwordModal .modal-close {
-        font-size: 0.85rem;
-    }
-
-    #passwordModal .modal-body {
-        padding: 10px 12px;
-    }
-
-    #passwordModal .modal-actions {
-        margin-top: 10px;
-        gap: 7px;
-    }
-
-    #passwordModal .form-group.compact {
-        margin-bottom: 8px;
-    }
-
-    #passwordModal .form-group.compact label {
-        font-size: 0.78rem;
-        margin-bottom: 3px;
-    }
-
-    #passwordModal .form-input {
-        padding: 5px 10px;
-        font-size: 0.8rem;
-    }
-
-    #passwordModal .password-toggle {
-        font-size: 0.8rem;
-    }
-
-    #passwordModal .requirements h6 {
-        font-size: 0.73rem;
-        margin-bottom: 3px;
-    }
-
-    #passwordModal .requirements ul {
-        font-size: 0.68rem;
-        gap: 2px;
-    }
-
-    #passwordModal .modal-actions button {
-        padding: 5px 10px;
-        font-size: 0.78rem;
+    .profile-container {
+        max-width: 95%;
     }
 }
 
-@media (min-width: 992px) and (max-width: 999px) {
-    #passwordModal .modal-compact {
-        max-width: 295px;
+@media (min-width: 768px) and (max-width: 992px) {
+    .profile-head {
+        padding: 16px 20px;
+        gap: 16px;
     }
 
-    #passwordModal .modal-header {
-        padding: 8px 12px;
+    .profile-avatar {
+        width: 70px;
+        height: 70px;
     }
 
-    #passwordModal .modal-body {
-        padding: 10px 12px;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-    #passwordModal .modal-compact {
-        max-width: 290px;
+    .profile-info h2 {
+        font-size: 16px;
     }
 
-    #passwordModal .modal-header {
-        padding: 8px 12px;
+    .profile-stats {
+        padding: 10px 20px;
     }
 
-    #passwordModal .modal-header h3 {
-        font-size: 0.85rem;
+    .tabs-nav {
+        padding: 0 12px;
     }
 
-    #passwordModal .modal-body {
-        padding: 10px 12px;
+    .tab-btn {
+        padding: 10px 16px;
+        font-size: 12px;
     }
 
-    #passwordModal .modal-actions {
-        margin-top: 10px;
+    .tabs-content {
+        padding: 16px 20px;
     }
 
-    #passwordModal .form-group.compact {
-        margin-bottom: 7px;
-    }
-
-    #passwordModal .form-input {
-        padding: 5px 9px;
-        font-size: 0.78rem;
-    }
-
-    #passwordModal .requirements ul {
-        font-size: 0.65rem;
-        gap: 2px;
-    }
-
-    #passwordModal .modal-actions button {
-        padding: 4px 9px;
-        font-size: 0.73rem;
+    .form-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
 }
 
 @media (min-width: 576px) and (max-width: 767px) {
-    #passwordModal .modal-compact {
-        max-width: 270px;
+    .profile-wrap {
+        padding: 12px;
     }
 
-    #passwordModal .modal-header {
-        padding: 7px 12px;
+    .profile-head {
+        padding: 14px;
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
     }
 
-    #passwordModal .modal-header h3 {
-        font-size: 0.83rem;
-        gap: 5px;
+    .profile-info p {
+        justify-content: center;
     }
 
-    #passwordModal .modal-close {
-        font-size: 0.82rem;
+    .profile-stats {
+        flex-direction: column;
+        gap: 8px;
     }
 
-    #passwordModal .modal-body {
-        padding: 9px 11px;
+    .stat-item {
+        justify-content: center;
+        text-align: center;
     }
 
-    #passwordModal .modal-actions {
-        margin-top: 9px;
-        gap: 6px;
+    .tabs-nav {
+        justify-content: center;
     }
 
-    #passwordModal .form-group.compact {
-        margin-bottom: 7px;
+    .tabs-content {
+        padding: 16px;
     }
 
-    #passwordModal .form-group.compact label {
-        font-size: 0.75rem;
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 
-    #passwordModal .form-input {
-        padding: 5px 9px;
-        font-size: 0.76rem;
+    .form-field.full-width {
+        grid-column: span 1;
     }
 
-    #passwordModal .password-toggle {
-        font-size: 0.75rem;
+    .form-actions {
+        flex-direction: column;
+        gap: 8px;
     }
 
-    #passwordModal .requirements h6 {
-        font-size: 0.7rem;
-    }
-
-    #passwordModal .requirements ul {
-        font-size: 0.62rem;
-        gap: 2px;
-    }
-
-    #passwordModal .modal-actions button {
-        padding: 4px 8px;
-        font-size: 0.7rem;
+    .btn-reset,
+    .btn-save {
+        width: 100%;
+        justify-content: center;
     }
 }
 
 @media (min-width: 481px) and (max-width: 575px) {
-    #passwordModal .modal-compact {
-        max-width: 260px;
-        width: 95%;
+    .profile-wrap {
+        padding: 10px;
     }
 
-    #passwordModal .modal-header {
-        padding: 7px 11px;
+    .profile-head {
+        padding: 12px;
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
     }
 
-    #passwordModal .modal-header h3 {
-        font-size: 0.8rem;
+    .profile-avatar {
+        width: 65px;
+        height: 65px;
     }
 
-    #passwordModal .modal-close {
-        font-size: 0.8rem;
+    .profile-info h2 {
+        font-size: 15px;
     }
 
-    #passwordModal .modal-body {
-        padding: 8px 10px;
+    .profile-info p {
+        font-size: 11px;
+        justify-content: center;
     }
 
-    #passwordModal .modal-actions {
-        margin-top: 8px;
+    .profile-stats {
+        padding: 8px 12px;
+        flex-direction: column;
         gap: 6px;
     }
 
-    #passwordModal .form-group.compact {
-        margin-bottom: 6px;
+    .tabs-nav {
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
-    #passwordModal .form-group.compact label {
-        font-size: 0.72rem;
-        margin-bottom: 2px;
+    .tab-btn {
+        padding: 8px 14px;
+        font-size: 11px;
     }
 
-    #passwordModal .form-input {
-        padding: 4px 8px;
-        font-size: 0.72rem;
+    .tabs-content {
+        padding: 14px;
     }
 
-    #passwordModal .password-toggle {
-        font-size: 0.72rem;
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
     }
 
-    #passwordModal .requirements h6 {
-        font-size: 0.67rem;
+    .form-field.full-width {
+        grid-column: span 1;
     }
 
-    #passwordModal .requirements ul {
-        font-size: 0.58rem;
-        gap: 2px;
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        padding: 6px 10px;
+        font-size: 11px;
     }
 
-    #passwordModal .modal-actions button {
-        padding: 3px 7px;
-        font-size: 0.65rem;
+    .form-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-reset,
+    .btn-save {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 16px;
+    }
+
+    .modal-container {
+        max-width: 340px;
+    }
+
+    .password-requirements ul {
+        grid-template-columns: 1fr;
     }
 }
 
 @media (min-width: 380px) and (max-width: 480px) {
-    #passwordModal .modal-compact {
-        max-width: 245px;
-        width: 95%;
-        border-radius: 8px;
+    .profile-wrap {
+        padding: 8px;
     }
 
-    #passwordModal .modal-header {
-        padding: 6px 10px;
+    .profile-head {
+        padding: 10px;
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
     }
 
-    #passwordModal .modal-header h3 {
-        font-size: 0.76rem;
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
     }
 
-    #passwordModal .modal-close {
-        font-size: 0.75rem;
+    .profile-info h2 {
+        font-size: 14px;
     }
 
-    #passwordModal .modal-body {
-        padding: 7px 9px;
+    .profile-info p {
+        font-size: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
-    #passwordModal .modal-actions {
-        margin-top: 7px;
-        gap: 5px;
+    .profile-stats {
+        padding: 8px 12px;
+        flex-direction: column;
+        gap: 6px;
     }
 
-    #passwordModal .form-group.compact {
-        margin-bottom: 5px;
+    .tabs-nav {
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
-    #passwordModal .form-group.compact label {
-        font-size: 0.68rem;
+    .tab-btn {
+        padding: 6px 12px;
+        font-size: 10px;
     }
 
-    #passwordModal .form-input {
-        padding: 3px 7px;
-        font-size: 0.68rem;
+    .tab-btn i {
+        font-size: 10px;
     }
 
-    #passwordModal .password-field input {
-        padding-right: 28px;
+    .tabs-content {
+        padding: 12px;
     }
 
-    #passwordModal .password-toggle {
-        font-size: 0.68rem;
-        right: 6px;
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
     }
 
-    #passwordModal .requirements h6 {
-        font-size: 0.63rem;
+    .form-field.full-width {
+        grid-column: span 1;
     }
 
-    #passwordModal .requirements ul {
-        font-size: 0.54rem;
-        gap: 1px;
+    .form-field label {
+        font-size: 10px;
     }
 
-    #passwordModal .modal-actions button {
-        padding: 2px 6px;
-        font-size: 0.6rem;
-    }
-}
-
-@media (max-width: 379px) {
-    #passwordModal .modal-compact {
-        max-width: 230px;
-        width: 98%;
-        border-radius: 8px;
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        padding: 5px 8px;
+        font-size: 10px;
     }
 
-    #passwordModal .modal-header {
-        padding: 5px 9px;
+    .form-section h3 {
+        font-size: 12px;
+        margin-bottom: 12px;
     }
 
-    #passwordModal .modal-header h3 {
-        font-size: 0.72rem;
-        gap: 4px;
+    .form-actions {
+        flex-direction: column;
+        gap: 6px;
     }
 
-    #passwordModal .modal-close {
-        font-size: 0.72rem;
-        padding: 2px;
+    .btn-reset,
+    .btn-save {
+        width: 100%;
+        justify-content: center;
+        padding: 6px 12px;
+        font-size: 11px;
     }
 
-    #passwordModal .modal-body {
-        padding: 6px 8px;
+    .modal-container {
+        max-width: 320px;
     }
 
-    #passwordModal .modal-actions {
-        margin-top: 6px;
-        gap: 4px;
+    .modal-head {
+        padding: 12px 16px;
     }
 
-    #passwordModal .form-group.compact {
-        margin-bottom: 5px;
-    }
-
-    #passwordModal .form-group.compact label {
-        font-size: 0.63rem;
-        margin-bottom: 2px;
-    }
-
-    #passwordModal .form-input {
-        padding: 3px 5px;
-        font-size: 0.63rem;
-    }
-
-    #passwordModal .password-field input {
-        padding-right: 26px;
-    }
-
-    #passwordModal .password-toggle {
-        font-size: 0.63rem;
-        right: 5px;
-    }
-
-    #passwordModal .requirements h6 {
-        font-size: 0.58rem;
-    }
-
-    #passwordModal .requirements ul {
-        font-size: 0.5rem !important;
-        gap: 1px;
-    }
-
-    #passwordModal .modal-actions button {
-        padding: 2px 4px;
-        font-size: 0.55rem;
-    }
-}
-
-@media (min-width: 1501px) and (max-width: 2559px) {
-    .modal-compact {
-        max-width: 420px;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px 22px;
-    }
-
-    .modal-header h3 {
-        font-size: 1.15rem;
-    }
-
-    .modal-body {
-        padding: 22px;
-    }
-}
-
-@media (min-width: 1400px) and (max-width: 1500px) {
-    .modal-compact {
-        max-width: 410px;
-    }
-
-    .modal-header {
-        padding: 15px 20px;
-    }
-
-    .modal-body {
-        padding: 20px;
-    }
-}
-
-@media (min-width: 1200px) and (max-width: 1399px) {
-    .modal-compact {
-        max-width: 400px;
-    }
-
-    .modal-header {
-        padding: 14px 20px;
-    }
-
-    .modal-header h3 {
-        font-size: 1.05rem;
-    }
-
-    .modal-body {
-        padding: 18px;
-    }
-
-    .modal-actions {
-        margin-top: 18px;
-    }
-}
-
-@media (min-width: 1001px) and (max-width: 1199px) {
-    .modal-compact {
-        max-width: 380px;
-    }
-
-    .modal-header {
-        padding: 12px 18px;
-    }
-
-    .modal-header h3 {
-        font-size: 1rem;
+    .modal-head h3 {
+        font-size: 12px;
     }
 
     .modal-body {
         padding: 16px;
     }
 
-    .modal-actions {
-        margin-top: 16px;
-    }
-
-    .form-group.compact {
-        margin-bottom: 14px;
-    }
-}
-
-@media (max-width: 1000px) {
-    .modal-compact {
-        max-width: 360px;
-    }
-
-    .modal-header {
-        padding: 10px 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 0.95rem;
-        gap: 6px;
-    }
-
-    .modal-close {
-        font-size: 1rem;
-    }
-
-    .modal-body {
-        padding: 14px;
-    }
-
-    .modal-actions {
-        margin-top: 14px;
-        gap: 8px;
-    }
-
-    .form-group.compact {
-        margin-bottom: 12px;
-    }
-
-    .form-group.compact label {
-        font-size: 0.85rem;
-        margin-bottom: 4px;
-    }
-
-    .form-input {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-    }
-
-    .password-toggle {
-        font-size: 0.85rem;
-    }
-
-    .strength-meter .d-flex small {
-        font-size: 0.7rem;
-    }
-
-    .requirements h6 {
-        font-size: 0.8rem;
-        margin-bottom: 4px;
-    }
-
-    .requirements ul {
-        font-size: 0.7rem;
-        gap: 3px;
-    }
-
-    .modal-actions button {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-    }
-}
-
-@media (min-width: 992px) and (max-width: 999px) {
-    .modal-compact {
-        max-width: 350px;
-    }
-
-    .modal-header {
-        padding: 10px 16px;
-    }
-
-    .modal-body {
-        padding: 14px;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-    .modal-compact {
-        max-width: 340px;
-    }
-
-    .modal-header {
-        padding: 10px 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 0.95rem;
-    }
-
-    .modal-body {
-        padding: 14px;
-    }
-
-    .modal-actions {
-        margin-top: 14px;
-    }
-
-    .form-group.compact {
-        margin-bottom: 12px;
-    }
-
-    .form-input {
-        padding: 7px 12px;
-        font-size: 0.85rem;
-    }
-
-    .requirements ul {
-        font-size: 0.7rem;
+    .password-requirements ul {
+        grid-template-columns: 1fr;
         gap: 4px;
     }
 
-    .modal-actions button {
-        padding: 5px 10px;
-        font-size: 0.75rem;
-    }
-}
-
-@media (min-width: 576px) and (max-width: 767px) {
-    .modal-compact {
-        max-width: 320px;
-    }
-
-    .modal-header {
-        padding: 8px 14px;
-    }
-
-    .modal-header h3 {
-        font-size: 0.9rem;
-        gap: 5px;
-    }
-
-    .modal-close {
-        font-size: 0.9rem;
-    }
-
-    .modal-body {
-        padding: 12px;
-    }
-
-    .modal-actions {
-        margin-top: 12px;
-        gap: 6px;
-    }
-
-    .form-group.compact {
-        margin-bottom: 10px;
-    }
-
-    .form-group.compact label {
-        font-size: 0.8rem;
-    }
-
-    .form-input {
-        padding: 6px 10px;
-        font-size: 0.8rem;
-    }
-
-    .password-toggle {
-        font-size: 0.8rem;
-    }
-
-    .strength-meter .d-flex small {
-        font-size: 0.65rem;
-    }
-
-    .requirements h6 {
-        font-size: 0.75rem;
-    }
-
-    .requirements ul {
-        font-size: 0.65rem;
-        gap: 3px;
-    }
-
-    .modal-actions button {
-        padding: 4px 8px;
-        font-size: 0.7rem;
-    }
-}
-
-@media (min-width: 481px) and (max-width: 575px) {
-    .modal-compact {
-        max-width: 300px;
-        width: 95%;
-    }
-
-    .modal-header {
-        padding: 8px 12px;
-    }
-
-    .modal-header h3 {
-        font-size: 0.85rem;
-    }
-
-    .modal-close {
-        font-size: 0.85rem;
-    }
-
-    .modal-body {
-        padding: 10px;
-    }
-
-    .modal-actions {
-        margin-top: 10px;
-        gap: 6px;
-    }
-
-    .form-group.compact {
-        margin-bottom: 8px;
-    }
-
-    .form-group.compact label {
-        font-size: 0.75rem;
-        margin-bottom: 3px;
-    }
-
-    .form-input {
-        padding: 5px 8px;
-        font-size: 0.75rem;
-    }
-
-    .password-toggle {
-        font-size: 0.75rem;
-    }
-
-    .strength-meter .d-flex small {
-        font-size: 0.6rem;
-    }
-
-    .requirements h6 {
-        font-size: 0.7rem;
-    }
-
-    .requirements ul {
-        font-size: 0.6rem;
-        gap: 2px;
-    }
-
-    .modal-actions button {
-        padding: 3px 6px;
-        font-size: 0.65rem;
-    }
-}
-
-@media (min-width: 380px) and (max-width: 480px) {
-    .modal-compact {
-        max-width: 280px;
-        width: 95%;
-        border-radius: 8px;
-    }
-
-    .modal-header {
-        padding: 6px 10px;
-    }
-
-    .modal-header h3 {
-        font-size: 0.8rem;
-    }
-
-    .modal-close {
-        font-size: 0.8rem;
-    }
-
-    .modal-body {
-        padding: 8px;
-    }
-
-    .modal-actions {
-        margin-top: 8px;
-        gap: 5px;
-    }
-
-    .form-group.compact {
-        margin-bottom: 6px;
-    }
-
-    .form-group.compact label {
-        font-size: 0.7rem;
-    }
-
-    .form-input {
-        padding: 4px 6px;
-        font-size: 0.7rem;
-    }
-
-    .password-field input {
-        padding-right: 32px;
-    }
-
-    .password-toggle {
-        font-size: 0.7rem;
-        right: 6px;
-    }
-
-    .strength-meter .d-flex small {
-        font-size: 0.55rem;
-    }
-
-    .progress {
-        height: 4px;
-    }
-
-    .requirements h6 {
-        font-size: 0.65rem;
-    }
-
-    .requirements ul {
-        font-size: 0.55rem;
-        gap: 2px;
-    }
-
-    .modal-actions button {
-        padding: 2px 5px;
-        font-size: 0.6rem;
+    .password-requirements li {
+        font-size: 9px;
     }
 }
 
 @media (max-width: 379px) {
-    .modal-compact {
-        max-width: 260px;
-        width: 98%;
-        border-radius: 8px;
-    }
-
-    .modal-header {
-        padding: 5px 8px;
-    }
-
-    .modal-header h3 {
-        font-size: 0.75rem;
-        gap: 4px;
-    }
-
-    .modal-close {
-        font-size: 0.75rem;
-        padding: 3px;
-    }
-
-    .modal-body {
+    .profile-wrap {
         padding: 6px;
     }
 
-    .modal-actions {
-        margin-top: 6px;
+    .profile-head {
+        padding: 8px;
+        flex-direction: column;
+        text-align: center;
+        gap: 6px;
+    }
+
+    .profile-avatar {
+        width: 55px;
+        height: 55px;
+    }
+
+    .profile-info h2 {
+        font-size: 13px;
+    }
+
+    .profile-info p {
+        font-size: 9px;
+        justify-content: center;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .profile-stats {
+        padding: 6px 10px;
+        flex-direction: column;
         gap: 4px;
     }
 
-    .form-group.compact {
-        margin-bottom: 5px;
+    .tabs-nav {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 2px;
     }
 
-    .form-group.compact label {
-        font-size: 0.65rem;
-        margin-bottom: 2px;
+    .tab-btn {
+        padding: 5px 10px;
+        font-size: 9px;
     }
 
-    .form-input {
-        padding: 3px 5px;
-        font-size: 0.65rem;
+    .tab-btn i {
+        font-size: 9px;
     }
 
-    .password-field input {
-        padding-right: 28px;
+    .tabs-content {
+        padding: 10px;
     }
 
-    .password-toggle {
-        font-size: 0.65rem;
-        right: 5px;
-    }
-
-    .strength-meter .d-flex small {
-        font-size: 0.5rem;
-    }
-
-    .progress {
-        height: 3px;
-    }
-
-    .requirements h6 {
-        font-size: 0.6rem;
-    }
-
-    .requirements ul {
-        font-size: 0.5rem;
-        gap: 1px;
-    }
-
-    .modal-actions button {
-        padding: 2px 4px;
-        font-size: 0.55rem;
-    }
-}
-
-
-
-@media (max-width: 1199px) {
-    .compact-grid {
-        grid-template-columns: 1fr 1.8fr;
-    }
-}
-
-@media (max-width: 991px) {
-    .compact-grid {
-        grid-template-columns: 1fr 1.5fr;
-    }
-
-    .form-grid {
+    .form-row {
         grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .compact-grid {
-        grid-template-columns: 1fr;
+        gap: 6px;
     }
 
-    .profile-compact-container {
-        margin: 5px auto;
-        padding: 0 8px;
+    .form-field.full-width {
+        grid-column: span 1;
     }
 
-    .compact-header {
-        padding: 12px 15px;
+    .form-field label {
+        font-size: 9px;
     }
 
-    .header-main h1 {
-        font-size: 1.2rem;
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        padding: 4px 6px;
+        font-size: 9px;
     }
 
-    .card-top {
-        padding: 10px 12px;
+    .form-section h3 {
+        font-size: 11px;
+        margin-bottom: 10px;
     }
 
-    .card-top h3 {
-        font-size: 0.95rem;
-    }
-
-    .compact-photo-wrapper {
-        width: 100px;
-        height: 100px;
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-compact-container {
-        padding: 0 5px;
-    }
-
-    .compact-header {
-        padding: 10px 12px;
-    }
-
-    .header-main h1 {
-        font-size: 1.1rem;
-    }
-
-    .header-sub {
-        font-size: 0.75rem;
-    }
-
-    .card-content {
-        padding: 12px;
-    }
-
-    .compact-btn,
-    .action-btn {
-        padding: 7px 14px;
-        font-size: 0.8rem;
-    }
-
-    .form-actions.compact {
+    .form-actions {
         flex-direction: column;
+        gap: 4px;
     }
 
-    .action-btn {
+    .btn-reset,
+    .btn-save {
         width: 100%;
         justify-content: center;
+        padding: 5px 10px;
+        font-size: 10px;
+    }
+
+    .modal-container {
+        max-width: 300px;
+    }
+
+    .modal-head {
+        padding: 10px 14px;
+    }
+
+    .modal-head h3 {
+        font-size: 11px;
+    }
+
+    .modal-body {
+        padding: 14px;
+    }
+
+    .password-requirements ul {
+        grid-template-columns: 1fr;
+        gap: 3px;
+    }
+
+    .password-requirements li {
+        font-size: 8px;
     }
 }
