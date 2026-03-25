@@ -521,6 +521,8 @@ Route::prefix('admin')
 	Route::post('/profile/update-photo', [AdminProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
 	Route::delete('/profile/delete-photo', [AdminProfileController::class, 'deletePhoto'])->name('profile.deletePhoto');
 	Route::post('/profile/update-password', [AdminProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+	Route::post('/profile/nic/send-otp', [AdminProfileController::class, 'sendNicUpdateOtp'])->name('profile.nic.sendOtp');
+	Route::post('/profile/nic/verify-otp', [AdminProfileController::class, 'verifyNicUpdateOtp'])->name('profile.nic.verifyOtp');
 
 	Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 	Route::get('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');

@@ -671,6 +671,82 @@
                 font-size: 14px;
             }
         }
+        .nic-status {
+            font-size: 13px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nic-status.valid { color: #10B981; }
+        .nic-status.invalid { color: #ef4444; }
+
+        .nic-edit-container {
+            margin-top: 15px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: none;
+            animation: fadeInDown 0.4s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .edit-nic-btn {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .edit-nic-btn:hover {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .otp-input-group {
+            display: none;
+            margin-top: 15px;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .btn-otp-send {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .btn-otp-send:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .timer-display {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
     </style>
 @endsection
 
@@ -767,7 +843,9 @@
                                     <i class="fas fa-phone"></i> Phone Number
                                 </label>
                                 <input type="tel" class="form-control @error('phone') is-invalid @enderror" name="phone"
-                                    value="{{ old('phone', $adminDetails->phone_number ?? '') }}">
+                                    value="{{ old('phone', $adminDetails->phone_number ?? '') }}" maxlength="10"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);"
+                                    placeholder="e.g. 077XXXXXXX">
                                 @error('phone')
                                     <div class="invalid-feedback">
                                         <i class="fas fa-circle-exclamation"></i> {{ $message }}
@@ -791,11 +869,44 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-id-card"></i> NIC Number
-                                </label>
-                                <input type="text" class="form-control" value="{{ $adminDetails->nic_no ?? 'Not set' }}"
-                                    readonly>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">
+                                        <i class="fas fa-id-card"></i> NIC Number
+                                    </label>
+                                    <button type="button" class="edit-nic-btn" onclick="toggleNicEdit()">
+                                        <i class="fas fa-edit"></i> Edit NIC
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control" id="currentNicDisplay" 
+                                    value="{{ $adminDetails->nic_no ?? 'Not set' }}" readonly>
+                                
+                                <div id="nicEditWrapper" class="nic-edit-container">
+                                    <div class="mb-3">
+                                        <label class="form-label">New NIC Number</label>
+                                        <input type="text" class="form-control" id="new_nic_no" 
+                                            placeholder="e.g., 123456789V or 200123456789"
+                                            oninput="validateNicInput(this.value)">
+                                        <div id="nicStatus" class="nic-status"></div>
+                                    </div>
+
+                                    <div id="otpControls">
+                                        <button type="button" id="btnSendOtp" class="btn-otp-send" onclick="sendNicOtp()" disabled>
+                                            <i class="fas fa-paper-plane"></i> Send OTP to {{ substr($adminDetails->phone_number ?? '', 0, 3) }}xxxx{{ substr($adminDetails->phone_number ?? '', -2) }}
+                                        </button>
+                                    </div>
+
+                                    <div id="otpInputGroup" class="otp-input-group">
+                                        <div class="mb-3">
+                                            <label class="form-label">Verification OTP</label>
+                                            <input type="text" class="form-control" id="nic_otp" maxlength="6" 
+                                                placeholder="Enter 6-digit OTP">
+                                            <div id="otpTimer" class="timer-display"></div>
+                                        </div>
+                                        <button type="button" class="btn-submit w-100" onclick="verifyAndSaveNic()">
+                                            <i class="fas fa-check-circle"></i> Verify & Update NIC
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">
@@ -926,7 +1037,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             @if(session('success'))
                 Swal.fire({
-                    icon: 'success',
+                    imageUrl: '{{ asset('assets/icons/success1.gif') }}',
+                    imageWidth: 100,
+                    imageHeight: 100,
+                    imageAlt: 'Success',
                     title: 'Success!',
                     text: '{{ session('success') }}',
                     toast: true,
@@ -934,15 +1048,17 @@
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
-                    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                    color: 'white',
-                    iconColor: 'white'
+                    background: 'white',
+                    color: '#10B981'
                 });
             @endif
 
             @if(session('error'))
                 Swal.fire({
-                    icon: 'error',
+                    imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+                    imageWidth: 100,
+                    imageHeight: 100,
+                    imageAlt: 'Error',
                     title: 'Error!',
                     text: '{{ session('error') }}',
                     toast: true,
@@ -950,13 +1066,12 @@
                     showConfirmButton: false,
                     timer: 4000,
                     timerProgressBar: true,
-                    background: '#ef4444',
-                    color: 'white',
-                    iconColor: 'white'
+                    background: 'white',
+                    color: '#ef4444'
                 });
             @endif
 
-        const tabButtons = document.querySelectorAll('.nav-link');
+                const tabButtons = document.querySelectorAll('.nav-link');
             const tabPanes = document.querySelectorAll('.tab-pane');
 
             tabButtons.forEach(button => {
@@ -1037,32 +1152,38 @@
 
                     if (newPassword !== confirmPassword) {
                         Swal.fire({
-                            icon: 'error',
+                            imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+                            imageWidth: 100,
+                            imageHeight: 100,
+                            imageAlt: 'Error',
                             title: 'Password Mismatch',
                             text: 'New password and confirmation password do not match.',
-                            background: '#ef4444',
-                            color: 'white',
-                            iconColor: 'white',
+                            background: 'white',
+                            color: '#ef4444',
                             toast: true,
                             position: 'top-end',
                             timer: 3000,
-                            timerProgressBar: true
+                            timerProgressBar: true,
+                            showConfirmButton: false
                         });
                         return;
                     }
 
                     if (currentStrength < 5) {
                         Swal.fire({
-                            icon: 'warning',
+                            imageUrl: '{{ asset('assets/icons/alert1.gif') }}',
+                            imageWidth: 100,
+                            imageHeight: 100,
+                            imageAlt: 'Warning',
                             title: 'Weak Password',
                             text: 'Please use a stronger password for better security.',
-                            background: '#f59e0b',
-                            color: 'white',
-                            iconColor: 'white',
+                            background: 'white',
+                            color: '#f59e0b',
                             toast: true,
                             position: 'top-end',
                             timer: 3000,
-                            timerProgressBar: true
+                            timerProgressBar: true,
+                            showConfirmButton: false
                         });
                         return;
                     }
@@ -1175,6 +1296,206 @@
                 }
             });
         });
+
+        // NIC Update Flow Functions
+        function toggleNicEdit() {
+            const wrapper = document.getElementById('nicEditWrapper');
+            const btn = document.querySelector('.edit-nic-btn');
+            if (wrapper.style.display === 'none' || wrapper.style.display === '') {
+                wrapper.style.display = 'block';
+                btn.innerHTML = '<i class="fas fa-times"></i> Cancel Edit';
+                btn.style.background = '#ef4444';
+                btn.style.color = 'white';
+            } else {
+                wrapper.style.display = 'none';
+                btn.innerHTML = '<i class="fas fa-edit"></i> Edit NIC';
+                btn.style.background = '#f1f5f9';
+                btn.style.color = '#475569';
+                resetNicEditForm();
+            }
+        }
+
+        function resetNicEditForm() {
+            document.getElementById('new_nic_no').value = '';
+            document.getElementById('nic_otp').value = '';
+            document.getElementById('nicStatus').innerHTML = '';
+            document.getElementById('otpInputGroup').style.display = 'none';
+            document.getElementById('btnSendOtp').disabled = true;
+            document.getElementById('btnSendOtp').style.display = 'inline-block';
+            if (window.otpTimerInterval) clearInterval(window.otpTimerInterval);
+            document.getElementById('otpTimer').innerHTML = '';
+        }
+
+        function validateNicInput(nic) {
+            const status = document.getElementById('nicStatus');
+            const btn = document.getElementById('btnSendOtp');
+            
+            if (!nic) {
+                status.innerHTML = '';
+                btn.disabled = true;
+                return;
+            }
+
+            if (validateNIC(nic)) {
+                status.className = 'nic-status valid';
+                status.innerHTML = '<i class="fas fa-check-circle"></i> Valid NIC format';
+                btn.disabled = false;
+            } else {
+                status.className = 'nic-status invalid';
+                status.innerHTML = '<i class="fas fa-times-circle"></i> Invalid NIC format';
+                btn.disabled = true;
+            }
+        }
+
+        function validateNIC(nic) {
+            nic = nic.trim().toUpperCase();
+            const oldNicPattern = /^[0-9]{9}[VX]$/;
+            const newNicPattern = /^[0-9]{12}$/;
+            
+            if (oldNicPattern.test(nic)) {
+                const days = parseInt(nic.substr(2, 3));
+                if (days > 500) return days <= 866;
+                return days > 0 && days <= 366;
+            }
+            if (newNicPattern.test(nic)) {
+                const year = parseInt(nic.substr(0, 4));
+                const days = parseInt(nic.substr(4, 3));
+                if (days > 500) return days <= 866;
+                return year >= 1900 && year <= 2100 && days > 0 && days <= 366;
+            }
+            return false;
+        }
+
+        function sendNicOtp() {
+            const btn = document.getElementById('btnSendOtp');
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+            fetch('{{ route('admin.profile.nic.sendOtp') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        imageUrl: '{{ asset('assets/icons/success1.gif') }}',
+                        imageWidth: 100, imageHeight: 100,
+                        title: 'OTP Sent',
+                        text: data.message,
+                        toast: true, position: 'top-end',
+                        showConfirmButton: false, timer: 3000
+                    });
+                    
+                    document.getElementById('otpInputGroup').style.display = 'block';
+                    btn.style.display = 'none';
+                    startOtpTimer();
+                } else {
+                    Swal.fire({
+                        imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+                        imageWidth: 100, imageHeight: 100,
+                        title: 'Error',
+                        text: data.message,
+                        background: 'white', color: '#ef4444',
+                        toast: true, position: 'top-end',
+                        showConfirmButton: false, timer: 4000
+                    });
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        function startOtpTimer() {
+            let timeLeft = 600; // 10 minutes
+            const display = document.getElementById('otpTimer');
+            
+            if (window.otpTimerInterval) clearInterval(window.otpTimerInterval);
+            
+            window.otpTimerInterval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                display.innerHTML = `OTP expires in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                
+                if (--timeLeft < 0) {
+                    clearInterval(window.otpTimerInterval);
+                    display.innerHTML = 'OTP expired. Please try again.';
+                    document.getElementById('btnSendOtp').style.display = 'inline-block';
+                    document.getElementById('btnSendOtp').disabled = false;
+                    document.getElementById('otpInputGroup').style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        function verifyAndSaveNic() {
+            const nic = document.getElementById('new_nic_no').value;
+            const otp = document.getElementById('nic_otp').value;
+            
+            if (!otp || otp.length !== 6) {
+                Swal.fire({
+                    imageUrl: '{{ asset('assets/icons/alert1.gif') }}',
+                    imageWidth: 100, imageHeight: 100,
+                    title: 'Invalid OTP',
+                    text: 'Please enter the 6-digit OTP.',
+                    toast: true, position: 'top-end',
+                    showConfirmButton: false, timer: 3000
+                });
+                return;
+            }
+
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            fetch('{{ route('admin.profile.nic.verifyOtp') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ nic_no: nic, otp: otp })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingOverlay').classList.remove('active');
+                if (data.success) {
+                    Swal.fire({
+                        imageUrl: '{{ asset('assets/icons/success1.gif') }}',
+                        imageWidth: 100, imageHeight: 100,
+                        title: 'Success!',
+                        text: data.message,
+                        background: 'white', color: '#10B981',
+                        toast: true, position: 'top-end',
+                        showConfirmButton: false, timer: 3000
+                    });
+                    
+                    document.getElementById('currentNicDisplay').value = nic;
+                    toggleNicEdit();
+                } else {
+                    Swal.fire({
+                        imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+                        imageWidth: 100, imageHeight: 100,
+                        title: 'Failed',
+                        text: data.message,
+                        background: 'white', color: '#ef4444',
+                        toast: true, position: 'top-end',
+                        showConfirmButton: false, timer: 4000
+                    });
+                }
+            })
+            .catch(error => {
+                document.getElementById('loadingOverlay').classList.remove('active');
+                console.error('Error:', error);
+            });
+        }
 
         let currentStrength = 0;
 

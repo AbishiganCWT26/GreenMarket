@@ -7,7 +7,7 @@
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/lead_farmer/Profile.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 @endsection
 
 @section('content')
@@ -16,9 +16,10 @@
             <div class="profile-card">
                 <div class="profile-head">
                     <div class="profile-avatar" onclick="window.location.href='{{ route('lf.profile.photo') }}'">
-                        <img src="{{ Auth::user()->profile_photo ? asset('uploads/profile_pictures/' . Auth::user()->profile_photo) : asset('assets/images/default-avatar.png') }}" alt="Profile" id="profilePreview">
+                        <img src="{{ Auth::user()->profile_photo ? asset('uploads/profile_pictures/' . Auth::user()->profile_photo) : asset('assets/images/default-avatar.png') }}"
+                            alt="Profile" id="profilePreview">
                         <div class="avatar-overlay">
-                            <i class="fas fa-camera"></i>
+                            <i class="fas fa-camera" style="color: white !important;"></i>
                         </div>
                     </div>
                     <div class="profile-info">
@@ -67,14 +68,17 @@
                                     <h3><i class="fas fa-id-card"></i> Personal Information</h3>
                                     <div class="form-row">
                                         <div class="form-field">
-                                            <label><i class="fas fa-user"></i> Full Name <span class="required">*</span></label>
-                                            <input type="text" name="name" value="{{ old('name', $leadFarmer->name) }}" required>
+                                            <label><i class="fas fa-user"></i> Full Name <span
+                                                    class="required">*</span></label>
+                                            <input type="text" name="name" value="{{ old('name', $leadFarmer->name) }}"
+                                                required>
                                             @error('name')<span class="error">{{ $message }}</span>@enderror
                                         </div>
                                         <div class="form-field">
                                             <label><i class="fas fa-id-card"></i> NIC Number</label>
                                             <div class="readonly-field">
-                                                <input type="text" name="nic_no" value="{{ old('nic_no', $leadFarmer->nic_no) }}" readonly>
+                                                <input type="text" name="nic_no"
+                                                    value="{{ old('nic_no', $leadFarmer->nic_no) }}" readonly>
                                                 <i class="fas fa-lock"></i>
                                             </div>
                                             @error('nic_no')<span class="error">{{ $message }}</span>@enderror
@@ -86,18 +90,24 @@
                                     <h3><i class="fas fa-phone-alt"></i> Contact Details</h3>
                                     <div class="form-row">
                                         <div class="form-field">
-                                            <label><i class="fas fa-mobile-alt"></i> Primary Mobile <span class="required">*</span></label>
-                                            <input type="tel" name="primary_mobile" value="{{ old('primary_mobile', $leadFarmer->primary_mobile) }}" maxlength="10" required>
+                                            <label><i class="fas fa-mobile-alt"></i> Primary Mobile <span
+                                                    class="required">*</span></label>
+                                            <input type="tel" name="primary_mobile"
+                                                value="{{ old('primary_mobile', $leadFarmer->primary_mobile) }}"
+                                                maxlength="10" required>
                                             @error('primary_mobile')<span class="error">{{ $message }}</span>@enderror
                                         </div>
                                         <div class="form-field">
                                             <label><i class="fab fa-whatsapp"></i> WhatsApp Number</label>
-                                            <input type="tel" name="whatsapp_number" value="{{ old('whatsapp_number', $leadFarmer->whatsapp_number) }}" maxlength="10">
+                                            <input type="tel" name="whatsapp_number"
+                                                value="{{ old('whatsapp_number', $leadFarmer->whatsapp_number) }}"
+                                                maxlength="10">
                                             @error('whatsapp_number')<span class="error">{{ $message }}</span>@enderror
                                         </div>
                                         <div class="form-field full-width">
                                             <label><i class="fas fa-envelope"></i> Email Address</label>
-                                            <input type="email" name="email" value="{{ old('email', Auth::user()->email) }}">
+                                            <input type="email" name="email"
+                                                value="{{ old('email', Auth::user()->email) }}">
                                             @error('email')<span class="error">{{ $message }}</span>@enderror
                                         </div>
                                     </div>
@@ -107,35 +117,44 @@
                                     <h3><i class="fas fa-map-marker-alt"></i> Location Details</h3>
                                     <div class="form-row">
                                         <div class="form-field full-width">
-                                            <label><i class="fas fa-home"></i> Residential Address <span class="required">*</span></label>
-                                            <textarea name="residential_address" rows="2" required>{{ old('residential_address', $leadFarmer->residential_address) }}</textarea>
+                                            <label><i class="fas fa-home"></i> Residential Address <span
+                                                    class="required">*</span></label>
+                                            <textarea name="residential_address" rows="2"
+                                                required>{{ old('residential_address', $leadFarmer->residential_address) }}</textarea>
                                             @error('residential_address')<span class="error">{{ $message }}</span>@enderror
                                         </div>
                                         <div class="form-field">
                                             <label><i class="fas fa-map-marker-alt"></i> District</label>
                                             <div class="readonly-field">
-                                                <input type="text" name="district" value="{{ old('district', $leadFarmer->district) }}" readonly>
+                                                <input type="text" name="district"
+                                                    value="{{ old('district', $leadFarmer->district) }}" readonly>
                                                 <i class="fas fa-lock"></i>
                                             </div>
                                         </div>
                                         <div class="form-field">
                                             <label><i class="fas fa-map-marked-alt"></i> Divisional Secretariat</label>
                                             <div class="readonly-field">
-                                                <input type="text" name="divisional_secretariat" value="{{ old('divisional_secretariat', $leadFarmer->divisional_secretariat) }}" readonly>
+                                                <input type="text" name="divisional_secretariat"
+                                                    value="{{ old('divisional_secretariat', $leadFarmer->divisional_secretariat) }}"
+                                                    readonly>
                                                 <i class="fas fa-lock"></i>
                                             </div>
                                         </div>
                                         <div class="form-field">
                                             <label><i class="fas fa-map-signs"></i> GN Division</label>
                                             <div class="readonly-field">
-                                                <input type="text" name="grama_niladhari_division" value="{{ old('grama_niladhari_division', $leadFarmer->grama_niladhari_division) }}" readonly>
+                                                <input type="text" name="grama_niladhari_division"
+                                                    value="{{ old('grama_niladhari_division', $leadFarmer->grama_niladhari_division) }}"
+                                                    readonly>
                                                 <i class="fas fa-lock"></i>
                                             </div>
                                         </div>
                                         <div class="form-field">
                                             <label><i class="fas fa-barcode"></i> GN Code</label>
                                             <div class="readonly-field">
-                                                <input type="text" name="gn_division_code" value="{{ old('gn_division_code', $leadFarmer->gn_division_code) }}" readonly>
+                                                <input type="text" name="gn_division_code"
+                                                    value="{{ old('gn_division_code', $leadFarmer->gn_division_code) }}"
+                                                    readonly>
                                                 <i class="fas fa-lock"></i>
                                             </div>
                                         </div>
@@ -146,23 +165,32 @@
                                     <h3><i class="fas fa-wallet"></i> Payment Details</h3>
                                     <div class="form-row">
                                         <div class="form-field">
-                                            <label><i class="fas fa-user-tie"></i> Account Holder <span class="required">*</span></label>
-                                            <input type="text" name="account_holder_name" value="{{ old('account_holder_name', $leadFarmer->account_holder_name) }}" required>
+                                            <label><i class="fas fa-user-tie"></i> Account Holder <span
+                                                    class="required">*</span></label>
+                                            <input type="text" name="account_holder_name"
+                                                value="{{ old('account_holder_name', $leadFarmer->account_holder_name) }}"
+                                                required>
                                             @error('account_holder_name')<span class="error">{{ $message }}</span>@enderror
                                         </div>
                                         <div class="form-field">
-                                            <label><i class="fas fa-hashtag"></i> Account Number <span class="required">*</span></label>
-                                            <input type="text" name="account_number" value="{{ old('account_number', $leadFarmer->account_number) }}" required>
+                                            <label><i class="fas fa-hashtag"></i> Account Number <span
+                                                    class="required">*</span></label>
+                                            <input type="text" name="account_number"
+                                                value="{{ old('account_number', $leadFarmer->account_number) }}" required>
                                             @error('account_number')<span class="error">{{ $message }}</span>@enderror
                                         </div>
                                         <div class="form-field">
-                                            <label><i class="fas fa-university"></i> Bank Name <span class="required">*</span></label>
-                                            <input type="text" name="bank_name" value="{{ old('bank_name', $leadFarmer->bank_name) }}" required>
+                                            <label><i class="fas fa-university"></i> Bank Name <span
+                                                    class="required">*</span></label>
+                                            <input type="text" name="bank_name"
+                                                value="{{ old('bank_name', $leadFarmer->bank_name) }}" required>
                                             @error('bank_name')<span class="error">{{ $message }}</span>@enderror
                                         </div>
                                         <div class="form-field">
-                                            <label><i class="fas fa-code-branch"></i> Bank Branch <span class="required">*</span></label>
-                                            <input type="text" name="bank_branch" value="{{ old('bank_branch', $leadFarmer->bank_branch) }}" required>
+                                            <label><i class="fas fa-code-branch"></i> Bank Branch <span
+                                                    class="required">*</span></label>
+                                            <input type="text" name="bank_branch"
+                                                value="{{ old('bank_branch', $leadFarmer->bank_branch) }}" required>
                                             @error('bank_branch')<span class="error">{{ $message }}</span>@enderror
                                         </div>
                                     </div>
@@ -185,7 +213,8 @@
                             <div class="form-section">
                                 <h3><i class="fas fa-key"></i> Password Management</h3>
                                 <div class="security-info">
-                                    <p><i class="fas fa-info-circle"></i> Change your password regularly to keep your account secure</p>
+                                    <p><i class="fas fa-info-circle"></i> Change your password regularly to keep your
+                                        account secure</p>
                                 </div>
                                 <button type="button" class="btn-password" onclick="showPasswordModal()">
                                     <i class="fas fa-lock"></i>
@@ -272,10 +301,10 @@
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const tabBtns = document.querySelectorAll('.tab-btn');
             tabBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     tabBtns.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
@@ -286,12 +315,12 @@
             const profileForm = document.getElementById('profileForm');
             if (profileForm) {
                 const originalData = new FormData(profileForm);
-                window.resetForm = function() {
+                window.resetForm = function () {
                     profileForm.reset();
                     showSweetAlert('info', 'Form Reset', 'All changes have been discarded');
                 };
 
-                profileForm.addEventListener('submit', function(e) {
+                profileForm.addEventListener('submit', function (e) {
                     e.preventDefault();
                     showSweetAlert('question', 'Update Profile', 'Are you sure you want to update your profile?').then(result => {
                         if (result.isConfirmed) {
@@ -303,30 +332,30 @@
 
             const readonlyFields = document.querySelectorAll('.readonly-field');
             readonlyFields.forEach(field => {
-                field.addEventListener('click', function() {
+                field.addEventListener('click', function () {
                     showSweetAlert('info', 'Restricted Field', 'Contact the Facilitator to edit this information');
                 });
             });
 
             document.querySelectorAll('input[type="tel"]').forEach(input => {
-                input.addEventListener('input', function() {
+                input.addEventListener('input', function () {
                     this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
                 });
             });
 
-            window.showPasswordModal = function() {
+            window.showPasswordModal = function () {
                 document.getElementById('passwordModal').classList.add('active');
                 document.body.classList.add('no-scroll');
             };
 
-            window.hidePasswordModal = function() {
+            window.hidePasswordModal = function () {
                 document.getElementById('passwordModal').classList.remove('active');
                 document.body.classList.remove('no-scroll');
                 document.getElementById('changePasswordForm').reset();
                 document.getElementById('updatePasswordBtn').disabled = true;
             };
 
-            window.togglePassword = function(fieldId, icon) {
+            window.togglePassword = function (fieldId, icon) {
                 const field = document.getElementById(fieldId);
                 if (field.type === 'password') {
                     field.type = 'text';
@@ -403,7 +432,7 @@
                 return strength === 5;
             }
 
-            newPassword.addEventListener('input', function() {
+            newPassword.addEventListener('input', function () {
                 const isValid = checkPasswordStrength(this.value);
                 checkPasswordMatch();
                 updateBtn.disabled = !(isValid && confirmPassword.value === this.value);
@@ -427,13 +456,13 @@
                 }
             }
 
-            confirmPassword.addEventListener('input', function() {
+            confirmPassword.addEventListener('input', function () {
                 const matches = checkPasswordMatch();
                 updateBtn.disabled = !(checkPasswordStrength(newPassword.value) && matches);
             });
 
             const passwordForm = document.getElementById('changePasswordForm');
-            passwordForm.addEventListener('submit', function(e) {
+            passwordForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 const formData = new FormData(this);
                 const newPass = formData.get('new_password');
@@ -460,31 +489,31 @@
                             },
                             body: JSON.stringify({ new_password: newPass })
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                showSweetAlert('success', 'Success!', data.message).then(() => {
-                                    hidePasswordModal();
-                                    location.reload();
-                                });
-                            } else {
-                                showSweetAlert('error', 'Error!', data.message);
-                            }
-                        })
-                        .catch(() => {
-                            showSweetAlert('error', 'Error!', 'Something went wrong. Please try again.');
-                        });
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    showSweetAlert('success', 'Success!', data.message).then(() => {
+                                        hidePasswordModal();
+                                        location.reload();
+                                    });
+                                } else {
+                                    showSweetAlert('error', 'Error!', data.message);
+                                }
+                            })
+                            .catch(() => {
+                                showSweetAlert('error', 'Error!', 'Something went wrong. Please try again.');
+                            });
                     }
                 });
             });
 
-            window.addEventListener('click', function(e) {
+            window.addEventListener('click', function (e) {
                 if (e.target.classList.contains('modal-overlay')) {
                     hidePasswordModal();
                 }
             });
 
-            window.showSweetAlert = function(type, title, message) {
+            window.showSweetAlert = function (type, title, message) {
                 const icons = {
                     success: '{{ asset("assets/icons/success1.gif") }}',
                     error: '{{ asset("assets/icons/error1.gif") }}',
@@ -533,6 +562,6 @@
             @if($errors->any())
                 showSweetAlert('error', 'Validation Error', '{!! implode('\\n', $errors->all()) !!}');
             @endif
-        });
+            });
     </script>
 @endsection

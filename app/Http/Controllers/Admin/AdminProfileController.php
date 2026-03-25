@@ -12,6 +12,8 @@ use App\Mail\AdminPasswordChangedMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\OtpVerification;
+use Carbon\Carbon;
 
 class AdminProfileController extends Controller
 {
@@ -38,7 +40,7 @@ class AdminProfileController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:100',
             'email' => 'required|email|max:100|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|digits:10',
             'username' => 'required|string|max:50|unique:users,username,' . $user->id,
         ]);
 
@@ -197,5 +199,185 @@ class AdminProfileController extends Controller
     public function photoPage()
     {
         return view('admin.profile.photo');
+    }
+
+    public function sendNicUpdateOtp(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $adminDetails = $user->adminDetails;
+
+            if (!$adminDetails || !$adminDetails->phone_number) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Phone number not found. please update your phone number first.'
+                ], 400);
+            }
+
+            $otp = rand(100000, 999999);
+            
+            // Log the OTP for development/testing
+            \Log::info("NIC Update OTP for Admin (User ID: {$user->id}): " . $otp);
+
+            OtpVerification::create([
+                'user_id' => $user->id,
+                'otp' => $otp,
+                'action' => 'nic_update',
+                'expires_at' => Carbon::now()->addMinutes(10),
+                'used' => false
+            ]);
+
+            // Send OTP via SMS using textit.biz gateway
+            $message = "Your GreenMarket OTP for NIC update is: $otp. \nThis code is valid for 10 minutes. \nDo not share this with anyone.";
+            $smsSent = $this->sendSMS($adminDetails->phone_number, $message);
+
+            if (!$smsSent) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send OTP via SMS. Please try again later.'
+                ], 500);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully to your registered phone number.'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('NIC OTP Sending Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function verifyNicUpdateOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'otp' => 'required|string|size:6',
+            'nic_no' => 'required|string|max:20'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid input. Please check the OTP and NIC format.'
+            ], 400);
+        }
+
+        try {
+            $user = Auth::user();
+            
+            $otpRecord = OtpVerification::where('user_id', $user->id)
+                ->where('otp', $request->otp)
+                ->where('action', 'nic_update')
+                ->where('used', false)
+                ->where('expires_at', '>', Carbon::now())
+                ->latest()
+                ->first();
+
+            if (!$otpRecord) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired OTP.'
+                ], 400);
+            }
+
+            // Backend validation for NIC
+            $nic = $request->nic_no;
+            $isValidNic = false;
+            if (preg_match('/^[0-9]{9}[VXvx]$/', $nic)) {
+                $isValidNic = true;
+            } elseif (preg_match('/^[0-9]{12}$/', $nic)) {
+                $isValidNic = true;
+            }
+
+            if (!$isValidNic) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid NIC format.'
+                ], 400);
+            }
+
+            // Check if NIC is already taken by another admin
+            $existingAdmin = Admin::where('nic_no', $nic)->where('user_id', '!=', $user->id)->first();
+            if ($existingAdmin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This NIC number is already registered in the system.'
+                ], 400);
+            }
+
+            \DB::beginTransaction();
+
+            $adminDetails = $user->adminDetails;
+            $adminDetails->nic_no = $nic;
+            $adminDetails->save();
+
+            $otpRecord->used = true;
+            $otpRecord->used_at = Carbon::now();
+            $otpRecord->save();
+
+            \DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'NIC updated successfully!'
+            ]);
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('NIC Update Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update NIC: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function sendSMS($to, $message)
+    {
+        try {
+            $user = env('SMS_USER');
+            $password = env('SMS_PASSWORD');
+            $baseurl = env('SMS_API_URL', 'https://textit.biz/sendmsg');
+
+            $to = preg_replace('/[^0-9]/', '', $to);
+            $text = urlencode($message);
+            
+            $baseurl = rtrim($baseurl, '/') . '/';
+            $url = $baseurl . "?id=" . $user . "&pw=" . $password . "&to=" . $to . "&text=" . $text;
+            
+            $ret = $this->get_web_page($url);
+            $res = explode(":", $ret);
+            
+            if (trim($res[0]) == "OK") {
+                \Log::info("SMS Sent successfully to $to for NIC Update. Response: $ret");
+                return true;
+            } else {
+                \Log::error("SMS Sending Failed to $to for NIC Update. Response: $ret");
+                return false;
+            }
+        } catch (\Exception $e) {
+            \Log::error('SMS Error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function get_web_page($url)
+    {
+        $options = array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => 30,
+        );
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, $options);
+        $content = curl_exec($ch);
+        curl_close($ch);
+
+        return $content;
     }
 }

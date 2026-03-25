@@ -106,7 +106,7 @@ body {
 }
 
 .avatar-overlay i {
-    color: white;
+    color: white !important;
     font-size: 20px;
 }
 

@@ -102,6 +102,11 @@ class User extends Authenticatable
         return $this->hasOne(Facilitator::class, 'user_id');
     }
 
+    public function adminDetails()
+    {
+        return $this->hasOne(Admin::class, 'user_id');
+    }
+
     public function notifications()
     {
         return $this->hasMany(Notification::class, 'user_id');
