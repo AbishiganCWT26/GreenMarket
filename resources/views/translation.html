@@ -3,440 +3,356 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ perfect translate · compact card</title>
-    <!-- Font Awesome 6 (free) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- SweetAlert2 (beautiful toasts) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Translation Alert</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- animate.css (for subtle entrance) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
-        .goog-te-gadget-simple {
-            background-color: #f0f4f9 !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 20px !important;
-            padding: 1px 6px 1px 4px !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 1px !important;
-            font-family: 'Inter', sans-serif !important;
-            font-weight: 700 !important;
-            font-size: 5pt !important;
-            transition: all 0.2s ease !important;
-            cursor: pointer !important;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
-            line-height: 1 !important;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .translate-card {
+        body {
+            background: transparent;
+            min-height: 100vh;
+            margin-top: 0 !important;
+            position: static !important;
+        }
+
+        .goog-te-gadget-simple {
             background-color: #ffffff !important;
-            box-shadow: 0 2px 5px rgba(15, 23, 36, 0.04), 0 1px 2px rgba(15, 23, 36, 0.02) !important;
-            border-radius: 14px !important;
-            padding: 1px 3px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 1px !important;
-            transition: all 0.25s ease !important;
-            border: 1px solid rgba(16, 185, 129, 0.1) !important;
-            backdrop-filter: blur(1px) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 40px !important;
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            font-family: inherit !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s;
         }
 
         .goog-te-gadget-simple:hover {
-            background-color: #e9eef3 !important;
-            border-color: #10B981 !important;
-            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.08) !important;
-            transform: translateY(-0.5px);
+            border-color: #3b82f6 !important;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.15);
         }
 
-        .goog-te-gadget-simple:active {
-            transform: scale(0.98) translateY(0.5px) !important;
-            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1) !important;
+        .goog-te-gadget-simple .goog-te-menu-value {
+            color: #1e293b !important;
+            font-weight: 500;
         }
 
-        .goog-te-menu-value {
-            color: #0f1724 !important;
-            font-size: 0.5rem !important;
-            font-weight: 500 !important;
-            letter-spacing: 0.01em !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 0.5px !important;
-        }
-
-        .goog-te-gadget-icon {
-            display: none !important;
-        }
-
-        .goog-te-menu-value img {
-            display: none !important;
-        }
-
-        .goog-te-menu-value span:first-child {
-            color: #0f1724 !important;
-            font-weight: 500 !important;
-            font-size: 0.45rem !important;
-        }
-
-        .goog-te-menu-value span:last-child {
-            color: #10B981 !important;
-            font-size: 0.55rem !important;
-            margin-left: 0.5px !important;
-            font-weight: 600 !important;
-            opacity: 0.9;
-            transition: transform 0.2s;
-        }
-
-        .goog-te-gadget-simple:hover .goog-te-menu-value span:last-child {
-            transform: translateY(0.5px);
-            color: #059669 !important;
-        }
-
-        .VIpgJd-ZVi9od-ORHb,
-        .VIpgJd-ZVi9od-ORHb-OEVmcd,
-        .goog-te-banner-frame.skiptranslate {
-            display: none !important;
-        }
-
-        .goog-tooltip,
-        .goog-tooltip:hover,
-        .goog-text-highlight {
-            display: none !important;
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-
-        iframe.goog-te-banner-frame,
         .goog-te-banner-frame,
-        [class*="VIpgJd-ZVi9od-ORHb"] {
+        .goog-te-balloon-frame,
+        .goog-te-banner {
+            display: none !important;
+        }
+
+        body>.skiptranslate {
+            display: none !important;
+        }
+
+        iframe.goog-te-banner-frame {
             display: none !important;
         }
 
         body {
-            top: 0 !important;
+            top: 0px !important;
+            position: relative !important;
         }
 
-        @media screen and (min-width: 2560px) and (max-width: 5000px) {
-            .goog-te-gadget-simple {
+        .goog-te-spinner-pos,
+        .goog-te-spinner,
+        .goog-te-cta {
+            display: none;
+        }
+
+        .swal-popup-compact {
+            border-radius: 20px !important;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
+            padding: 1rem !important;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2) !important;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
+        @media (min-width: 2560px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1.8rem !important;
+                padding: 2rem 2.5rem !important;
+                min-width: 650px !important;
+                border-radius: 48px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 2.2rem !important;
+                margin-bottom: 1.2rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-html-container,
+            .swal2-popup.swal-popup-compact .swal2-toast .swal2-title {
+                font-size: 1.6rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-timer-progress-bar {
+                height: 6px !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 580px !important;
+                padding: 1.2rem 2rem !important;
+                border-radius: 60px !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast .swal2-title {
+                font-size: 1.7rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast .swal2-html-container {
+                font-size: 1.4rem !important;
+            }
+        }
+
+        @media (min-width: 1501px) and (max-width: 2559px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1.4rem !important;
+                padding: 1.6rem 2rem !important;
+                border-radius: 36px !important;
+                min-width: 480px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.8rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 480px !important;
+                padding: 1rem 1.6rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast .swal2-title {
+                font-size: 1.4rem !important;
+            }
+        }
+
+        @media (min-width: 1400px) and (max-width: 1500px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1.2rem !important;
+                padding: 1.2rem 1.8rem !important;
+                border-radius: 28px !important;
+                min-width: 420px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.6rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 440px !important;
+                padding: 0.9rem 1.5rem !important;
+            }
+        }
+
+        @media (min-width: 1200px) and (max-width: 1399px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1.1rem !important;
+                padding: 1rem 1.5rem !important;
+                border-radius: 26px !important;
+                min-width: 380px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.5rem !important;
+            }
+        }
+
+        @media (min-width: 1001px) and (max-width: 1199px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1rem !important;
+                padding: 0.9rem 1.4rem !important;
                 border-radius: 24px !important;
-                padding: 2px 8px 2px 6px !important;
-                font-size: 7pt !important;
-                gap: 2px !important;
+                min-width: 340px !important;
             }
 
-            .translate-card {
-                border-radius: 16px !important;
-                padding: 2px 4px !important;
-                gap: 2px !important;
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.4rem !important;
             }
 
-            .goog-te-menu-value {
-                font-size: 0.6rem !important;
-            }
-
-            .goog-te-menu-value span:first-child {
-                font-size: 0.55rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.65rem !important;
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 380px !important;
             }
         }
 
-        @media screen and (min-width: 1501px) and (max-width: 2559px) {
-            .goog-te-gadget-simple {
+        @media (width: 1000px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1rem !important;
+                padding: 0.9rem 1.4rem !important;
+                border-radius: 24px !important;
+            }
+        }
+
+        @media (min-width: 992px) and (max-width: 999px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.95rem !important;
+                padding: 0.85rem 1.3rem !important;
+                border-radius: 24px !important;
+                min-width: 320px !important;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.9rem !important;
+                padding: 0.8rem 1.2rem !important;
                 border-radius: 22px !important;
-                padding: 2px 7px 2px 5px !important;
-                font-size: 7pt !important;
+                min-width: 300px !important;
             }
 
-            .translate-card {
-                border-radius: 15px !important;
-                padding: 2px 4px !important;
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.25rem !important;
             }
 
-            .goog-te-menu-value {
-                font-size: 0.55rem !important;
-            }
-
-            .goog-te-menu-value span:first-child {
-                font-size: 0.5rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.6rem !important;
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 340px !important;
+                bottom: 20px !important;
+                right: 20px !important;
             }
         }
 
-        @media screen and (min-width: 1400px) and (max-width: 1500px) {
-            .goog-te-gadget-simple {
-                border-radius: 21px !important;
-                padding: 2px 6px 2px 5px !important;
-                font-size: 6.5pt !important;
-            }
-
-            .translate-card {
-                border-radius: 14px !important;
-                padding: 1.5px 3px !important;
-            }
-
-            .goog-te-menu-value {
-                font-size: 0.5rem !important;
-            }
-
-            .goog-te-menu-value span:first-child {
-                font-size: 0.45rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.55rem !important;
-            }
-        }
-
-        @media screen and (min-width: 1200px) and (max-width: 1399px) {
-            .goog-te-gadget-simple {
+        @media (min-width: 576px) and (max-width: 767px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.85rem !important;
+                padding: 0.7rem 1rem !important;
                 border-radius: 20px !important;
-                padding: 1.5px 5px 1.5px 4px !important;
-                font-size: 6pt !important;
+                min-width: 280px !important;
             }
 
-            .translate-card {
-                border-radius: 13px !important;
-                padding: 1px 3px !important;
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.1rem !important;
+                margin-bottom: 0.4rem !important;
             }
 
-            .goog-te-menu-value {
-                font-size: 0.45rem !important;
+            .swal2-popup.swal-popup-compact .swal2-html-container {
+                font-size: 0.85rem !important;
             }
 
-            .goog-te-menu-value span:first-child {
-                font-size: 0.4rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.5rem !important;
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 300px !important;
+                padding: 0.7rem 1rem !important;
+                border-radius: 36px !important;
             }
         }
 
-        @media screen and (min-width: 1001px) and (max-width: 1199px) {
-            .goog-te-gadget-simple {
-                border-radius: 19px !important;
-                padding: 1px 5px 1px 4px !important;
-                font-size: 10pt !important;
-            }
-
-            .translate-card {
-                border-radius: 12px !important;
-                padding: 1px 3px !important;
-            }
-
-            .goog-te-menu-value {
-                font-size: 0.4rem !important;
-            }
-
-            .goog-te-menu-value span:first-child {
-                font-size: 0.35rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.45rem !important;
-            }
-        }
-
-        @media screen and (max-width: 1000px) {
-            .goog-te-gadget-simple {
+        @media (min-width: 481px) and (max-width: 575px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.8rem !important;
+                padding: 0.6rem 0.9rem !important;
                 border-radius: 18px !important;
-                padding: 1px 4px 1px 3px !important;
-                font-size: 10pt !important;
+                min-width: 260px !important;
             }
 
-            .translate-card {
-                border-radius: 11px !important;
-                padding: 1px 2px !important;
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1rem !important;
             }
 
-            .goog-te-menu-value {
-                font-size: 0.35rem !important;
-            }
-
-            .goog-te-menu-value span:first-child {
-                font-size: 0.3rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.4rem !important;
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 270px !important;
+                bottom: 16px !important;
+                right: 16px !important;
             }
         }
 
-        @media screen and (min-width: 992px) and (max-width: 999px) {
-            .goog-te-gadget-simple {
-                border-radius: 17px !important;
-                padding: 1px 4px 1px 3px !important;
-                font-size: 10pt !important;
-                gap: 1px !important;
-            }
-
-            .translate-card {
-                border-radius: 10px !important;
-                padding: 1px 2px !important;
-            }
-
-            .goog-te-menu-value {
-                font-size: 0.3rem !important;
-            }
-
-            .goog-te-menu-value span:first-child {
-                font-size: 0.25rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.35rem !important;
-            }
-        }
-
-        @media screen and (min-width: 768px) and (max-width: 991px) {
-            .goog-te-gadget-simple {
+        @media (min-width: 380px) and (max-width: 480px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.75rem !important;
+                padding: 0.5rem 0.8rem !important;
                 border-radius: 16px !important;
-                padding: 1px 4px 1px 3px !important;
-                font-size: 8pt !important;
+                min-width: 240px !important;
             }
 
-            .translate-card {
-                border-radius: 9px !important;
-                padding: 1px 2px !important;
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 0.9rem !important;
+                margin-bottom: 0.2rem !important;
             }
 
-            .goog-te-menu-value {
-                font-size: 0.3rem !important;
+            .swal2-popup.swal-popup-compact .swal2-html-container {
+                font-size: 0.75rem !important;
             }
 
-            .goog-te-menu-value span:first-child {
-                font-size: 0.25rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.35rem !important;
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 250px !important;
+                padding: 0.5rem 0.8rem !important;
+                border-radius: 30px !important;
             }
         }
 
-        @media screen and (min-width: 576px) and (max-width: 767px) {
-            .goog-te-gadget-simple {
-                border-radius: 15px !important;
-                padding: 1px 3px 1px 2px !important;
-                font-size: 7pt !important;
-                gap: 0.5px !important;
-            }
-
-            .translate-card {
-                border-radius: 8px !important;
-                padding: 0.5px 2px !important;
-            }
-
-            .goog-te-menu-value {
-                font-size: 0.3rem !important;
-            }
-
-            .goog-te-menu-value span:first-child {
-                font-size: 0.25rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.35rem !important;
-            }
-        }
-
-        @media screen and (min-width: 481px) and (max-width: 575px) {
-            .goog-te-gadget-simple {
+        @media (max-width: 379px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.7rem !important;
+                padding: 0.4rem 0.7rem !important;
                 border-radius: 14px !important;
-                padding: 1px 3px 1px 2px !important;
-                font-size: 4.5pt !important;
-                gap: 0.5px !important;
+                min-width: 210px !important;
             }
 
-            .translate-card {
-                border-radius: 7px !important;
-                padding: 0.5px 2px !important;
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 0.85rem !important;
+                line-height: 1.2 !important;
             }
 
-            .goog-te-menu-value span:first-child {
-                font-size: 0.2rem !important;
+            .swal2-popup.swal-popup-compact .swal2-html-container {
+                font-size: 0.7rem !important;
+                line-height: 1.3 !important;
             }
 
-            .goog-te-menu-value span:last-child {
-                font-size: 0.3rem !important;
-            }
-        }
-
-        @media screen and (min-width: 380px) and (max-width: 480px) {
-            .goog-te-gadget-simple {
-                border-radius: 12px !important;
-                padding: 1px 2px 1px 1px !important;
-                font-size: 4.5pt !important;
-                gap: 0.5px !important;
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 220px !important;
+                bottom: 12px !important;
+                right: 12px !important;
+                padding: 0.4rem 0.7rem !important;
+                border-radius: 28px !important;
             }
 
-            .translate-card {
-                border-radius: 6px !important;
-                padding: 0.5px 1px !important;
-            }
-
-            .goog-te-menu-value {
-                font-size: 0.25rem !important;
-            }
-
-            .goog-te-menu-value span:first-child {
-                font-size: 0.2rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.3rem !important;
+            .swal2-popup.swal-popup-compact .swal2-icon {
+                width: 2.2rem !important;
+                height: 2.2rem !important;
+                margin: 0.2rem auto 0.4rem !important;
             }
         }
 
-        @media screen and (max-width: 379px) {
-            .goog-te-gadget-simple {
-                border-radius: 8px !important;
-                padding: 0.5px 1px 0.5px 0.5px !important;
-                font-size: 4.5pt !important;
-                font-weight: 700 !important;
-                gap: 0.2px !important;
-            }
+        .swal2-toast {
+            position: fixed !important;
+            bottom: 24px !important;
+            right: 24px !important;
+            left: auto !important;
+            top: auto !important;
+        }
 
-            .translate-card {
-                border-radius: 4px !important;
-                padding: 0.2px 0.5px !important;
+        @media (max-width: 767px) {
+            .swal2-toast {
+                bottom: 16px !important;
+                right: 16px !important;
             }
+        }
 
-            .goog-te-menu-value {
-                font-size: 0.2rem !important;
+        @media (max-width: 480px) {
+            .swal2-toast {
+                bottom: 12px !important;
+                right: 12px !important;
             }
+        }
 
-            .goog-te-menu-value span:first-child {
-                font-size: 0.15rem !important;
-            }
-
-            .goog-te-menu-value span:last-child {
-                font-size: 0.25rem !important;
+        @media (min-width: 2560px) {
+            .swal2-toast {
+                bottom: 48px !important;
+                right: 48px !important;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <!-- nice demo content to translate -->
-    <div class="translate-wrapper" style="display:flex;justify-content:center;margin:10px 0;">
-        <div class="translate-card"
-            style="background-color:#ffffff;box-shadow:0 7px 15px rgba(15,23,36,0.08),0 1px 3px rgba(15,23,36,0.04);border-radius:28px;padding:4px 10px;display:inline-flex;align-items:center;gap:8px;transition:all 0.25s ease;border:1px solid rgba(16,185,129,0.15);backdrop-filter:blur(2px);">
-            <div class="translate-icon"
-                style="background:linear-gradient(145deg,#10B981,#059669);width:28px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;box-shadow:0 6px 12px rgba(5,150,105,0.25);transition:0.2s ease;">
-                <i class="fas fa-language"></i>
-            </div>
-            <div id="google_translate_element"></div>
-        </div>
-    </div>
-
+    <div id="google_translate_element" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
     <script>
         window.welcomeShown = false;
@@ -446,7 +362,7 @@
                     icon: 'info',
                     title: 'translate ready',
                     text: 'choose language from the compact menu',
-                    timer: 3000,
+                    timer: 4500,
                     showConfirmButton: false,
                     toast: true,
                     position: 'bottom-end',
@@ -548,7 +464,8 @@
                         text: 'google translate failed to load. please refresh.',
                         confirmButtonColor: '#059669',
                         background: '#ffffff',
-                        iconColor: '#f59e0b'
+                        iconColor: '#f59e0b',
+                        customClass: { popup: 'swal-popup-compact' }
                     });
                 }
             }, true);

@@ -28,62 +28,18 @@ class FarmerController extends Controller
     /**
      * Share counts with all views
      */
-    private function getSharedCounts()
-    {
-        $user = Auth::user();
-        if (!$user) {
-            return [
-                'productCount' => 0,
-                'pendingOrders' => 0,
-                'openComplaints' => 0
-            ];
-        }
-
-        $farmer = Farmer::where('user_id', $user->id)->first();
-        if (!$farmer) {
-            return [
-                'productCount' => 0,
-                'pendingOrders' => 0,
-                'openComplaints' => 0
-            ];
-        }
-
-        return [
-            'productCount' => Product::where('farmer_id', $farmer->id)->count(),
-            'pendingOrders' => Order::where('farmer_id', $farmer->id)
-                ->whereIn('order_status', ['paid', 'ready_for_pickup'])
-                ->count(),
-            'openComplaints' => Complaint::where('complainant_user_id', $user->id)
-                ->where('status', 'new')
-                ->count()
-        ];
-    }
-
     /**
      * Share counts with all views automatically
      */
     public function __construct()
     {
-        // Don't use middleware closure in constructor
-        // Instead, we'll manually share counts in each method
-    }
-
-    /**
-     * Helper method to share counts with view
-     */
-    private function shareCounts()
-    {
-        $counts = $this->getSharedCounts();
-        view()->share('sharedCounts', $counts);
+        // View Composer handles sharing counts and notifications
     }
 
     // Profile Settings Page
     public function profileSettings()
     {
         $user = Auth::user();
-
-        // Share counts with view
-        $this->shareCounts();
 
         return view('farmer.profile.settings', compact('user'));
     }
@@ -225,27 +181,9 @@ class FarmerController extends Controller
         $user = Auth::user();
         $farmer = Farmer::where('user_id', $user->id)->first();
 
-        // Get counts from shared method
-        $counts = $this->getSharedCounts();
-        $productCount = $counts['productCount'];
-        $pendingOrders = $counts['pendingOrders'];
-        $openComplaints = $counts['openComplaints'];
-
-        // Share counts with view
-        $this->shareCounts();
-
         $pendingPickups = Order::where('farmer_id', $farmer->id)
             ->where('order_status', 'ready_for_pickup')
             ->count();
-
-        $unreadNotifications = Notification::where('user_id', $user->id)
-            ->where('is_read', false)
-            ->count();
-
-        $notifications = Notification::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
 
         $recentOrders = Order::where('farmer_id', $farmer->id)
             ->with(['buyer', 'orderItems.product'])
@@ -277,7 +215,6 @@ class FarmerController extends Controller
             }
         }
 
-        $leadFarmer = null;
         $leadFarmerName = null;
         $leadFarmerGroup = null;
         if ($farmer->lead_farmer_id) {
@@ -289,12 +226,7 @@ class FarmerController extends Controller
         }
 
         return view('farmer.dashboard', compact(
-            'productCount',
-            'pendingOrders',
             'pendingPickups',
-            'openComplaints',
-            'unreadNotifications',
-            'notifications',
             'recentOrders',
             'lowStockProducts',
             'leadFarmerName',
@@ -317,9 +249,6 @@ class FarmerController extends Controller
             $farmer->name = $user->username;
             $farmer->save();
         }
-
-        // Share counts with view
-        $this->shareCounts();
 
         return view('farmer.profile.Payment', compact('farmer', 'user'));
     }
@@ -469,27 +398,8 @@ class FarmerController extends Controller
                 'message' => 'Failed to update payment settings. Please try again.'
             ], 500);
         }
-    }
-
-
-
-    public function getOrderDetails($id)
+    }    public function getOrderDetails($id)
     {
-        $user = Auth::user();
-        $farmer = Farmer::where('user_id', $user->id)->first();
-
-        $unreadNotifications = Notification::where('user_id', $user->id)
-            ->where('is_read', false)
-            ->count();
-
-        $notifications = Notification::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
-
-        // Get counts from shared method and share them
-        $this->shareCounts();
-
         try {
             $order = Order::with([
                 'buyer',
@@ -598,20 +508,6 @@ class FarmerController extends Controller
     {
         $user = Auth::user();
         $farmer = Farmer::where('user_id', $user->id)->first();
-
-        $unreadNotifications = Notification::where('user_id', $user->id)
-            ->where('is_read', false)
-            ->count();
-
-        $notifications = Notification::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
-
-
-
-        // Get counts from shared method and share them
-        $this->shareCounts();
 
         $currentDate = Carbon::now()->format('Y-m-d');
 
@@ -726,9 +622,7 @@ class FarmerController extends Controller
             'waitingCount',
             'removedCount',
             'leadFarmer',
-            'filter',
-            'notifications',
-            'unreadNotifications'
+            'filter'
         ));
     }
 
@@ -736,18 +630,6 @@ class FarmerController extends Controller
     {
         $user = Auth::user();
         $farmer = Farmer::where('user_id', $user->id)->first();
-
-        $unreadNotifications = Notification::where('user_id', $user->id)
-            ->where('is_read', false)
-            ->count();
-
-        $notifications = Notification::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
-
-        // Share counts with view
-        $this->shareCounts();
 
         $removedProducts = Product::where('farmer_id', $farmer->id)
             ->where('product_status', '!=', 'have it')
@@ -764,7 +646,7 @@ class FarmerController extends Controller
 
         $removedCount = $removedProducts->total();
 
-        return view('farmer.products.removed', compact('removedProducts', 'removedCount', 'notifications', 'unreadNotifications'));
+        return view('farmer.products.removed', compact('removedProducts', 'removedCount'));
     }
 
     public function viewProduct($id)
@@ -803,9 +685,6 @@ class FarmerController extends Controller
         $user = Auth::user();
         $farmer = Farmer::where('user_id', $user->id)->first();
 
-        // Share counts with view
-        $this->shareCounts();
-
         $query = Order::where('farmer_id', $farmer->id)
             ->whereIn('order_status', ['paid', 'ready_for_pickup']);
 
@@ -827,9 +706,6 @@ class FarmerController extends Controller
     {
         $user = Auth::user();
         $farmer = Farmer::where('user_id', $user->id)->first();
-
-        // Share counts with view
-        $this->shareCounts();
 
         $orders = Order::where('farmer_id', $farmer->id)
             ->with(['buyer', 'orderItems.product', 'payment'])
@@ -883,9 +759,6 @@ class FarmerController extends Controller
     {
         $user = Auth::user();
         $farmer = Farmer::where('user_id', $user->id)->first();
-
-        // Share counts with view
-        $this->shareCounts();
 
         $leadFarmer = null;
         $leadFarmerUser = null;
@@ -993,9 +866,6 @@ class FarmerController extends Controller
     {
         $user = Auth::user();
 
-        // Share counts with view
-        $this->shareCounts();
-
         $complaints = Complaint::where('complainant_user_id', $user->id)
             ->with(['againstUserInfo', 'relatedOrder.buyer'])
             ->orderBy('created_at', 'desc')
@@ -1101,14 +971,10 @@ class FarmerController extends Controller
             ], 500);
         }
     }
-
     public function profile()
     {
         $user = Auth::user();
         $farmer = Farmer::where('user_id', $user->id)->first();
-
-        // Share counts with view
-        $this->shareCounts();
 
         return view('farmer.profile.profile', compact('farmer', 'user'));
     }
@@ -1157,9 +1023,6 @@ class FarmerController extends Controller
     public function profilePhoto()
     {
         $user = Auth::user();
-
-        // Share counts with view
-        $this->shareCounts();
 
         return view('farmer.profile.photo', compact('user'));
     }
@@ -1231,22 +1094,12 @@ class FarmerController extends Controller
     {
         $user = Auth::user();
 
-        // Share counts with view
-        $this->shareCounts();
-
         $notifications = Notification::where('user_id', $user->id)
             ->orWhere('recipient_type', 'system_wide')
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        $unreadNotifications = Notification::where('user_id', $user->id)
-            ->where('is_read', false)
-            ->count();
-
-        Notification::where('user_id', $user->id)
-            ->update(['is_read' => true]);
-
-        return view('farmer.notifications', compact('notifications', 'unreadNotifications'));
+        return view('farmer.notifications', compact('notifications'));
     }
 
     public function markNotificationRead(Request $request)
@@ -1282,8 +1135,6 @@ class FarmerController extends Controller
     {
         $user = Auth::user();
         $farmer = Farmer::where('user_id', $user->id)->first();
-
-        $this->shareCounts();
 
         $requests = DB::table('buyer_product_requests')
             ->where('status', 'active')

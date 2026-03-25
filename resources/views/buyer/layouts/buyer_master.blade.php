@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,134 +14,138 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Google Translate Compact Card CSS -->
     <style>
-    .goog-te-gadget-simple {
-        background-color: #f0f4f9 !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 20px !important;
-        padding: 1px 6px 1px 4px !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 1px !important;
-        font-family: 'Inter', sans-serif !important;
-        font-weight: 700 !important;
-        font-size: 5pt !important;
-        transition: all 0.2s ease !important;
-        cursor: pointer !important;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
-        line-height: 1 !important;
-    }
+        .goog-te-gadget-simple {
+            background-color: #f0f4f9 !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 20px !important;
+            padding: 1px 6px 1px 4px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 1px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 5pt !important;
+            transition: all 0.2s ease !important;
+            cursor: pointer !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+            line-height: 1 !important;
+        }
 
-    .translate-card {
-        background-color: #ffffff !important;
-        box-shadow: 0 2px 5px rgba(15, 23, 36, 0.04), 0 1px 2px rgba(15, 23, 36, 0.02) !important;
-        border-radius: 14px !important;
-        padding: 1px 3px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 1px !important;
-        transition: all 0.25s ease !important;
-        border: 1px solid rgba(16, 185, 129, 0.1) !important;
-        backdrop-filter: blur(1px) !important;
-    }
+        .translate-card {
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 5px rgba(15, 23, 36, 0.04), 0 1px 2px rgba(15, 23, 36, 0.02) !important;
+            border-radius: 14px !important;
+            padding: 1px 3px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 1px !important;
+            transition: all 0.25s ease !important;
+            border: 1px solid rgba(16, 185, 129, 0.1) !important;
+            backdrop-filter: blur(1px) !important;
+        }
 
-    .goog-te-gadget-simple:hover {
-        background-color: #e9eef3 !important;
-        border-color: #10B981 !important;
-        box-shadow: 0 3px 6px rgba(16, 185, 129, 0.08) !important;
-        transform: translateY(-0.5px);
-    }
+        .goog-te-gadget-simple:hover {
+            background-color: #e9eef3 !important;
+            border-color: #10B981 !important;
+            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.08) !important;
+            transform: translateY(-0.5px);
+        }
 
-    .goog-te-gadget-simple:active {
-        transform: scale(0.98) translateY(0.5px) !important;
-        box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1) !important;
-    }
+        .goog-te-gadget-simple:active {
+            transform: scale(0.98) translateY(0.5px) !important;
+            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1) !important;
+        }
 
-    .goog-te-menu-value {
-        color: #0f1724 !important;
-        font-size: 0.5rem !important;
-        font-weight: 500 !important;
-        letter-spacing: 0.01em !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.5px !important;
-    }
+        .goog-te-menu-value {
+            color: #0f1724 !important;
+            font-size: 0.5rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.01em !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5px !important;
+        }
 
-    .goog-te-gadget-icon {
-        display: none !important;
-    }
+        .goog-te-gadget-icon {
+            display: none !important;
+        }
 
-    .goog-te-menu-value img {
-        display: none !important;
-    }
+        .goog-te-menu-value img {
+            display: none !important;
+        }
 
-    .goog-te-menu-value span:first-child {
-        color: #0f1724 !important;
-        font-weight: 500 !important;
-        font-size: 0.45rem !important;
-    }
+        .goog-te-menu-value span:first-child {
+            color: #0f1724 !important;
+            font-weight: 500 !important;
+            font-size: 0.45rem !important;
+        }
 
-    .goog-te-menu-value span:last-child {
-        color: #10B981 !important;
-        font-size: 0.55rem !important;
-        margin-left: 0.5px !important;
-        font-weight: 600 !important;
-        opacity: 0.9;
-        transition: transform 0.2s;
-    }
+        .goog-te-menu-value span:last-child {
+            color: #10B981 !important;
+            font-size: 0.55rem !important;
+            margin-left: 0.5px !important;
+            font-weight: 600 !important;
+            opacity: 0.9;
+            transition: transform 0.2s;
+        }
 
-    .goog-te-gadget-simple:hover .goog-te-menu-value span:last-child {
-        transform: translateY(0.5px);
-        color: #059669 !important;
-    }
+        .goog-te-gadget-simple:hover .goog-te-menu-value span:last-child {
+            transform: translateY(0.5px);
+            color: #059669 !important;
+        }
 
-    .VIpgJd-ZVi9od-ORHb,
-    .VIpgJd-ZVi9od-ORHb-OEVmcd,
-    .goog-te-banner-frame.skiptranslate {
-        display: none !important;
-    }
+        .VIpgJd-ZVi9od-ORHb,
+        .VIpgJd-ZVi9od-ORHb-OEVmcd,
+        .goog-te-banner-frame.skiptranslate {
+            display: none !important;
+        }
 
-    .goog-tooltip,
-    .goog-tooltip:hover,
-    .goog-text-highlight {
-        display: none !important;
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
+        .goog-tooltip,
+        .goog-tooltip:hover,
+        .goog-text-highlight {
+            display: none !important;
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
 
-    iframe.goog-te-banner-frame,
-    .goog-te-banner-frame,
-    [class*="VIpgJd-ZVi9od-ORHb"] {
-        display: none !important;
-    }
+        iframe.goog-te-banner-frame,
+        .goog-te-banner-frame,
+        [class*="VIpgJd-ZVi9od-ORHb"] {
+            display: none !important;
+        }
 
-    body {
-        top: 0 !important;
-    }
+        body {
+            top: 0 !important;
+        }
 
-    .translate-icon {
-        width: 30px !important;
-        height: 25px !important;
-    }
+        .translate-icon {
+            width: 30px !important;
+            height: 25px !important;
+        }
 
-    @media screen and (min-width: 2560px) and (max-width: 5000px) {
+        @media screen and (min-width: 2560px) and (max-width: 5000px) {
             .goog-te-gadget-simple {
                 border-radius: 24px !important;
                 padding: 2px 8px 2px 6px !important;
                 font-size: 12pt !important;
                 gap: 2px !important;
             }
+
             .translate-card {
                 border-radius: 16px !important;
                 padding: 2px 4px !important;
                 gap: 2px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.6rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.55rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.65rem !important;
             }
@@ -152,16 +157,20 @@
                 padding: 2px 7px 2px 5px !important;
                 font-size: 12pt !important;
             }
+
             .translate-card {
                 border-radius: 15px !important;
                 padding: 2px 4px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.55rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.5rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.6rem !important;
             }
@@ -173,16 +182,20 @@
                 padding: 2px 6px 2px 5px !important;
                 font-size: 12pt !important;
             }
+
             .translate-card {
                 border-radius: 14px !important;
                 padding: 1.5px 3px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.5rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.45rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.55rem !important;
             }
@@ -194,16 +207,20 @@
                 padding: 1.5px 5px 1.5px 4px !important;
                 font-size: 12pt !important;
             }
+
             .translate-card {
                 border-radius: 13px !important;
                 padding: 1px 3px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.45rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.4rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.5rem !important;
             }
@@ -215,16 +232,20 @@
                 padding: 1px 5px 1px 4px !important;
                 font-size: 10pt !important;
             }
+
             .translate-card {
                 border-radius: 12px !important;
                 padding: 1px 3px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.4rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.35rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.45rem !important;
             }
@@ -236,16 +257,20 @@
                 padding: 1px 4px 1px 3px !important;
                 font-size: 10pt !important;
             }
+
             .translate-card {
                 border-radius: 11px !important;
                 padding: 1px 2px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.35rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.3rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.4rem !important;
             }
@@ -258,16 +283,20 @@
                 font-size: 10pt !important;
                 gap: 1px !important;
             }
+
             .translate-card {
                 border-radius: 10px !important;
                 padding: 1px 2px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.3rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.25rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.35rem !important;
             }
@@ -279,16 +308,20 @@
                 padding: 1px 4px 1px 3px !important;
                 font-size: 8pt !important;
             }
+
             .translate-card {
                 border-radius: 9px !important;
                 padding: 1px 2px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.3rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.25rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.35rem !important;
             }
@@ -301,16 +334,20 @@
                 font-size: 7pt !important;
                 gap: 0.5px !important;
             }
+
             .translate-card {
                 border-radius: 8px !important;
                 padding: 0.5px 2px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.3rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.25rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.35rem !important;
             }
@@ -323,13 +360,16 @@
                 font-size: 4.5pt !important;
                 gap: 0.5px !important;
             }
+
             .translate-card {
                 border-radius: 7px !important;
                 padding: 0.5px 2px !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.2rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.3rem !important;
             }
@@ -342,16 +382,20 @@
                 font-size: 4.5pt !important;
                 gap: 0.5px !important;
             }
+
             .translate-card {
                 border-radius: 6px !important;
                 padding: 0.5px 1px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.25rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.2rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.3rem !important;
             }
@@ -365,16 +409,20 @@
                 font-weight: 700 !important;
                 gap: 0.2px !important;
             }
+
             .translate-card {
                 border-radius: 4px !important;
                 padding: 0.2px 0.5px !important;
             }
+
             .goog-te-menu-value {
                 font-size: 0.2rem !important;
             }
+
             .goog-te-menu-value span:first-child {
                 font-size: 0.15rem !important;
             }
+
             .goog-te-menu-value span:last-child {
                 font-size: 0.25rem !important;
             }
@@ -385,427 +433,725 @@
                 font-size: 0.6rem !important;
             }
         }
+
+        .swal-popup-compact {
+            border-radius: 20px !important;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
+            padding: 1rem !important;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2) !important;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
+        @media (min-width: 2560px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1.8rem !important;
+                padding: 2rem 2.5rem !important;
+                min-width: 650px !important;
+                border-radius: 48px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 2.2rem !important;
+                margin-bottom: 1.2rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-html-container,
+            .swal2-popup.swal-popup-compact .swal2-toast .swal2-title {
+                font-size: 1.6rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-timer-progress-bar {
+                height: 6px !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 580px !important;
+                padding: 1.2rem 2rem !important;
+                border-radius: 60px !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast .swal2-title {
+                font-size: 1.7rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast .swal2-html-container {
+                font-size: 1.4rem !important;
+            }
+        }
+
+        @media (min-width: 1501px) and (max-width: 2559px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1.4rem !important;
+                padding: 1.6rem 2rem !important;
+                border-radius: 36px !important;
+                min-width: 480px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.8rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 480px !important;
+                padding: 1rem 1.6rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast .swal2-title {
+                font-size: 1.4rem !important;
+            }
+        }
+
+        @media (min-width: 1400px) and (max-width: 1500px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1.2rem !important;
+                padding: 1.2rem 1.8rem !important;
+                border-radius: 28px !important;
+                min-width: 420px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.6rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 440px !important;
+                padding: 0.9rem 1.5rem !important;
+            }
+        }
+
+        @media (min-width: 1200px) and (max-width: 1399px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1.1rem !important;
+                padding: 1rem 1.5rem !important;
+                border-radius: 26px !important;
+                min-width: 380px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.5rem !important;
+            }
+        }
+
+        @media (min-width: 1001px) and (max-width: 1199px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1rem !important;
+                padding: 0.9rem 1.4rem !important;
+                border-radius: 24px !important;
+                min-width: 340px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.4rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 380px !important;
+            }
+        }
+
+        @media (width: 1000px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 1rem !important;
+                padding: 0.9rem 1.4rem !important;
+                border-radius: 24px !important;
+            }
+        }
+
+        @media (min-width: 992px) and (max-width: 999px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.95rem !important;
+                padding: 0.85rem 1.3rem !important;
+                border-radius: 24px !important;
+                min-width: 320px !important;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.9rem !important;
+                padding: 0.8rem 1.2rem !important;
+                border-radius: 22px !important;
+                min-width: 300px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.25rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 340px !important;
+                bottom: 20px !important;
+                right: 20px !important;
+            }
+        }
+
+        @media (min-width: 576px) and (max-width: 767px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.85rem !important;
+                padding: 0.7rem 1rem !important;
+                border-radius: 20px !important;
+                min-width: 280px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1.1rem !important;
+                margin-bottom: 0.4rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-html-container {
+                font-size: 0.85rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 300px !important;
+                padding: 0.7rem 1rem !important;
+                border-radius: 36px !important;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 575px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.8rem !important;
+                padding: 0.6rem 0.9rem !important;
+                border-radius: 18px !important;
+                min-width: 260px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 1rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 270px !important;
+                bottom: 16px !important;
+                right: 16px !important;
+            }
+        }
+
+        @media (min-width: 380px) and (max-width: 480px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.75rem !important;
+                padding: 0.5rem 0.8rem !important;
+                border-radius: 16px !important;
+                min-width: 240px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 0.9rem !important;
+                margin-bottom: 0.2rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-html-container {
+                font-size: 0.75rem !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 250px !important;
+                padding: 0.5rem 0.8rem !important;
+                border-radius: 30px !important;
+            }
+        }
+
+        @media (max-width: 379px) {
+            .swal2-popup.swal-popup-compact {
+                font-size: 0.7rem !important;
+                padding: 0.4rem 0.7rem !important;
+                border-radius: 14px !important;
+                min-width: 210px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-title {
+                font-size: 0.85rem !important;
+                line-height: 1.2 !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-html-container {
+                font-size: 0.7rem !important;
+                line-height: 1.3 !important;
+            }
+
+            .swal2-popup.swal-popup-compact.swal2-toast {
+                max-width: 220px !important;
+                bottom: 12px !important;
+                right: 12px !important;
+                padding: 0.4rem 0.7rem !important;
+                border-radius: 28px !important;
+            }
+
+            .swal2-popup.swal-popup-compact .swal2-icon {
+                width: 2.2rem !important;
+                height: 2.2rem !important;
+                margin: 0.2rem auto 0.4rem !important;
+            }
+        }
+
+        .swal2-toast {
+            position: fixed !important;
+            bottom: 24px !important;
+            right: 24px !important;
+            left: auto !important;
+            top: auto !important;
+        }
+
+        @media (max-width: 767px) {
+            .swal2-toast {
+                bottom: 16px !important;
+                right: 16px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .swal2-toast {
+                bottom: 12px !important;
+                right: 12px !important;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .swal2-toast {
+                bottom: 48px !important;
+                right: 48px !important;
+            }
+        }
     </style>
 
 </head>
+
 <body>
-@include('includes.loader')
-<div class="dashboard-wrapper">
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="{{ asset('assets/images/Logo Green Market.png') }}" class="logo" alt="Greenmarket">
-            <h3>GreenMarket</h3>
-            <button id="sidebar-close" class="sidebar-toggle">
-                <i class="fa-solid fa-times"></i>
-            </button>
-        </div>
-
-        <nav class="sidebar-nav">
-            <ul class="main-menu">
-                <li>
-                    <a href="{{ route('buyer.dashboard') }}" class="menu-link {{ request()->routeIs('buyer.dashboard') ? 'active' : '' }}">
-                        <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
-                    </a>
-                </li>
-
-                <li class="menu-heading">SHOP</li>
-
-                <li>
-                    <a href="{{ route('buyer.browseProducts') }}" class="menu-link {{ request()->routeIs('buyer.browseProducts') ? 'active' : '' }}">
-                        <i class="fa-solid fa-store"></i><span>Browse Products</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('buyer.cart') }}" class="menu-link {{ request()->routeIs('buyer.cart') ? 'active' : '' }}">
-                        <i class="fa-solid fa-cart-shopping"></i><span>Shopping Cart</span>
-                        @if(session('cart_count', 0) > 0)
-                            <span class="cart-badge">{{ session('cart_count') }}</span>
-                        @endif
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('buyer.wishlist') }}" class="menu-link {{ request()->routeIs('buyer.wishlist') ? 'active' : '' }}">
-                        <i class="fa-solid fa-heart"></i><span>Wishlist</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('buyer.history') }}" class="menu-link {{ request()->routeIs('buyer.history') ? 'active' : '' }}">
-                        <i class="fa-solid fa-clock-rotate-left"></i><span>Order History</span>
-                    </a>
-                </li>
-                
-                <li>
-                    <a href="{{ route('buyer.productRequest.create') }}" class="menu-link {{ request()->routeIs('buyer.productRequest.create') ? 'active' : '' }}">
-                        <i class="fa-solid fa-plus-circle"></i><span>Request Product</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('buyer.productRequests.my') }}" class="menu-link {{ request()->routeIs('buyer.productRequests.my') ? 'active' : '' }}">
-                        <i class="fa-solid fa-list-check"></i><span>My Requests</span>
-                    </a>
-                </li>
-
-                <li class="menu-heading">ACCOUNT</li>
-
-                <li>
-                    <a href="{{ route('buyer.profile.profile') }}" class="menu-link {{ request()->routeIs('buyer.profile.profile') ? 'active' : '' }}">
-                        <i class="fa-solid fa-user"></i><span>My Profile</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('buyer.profile.photo') }}" class="menu-link {{ request()->routeIs('buyer.profile.photo') ? 'active' : '' }}">
-                        <i class="fa-solid fa-camera"></i><span>Profile Photo</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('buyer.notifications') }}" class="menu-link {{ request()->routeIs('buyer.notifications') ? 'active' : '' }}">
-                        <i class="fa-solid fa-bell"></i><span>Notifications</span>
-                        @if(isset($unreadNotifications) && $unreadNotifications > 0)
-                            <span class="notif-dot"></span>
-                        @endif
-                    </a>
-                </li>
-
-                <li class="menu-heading">COMPLAINTS</li>
-
-                <li>
-                    <a href="{{ route('buyer.complaints.create') }}" class="menu-link {{ request()->routeIs('buyer.complaints.create') ? 'active' : '' }}">
-                        <i class="fa-solid fa-flag"></i><span>File Complaint</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('buyer.complaints.list') }}" class="menu-link {{ request()->routeIs('buyer.complaints.list') ? 'active' : '' }}">
-                        <i class="fa-solid fa-list-check"></i><span>My Complaints</span>
-                        @php
-                            $sharedCounts = session('sharedCounts', ['openComplaints' => 0]);
-                        @endphp
-                        @if($sharedCounts['openComplaints'] > 0)
-                            <span class="badge bg-danger">{{ $sharedCounts['openComplaints'] }}</span>
-                        @endif
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <div class="sidebar-footer">
-            <a href="{{ route('logout.confirmation') }}" id="nav-logout-link" class="logout-link">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
-
-    <main class="main-content">
-        <header class="navbar">
-            <div class="left-header">
-                <button id="mobile-menu-btn" class="mobile-menu-btn">
-                    <i class="fa-solid fa-bars"></i>
+    @include('includes.loader')
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ asset('assets/images/Logo Green Market.png') }}" class="logo" alt="Greenmarket">
+                <h3>GreenMarket</h3>
+                <button id="sidebar-close" class="sidebar-toggle">
+                    <i class="fa-solid fa-times"></i>
                 </button>
-                <h1 class="page-title">
-                    <i class="fa-solid fa-gauge-high"></i>
-                    @yield('page-title', 'Dashboard')
-                </h1>
             </div>
 
-            <div class="header-right-group">
+            <nav class="sidebar-nav">
+                <ul class="main-menu">
+                    <li>
+                        <a href="{{ route('buyer.dashboard') }}"
+                            class="menu-link {{ request()->routeIs('buyer.dashboard') ? 'active' : '' }}">
+                            <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+                        </a>
+                    </li>
 
-                <!-- Google Translate Container -->
-                <div class="translate-wrapper" style="display:inline-flex; align-items:center; margin-right: 0px;">
-                    <div class="translate-card" style="background-color:#ffffff; box-shadow:0 7px 15px rgba(15,23,36,0.08), 0 1px 3px rgba(15,23,36,0.04); border-radius:28px; padding:4px 10px; display:inline-flex; align-items:center; gap:8px; transition:all 0.25s ease; border:1px solid rgba(16,185,129,0.15); backdrop-filter:blur(2px);">
-                        <div class="translate-icon" style="background:linear-gradient(145deg,#10B981,#059669); width:28px; height:28px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:white; font-size:1rem; box-shadow:0 6px 12px rgba(5,150,105,0.25); transition:0.2s ease;">
-                            <i class="fas fa-language"></i>
-                        </div>
-                        <div id="google_translate_element"></div>
-                    </div>
+                    <li class="menu-heading">SHOP</li>
+
+                    <li>
+                        <a href="{{ route('buyer.browseProducts') }}"
+                            class="menu-link {{ request()->routeIs('buyer.browseProducts') ? 'active' : '' }}">
+                            <i class="fa-solid fa-store"></i><span>Browse Products</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('buyer.cart') }}"
+                            class="menu-link {{ request()->routeIs('buyer.cart') ? 'active' : '' }}">
+                            <i class="fa-solid fa-cart-shopping"></i><span>Shopping Cart</span>
+                            @if(session('cart_count', 0) > 0)
+                                <span class="cart-badge">{{ session('cart_count') }}</span>
+                            @endif
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('buyer.wishlist') }}"
+                            class="menu-link {{ request()->routeIs('buyer.wishlist') ? 'active' : '' }}">
+                            <i class="fa-solid fa-heart"></i><span>Wishlist</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('buyer.history') }}"
+                            class="menu-link {{ request()->routeIs('buyer.history') ? 'active' : '' }}">
+                            <i class="fa-solid fa-clock-rotate-left"></i><span>Order History</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('buyer.productRequest.create') }}"
+                            class="menu-link {{ request()->routeIs('buyer.productRequest.create') ? 'active' : '' }}">
+                            <i class="fa-solid fa-plus-circle"></i><span>Request Product</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('buyer.productRequests.my') }}"
+                            class="menu-link {{ request()->routeIs('buyer.productRequests.my') ? 'active' : '' }}">
+                            <i class="fa-solid fa-list-check"></i><span>My Requests</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-heading">ACCOUNT</li>
+
+                    <li>
+                        <a href="{{ route('buyer.profile.profile') }}"
+                            class="menu-link {{ request()->routeIs('buyer.profile.profile') ? 'active' : '' }}">
+                            <i class="fa-solid fa-user"></i><span>My Profile</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('buyer.profile.photo') }}"
+                            class="menu-link {{ request()->routeIs('buyer.profile.photo') ? 'active' : '' }}">
+                            <i class="fa-solid fa-camera"></i><span>Profile Photo</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('buyer.notifications') }}"
+                            class="menu-link {{ request()->routeIs('buyer.notifications') ? 'active' : '' }}">
+                            <i class="fa-solid fa-bell"></i><span>Notifications</span>
+                            @if(isset($unreadNotifications) && $unreadNotifications > 0)
+                                <span class="notif-dot"></span>
+                            @endif
+                        </a>
+                    </li>
+
+                    <li class="menu-heading">COMPLAINTS</li>
+
+                    <li>
+                        <a href="{{ route('buyer.complaints.create') }}"
+                            class="menu-link {{ request()->routeIs('buyer.complaints.create') ? 'active' : '' }}">
+                            <i class="fa-solid fa-flag"></i><span>File Complaint</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('buyer.complaints.list') }}"
+                            class="menu-link {{ request()->routeIs('buyer.complaints.list') ? 'active' : '' }}">
+                            <i class="fa-solid fa-list-check"></i><span>My Complaints</span>
+                            @php
+                                $sharedCounts = session('sharedCounts', ['openComplaints' => 0]);
+                            @endphp
+                            @if($sharedCounts['openComplaints'] > 0)
+                                <span class="badge bg-danger">{{ $sharedCounts['openComplaints'] }}</span>
+                            @endif
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="{{ route('logout.confirmation') }}" id="nav-logout-link" class="logout-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="navbar">
+                <div class="left-header">
+                    <button id="mobile-menu-btn" class="mobile-menu-btn">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        @yield('page-title', 'Dashboard')
+                    </h1>
                 </div>
-                <div class="notif-wrapper">
-                    <div class="notif-btn" id="notifBtn">
-                        <i class="fa-regular fa-bell"></i>
-                        @if(isset($unreadNotifications) && $unreadNotifications > 0)
-                            <span class="notif-dot"></span>
-                        @endif
-                    </div>
 
-                    
+                <div class="header-right-group">
 
-
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">
-                            <span>Notifications</span>
+                    <!-- Google Translate Container -->
+                    <div class="translate-wrapper" style="display:inline-flex; align-items:center; margin-right: 0px;">
+                        <div class="translate-card"
+                            style="background-color:#ffffff; box-shadow:0 7px 15px rgba(15,23,36,0.08), 0 1px 3px rgba(15,23,36,0.04); border-radius:28px; padding:4px 10px; display:inline-flex; align-items:center; gap:8px; transition:all 0.25s ease; border:1px solid rgba(16,185,129,0.15); backdrop-filter:blur(2px);">
+                            <div class="translate-icon"
+                                style="background:linear-gradient(145deg,#10B981,#059669); width:28px; height:28px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:white; font-size:1rem; box-shadow:0 6px 12px rgba(5,150,105,0.25); transition:0.2s ease;">
+                                <i class="fas fa-language"></i>
+                            </div>
+                            <div id="google_translate_element"></div>
                         </div>
-
-                        <div class="notif-list">
-                            @if(!isset($notifications) || count($notifications) == 0)
-                                <div class="notif-item">No notifications</div>
-                            @else
-                                @foreach($notifications as $n)
-                                <div class="notif-item {{ $n->is_read ? 'read' : 'unread' }}">
-                                    <div class="notif-left">
-                                        <div class="notif-title">{{ $n->title }}</div>
-                                        <div class="notif-msg">{{ Str::limit($n->message, 80) }}</div>
-                                    </div>
-                                    <div class="notif-actions">
-                                        <small>{{ \Carbon\Carbon::parse($n->created_at)->diffForHumans() }}</small>
-                                    </div>
-                                </div>
-                                @endforeach
+                    </div>
+                    <div class="notif-wrapper">
+                        <div class="notif-btn" id="notifBtn">
+                            <i class="fa-regular fa-bell"></i>
+                            @if(isset($unreadNotifications) && $unreadNotifications > 0)
+                                <span class="notif-dot"></span>
                             @endif
                         </div>
 
-                        <div class="notif-footer">
-                            <a href="{{ route('buyer.notifications') }}">View all</a>
+
+
+
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <span>Notifications</span>
+                            </div>
+
+                            <div class="notif-list">
+                                @if(!isset($notifications) || count($notifications) == 0)
+                                    <div class="notif-item">No notifications</div>
+                                @else
+                                    @foreach($notifications as $n)
+                                        <div class="notif-item {{ $n->is_read ? 'read' : 'unread' }}">
+                                            <div class="notif-left">
+                                                <div class="notif-title">{{ $n->title }}</div>
+                                                <div class="notif-msg">{{ Str::limit($n->message, 80) }}</div>
+                                            </div>
+                                            <div class="notif-actions">
+                                                <small>{{ \Carbon\Carbon::parse($n->created_at)->diffForHumans() }}</small>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+
+                            <div class="notif-footer">
+                                <a href="{{ route('buyer.notifications') }}">View all</a>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="header-user-meta">
+                        <span class="role">Buyer</span>
+                        <span class="username">
+                            {{ Auth::user()->username ?? Auth::user()->name ?? 'Buyer' }}
+                        </span>
+                    </div>
+
+                    <a href="{{ route('buyer.profile.photo') }}" class="profile-photo-link">
+                        <img src="{{ asset('uploads/profile_pictures/' . (Auth::user()->profile_photo ?? 'default-avatar.png')) }}"
+                            class="profile-photo"
+                            onerror="this.src='{{ asset('uploads/profile_pictures/default-buyer.png') }}'">
+                    </a>
+
+                    <a href="{{ route('logout.confirmation') }}" class="logout-icon" id="header-logout-link"
+                        title="Logout">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </a>
                 </div>
+            </header>
 
-                <div class="header-user-meta">
-                    <span class="role">Buyer</span>
-                    <span class="username">
-                        {{ Auth::user()->username ?? Auth::user()->name ?? 'Buyer' }}
-                    </span>
-                </div>
+            <section class="dashboard-body">
+                @yield('content')
+            </section>
+        </main>
+    </div>
 
-                <a href="{{ route('buyer.profile.photo') }}" class="profile-photo-link">
-                    <img src="{{ asset('uploads/profile_pictures/' . (Auth::user()->profile_photo ?? 'default-avatar.png')) }}"
-                         class="profile-photo"
-                         onerror="this.src='{{ asset('uploads/profile_pictures/default-buyer.png') }}'">
-                </a>
+    <div class="overlay" id="overlay"></div>
 
-                <a href="{{ route('logout.confirmation') }}" class="logout-icon" id="header-logout-link" title="Logout">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </a>
-            </div>
-        </header>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @yield('scripts')
 
-        <section class="dashboard-body">
-            @yield('content')
-        </section>
-    </main>
-</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebarClose = document.getElementById('sidebar-close');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const notifBtn = document.getElementById('notifBtn');
+            const notifDropdown = document.getElementById('notifDropdown');
 
-<div class="overlay" id="overlay"></div>
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function () {
+                    sidebar.classList.add('open');
+                    overlay.classList.add('active');
+                });
+            }
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-@yield('scripts')
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', function () {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                });
+            }
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const sidebarClose = document.getElementById('sidebar-close');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const notifBtn = document.getElementById('notifBtn');
-        const notifDropdown = document.getElementById('notifDropdown');
+            if (overlay) {
+                overlay.addEventListener('click', function () {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                });
+            }
 
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', function() {
-                sidebar.classList.add('open');
-                overlay.classList.add('active');
-            });
-        }
+            if (notifBtn && notifDropdown) {
+                notifBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    notifDropdown.classList.toggle('show');
+                });
 
-        if (sidebarClose) {
-            sidebarClose.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-            });
-        }
-
-        if (overlay) {
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-            });
-        }
-
-        if (notifBtn && notifDropdown) {
-            notifBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                notifDropdown.classList.toggle('show');
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
-                    notifDropdown.classList.remove('show');
-                }
-            });
-        }
-
-
-        @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '{{ session("success") }}',
-                timer: 3000,
-                showConfirmButton: false,
-                background: '#ffffff',
-                backdrop: 'rgba(16, 185, 129, 0.1)'
-            });
-        @endif
-
-        @if(session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: '{{ session("error") }}',
-                timer: 3000,
-                showConfirmButton: false,
-                background: '#ffffff',
-                backdrop: 'rgba(239, 68, 68, 0.1)'
-            });
-        @endif
-
-        @if($errors->any())
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                html: '{!! implode("<br>", $errors->all()) !!}',
-                timer: 4000,
-                background: '#ffffff'
-            });
-        @endif
-    });
-
-    /* Google Translate Initialization and Monitoring */
-    window.welcomeShown = false;
-    window.showWelcomeMessage = function () {
-        if (!window.welcomeShown) {
-            Swal.fire({
-                icon: 'info',
-                title: 'translate ready',
-                text: 'choose language from the compact menu',
-                timer: 3000,
-                showConfirmButton: false,
-                toast: true,
-                position: 'bottom-end',
-                background: '#ffffff',
-                iconColor: '#3b82f6',
-                customClass: { popup: 'swal-popup-compact' }
-            });
-            window.welcomeShown = true;
-        }
-    };
-    window.googleTranslateElementInit = function () {
-        new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,si,ta',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-        }, 'google_translate_element');
-        setTimeout(window.showWelcomeMessage, 600);
-    };
-    (function () {
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-        script.async = true;
-        document.head.appendChild(script);
-        setTimeout(function () {
-            const gadget = document.querySelector('.goog-te-gadget-simple');
-            if (!gadget) return;
-            let previousLangText = gadget.innerText || 'en';
-            const observer = new MutationObserver(function (mutations) {
-                mutations.forEach(function (mut) {
-                    if (mut.type === 'characterData' || mut.type === 'childList') {
-                        const currentText = gadget.innerText || '';
-                        if (currentText !== previousLangText && currentText.trim() !== '') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'language updated',
-                                text: 'page content will now appear in selected language.',
-                                timer: 3500,
-                                showConfirmButton: false,
-                                background: '#ffffff',
-                                iconColor: '#10B981',
-                                toast: true,
-                                position: 'bottom-end',
-                                showClass: { popup: 'animate__animated animate__fadeInUp' },
-                                hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-                                customClass: { popup: 'swal-popup-compact' }
-                            });
-                            previousLangText = currentText;
-                        }
+                document.addEventListener('click', function (e) {
+                    if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
+                        notifDropdown.classList.remove('show');
                     }
                 });
-            });
-            if (gadget) {
-                observer.observe(gadget, { childList: true, subtree: true, characterData: true });
             }
-        }, 800);
-        const observerRetry = new MutationObserver(function (mutations, obs) {
-            if (document.querySelector('.goog-te-gadget-simple')) {
-                obs.disconnect();
-                setTimeout(function () {
-                    const gadget = document.querySelector('.goog-te-gadget-simple');
-                    if (!gadget) return;
-                    let previousLangText = gadget.innerText || 'en';
-                    const observer = new MutationObserver(function (mutations) {
-                        mutations.forEach(function (mut) {
-                            if (mut.type === 'characterData' || mut.type === 'childList') {
-                                const currentText = gadget.innerText || '';
-                                if (currentText !== previousLangText && currentText.trim() !== '') {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'language updated',
-                                        text: 'page content will now appear in selected language.',
-                                        timer: 3500,
-                                        showConfirmButton: false,
-                                        background: '#ffffff',
-                                        iconColor: '#10B981',
-                                        toast: true,
-                                        position: 'bottom-end',
-                                        showClass: { popup: 'animate__animated animate__fadeInUp' },
-                                        hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-                                        customClass: { popup: 'swal-popup-compact' }
-                                    });
-                                    previousLangText = currentText;
-                                }
-                            }
-                        });
-                    });
-                    observer.observe(gadget, { childList: true, subtree: true, characterData: true });
-                }, 150);
-            }
-        });
-        observerRetry.observe(document.body, { childList: true, subtree: true });
-        window.addEventListener('error', function (e) {
-            if (e.target && (e.target.src || '').includes('translate.google')) {
-                e.preventDefault();
+
+
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session("success") }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    background: '#ffffff',
+                    backdrop: 'rgba(16, 185, 129, 0.1)'
+                });
+            @endif
+
+            @if(session('error'))
                 Swal.fire({
                     icon: 'error',
-                    title: 'translation error',
-                    text: 'google translate failed to load. please refresh.',
-                    confirmButtonColor: '#059669',
+                    title: 'Oops...',
+                    text: '{{ session("error") }}',
+                    timer: 3000,
+                    showConfirmButton: false,
                     background: '#ffffff',
-                    iconColor: '#f59e0b'
+                    backdrop: 'rgba(239, 68, 68, 0.1)'
                 });
+            @endif
+
+            @if($errors->any())
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    html: '{!! implode("<br>", $errors->all()) !!}',
+                    timer: 4000,
+                    background: '#ffffff'
+                });
+            @endif
+    });
+
+        /* Google Translate Initialization and Monitoring */
+        window.welcomeShown = false;
+        window.showWelcomeMessage = function () {
+            if (!window.welcomeShown) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'translate ready',
+                    text: 'choose language from the compact menu',
+                    timer: 4500,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'bottom-end',
+                    background: '#ffffff',
+                    iconColor: '#3b82f6',
+                    customClass: { popup: 'swal-popup-compact' }
+                });
+                window.welcomeShown = true;
             }
-        }, true);
-    })();
-    (function () {
-        if (document.body) {
-            document.body.style.marginTop = '0px';
-            document.body.style.position = 'static';
-        }
-        const bodyObserver = new MutationObserver(function () {
-            if (document.body.style.marginTop !== '0px') {
+        };
+        window.googleTranslateElementInit = function () {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,si,ta',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+            setTimeout(window.showWelcomeMessage, 600);
+        };
+        (function () {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            script.async = true;
+            document.head.appendChild(script);
+            setTimeout(function () {
+                const gadget = document.querySelector('.goog-te-gadget-simple');
+                if (!gadget) return;
+                let previousLangText = gadget.innerText || 'en';
+                const observer = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (mut) {
+                        if (mut.type === 'characterData' || mut.type === 'childList') {
+                            const currentText = gadget.innerText || '';
+                            if (currentText !== previousLangText && currentText.trim() !== '') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'language updated',
+                                    text: 'page content will now appear in selected language.',
+                                    timer: 3500,
+                                    showConfirmButton: false,
+                                    background: '#ffffff',
+                                    iconColor: '#10B981',
+                                    toast: true,
+                                    position: 'bottom-end',
+                                    showClass: { popup: 'animate__animated animate__fadeInUp' },
+                                    hideClass: { popup: 'animate__animated animate__fadeOutDown' },
+                                    customClass: { popup: 'swal-popup-compact' }
+                                });
+                                previousLangText = currentText;
+                            }
+                        }
+                    });
+                });
+                if (gadget) {
+                    observer.observe(gadget, { childList: true, subtree: true, characterData: true });
+                }
+            }, 800);
+            const observerRetry = new MutationObserver(function (mutations, obs) {
+                if (document.querySelector('.goog-te-gadget-simple')) {
+                    obs.disconnect();
+                    setTimeout(function () {
+                        const gadget = document.querySelector('.goog-te-gadget-simple');
+                        if (!gadget) return;
+                        let previousLangText = gadget.innerText || 'en';
+                        const observer = new MutationObserver(function (mutations) {
+                            mutations.forEach(function (mut) {
+                                if (mut.type === 'characterData' || mut.type === 'childList') {
+                                    const currentText = gadget.innerText || '';
+                                    if (currentText !== previousLangText && currentText.trim() !== '') {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'language updated',
+                                            text: 'page content will now appear in selected language.',
+                                            timer: 3500,
+                                            showConfirmButton: false,
+                                            background: '#ffffff',
+                                            iconColor: '#10B981',
+                                            toast: true,
+                                            position: 'bottom-end',
+                                            showClass: { popup: 'animate__animated animate__fadeInUp' },
+                                            hideClass: { popup: 'animate__animated animate__fadeOutDown' },
+                                            customClass: { popup: 'swal-popup-compact' }
+                                        });
+                                        previousLangText = currentText;
+                                    }
+                                }
+                            });
+                        });
+                        observer.observe(gadget, { childList: true, subtree: true, characterData: true });
+                    }, 150);
+                }
+            });
+            observerRetry.observe(document.body, { childList: true, subtree: true });
+            window.addEventListener('error', function (e) {
+                if (e.target && (e.target.src || '').includes('translate.google')) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'translation error',
+                        text: 'google translate failed to load. please refresh.',
+                        confirmButtonColor: '#059669',
+                        background: '#ffffff',
+                        iconColor: '#f59e0b'
+                    });
+                }
+            }, true);
+        })();
+        (function () {
+            if (document.body) {
                 document.body.style.marginTop = '0px';
-            }
-            if (document.body.style.position !== 'static') {
                 document.body.style.position = 'static';
             }
-        });
-        bodyObserver.observe(document.body, { attributes: true, attributeFilter: ['style'] });
-    })();
-</script>
+            const bodyObserver = new MutationObserver(function () {
+                if (document.body.style.marginTop !== '0px') {
+                    document.body.style.marginTop = '0px';
+                }
+                if (document.body.style.position !== 'static') {
+                    document.body.style.position = 'static';
+                }
+            });
+            bodyObserver.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+        })();
+    </script>
 </body>
+
 </html>
