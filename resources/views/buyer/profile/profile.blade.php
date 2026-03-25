@@ -215,18 +215,6 @@
 						</div>
 					</div>
 
-					<div class="mb-3">
-						<label for="business_address" class="form-label">Business Address</label>
-						<textarea class="form-control @error('business_address') is-invalid @enderror" id="business_address"
-							name="business_address"
-							rows="3">{{ old('business_address', $buyer->business_address ?? '') }}</textarea>
-						@error('business_address')
-							<div class="invalid-feedback">{{ $message }}</div>
-						@enderror
-					</div>
-
-
-
 					<button type="submit" class="btn btn-success">
 						<i class="fa-solid fa-building me-2"></i> Update Business Details
 					</button>
@@ -388,7 +376,7 @@
 					});
 				@endif
 
-			const forms = ['personalForm', 'businessForm', 'passwordForm'];
+				const forms = ['personalForm', 'businessForm', 'passwordForm'];
 			forms.forEach(formId => {
 				const form = document.getElementById(formId);
 				if (form) {
