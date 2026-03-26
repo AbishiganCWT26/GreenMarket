@@ -861,37 +861,8 @@
                     $zone = $adminDetails->zone_assigned_area ?? 'Sri Lanka';
                 @endphp
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-user-tag"></i> Role
-                        </label>
-                        <select name="role" id="role" class="form-control @error('role') input-error @enderror" required>
-                            <option value="admin" {{ $role === 'admin' ? 'selected' : '' }}>Administrator</option>
-                            <option value="subadmin" {{ $role === 'subadmin' ? 'selected' : '' }}>Sub Administrator</option>
-                        </select>
-                        @error('role')
-                            <div class="error-text">
-                                <i class="fas fa-exclamation-circle"></i> {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-
-                    <div class="form-group" id="zone-field" style="{{ $role === 'admin' ? 'display: none;' : '' }}">
-                        <label class="form-label">
-                            <i class="fas fa-map-marker-alt"></i> Zone Assigned Area
-                        </label>
-                        <input type="text" name="zone_assigned_area"
-                               class="form-control @error('zone_assigned_area') input-error @enderror"
-                               value="{{ old('zone_assigned_area', $role === 'subadmin' ? $zone : 'Sri Lanka') }}"
-                               placeholder="Enter assigned zone area">
-                        @error('zone_assigned_area')
-                            <div class="error-text">
-                                <i class="fas fa-exclamation-circle"></i> {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-                </div>
+                <input type="hidden" name="role" value="admin">
+                <input type="hidden" name="zone_assigned_area" value="Sri Lanka">
 
                 <button type="submit" class="submit-btn" id="personalSubmit">
                     <i class="fas fa-save"></i> Update Personal Information
@@ -1025,8 +996,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const toggleCurrentPassword = document.getElementById('toggleCurrentPassword');
     const toggleNewPassword = document.getElementById('toggleNewPassword');
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-    const roleSelect = document.getElementById('role');
-    const zoneField = document.getElementById('zone-field');
     const newPasswordInput = document.getElementById('new_password');
     const confirmPasswordInput = document.getElementById('confirm_password');
 
@@ -1042,14 +1011,6 @@ document.addEventListener('DOMContentLoaded', function() {
         togglePasswordVisibility('confirm_password', this);
     });
 
-    roleSelect.addEventListener('change', function() {
-        if (this.value === 'admin') {
-            zoneField.style.display = 'none';
-            zoneField.querySelector('input').value = 'Sri Lanka';
-        } else {
-            zoneField.style.display = 'block';
-        }
-    });
 
     newPasswordInput.addEventListener('input', function() {
         checkPasswordMatch();

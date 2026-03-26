@@ -86,7 +86,6 @@ class User extends Authenticatable
                         }
                         break;
                     case 'admin':
-                    case 'subadmin':
                         if ($user->adminDetails) {
                             $user->adminDetails->update(['updated_by' => auth()->id()]);
                         }

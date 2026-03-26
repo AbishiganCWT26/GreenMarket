@@ -457,7 +457,6 @@ Route::prefix('admin')
 	Route::post('/users/{id}/activate', [UserController::class, 'activate'])->name('users.activate');
 	Route::post('/users/{id}/suspend', [UserController::class, 'suspend'])->name('users.suspend');
 	Route::post('/users/{id}/promote', [UserController::class, 'promote'])->name('users.promote');
-	Route::post('/users/{id}/make-subadmin', [UserController::class, 'makeSubadmin'])->name('users.makeSubadmin');
 	Route::post('/users/send-otp', [UserController::class, 'sendOtp'])->name('users.sendOtp');
 	Route::post('/users/verify-otp', [UserController::class, 'verifyOtp'])->name('users.verifyOtp');
 	Route::post('/users/resend-otp', [UserController::class, 'resendOtp'])->name('users.resendOtp');

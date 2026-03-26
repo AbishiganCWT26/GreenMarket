@@ -908,13 +908,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-map-marker-alt"></i> Assigned Zone
-                                </label>
-                                <input type="text" class="form-control"
-                                    value="{{ $adminDetails->zone_assigned_area ?? 'Sri Lanka' }}" readonly>
-                            </div>
                         </div>
 
                         <button type="submit" class="btn-submit">

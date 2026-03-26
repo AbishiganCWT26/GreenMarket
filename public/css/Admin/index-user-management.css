@@ -96,7 +96,7 @@ body {
 
 .controls {
 	display: flex;
-	gap: 12px;
+	gap: 5px;
 	align-items: center;
 	flex-wrap: wrap;
 }
@@ -446,10 +446,6 @@ body {
 	color: var(--danger-color);
 }
 
-.role-subadmin {
-	background: var(--warning-bg);
-	color: var(--warning-color);
-}
 
 .user-email {
 	font-size: 11px;

@@ -19,7 +19,7 @@ class UserController extends Controller
         $totalUsers = DB::table('users')->count();
         $activeUsers = DB::table('users')->where('is_active', true)->count();
         $inactiveUsers = DB::table('users')->where('is_active', false)->count();
-        $adminUsers = DB::table('users')->whereIn('role', ['admin', 'subadmin'])->count();
+        $adminUsers = DB::table('users')->where('role', 'admin')->count();
         $leadFarmerList = DB::table('lead_farmers')->select('id', 'name', 'district')->get();
 
         $query = DB::table('users')
@@ -70,6 +70,12 @@ class UserController extends Controller
                     ->orWhere('facilitators.primary_mobile', 'ILIKE', $search)
                     ->orWhere('admins.phone_number', 'ILIKE', $search);
             });
+        }
+
+        // Role filter
+        $validRoles = ['farmer', 'lead_farmer', 'buyer', 'facilitator', 'admin'];
+        if ($request->filled('role') && in_array($request->role, $validRoles)) {
+            $query->where('users.role', $request->role);
         }
 
         $viewType = $request->get('view', 'card');
@@ -157,7 +163,6 @@ class UserController extends Controller
                 break;
 
             case 'admin':
-            case 'subadmin':
                 $user->display_name = $user->admin_name ?? $user->username;
                 $user->contact_number = $user->admin_phone ?? 'N/A';
                 $user->nic_number = $user->admin_nic ?? '';
@@ -188,7 +193,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_type' => 'required|in:farmer,lead_farmer,buyer,facilitator,admin,subadmin',
+            'user_type' => 'required|in:farmer,lead_farmer,buyer,facilitator,admin',
             'username' => 'required|string|max:50|unique:users,username',
             'email' => 'nullable|email|max:100|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
@@ -223,7 +228,7 @@ class UserController extends Controller
         }
 
         // Additional validation for admin types
-        if (in_array($validated['user_type'], ['admin', 'subadmin'])) {
+        if ($validated['user_type'] == 'admin') {
             $request->validate([
                 'phone_number' => 'required|string|max:20'
             ]);
@@ -379,7 +384,7 @@ class UserController extends Controller
                         ]);
                     }
                 }
-            } elseif ($validated['user_type'] == 'admin' || $validated['user_type'] == 'subadmin') {
+            } elseif ($validated['user_type'] == 'admin') {
                 // Insert into admins table
                 DB::table('admins')->insert([
                     'user_id' => $userId,
@@ -491,7 +496,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'username' => 'required|string|max:50|unique:users,username,' . $id,
             'email' => 'nullable|email|max:100|unique:users,email,' . $id,
-            'role' => 'required|in:admin,subadmin,facilitator,lead_farmer,farmer,buyer',
+            'role' => 'required|in:admin,facilitator,lead_farmer,farmer,buyer',
             'is_active' => 'required|boolean'
         ]);
 
@@ -543,7 +548,7 @@ class UserController extends Controller
                 $this->updateBuyerDetails($user, $request, $id);
             } elseif ($validated['role'] == 'facilitator') {
                 $this->updateFacilitatorDetails($user, $request, $id);
-            } elseif ($validated['role'] == 'admin' || $validated['role'] == 'subadmin') {
+            } elseif ($validated['role'] == 'admin') {
                 $this->updateAdminDetails($user, $request, $id);
             }
 
@@ -1075,33 +1080,6 @@ class UserController extends Controller
         }
     }
 
-    public function makeSubadmin($id)
-    {
-        $user = DB::table('users')->find($id);
-
-        if (!$user) {
-            return response()->json(['success' => false, 'message' => 'User not found'], 404);
-        }
-
-        if ($user->role == 'admin') {
-            DB::table('users')->where('id', $id)->update([
-                'role' => 'subadmin',
-                'updated_at' => now()
-            ]);
-
-            // Update admin role in admins table
-            DB::table('admins')->where('user_id', $id)->update([
-                'role' => 'subadmin',
-                'updated_at' => now()
-            ]);
-
-            $this->sendRoleChangeNotification($id, 'subadmin');
-
-            return response()->json(['success' => true, 'message' => 'User made Sub Administrator']);
-        }
-
-        return response()->json(['success' => false, 'message' => 'User is not an administrator'], 400);
-    }
 
     public function sendOtp(Request $request)
     {
@@ -1445,7 +1423,6 @@ class UserController extends Controller
                 }
                 break;
             case 'admin':
-            case 'subadmin':
                 $details = DB::table('admins')->where('user_id', $user->id)->first();
                 if (!$details) {
                     $details = (object) [
@@ -1527,7 +1504,7 @@ class UserController extends Controller
 
         // Check NIC change
         $currentNic = null;
-        if (in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer', 'admin', 'subadmin'])) {
+        if (in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer', 'admin'])) {
             $currentNic = $details->nic_no ?? '';
         }
 
@@ -1673,7 +1650,7 @@ class UserController extends Controller
         } elseif ($role == 'facilitator') {
             $facilitator = DB::table('facilitators')->where('user_id', $userId)->first();
             return $facilitator->primary_mobile ?? null;
-        } elseif ($role == 'admin' || $role == 'subadmin') {
+        } elseif ($role == 'admin') {
             $admin = DB::table('admins')->where('user_id', $userId)->first();
             return $admin->phone_number ?? null;
         }
@@ -1689,8 +1666,8 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
-        if (in_array($user->role, ['admin', 'subadmin'])) {
-            return response()->json(['success' => false, 'message' => 'Cannot delete admin or subadmin accounts']);
+        if ($user->role == 'admin') {
+            return response()->json(['success' => false, 'message' => 'Cannot delete admin accounts']);
         }
 
         if ($user->role == 'farmer') {
