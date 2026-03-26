@@ -16,6 +16,23 @@ class FacilitatorAssignment extends Model
         'gn_division_code'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($model) {
+            if (auth()->check() && $model->facilitator) {
+                $model->facilitator->update(['updated_by' => auth()->id()]);
+            }
+        });
+
+        static::deleted(function ($model) {
+            if (auth()->check() && $model->facilitator) {
+                $model->facilitator->update(['updated_by' => auth()->id()]);
+            }
+        });
+    }
+
     public function facilitator()
     {
         return $this->belongsTo(Facilitator::class);

@@ -13,8 +13,19 @@ class Farmer extends Model
         'whatsapp_number', 'email', 'residential_address', 'address_map_link',
         'preferred_payment', 'payment_details', 'grama_niladhari_division', 'gn_division_code', 'is_active',
         'district', 'divisional_secretariat', 'bank_name', 'bank_branch', 'account_holder_name', 'account_number',
-        'ezcash_mobile', 'mcash_mobile'
+        'ezcash_mobile', 'mcash_mobile', 'updated_by'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($model) {
+            if (auth()->check()) {
+                $model->updated_by = auth()->id();
+            }
+        });
+    }
 
     public function user()
     {
@@ -34,5 +45,10 @@ class Farmer extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

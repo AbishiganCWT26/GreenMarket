@@ -15,7 +15,8 @@ class Admin extends Model
         'nic_no',
         'role',
         'phone_number',
-        'zone_assigned_area'
+        'zone_assigned_area',
+        'updated_by'
     ];
 
     protected $attributes = [
@@ -24,8 +25,24 @@ class Admin extends Model
         'zone_assigned_area' => 'Sri Lanka'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($model) {
+            if (auth()->check()) {
+                $model->updated_by = auth()->id();
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

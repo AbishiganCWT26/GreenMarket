@@ -54,6 +54,50 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
+    | Boot / Model Events
+    |--------------------------------------------------------------------------
+    */
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($user) {
+            if (auth()->check() && $user->wasChanged(['username', 'email', 'profile_photo'])) {
+                switch ($user->role) {
+                    case 'farmer':
+                        if ($user->farmer) {
+                            $user->farmer->update(['updated_by' => auth()->id()]);
+                        }
+                        break;
+                    case 'lead_farmer':
+                        if ($user->leadFarmer) {
+                            $user->leadFarmer->update(['updated_by' => auth()->id()]);
+                        }
+                        break;
+                    case 'buyer':
+                        if ($user->buyer) {
+                            $user->buyer->update(['updated_by' => auth()->id()]);
+                        }
+                        break;
+                    case 'facilitator':
+                        if ($user->facilitator) {
+                            $user->facilitator->update(['updated_by' => auth()->id()]);
+                        }
+                        break;
+                    case 'admin':
+                    case 'subadmin':
+                        if ($user->adminDetails) {
+                            $user->adminDetails->update(['updated_by' => auth()->id()]);
+                        }
+                        break;
+                }
+            }
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Authentication Overrides
     |--------------------------------------------------------------------------
     */

@@ -23,7 +23,8 @@ class Buyer extends Model
         'business_type',
         'is_verified',
         'verification_status',
-        'verification_notes'
+        'verification_notes',
+        'updated_by'
     ];
 
     protected $casts = [
@@ -31,6 +32,17 @@ class Buyer extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($model) {
+            if (auth()->check()) {
+                $model->updated_by = auth()->id();
+            }
+        });
+    }
 
     public function user()
     {
@@ -50,5 +62,10 @@ class Buyer extends Model
     public function shoppingCart()
     {
         return $this->hasMany(ShoppingCart::class);
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

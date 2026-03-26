@@ -699,7 +699,8 @@ class UserController extends Controller
             $details = DB::table($table)->where('user_id', $userId)->first();
 
             $updateData = [
-                'updated_at' => now()
+                'updated_at' => now(),
+                'updated_by' => Auth::id()
             ];
 
             $paymentFields = ['preferred_payment', 'account_number', 'account_holder_name',
@@ -789,7 +790,8 @@ class UserController extends Controller
             'business_name' => $request->business_name ?? ($buyer->business_name ?? ''),
             'business_type' => $request->business_type ?? ($buyer->business_type ?? 'individual'),
             'nic_no' => $request->buyer_nic_no ?? $request->nic_no ?? ($buyer->nic_no ?? ''),
-            'updated_at' => now()
+            'updated_at' => now(),
+            'updated_by' => Auth::id()
         ];
 
         if ($buyer) {
@@ -813,7 +815,8 @@ class UserController extends Controller
 
         if ($facilitator) {
             $updateData = [
-                'updated_at' => now()
+                'updated_at' => now(),
+                'updated_by' => Auth::id()
             ];
 
             // Map request fields to database columns
@@ -911,7 +914,8 @@ class UserController extends Controller
             'full_name' => $request->name ?? ($admin->full_name ?? ''),
             'nic_no' => $request->nic_no ?? ($admin->nic_no ?? 'NOT_SET'),
             'phone_number' => $request->phone_number ?? ($admin->phone_number ?? ''),
-            'updated_at' => now()
+            'updated_at' => now(),
+            'updated_by' => Auth::id()
         ];
 
         if ($admin) {

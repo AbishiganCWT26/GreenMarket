@@ -30,12 +30,24 @@ class LeadFarmer extends Model
         'account_holder_name',
         'bank_name',
         'bank_branch',
+        'updated_by',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($model) {
+            if (auth()->check()) {
+                $model->updated_by = auth()->id();
+            }
+        });
+    }
 
     /**
      * Get the user associated with the lead farmer.
@@ -67,5 +79,13 @@ class LeadFarmer extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the user who last updated this lead farmer.
+     */
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

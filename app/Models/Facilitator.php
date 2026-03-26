@@ -10,8 +10,19 @@ class Facilitator extends Model
 
     protected $fillable = [
         'user_id', 'name', 'nic_no', 'primary_mobile', 'whatsapp_number',
-        'email', 'assigned_division', 'divisional_secretariat', 'gn_division_code', 'is_active'
+        'email', 'assigned_division', 'divisional_secretariat', 'gn_division_code', 'is_active', 'updated_by'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($model) {
+            if (auth()->check()) {
+                $model->updated_by = auth()->id();
+            }
+        });
+    }
 
     public function user()
     {
@@ -21,5 +32,10 @@ class Facilitator extends Model
     public function assignments()
     {
         return $this->hasMany(FacilitatorAssignment::class);
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

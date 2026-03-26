@@ -595,7 +595,7 @@ body {
 	border-radius: var(--border-radius);
 	overflow: hidden;
 	animation: slideUp 0.3s ease;
-	max-width: 500px;
+	max-width: 300px;
 	width: 90%;
 	box-shadow: var(--shadow-lg);
 }
@@ -608,7 +608,7 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 12px;
-	padding: 20px;
+	padding: 16px;
 	background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
 	color: white;
 }
@@ -653,11 +653,11 @@ body {
 }
 
 .notification-modal-body {
-	padding: 24px;
+	padding: 15px;
 }
 
 .form-group {
-	margin-bottom: 20px;
+	margin-bottom: 13px;
 }
 
 .form-group label {
@@ -687,7 +687,7 @@ body {
 }
 
 .notification-modal-footer {
-	padding: 20px;
+	padding: 16px 20px;
 	background: var(--hover-bg);
 	border-top: 1px solid var(--border-color);
 	display: flex;
@@ -873,11 +873,11 @@ body {
 	}
 
 	.notification-modal-header {
-		padding: 16px;
+		padding: 7px;
 	}
 
 	.notification-modal-body {
-		padding: 16px;
+		padding: 7px;
 	}
 
 	.notification-modal-footer {
