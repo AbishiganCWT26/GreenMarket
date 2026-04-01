@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logout Confirmation - GreenMarket</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
         body {
             margin: 0;
@@ -28,7 +28,14 @@
             padding: 1.5rem !important;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
         }
+
+        .swal2-image {
+            margin: 0em auto 0em !important;
+        }
     </style>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="blur-bg"></div>
@@ -44,7 +51,7 @@
                 html: `
                     <div style="display: flex; justify-content: center; margin-bottom: 20px;">
                         <img src="https://cdn-icons-gif.flaticon.com/7740/7740910.gif" 
-                             onerror="this.onerror=null; this.src='{{ asset('assets/images/logout btn.png') }}';" 
+                             onerror="this.onerror=null; this.src='{{ asset('assets/icons/Gif/logout1.gif') }}';" 
                              alt="Logout Icon" 
                              style="width: 80px; height: 80px;">
                     </div>

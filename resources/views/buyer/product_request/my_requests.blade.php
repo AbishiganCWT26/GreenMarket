@@ -5,7 +5,7 @@
 @section('page-title', 'My Product Requests')
 
 @section('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <style>
 :root {
     --primary-green: #10B981;
@@ -617,7 +617,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 async function updateStatus(select, requestId) {
     const newStatus = select.value;
@@ -626,7 +626,7 @@ async function updateStatus(select, requestId) {
     const result = await Swal.fire({
         title: 'Update Status?',
         text: `Change request status to "${newStatus}"?`,
-        icon: 'question',
+        @if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
         showCancelButton: true,
         confirmButtonColor: '#10B981',
         cancelButtonColor: '#6b7280',
@@ -650,7 +650,7 @@ async function updateStatus(select, requestId) {
 
             if (data.success) {
                 await Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Updated!',
                     text: data.message,
                     confirmButtonColor: '#10B981'
@@ -663,7 +663,7 @@ async function updateStatus(select, requestId) {
 
         } catch (error) {
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error!',
                 text: error.message,
                 confirmButtonColor: '#ef4444'
@@ -679,7 +679,7 @@ async function deleteRequest(requestId) {
     const result = await Swal.fire({
         title: 'Are you sure?',
         text: "This request will be permanently deleted!",
-        icon: 'warning',
+        @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#6b7280',
@@ -701,7 +701,7 @@ async function deleteRequest(requestId) {
 
             if (data.success) {
                 await Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Deleted!',
                     text: data.message,
                     confirmButtonColor: '#10B981'
@@ -714,7 +714,7 @@ async function deleteRequest(requestId) {
 
         } catch (error) {
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error!',
                 text: error.message,
                 confirmButtonColor: '#ef4444'
@@ -781,3 +781,4 @@ async function autoUpdateExpiredRequests() {
 }
 </script>
 @endsection
+

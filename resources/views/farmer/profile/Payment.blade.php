@@ -237,7 +237,7 @@
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const methodItems = document.querySelectorAll('.method-item');
@@ -404,7 +404,7 @@
 
                 if (!isValid) {
                     Swal.fire({
-                        icon: 'error',
+                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Validation Error',
                         text: errorMsg,
                         confirmButtonColor: '#ef4444'
@@ -489,7 +489,7 @@
 
                     if (data.success) {
                         Swal.fire({
-                            icon: 'success',
+                            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                             title: 'Success!',
                             text: data.message || 'Payment settings updated',
                             confirmButtonColor: '#10B981',
@@ -503,7 +503,7 @@
                     }
                 } catch (error) {
                     Swal.fire({
-                        icon: 'error',
+                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Error!',
                         text: error.message,
                         confirmButtonColor: '#ef4444'

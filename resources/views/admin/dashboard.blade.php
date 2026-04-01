@@ -242,7 +242,7 @@
                     if (result.isConfirmed) {
                         if (result.value.success) {
                             Swal.fire({
-                                icon: 'success',
+                                @if(file_exists(public_path('assets/icons/Gif/Send successfully1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Send successfully1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                                 title: 'Alert Sent',
                                 text: result.value.message,
                                 timer: 2000,
@@ -250,7 +250,7 @@
                             });
                         } else {
                             Swal.fire({
-                                icon: 'error',
+                                @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                                 title: 'Error',
                                 text: result.value.message || 'Unable to alert facilitator',
                                 confirmButtonColor: '#10B981'

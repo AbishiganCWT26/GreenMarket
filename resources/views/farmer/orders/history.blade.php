@@ -174,7 +174,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     function viewOrderHistory(orderId) {
         Swal.fire({
@@ -284,7 +284,7 @@
                     });
                 } else {
                     Swal.fire({
-                        icon: 'error',
+                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Error',
                         text: response.message
                     });
@@ -293,7 +293,7 @@
             error: function() {
                 Swal.close();
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Error',
                     text: 'Failed to load order details.'
                 });
@@ -335,3 +335,4 @@
     });
 </script>
 @endsection
+

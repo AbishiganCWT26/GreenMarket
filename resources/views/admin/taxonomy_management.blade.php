@@ -196,7 +196,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     let categories = [];
     let subcategories = [];
@@ -233,7 +233,7 @@
             renderProducts();
         }).catch(error => {
             console.error('Error loading data:', error);
-            Swal.fire('Error', 'Failed to load taxonomy data', 'error');
+            Swal.fire({ title: 'Error', html: 'Failed to load taxonomy data', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
         });
     }
 
@@ -607,13 +607,13 @@
         if (!file) return;
 
         if (file.type !== 'image/png') {
-            Swal.fire('Error', 'Only PNG images are allowed', 'error');
+            Swal.fire({ title: 'Error', html: 'Only PNG images are allowed', @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             input.value = '';
             return;
         }
 
         if (file.size > 2 * 1024 * 1024) {
-            Swal.fire('Error', 'Image size should be less than 2MB', 'error');
+            Swal.fire({ title: 'Error', html: 'Image size should be less than 2MB', @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             input.value = '';
             return;
         }
@@ -669,7 +669,7 @@
             button.parentElement.remove();
             updateProductSubcategorySelects();
         } else {
-            Swal.fire('Warning', 'You must have at least one sub-category', 'warning');
+            Swal.fire({ title: 'Warning', html: 'You must have at least one sub-category', @if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif });
         }
     }
 
@@ -700,7 +700,7 @@
             button.parentElement.remove();
             reindexProductForms();
         } else {
-            Swal.fire('Warning', 'You must have at least two products', 'warning');
+            Swal.fire({ title: 'Warning', html: 'You must have at least two products', @if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif });
         }
     }
 
@@ -764,28 +764,28 @@
         }
 
         if (subcategories.length < 1) {
-            Swal.fire('Validation Error', 'Must have at least 1 sub-category', 'error');
+            Swal.fire({ title: 'Validation Error', html: 'Must have at least 1 sub-category', @if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             return;
         }
 
         if (products.length < 2) {
-            Swal.fire('Validation Error', 'Must have at least 2 specific products', 'error');
+            Swal.fire({ title: 'Validation Error', html: 'Must have at least 2 specific products', @if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             return;
         }
 
         if (products.some(p => p.subcategory_index === null || p.subcategory_index === undefined)) {
-            Swal.fire('Validation Error', 'All products must be assigned to a sub-category', 'error');
+            Swal.fire({ title: 'Validation Error', html: 'All products must be assigned to a sub-category', @if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             return;
         }
 
         const imageFile = formData.get('image');
         if (imageFile && imageFile.size > 0) {
             if (imageFile.type !== 'image/png') {
-                Swal.fire('Error', 'Only PNG images are allowed', 'error');
+                Swal.fire({ title: 'Error', html: 'Only PNG images are allowed', @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
                 return;
             }
             if (imageFile.size > 2 * 1024 * 1024) {
-                Swal.fire('Error', 'Image size should be less than 2MB', 'error');
+                Swal.fire({ title: 'Error', html: 'Image size should be less than 2MB', @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
                 return;
             }
         }
@@ -823,7 +823,7 @@
 
             if (response.ok) {
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Success!',
                     text: 'Main category created successfully',
                     showConfirmButton: false,
@@ -836,7 +836,7 @@
                 throw new Error(result.message || 'Failed to save category');
             }
         } catch (error) {
-            Swal.fire('Error', error.message, 'error');
+            Swal.fire({ title: 'Error', html: error.message, @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
         }
     }
 
@@ -953,7 +953,7 @@
         if (container.children.length > 2) {
             button.parentElement.remove();
         } else {
-            Swal.fire('Warning', 'You must have at least two products', 'warning');
+            Swal.fire({ title: 'Warning', html: 'You must have at least two products', @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif });
         }
     }
 
@@ -965,7 +965,7 @@
         const products = Array.from(formData.getAll('products[]')).filter(p => p.trim());
 
         if (products.length < 2) {
-            Swal.fire('Validation Error', 'Must have at least 2 specific products', 'error');
+            Swal.fire({ title: 'Validation Error', html: 'Must have at least 2 specific products', @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             return;
         }
 
@@ -991,7 +991,7 @@
 
             if (response.ok) {
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Success!',
                     text: 'Sub-category created successfully',
                     showConfirmButton: false,
@@ -1004,7 +1004,7 @@
                 throw new Error(result.message || 'Failed to save sub-category');
             }
         } catch (error) {
-            Swal.fire('Error', error.message, 'error');
+            Swal.fire({ title: 'Error', html: error.message, @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
         }
     }
 
@@ -1111,7 +1111,7 @@
 
             if (response.ok) {
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Success!',
                     text: 'Product added successfully',
                     showConfirmButton: false,
@@ -1124,7 +1124,7 @@
                 throw new Error(result.message || 'Failed to save product');
             }
         } catch (error) {
-            Swal.fire('Error', error.message, 'error');
+            Swal.fire({ title: 'Error', html: error.message, @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
         }
     }
 
@@ -1179,6 +1179,7 @@
                     <input type="hidden" id="categoryId" value="${id}">
                 </div>
             `,
+            @if(file_exists(public_path('assets/icons/Gif/editing1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/editing1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             showCancelButton: true,
             confirmButtonText: 'Update Category',
             confirmButtonColor: '#10B981',
@@ -1277,6 +1278,7 @@
                     <input type="hidden" id="editCategoryId" value="${categoryId}">
                 </div>
             `,
+            @if(file_exists(public_path('assets/icons/Gif/editing1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/editing1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             showCancelButton: true,
             confirmButtonText: 'Update Subcategory',
             confirmButtonColor: '#10B981',
@@ -1352,6 +1354,7 @@
                     <input type="hidden" id="editSubcategoryId" value="${subcategoryId}">
                 </div>
             `,
+            @if(file_exists(public_path('assets/icons/Gif/editing1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/editing1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             showCancelButton: true,
             confirmButtonText: 'Update Product',
             confirmButtonColor: '#10B981',
@@ -1414,13 +1417,13 @@
         if (!file) return;
 
         if (file.type !== 'image/png') {
-            Swal.fire('Error', 'Only PNG images are allowed', 'error');
+            Swal.fire({ title: 'Error', html: 'Only PNG images are allowed', @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             input.value = '';
             return;
         }
 
         if (file.size > 2 * 1024 * 1024) {
-            Swal.fire('Error', 'Image size should be less than 2MB', 'error');
+            Swal.fire({ title: 'Error', html: 'Image size should be less than 2MB', @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
             input.value = '';
             return;
         }
@@ -1475,7 +1478,7 @@
         Swal.fire({
             title: title,
             text: text,
-            icon: 'warning',
+            @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#6b7280',
@@ -1526,7 +1529,7 @@
 
     function showSuccess(message) {
         Swal.fire({
-            icon: 'success',
+            @if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
             title: 'Success!',
             text: message,
             showConfirmButton: false,
@@ -1536,7 +1539,7 @@
 
     function showError(message) {
         Swal.fire({
-            icon: 'error',
+            @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: 'Error!',
             text: message
         });

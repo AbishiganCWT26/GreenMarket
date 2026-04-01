@@ -89,7 +89,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     let standards = [];
     let searchTerm = '';
@@ -116,7 +116,7 @@
             renderStandards();
         } catch (error) {
             console.error('Error loading standards:', error);
-            Swal.fire('Error', 'Failed to load standards data', 'error');
+            Swal.fire({ title: 'Error', html: 'Failed to load standards data', @if(file_exists(public_path('assets/icons/Gif/error4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
         }
     }
 
@@ -258,7 +258,7 @@
 
             if (response.ok) {
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Success!',
                     text: 'Standard added successfully',
                     showConfirmButton: false,
@@ -271,7 +271,7 @@
                 throw new Error(result.message || 'Failed to save standard');
             }
         } catch (error) {
-            Swal.fire('Error', error.message, 'error');
+            Swal.fire({ title: 'Error', html: error.message, @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
         }
     }
 
@@ -332,7 +332,7 @@
             document.getElementById('editModal').style.display = 'block';
         } catch (error) {
             console.error('Error editing standard:', error);
-            Swal.fire('Error', 'Failed to load standard for editing', 'error');
+            Swal.fire({ title: 'Error', html: 'Failed to load standard for editing', @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
         }
     }
 
@@ -362,7 +362,7 @@
 
             if (response.ok) {
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Success!',
                     text: 'Standard updated successfully',
                     showConfirmButton: false,
@@ -375,7 +375,7 @@
                 throw new Error(result.message || 'Failed to update standard');
             }
         } catch (error) {
-            Swal.fire('Error', error.message, 'error');
+            Swal.fire({ title: 'Error', html: error.message, @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
         }
     }
 
@@ -383,7 +383,7 @@
         const result = await Swal.fire({
             title: 'Are you sure?',
             text: 'This will delete the standard!',
-            icon: 'warning',
+            @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
@@ -405,7 +405,7 @@
 
             if (response.ok) {
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Deleted!',
                     text: 'Standard has been deleted successfully',
                     showConfirmButton: false,
@@ -417,7 +417,7 @@
                 throw new Error(data.message || 'Failed to delete standard');
             }
         } catch (error) {
-            Swal.fire('Error', error.message, 'error');
+            Swal.fire({ title: 'Error', html: error.message, @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
         }
     }
 
@@ -432,3 +432,4 @@
     }
 </script>
 @endsection
+

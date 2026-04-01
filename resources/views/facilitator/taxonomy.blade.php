@@ -5,7 +5,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/Facilitator/taxonomy.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 @endsection
 
 @section('content')
@@ -272,7 +272,7 @@
 	<div class="spinner"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 let subcategoryCount = 0;
 let productCounts = {};
@@ -321,7 +321,7 @@ function hideLoading() {
 
 function showSuccess(msg) {
 	Swal.fire({
-		icon: 'success',
+		@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 		title: 'Success',
 		text: msg,
 		confirmButtonColor: '#10B981',
@@ -332,7 +332,7 @@ function showSuccess(msg) {
 
 function showError(msg) {
 	Swal.fire({
-		icon: 'error',
+		@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 		title: 'Error',
 		text: msg,
 		confirmButtonColor: '#10B981'
@@ -802,7 +802,7 @@ function addProductField(subIdx) {
 function removeSubcategory(btn, idx) {
 	const cards = document.querySelectorAll('.subcategory-card');
 	if (cards.length <= 1) {
-		Swal.fire('Error', 'At least one subcategory required', 'error');
+		Swal.fire({ title: 'Error', html: 'At least one subcategory required', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		return;
 	}
 	btn.closest('.subcategory-card').remove();
@@ -812,7 +812,7 @@ function removeSubcategory(btn, idx) {
 function removeProductField(btn, subIdx) {
 	const container = document.getElementById(`products-${subIdx}`);
 	if (container.children.length <= 2) {
-		Swal.fire('Error', 'At least 2 products required', 'error');
+		Swal.fire({ title: 'Error', html: 'At least 2 products required', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		return;
 	}
 	btn.closest('.product-card').remove();
@@ -825,13 +825,13 @@ document.getElementById('full_category_icon')?.addEventListener('change', functi
 
 	if (file) {
 		if (file.type !== 'image/png') {
-			Swal.fire('Invalid', 'Only PNG allowed', 'error');
+			Swal.fire({ title: 'Invalid', html: 'Only PNG allowed', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 			this.value = '';
 			preview.style.display = 'none';
 			return;
 		}
 		if (file.size > 5 * 1024 * 1024) {
-			Swal.fire('Too Large', 'Max 5MB', 'error');
+			Swal.fire({ title: 'Too Large', html: 'Max 5MB', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 			this.value = '';
 			preview.style.display = 'none';
 			return;
@@ -851,13 +851,13 @@ document.getElementById('addCategoryFullForm')?.addEventListener('submit', funct
 	e.preventDefault();
 
 	if (!document.getElementById('full_category_icon').files.length) {
-		Swal.fire('Error', 'Category icon required', 'error');
+		Swal.fire({ title: 'Error', html: 'Category icon required', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		return;
 	}
 
 	const subCards = document.querySelectorAll('.subcategory-card');
 	if (!subCards.length) {
-		Swal.fire('Error', 'At least one subcategory required', 'error');
+		Swal.fire({ title: 'Error', html: 'At least one subcategory required', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		return;
 	}
 
@@ -866,7 +866,7 @@ document.getElementById('addCategoryFullForm')?.addEventListener('submit', funct
 		const products = card.querySelectorAll('.product-card');
 		if (products.length < 2) {
 			valid = false;
-			Swal.fire('Error', `Subcategory #${i+1} needs at least 2 products`, 'error');
+			Swal.fire({ title: 'Error', html: `Subcategory #${i+1} needs at least 2 products`, @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		}
 	});
 

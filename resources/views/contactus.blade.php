@@ -72,12 +72,12 @@
 
 @section('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <link rel="stylesheet" href="{{ asset('css/contactus.css') }}">
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 	const contactForm = document.getElementById('contactForm');
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	@if(session('success'))
 		Swal.fire({
-			icon: 'success',
+			@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 			title: 'Success!',
 			text: '{{ session('success') }}',
 			confirmButtonColor: '#10B981',
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	@if(session('error'))
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error!',
 			text: '{{ session('error') }}',
 			confirmButtonColor: '#10B981'
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	@if($errors->any())
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/Validation Error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Validation Error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Validation Error',
 			html: `
 				<div style="text-align: left;">
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				if (result.success) {
 					Swal.fire({
-						icon: 'success',
+						@if(file_exists(public_path('assets/icons/Gif/Send successfully1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Send successfully1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 						title: 'Sent!',
 						text: undefined,
 						html: result.message || 'We\'ll reply soon.',
@@ -201,10 +201,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 
 				Swal.fire({
-					icon: errorIcon,
 					title: errorTitle,
 					html: errorMessage,
 					confirmButtonColor: '#10B981'
+					@if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				});
 			} finally {
 				submitBtn.classList.remove('loading');
@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			errorHtml += '</ul></div>';
 
 			Swal.fire({
-				icon: 'warning',
+				@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 				title: 'Please Check Your Input',
 				html: errorHtml,
 				confirmButtonColor: '#10B981'
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		errorHtml += '</ul></div>';
 
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/Validation Error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Validation Error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Validation Failed',
 			html: errorHtml,
 			confirmButtonColor: '#10B981'
@@ -335,3 +335,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+

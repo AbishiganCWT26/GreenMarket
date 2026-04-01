@@ -26,7 +26,8 @@ class PublicController extends Controller
 			->where('products.is_available', true)
 			->where('products.quantity', '>', 0)
 			->orderBy('products.created_at', 'desc')
-			->paginate(8);
+			->paginate(8)
+			->withQueryString();
 
 		$stats = [
 			'total_products' => DB::table('products')->where('is_available', true)->count() + 140,
@@ -108,7 +109,15 @@ class PublicController extends Controller
 
 	public function about()
 	{
-		return view('aboutus');
+		$stats = [
+			'total_categories' => DB::table('product_categories')->where('is_active', true)->count() + 30,
+			'total_products' => DB::table('products')->where('is_available', true)->count() + 140,
+			'active_farmers' => DB::table('farmers')->where('is_active', true)->count() + 500,
+			'total_buyers' => DB::table('buyers')->count() + 135,
+			'successful_orders' => DB::table('orders')->count() + 100
+		];
+
+		return view('aboutus', compact('stats'));
 	}
 
 	public function contactForm()
@@ -170,7 +179,8 @@ class PublicController extends Controller
 			'total_categories' => DB::table('product_categories')->where('is_active', true)->count() + 30,
 			'total_products' => DB::table('products')->where('is_available', true)->count() + 140,
 			'active_farmers' => DB::table('farmers')->where('is_active', true)->count() + 500,
-			'total_buyers' => DB::table('buyers')->count() + 135
+			'total_buyers' => DB::table('buyers')->count() + 135,
+			'successful_orders' => DB::table('orders')->count() + 100
 		];
 
 		return view('how-it-works', compact('categories', 'stats'));

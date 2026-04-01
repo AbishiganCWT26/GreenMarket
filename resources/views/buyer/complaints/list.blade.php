@@ -266,7 +266,7 @@ function getStatusIcon($status) {
 @endphp
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 function viewComplaint(complaintId) {
     Swal.fire({
@@ -397,7 +397,7 @@ function viewComplaint(complaintId) {
                 });
             } else {
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Error',
                     text: response.message || 'Failed to load complaint details',
                     confirmButtonColor: '#10B981'
@@ -407,7 +407,7 @@ function viewComplaint(complaintId) {
         error: function(xhr) {
             Swal.close();
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error',
                 text: 'Failed to load complaint details. Please try again.',
                 confirmButtonColor: '#10B981'
@@ -440,7 +440,7 @@ function editComplaint(complaintId) {
                 
                 if (complaint.status !== 'new') {
                     Swal.fire({
-                        icon: 'warning',
+                        @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                         title: 'Cannot Edit',
                         text: 'Only new complaints can be edited. This complaint status is already ' + complaint.status.replace('_', ' ') + '.',
                         confirmButtonColor: '#10B981'
@@ -527,7 +527,7 @@ function editComplaint(complaintId) {
                 });
             } else {
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Error',
                     text: response.message || 'Failed to load complaint details',
                     confirmButtonColor: '#10B981'
@@ -537,7 +537,7 @@ function editComplaint(complaintId) {
         error: function(xhr) {
             Swal.close();
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error',
                 text: 'Failed to load complaint details. Please try again.',
                 confirmButtonColor: '#10B981'
@@ -568,7 +568,7 @@ function updateComplaint(complaintId, data) {
             Swal.close();
             if (response.success) {
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Success',
                     text: response.message || 'Complaint updated successfully!',
                     confirmButtonColor: '#10B981',
@@ -579,7 +579,7 @@ function updateComplaint(complaintId, data) {
                 });
             } else {
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Error',
                     text: response.message || 'Failed to update complaint',
                     confirmButtonColor: '#10B981'
@@ -589,7 +589,7 @@ function updateComplaint(complaintId, data) {
         error: function(xhr) {
             Swal.close();
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error',
                 text: xhr.responseJSON?.message || 'Failed to update complaint. Please try again.',
                 confirmButtonColor: '#10B981'
@@ -602,7 +602,7 @@ function deleteComplaint(complaintId) {
     Swal.fire({
         title: 'Delete Complaint',
         text: 'Are you sure you want to delete this complaint? This action cannot be undone.',
-        icon: 'warning',
+        @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#6b7280',
@@ -633,7 +633,7 @@ function deleteComplaint(complaintId) {
             Swal.fire({
                 title: 'Deleted!',
                 text: 'Complaint has been deleted successfully.',
-                icon: 'success',
+                @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                 confirmButtonColor: '#10B981',
                 timer: 2000,
                 timerProgressBar: true

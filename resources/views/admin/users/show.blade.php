@@ -4,7 +4,7 @@
 
 @section('styles')
 	<link rel="stylesheet" href="{{ asset('css/Admin/view-user-management.css') }}">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 @endsection
 
@@ -540,7 +540,7 @@
 @endsection
 
 @section('scripts')
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		$(document).ready(function () {
@@ -565,7 +565,7 @@
 				Swal.fire({
 					title: 'Suspend User?',
 					html: `Are you sure you want to suspend <strong>${userName}</strong>?`,
-					icon: 'warning',
+					@if(file_exists(public_path('assets/icons/Gif/alert3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 					showCancelButton: true,
 					confirmButtonColor: '#f59e0b',
 					cancelButtonColor: '#6b7280',
@@ -600,7 +600,7 @@
 				Swal.fire({
 					title: 'Activate User?',
 					html: `Are you sure you want to activate <strong>${userName}</strong>?`,
-					icon: 'question',
+					@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 					showCancelButton: true,
 					confirmButtonColor: '#10B981',
 					cancelButtonColor: '#6b7280',
@@ -635,7 +635,7 @@
 				Swal.fire({
 					title: 'Promote to Lead Farmer?',
 					html: `Are you sure you want to promote <strong>${userName}</strong> to Lead Farmer?`,
-					icon: 'question',
+					@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 					showCancelButton: true,
 					confirmButtonColor: '#8b5cf6',
 					cancelButtonColor: '#6b7280',

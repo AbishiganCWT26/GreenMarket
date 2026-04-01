@@ -3,7 +3,7 @@
 @section('title', 'Admin Profile')
 
 @section('styles')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="{{ asset('js/form-validation.js') }}"></script>
     <style>
@@ -1025,12 +1025,12 @@
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             @if(session('success'))
                 Swal.fire({
-                    imageUrl: '{{ asset('assets/icons/success1.gif') }}',
+                    imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}',
                     imageWidth: 100,
                     imageHeight: 100,
                     imageAlt: 'Success',
@@ -1048,7 +1048,7 @@
 
             @if(session('error'))
                 Swal.fire({
-                    imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+                    imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}',
                     imageWidth: 100,
                     imageHeight: 100,
                     imageAlt: 'Error',
@@ -1145,7 +1145,7 @@
 
                     if (newPassword !== confirmPassword) {
                         Swal.fire({
-                            imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+                            imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}',
                             imageWidth: 100,
                             imageHeight: 100,
                             imageAlt: 'Error',
@@ -1164,7 +1164,7 @@
 
                     if (currentStrength < 5) {
                         Swal.fire({
-                            imageUrl: '{{ asset('assets/icons/alert1.gif') }}',
+                            imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}',
                             imageWidth: 100,
                             imageHeight: 100,
                             imageAlt: 'Warning',
@@ -1377,7 +1377,7 @@
             .then(data => {
                 if (data.success) {
                     Swal.fire({
-                        imageUrl: '{{ asset('assets/icons/success1.gif') }}',
+                        imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}',
                         imageWidth: 100, imageHeight: 100,
                         title: 'OTP Sent',
                         text: data.message,
@@ -1390,7 +1390,7 @@
                     startOtpTimer();
                 } else {
                     Swal.fire({
-                        imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+                        imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}',
                         imageWidth: 100, imageHeight: 100,
                         title: 'Error',
                         text: data.message,
@@ -1436,7 +1436,7 @@
             
             if (!otp || otp.length !== 6) {
                 Swal.fire({
-                    imageUrl: '{{ asset('assets/icons/alert1.gif') }}',
+                    imageUrl: '{{ asset('assets/icons/Gif/Wrong1.gif') }}',
                     imageWidth: 100, imageHeight: 100,
                     title: 'Invalid OTP',
                     text: 'Please enter the 6-digit OTP.',
@@ -1474,7 +1474,7 @@
                     toggleNicEdit();
                 } else {
                     Swal.fire({
-                        imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+                        imageUrl: '{{ asset('assets/icons/Gif/Failed1.gif') }}',
                         imageWidth: 100, imageHeight: 100,
                         title: 'Failed',
                         text: data.message,

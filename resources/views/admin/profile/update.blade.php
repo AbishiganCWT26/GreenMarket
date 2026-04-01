@@ -3,7 +3,7 @@
 @section('title', 'Profile Details Update')
 
 @section('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="{{ asset('js/form-validation.js') }}"></script>
 <style>
@@ -989,7 +989,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script src="{{ asset('js/form-validation.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1030,6 +1030,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             title: 'Updating Profile...',
             text: 'Please wait while we update your information',
+            @if(file_exists(public_path('assets/icons/Gif/Updating1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Updating1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
             allowOutsideClick: false,
             showConfirmButton: false,
             willOpen: () => {
@@ -1048,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (newPassword !== confirmPassword) {
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Password Mismatch',
                 text: 'New password and confirmation password do not match.',
                 background: '#ef4444',
@@ -1069,7 +1070,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!passwordValidationResult.isValid) {
             Swal.fire({
-                icon: 'warning',
+                @if(file_exists(public_path('assets/icons/Gif/Weak Password1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Weak Password1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 title: 'Weak Password',
                 text: 'Please use a stronger password that meets all requirements for better security.',
                 background: '#f59e0b',
@@ -1088,6 +1089,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             title: 'Updating Password...',
             text: 'Please wait while we update your security credentials',
+            @if(file_exists(public_path('assets/icons/Gif/updating password1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/updating password1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
             allowOutsideClick: false,
             showConfirmButton: false,
             willOpen: () => {
@@ -1278,7 +1280,7 @@ function checkPasswordStrength(password) {
 
 @if(session('success'))
     Swal.fire({
-        icon: 'success',
+        @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
         title: 'Success!',
         text: '{{ session('success') }}',
         toast: true,
@@ -1294,7 +1296,7 @@ function checkPasswordStrength(password) {
 
 @if(session('error'))
     Swal.fire({
-        icon: 'error',
+        @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
         title: 'Error!',
         text: '{{ session('error') }}',
         toast: true,
@@ -1309,3 +1311,4 @@ function checkPasswordStrength(password) {
 @endif
 </script>
 @endsection
+

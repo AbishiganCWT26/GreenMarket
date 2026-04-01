@@ -84,7 +84,7 @@
             Swal.fire({
                 title: 'Mark all as read?',
                 text: "All your notifications will be marked as read.",
-                icon: 'question',
+                @if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
                 showCancelButton: true,
                 confirmButtonColor: '#10B981',
                 cancelButtonColor: '#6b7280',
@@ -109,7 +109,7 @@
                             $('.badge.bg-danger').fadeOut();
                             
                             Swal.fire({
-                                icon: 'success',
+                                @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                                 title: 'Success',
                                 text: 'All notifications marked as read',
                                 timer: 1500,
@@ -150,7 +150,7 @@
                     btn.fadeOut();
                     
                     Swal.fire({
-                        icon: 'success',
+                        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                         title: 'Marked as read',
                         timer: 1000,
                         showConfirmButton: false,

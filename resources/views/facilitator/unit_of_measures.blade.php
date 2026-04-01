@@ -5,7 +5,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/Facilitator/unit_of_measures.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 @endsection
 
 @section('content')
@@ -188,7 +188,7 @@
 	<div class="loader-spinner"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 let currentPage = 1;
 let itemsPerPage = 12;
@@ -205,7 +205,7 @@ function hideLoader() {
 
 function showSuccess(msg) {
 	Swal.fire({
-		icon: 'success',
+		@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 		title: 'Success',
 		text: msg,
 		confirmButtonColor: '#10B981',
@@ -218,7 +218,7 @@ function showSuccess(msg) {
 
 function showError(msg) {
 	Swal.fire({
-		icon: 'error',
+		@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 		title: 'Error',
 		text: msg,
 		confirmButtonColor: '#10B981',

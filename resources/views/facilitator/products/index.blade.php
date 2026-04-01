@@ -5,7 +5,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/Facilitator/products_index.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 @endsection
 
 @section('content')
@@ -307,7 +307,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 function getPerPage(view) {
 	const w = window.innerWidth;
@@ -349,7 +349,7 @@ window.addEventListener('load', function() {
 
 	@if(session('success'))
 	Swal.fire({
-		icon: 'success',
+		@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 		title: 'Success!',
 		text: '{{ session('success') }}',
 		timer: 3000,
@@ -361,7 +361,7 @@ window.addEventListener('load', function() {
 
 	@if(session('error'))
 	Swal.fire({
-		icon: 'error',
+		@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 		title: 'Error!',
 		text: '{{ session('error') }}',
 		timer: 3000,
@@ -376,7 +376,7 @@ function openAlertModal(productId, productName) {
 	Swal.fire({
 		title: 'Send Alert',
 		html: `<span style="font-size: 0.9rem;">Suggest changes for <strong>${productName}</strong></span>`,
-		icon: 'warning',
+		@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 		input: 'textarea',
 		inputPlaceholder: 'Type your message here...',
 		inputAttributes: {
@@ -417,7 +417,7 @@ function openAlertModal(productId, productName) {
 	}).then((result) => {
 		if (result.isConfirmed && result.value && result.value.success) {
 			Swal.fire({
-				icon: 'success',
+				@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 				title: 'Sent!',
 				text: 'Alert has been sent to the lead farmer.',
 				timer: 2000,

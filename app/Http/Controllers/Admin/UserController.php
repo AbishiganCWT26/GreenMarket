@@ -81,7 +81,7 @@ class UserController extends Controller
         $viewType = $request->get('view', 'card');
         $perPage = $viewType === 'table' ? 15 : 6 ;
         
-        $usersPaginator = $query->paginate($perPage);
+        $usersPaginator = $query->paginate($perPage)->withQueryString();
 
         if ($request->ajax()) {
             try {

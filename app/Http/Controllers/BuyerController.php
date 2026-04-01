@@ -275,7 +275,7 @@ class BuyerController extends Controller
         $commonData = $this->getCommonData();
         $query = $this->buildProductQuery();
         $query = $this->applyFilters($query, $request);
-        $products = $query->paginate(12);
+        $products = $query->paginate(12)->withQueryString();
         $subcategories = $this->getFilteredSubcategories($request->category);
         if ($request->ajax()) {
             return response()->json([

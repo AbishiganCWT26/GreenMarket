@@ -6,7 +6,7 @@
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/buyer/wishlist.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 @endsection
 
 @section('content')
@@ -133,7 +133,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // CSRF Token
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             toast: true,
             position: 'top-end',
-            icon: 'success',
+            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
             title: "{{ session('success') }}",
             showConfirmButton: false,
             timer: 3000,
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             toast: true,
             position: 'top-end',
-            icon: 'error',
+            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: "{{ session('error') }}",
             showConfirmButton: false,
             timer: 3000,
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
                     title: 'Error',
                     text: 'Delete form not found. Please try again.',
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     confirmButtonColor: '#ef4444'
                 });
                 return;
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
                     title: 'Remove from wishlist?',
                     text: `Are you sure you want to remove "${productName}" from your wishlist?`,
-                    icon: 'warning',
+                    @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                     showCancelButton: true,
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#6b7280',
@@ -241,3 +241,4 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 </style>
 @endsection
+

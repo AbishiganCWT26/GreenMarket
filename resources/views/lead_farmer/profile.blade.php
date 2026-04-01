@@ -7,7 +7,7 @@
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/lead_farmer/Profile.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
 @endsection
 
 @section('content')
@@ -299,7 +299,7 @@
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const tabBtns = document.querySelectorAll('.tab-btn');

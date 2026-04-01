@@ -6,6 +6,12 @@
 @section('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link rel="stylesheet" href="{{ asset('css/Admin/complaints-index.css') }}">
+<style>
+    .swal2-image {
+		margin: 0em auto 0em !important;
+	}
+</style>
+
 @endsection
 
 @section('content')
@@ -243,7 +249,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 let selectedComplaints = new Set();
@@ -480,7 +486,7 @@ function updateStatus(id, status) {
         if (data.success) {
             updateStatusUI(id, status);
             toast.fire({
-                icon: 'success',
+                @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                 title: data.message
             });
             updateStats();
@@ -497,7 +503,7 @@ function bulkUpdate(status) {
     Swal.fire({
         title: `Update ${selectedComplaints.size} Complaints?`,
         html: `<p>Set status to <strong>${status.replace('_', ' ')}</strong></p>`,
-        icon: 'question',
+        @if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
         showCancelButton: true,
         confirmButtonColor: '#4361ee',
         cancelButtonColor: '#64748b',
@@ -508,6 +514,7 @@ function bulkUpdate(status) {
             Swal.fire({
                 title: 'Updating...',
                 html: 'Please wait',
+                @if(file_exists(public_path('assets/icons/Gif/loading1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -536,7 +543,7 @@ function bulkUpdate(status) {
                     updateBulkButtonState();
                     
                     Swal.fire({
-                        icon: 'success',
+                        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                         title: 'Success!',
                         text: data.message,
                         timer: 2000,
@@ -587,6 +594,7 @@ function updateStats() {
 function viewDetails(id) {
     Swal.fire({
         title: 'Loading...',
+        @if(file_exists(public_path('assets/icons/Gif/loading1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
         allowOutsideClick: false,
         didOpen: () => {
             Swal.showLoading();
@@ -706,6 +714,7 @@ function showDetailsModal(complaint) {
                 </div>
             </div>
         `,
+        @if(file_exists(public_path('assets/icons/Gif/Complaint Details1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Complaint Details1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
         width: 600,
         showConfirmButton: false,
         showCloseButton: true,
@@ -790,6 +799,7 @@ function showQuickActions(complaint) {
                 }
             </style>
         `,
+        @if(file_exists(public_path('assets/icons/Gif/Quick Action1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Quick Action1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
         showConfirmButton: false,
         showCloseButton: true,
         showCancelButton: true,
@@ -823,13 +833,13 @@ function alertFacilitator(id) {
                 </select>
             </div>
         `,
+        @if(file_exists(public_path('assets/icons/Gif/Notification Aleart1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Notification Aleart1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
         showCancelButton: true,
         confirmButtonText: 'Send Alert',
         confirmButtonColor: '#4361ee',
         cancelButtonText: 'Cancel',
         preConfirm: () => {
             const facilitatorId = document.getElementById('facilitatorSelect').value;
-            const sendNotification = document.getElementById('sendNotification').checked;
             
             if (!facilitatorId) {
                 Swal.showValidationMessage('Please select a facilitator');
@@ -843,9 +853,9 @@ function alertFacilitator(id) {
                     'X-CSRF-TOKEN': csrfToken
                 },
                 body: JSON.stringify({
-                    complaint_id: id,
+                    id: id,
                     facilitator_id: facilitatorId,
-                    send_notification: sendNotification
+                    send_notification: true
                 })
             })
             .then(res => res.json())
@@ -862,10 +872,10 @@ function alertFacilitator(id) {
     }).then(result => {
         if (result.isConfirmed && result.value.success) {
             Swal.fire({
-                icon: 'success',
+                @if(file_exists(public_path('assets/icons/Gif/Send successfully1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Send successfully1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                 title: 'Alert Sent!',
                 text: result.value.message,
-                timer: 2000,
+                timer: 1500,
                 showConfirmButton: false
             });
             
@@ -878,7 +888,7 @@ function alertFacilitator(id) {
 // Notification functions
 function showSuccess(message) {
     Swal.fire({
-        icon: 'success',
+        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
         title: 'Success',
         text: message,
         timer: 2000,
@@ -890,7 +900,7 @@ function showSuccess(message) {
 
 function showError(message) {
     Swal.fire({
-        icon: 'error',
+        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
         title: 'Error',
         text: message,
         confirmButtonColor: '#4361ee',
@@ -900,70 +910,12 @@ function showError(message) {
 
 function showWarning(message) {
     Swal.fire({
-        icon: 'warning',
+        @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
         title: 'Warning',
         text: message,
         confirmButtonColor: '#4361ee',
         confirmButtonText: 'Got it'
     });
-}
-
-// Export functionality (optional)
-function exportComplaints() {
-    const status = document.querySelector('.filter-chip.active[data-filter="status"]')?.dataset.value || '';
-    const type = document.getElementById('typeFilter')?.value || '';
-    
-    Swal.fire({
-        title: 'Export Complaints',
-        html: `
-            <div style="margin: 20px 0;">
-                <p style="margin-bottom: 15px;">Choose export format:</p>
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button class="export-btn" onclick="exportFormat('csv')">
-                        <i class="fas fa-file-csv"></i> CSV
-                    </button>
-                    <button class="export-btn" onclick="exportFormat('excel')">
-                        <i class="fas fa-file-excel"></i> Excel
-                    </button>
-                    <button class="export-btn" onclick="exportFormat('pdf')">
-                        <i class="fas fa-file-pdf"></i> PDF
-                    </button>
-                </div>
-            </div>
-            <style>
-                .export-btn {
-                    padding: 10px 20px;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 8px;
-                    background: white;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    transition: all 0.2s;
-                }
-                .export-btn:hover {
-                    background: #f1f5f9;
-                    border-color: #4361ee;
-                    transform: translateY(-2px);
-                }
-            </style>
-        `,
-        showConfirmButton: false,
-        showCloseButton: true
-    });
-}
-
-function exportFormat(format) {
-    Swal.close();
-    
-    // Build export URL with current filters
-    const params = new URLSearchParams(window.location.search);
-    params.set('export', format);
-    
-    window.location.href = `/admin/complaints/export?${params.toString()}`;
-    
-    showSuccess(`Exporting complaints as ${format.toUpperCase()}...`);
 }
 
 // Keyboard shortcuts
@@ -1048,10 +1000,7 @@ function refreshData() {
         });
 }
 
-// Initialize auto-refresh (optional - comment out if not needed)
-// startAutoRefresh(60000); // Refresh every minute
 
-// Clean up on page unload
 window.addEventListener('beforeunload', function() {
     stopAutoRefresh();
 });

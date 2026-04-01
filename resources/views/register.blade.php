@@ -5,8 +5,14 @@
 @section('styles')
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	
 	<link rel="stylesheet" href="{{ asset('css/buyer-register.css') }}">
+	<style>
+		.swal2-image {
+			margin: 0em auto 0em !important;
+		}
+	</style>
+
 	<script src="{{ asset('js/form-validation.js') }}"></script>
 @endsection
 
@@ -351,7 +357,7 @@
 @section('scripts')
 	<script src="{{ asset('js/gn-data.js') }}"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
 	<script>
 		function togglePasswordVisibility(fieldId, iconId) {
 			const passwordField = document.getElementById(fieldId);
@@ -593,7 +599,7 @@
 				e.preventDefault();
 				if (!validateAllSteps()) {
 					Swal.fire({
-						icon: 'error',
+						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Validation Error',
 						text: 'Please fill all required fields correctly.',
 						confirmButtonColor: '#10B981'
@@ -602,7 +608,7 @@
 				}
 				if (!validateNIC(nicInput.value)) {
 					Swal.fire({
-						icon: 'error',
+						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Invalid NIC',
 						text: 'Please enter a valid NIC number.',
 						confirmButtonColor: '#10B981'
@@ -626,7 +632,7 @@
 					const result = await response.json();
 					if (response.ok && result.success) {
 						Swal.fire({
-							icon: 'success',
+							@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							title: 'Registration Successful!',
 							html: 'Please check your email and SMS for login details.',
 							confirmButtonText: 'Go to Login',
@@ -653,7 +659,7 @@
 							errorMessage = result.error;
 						}
 						Swal.fire({
-							icon: 'error',
+							@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 							title: 'Registration Failed',
 							html: errorMessage,
 							confirmButtonColor: '#10B981'
@@ -664,7 +670,7 @@
 				} catch (error) {
 					console.error('Error:', error);
 					Swal.fire({
-						icon: 'error',
+						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Network Error',
 						text: 'Please check your internet connection and try again.',
 						confirmButtonColor: '#10B981'

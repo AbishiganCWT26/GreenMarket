@@ -5,7 +5,7 @@
 
 @section('styles')
 	<link rel="stylesheet" href="{{ asset('css/farmer/profile.css') }}">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	
 @endsection
 
 @section('content')
@@ -157,13 +157,13 @@
 @endsection
 
 @section('scripts')
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
 	<script src="{{ asset('js/gn-data.js') }}"></script>
 	<script>
 		document.addEventListener('DOMContentLoaded', function () {
 			@if(session('success'))
 				Swal.fire({
-					icon: 'success',
+					@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 					title: 'Success!',
 					text: '{{ session('success') }}',
 					toast: true,
@@ -178,7 +178,7 @@
 
 			@if(session('error'))
 				Swal.fire({
-					icon: 'error',
+					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Error!',
 					text: '{{ session('error') }}',
 					toast: true,

@@ -234,7 +234,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 $(document).ready(function() {
     // Character counter
@@ -293,7 +293,7 @@ $(document).ready(function() {
 
                 if (response.success) {
                     Swal.fire({
-                        icon: 'success',
+                        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                         title: 'Complaint Submitted!',
                         html: `
                             <div class="success-message">
@@ -326,7 +326,7 @@ $(document).ready(function() {
                     });
                 } else {
                     Swal.fire({
-                        icon: 'error',
+                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Submission Failed',
                         text: response.message || 'Failed to submit complaint. Please try again.',
                         confirmButtonColor: '#10B981'
@@ -347,7 +347,7 @@ $(document).ready(function() {
                 }
 
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Submission Error',
                     html: `
                         <div class="error-message">
@@ -385,3 +385,4 @@ $(document).ready(function() {
 });
 </script>
 @endsection
+

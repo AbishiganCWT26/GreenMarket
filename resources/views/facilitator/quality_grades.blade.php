@@ -342,7 +342,7 @@
                         Swal.fire({
                             title: 'Success!',
                             text: response.message,
-                            icon: 'success',
+                            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                             timer: 1500,
                             showConfirmButton: false
                         }).then(() => {
@@ -352,7 +352,7 @@
                         Swal.fire({
                             title: 'Error!',
                             text: response.message,
-                            icon: 'error'
+                            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif
                         });
                     }
                 },
@@ -368,7 +368,7 @@
                         Swal.fire({
                             title: 'Error!',
                             text: xhr.responseJSON?.message || 'Something went wrong',
-                            icon: 'error'
+                            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif
                         });
                     }
                 },
@@ -405,7 +405,7 @@
                         Swal.fire({
                             title: 'Success!',
                             text: response.message,
-                            icon: 'success',
+                            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                             timer: 1500,
                             showConfirmButton: false
                         }).then(() => {
@@ -417,7 +417,7 @@
                         Swal.fire({
                             title: 'Error!',
                             text: response.message,
-                            icon: 'error'
+                            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif
                         });
                     }
                 },
@@ -433,7 +433,7 @@
                         Swal.fire({
                             title: 'Error!',
                             text: xhr.responseJSON?.message || 'Something went wrong',
-                            icon: 'error'
+                            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif
                         });
                     }
                 },

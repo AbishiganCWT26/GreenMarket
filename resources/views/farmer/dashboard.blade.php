@@ -5,7 +5,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/farmer/dashboard.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 @endsection
 
 @section('content')
@@ -226,12 +226,12 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 	@if(session('success'))
 	Swal.fire({
-		icon: 'success',
+		@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 		title: 'Success!',
 		text: '{{ session("success") }}',
 		timer: 3000,
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	@if(session('error'))
 	Swal.fire({
-		icon: 'error',
+		@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 		title: 'Error!',
 		text: '{{ session("error") }}',
 		timer: 3000,
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	@if(session('warning'))
 	Swal.fire({
-		icon: 'warning',
+		@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 		title: 'Warning!',
 		text: '{{ session("warning") }}',
 		timer: 3000,
@@ -474,7 +474,7 @@ async function viewOrderDetails(orderId) {
 			});
 		} else {
 			Swal.fire({
-				icon: 'error',
+				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Error',
 				text: data.message || 'Failed to load order details.',
 				confirmButtonColor: '#10B981',
@@ -484,7 +484,7 @@ async function viewOrderDetails(orderId) {
 		console.error('Error viewing order:', error);
 		Swal.close();
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error',
 			text: 'Something went wrong. Please try again.',
 			confirmButtonColor: '#10B981',
@@ -493,3 +493,4 @@ async function viewOrderDetails(orderId) {
 }
 </script>
 @endsection
+

@@ -73,7 +73,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 <script>
 let isSaving = false;
@@ -102,7 +102,7 @@ function saveChanges() {
     .then(data => {
         if (data.success) {
             Swal.fire({
-                icon: 'success',
+                @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                 title: 'Success!',
                 text: data.message,
                 timer: 2000,
@@ -130,7 +130,7 @@ function saveChanges() {
     })
     .catch(error => {
         Swal.fire({
-            icon: 'error',
+            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: 'Error!',
             text: error.message,
             timer: 3000,
@@ -210,3 +210,4 @@ function previewLegalFile(inputId) {
 }
 </script>
 @endsection
+

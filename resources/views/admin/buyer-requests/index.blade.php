@@ -375,6 +375,10 @@
 			margin: 6px 0 0 0;
 		}
 	}
+
+	.swal2-image {
+		margin: 0em auto 0em !important;
+	}
 </style>
 @endsection
 
@@ -431,7 +435,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
@@ -505,10 +509,10 @@
 			.catch(error => {
 				console.error('Error loading requests:', error);
 				Swal.fire({
-					icon: 'error',
+					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Error',
 					text: 'Failed to load requests. Please try again.',
-					timer: 2000,
+					timer: 5000,
 					showConfirmButton: false
 				});
 			})
@@ -589,7 +593,7 @@
 				title: 'Delete Request',
 				html: `Are you sure you want to delete the request for<br><strong>"${productName}"</strong>?<br><br>
 					   <small class="text-muted">This will notify the buyer via email and SMS.</small>`,
-				icon: 'warning',
+				@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 100, imageHeight: 100 @else icon: 'warning' @endif,
 				showCancelButton: true,
 				confirmButtonColor: '#10B981',
 				cancelButtonColor: '#d33',
@@ -619,20 +623,20 @@
 				if (result.isConfirmed) {
 					if (result.value && result.value.success) {
 						Swal.fire({
-							icon: 'success',
+							@if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							title: 'Deleted!',
 							text: result.value.message,
-							timer: 2000,
+							timer: 4000,
 							showConfirmButton: false
 						}).then(() => {
 							loadRequests(currentPage);
 						});
 					} else {
 						Swal.fire({
-							icon: 'error',
+							@if(file_exists(public_path('assets/icons/Gif/Delete Unsuccess1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Unsuccess1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 							title: 'Error',
 							text: 'Failed to delete the request.',
-							timer: 2000,
+							timer: 4000,
 							showConfirmButton: false
 						});
 					}
@@ -667,4 +671,5 @@
 	});
 </script>
 @endsection
+
 

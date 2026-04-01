@@ -453,7 +453,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchTable');
@@ -507,7 +507,7 @@ function exportToCSV() {
 
     if (!table) {
         Swal.fire({
-            icon: 'error',
+            @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: 'Export Failed',
             text: 'No data available to export',
             confirmButtonColor: '#10B981',
@@ -539,7 +539,7 @@ function exportToCSV() {
     document.body.removeChild(link);
 
     Swal.fire({
-        icon: 'success',
+        @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
         title: 'Export Complete',
         text: 'CSV file has been downloaded',
         confirmButtonColor: '#10B981',
@@ -553,7 +553,7 @@ function exportToExcel() {
     Swal.fire({
         title: 'Export to Excel',
         text: 'This feature will be available soon.',
-        icon: 'info',
+        @if(file_exists(public_path('assets/icons/Gif/info2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
         confirmButtonColor: '#10B981',
         background: 'var(--card-bg)',
         color: 'var(--text-color)',

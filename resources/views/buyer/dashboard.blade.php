@@ -5,7 +5,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/buyer/dashboard.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 @endsection
 
 @section('content')
@@ -245,7 +245,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @if(!isset($fontAwesomeLoaded))
 <script>
     if (!document.querySelector('link[href*="font-awesome"]')) {
@@ -260,7 +260,7 @@
 <script>
     @if(session('success'))
     Swal.fire({
-        icon: 'success',
+        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
         title: 'Success!',
         text: '{{ session('success') }}',
         timer: 3000,
@@ -270,7 +270,7 @@
 
     @if(session('error'))
     Swal.fire({
-        icon: 'error',
+        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
         title: 'Error!',
         text: '{{ session('error') }}',
         timer: 4000,
@@ -280,7 +280,7 @@
 
     @if($errors->any())
     Swal.fire({
-        icon: 'error',
+        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
         title: 'Validation Error!',
         html: `@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach`,
         showConfirmButton: true
@@ -405,7 +405,7 @@
         Swal.fire({
             title: 'Clear all filters?',
             text: 'This will reset all search and filter settings',
-            icon: 'question',
+            @if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
             showCancelButton: true,
             confirmButtonColor: '#10B981',
             cancelButtonColor: '#6B7280',
@@ -439,3 +439,4 @@
     });
 </script>
 @endsection
+

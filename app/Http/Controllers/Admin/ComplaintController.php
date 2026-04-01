@@ -42,7 +42,7 @@ class ComplaintController extends Controller
             });
         }
 
-        $complaints = $query->paginate(4);
+        $complaints = $query->paginate(4)->withQueryString();
 
         // Fetch facilitators for the alert feature
         $facilitatorsList = DB::table('facilitators')
@@ -65,7 +65,7 @@ class ComplaintController extends Controller
             $complaint = Complaint::findOrFail($request->id);
             $facilitatorId = $request->facilitator_id;
 
-            // Create notification for the facilitator
+            // Always create notification for the facilitator
             \App\Models\Notification::create([
                 'user_id' => $facilitatorId,
                 'recipient_type' => 'user',
@@ -128,14 +128,6 @@ class ComplaintController extends Controller
                 'message' => 'Failed to update status: ' . $e->getMessage()
             ], 500);
         }
-    }
-
-    public function show($id)
-    {
-        $complaint = Complaint::with(['complainant', 'againstUser', 'order', 'resolvedBy'])
-            ->findOrFail($id);
-
-        return view('admin.complaints.show', compact('complaint'));
     }
 
     public function getComplaintDetails($id)

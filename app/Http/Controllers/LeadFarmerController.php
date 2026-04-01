@@ -46,7 +46,8 @@ class LeadFarmerController extends Controller
         $recentOrders = Order::with(['buyer', 'farmer'])
             ->where('lead_farmer_id', $leadFarmerId)
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         $recentNotifications = Notification::where('user_id', Auth::id())
             ->orWhere(function($query) use ($leadFarmerId) {
@@ -443,8 +444,7 @@ class LeadFarmerController extends Controller
         $viewType = $request->input('view_type', 'card');
         $itemsPerPage = ($viewType === 'card') ? 12 : 10;
 
-        $products = $query->orderBy('created_at', 'desc')->paginate($itemsPerPage);
-        $products->appends($request->all());
+        $products = $query->orderBy('created_at', 'desc')->paginate($itemsPerPage)->withQueryString();
 
         $farmers = Farmer::where('lead_farmer_id', $leadFarmerId)
             ->where('is_active', true)
@@ -1053,8 +1053,7 @@ class LeadFarmerController extends Controller
             });
         }
 
-        $logs = $query->orderBy('created_at', 'desc')->paginate(15);
-        $logs->appends($request->all());
+        $logs = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         $farmers = Farmer::where('lead_farmer_id', $leadFarmerId)
             ->where('is_active', true)
@@ -1235,7 +1234,8 @@ class LeadFarmerController extends Controller
                     ->where('recipient_type', 'lead_farmer');
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return view('lead_farmer.notifications', compact('notifications'));
     }
@@ -1624,7 +1624,8 @@ class LeadFarmerController extends Controller
         $orders = Order::with(['buyer', 'farmer', 'orderItems', 'payments'])
             ->where('lead_farmer_id', $leadFarmerId)
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('lead_farmer.view_orders', compact('orders'));
     }
@@ -1859,7 +1860,7 @@ class LeadFarmerController extends Controller
             $query->where('product_name', 'like', '%' . $request->search . '%');
         }
 
-        $products = $query->paginate(15);
+        $products = $query->paginate(15)->withQueryString();
         
         // Manual filter for stock status (since it's an accessor)
         if ($request->filled('status')) {

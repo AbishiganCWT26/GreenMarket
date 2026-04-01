@@ -7,6 +7,11 @@
 	<link rel="stylesheet" href="{{ asset('css/login.css') }}" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<style>
+		.swal2-image {
+			margin: 0em auto 0em !important;
+		}
+	</style>
 </head>
 <body>
 	@include('includes.loader')
@@ -107,6 +112,7 @@
 							Swal.fire({
 								title: 'Processing',
 								text: 'Please wait...',
+								@if(file_exists(public_path('assets/icons/Gif/loading1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 								allowOutsideClick: false,
 								showConfirmButton: false,
 								didOpen: () => {
@@ -129,7 +135,7 @@
 							.then(data => {
 								if (data.success) {
 									Swal.fire({
-										icon: 'success',
+										@if(file_exists(public_path('assets/icons/Gif/otp sent success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/otp sent success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 										title: 'OTP Sent',
 										text: 'Check your email for OTP',
 										timer: 2000,
@@ -139,7 +145,7 @@
 									});
 								} else {
 									Swal.fire({
-										icon: 'error',
+										@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 										title: 'Error',
 										text: data.message || 'User not found'
 									});
@@ -158,7 +164,7 @@
 					if (!username || !password) {
 						e.preventDefault();
 						Swal.fire({
-							icon: 'warning',
+							@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 							title: 'Required Fields',
 							text: 'Please fill in all fields'
 						});
@@ -167,49 +173,49 @@
 			}
 
 			@if ($errors->any())
-				Swal.fire({
-					icon: 'error',
-					title: 'Error',
-					text: '{{ $errors->first() }}'
-				});
-			@endif
+                Swal.fire({
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    title: 'Error',
+                    text: '{{ $errors->first() }}'
+                });
+            @endif
 
 			@if (session('error'))
-				Swal.fire({
-					icon: 'error',
-					title: 'Login Failed',
-					text: '{{ session('error') }}'
-				});
-			@endif
+                Swal.fire({
+                    @if(file_exists(public_path('assets/icons/Gif/Login fail1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Login fail1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    title: 'Login Failed',
+                    text: '{{ session('error') }}'
+                });
+            @endif
 
 			@if (session('login_success'))
-				Swal.fire({
-					icon: 'success',
-					title: 'Welcome {{ session('name') ?? 'User' }}',
-					text: 'Redirecting to dashboard...',
-					timer: 2000,
-					showConfirmButton: false
-				}).then(() => {
-					let url = '/';
-					switch('{{ session('role') }}') {
-						case 'admin': url = '/admin/dashboard'; break;
-						case 'facilitator': url = '/facilitator/dashboard'; break;
-						case 'lead_farmer': url = '/lead-farmer/dashboard'; break;
-						case 'farmer': url = '/farmer/dashboard'; break;
-						case 'buyer': url = '/buyer/dashboard'; break;
-					}
-					window.location.href = url;
-				});
-			@endif
+                Swal.fire({
+                    @if(file_exists(public_path('assets/icons/Gif/Login success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Login success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                    title: 'Welcome {{ session('name') ?? 'User' }}',
+                    text: 'Redirecting to dashboard...',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    let url = '/';
+                    switch('{{ session('role') }}') {
+                        case 'admin': url = '/admin/dashboard'; break;
+                        case 'facilitator': url = '/facilitator/dashboard'; break;
+                        case 'lead_farmer': url = '/lead-farmer/dashboard'; break;
+                        case 'farmer': url = '/farmer/dashboard'; break;
+                        case 'buyer': url = '/buyer/dashboard'; break;
+                    }
+                    window.location.href = url;
+                });
+            @endif
 
 			@if (session('password_reset_success'))
-				Swal.fire({
-					icon: 'success',
-					title: 'Password Reset Complete!',
-					text: 'New credentials sent to your registered contact',
-					confirmButtonColor: '#10B981'
-				});
-			@endif
+                Swal.fire({
+                    @if(file_exists(public_path('assets/icons/Gif/restore password1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/restore password1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                    title: 'Password Reset Complete!',
+                    text: 'New credentials sent to your registered contact',
+                    confirmButtonColor: '#10B981'
+                });
+            @endif
 		});
 	</script>
 </body>

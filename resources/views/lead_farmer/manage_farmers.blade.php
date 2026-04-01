@@ -251,7 +251,7 @@
 @endsection
 
 @section('scripts')
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
 	<script>
 		let currentView = 'card';
 		let currentPage = 1;
@@ -507,7 +507,7 @@
 				.catch(error => {
 					console.error('Error:', error);
 					Swal.fire({
-						icon: 'error',
+						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Error',
 						text: 'Failed to load farmer details. Please try again.',
 						confirmButtonColor: '#10B981'
@@ -701,7 +701,7 @@
 					</p>
 				</div>
 			`,
-				icon: 'warning',
+				@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 				showCancelButton: true,
 				confirmButtonText: 'Yes, deactivate',
 				cancelButtonText: 'Cancel',
@@ -722,7 +722,7 @@
 						.then(data => {
 							if (data.success) {
 								Swal.fire({
-									icon: 'success',
+									@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 									title: 'Deactivated!',
 									text: `${farmerName} has been deactivated successfully.`,
 									confirmButtonColor: '#10B981',
@@ -738,7 +738,7 @@
 						.catch(error => {
 							console.error('Error:', error);
 							Swal.fire({
-								icon: 'error',
+								@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 								title: 'Error',
 								text: 'Failed to deactivate farmer. Please try again.',
 								confirmButtonColor: '#10B981'

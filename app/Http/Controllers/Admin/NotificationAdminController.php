@@ -18,7 +18,8 @@ class NotificationAdminController extends Controller
 		
 		$notifications = Notification::with('user')
 			->orderByDesc('created_at')
-			->paginate($perPage);
+			->paginate($perPage)
+			->withQueryString();
 
 		$users = User::select('id', 'username', 'email')
 			->orderBy('username')

@@ -4,7 +4,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/Admin/edit-user-management.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="{{ asset('js/gn-data.js') }}"></script>
 @endsection
@@ -613,7 +613,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 function formatNIC(nic) {
@@ -819,7 +819,7 @@ $(document).ready(function() {
 				Swal.fire({
 					title: alertTitle,
 					html: alertHtml,
-					icon: 'info',
+					@if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
 					showCancelButton: true,
 					confirmButtonColor: '#10B981',
 					cancelButtonColor: '#6b7280',
@@ -1047,7 +1047,7 @@ $(document).ready(function() {
 
 	function showSuccess(message, title = 'Success') {
 		Swal.fire({
-			icon: 'success',
+			@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 			title: title,
 			text: message,
 			toast: true,
@@ -1062,7 +1062,7 @@ $(document).ready(function() {
 
 	function showError(message, title = 'Error') {
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: title,
 			text: message,
 			toast: true,
@@ -1097,7 +1097,7 @@ $(document).ready(function() {
 		Swal.fire({
 			title: 'Discard Changes?',
 			text: 'All unsaved changes will be lost',
-			icon: 'warning',
+			@if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 			showCancelButton: true,
 			confirmButtonColor: '#ef4444',
 			cancelButtonColor: '#6b7280',
@@ -1216,6 +1216,7 @@ $(document).ready(function() {
 		Swal.fire({
 			title: 'Saving Changes...',
 			text: 'Please wait while we update the user',
+			@if(file_exists(public_path('assets/icons/Gif/loading4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
 			allowOutsideClick: false,
 			didOpen: () => {
 				Swal.showLoading();
@@ -1233,7 +1234,7 @@ $(document).ready(function() {
 			},
 			success: function(response) {
 				Swal.fire({
-					icon: 'success',
+					@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 					title: 'Updated Successfully!',
 					html: `User details have been updated.<br><br>
 						  <small class="text-muted">The user has been notified of these changes</small>`,
@@ -1248,7 +1249,7 @@ $(document).ready(function() {
 			},
 			error: function(xhr) {
 				Swal.fire({
-					icon: 'error',
+					@if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Update Failed',
 					text: xhr.responseJSON?.message || 'Failed to update user details',
 					confirmButtonColor: '#10B981',
@@ -1291,6 +1292,7 @@ $(document).ready(function() {
 
 		Swal.fire({
 			title: 'Verifying OTP...',
+			@if(file_exists(public_path('assets/icons/Gif/loading5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
 			allowOutsideClick: false,
 			didOpen: () => {
 				Swal.showLoading();

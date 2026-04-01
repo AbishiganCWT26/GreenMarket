@@ -3,7 +3,7 @@
 @section('title', 'Profile Details Update')
 
 @section('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="{{ asset('js/form-validation.js') }}"></script>
 <style>
@@ -727,7 +727,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const toggleCurrentPassword = document.getElementById('toggleCurrentPassword');
@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (newPassword !== confirmPassword) {
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Password Mismatch',
                 text: 'New password and confirmation password do not match.',
                 background: '#ef4444',
@@ -790,7 +790,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (currentStrength < 5) {
             Swal.fire({
-                icon: 'warning',
+                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 title: 'Weak Password',
                 text: 'Please use a stronger password for better security.',
                 background: '#f59e0b',
@@ -957,7 +957,7 @@ function showPasswordGuidelines() {
 
 @if(session('success'))
     Swal.fire({
-        icon: 'success',
+        @if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
         title: 'Success!',
         text: '{{ session('success') }}',
         toast: true,
@@ -973,7 +973,7 @@ function showPasswordGuidelines() {
 
 @if(session('error'))
     Swal.fire({
-        icon: 'error',
+        @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
         title: 'Error!',
         text: '{{ session('error') }}',
         toast: true,
@@ -988,3 +988,4 @@ function showPasswordGuidelines() {
 @endif
 </script>
 @endsection
+

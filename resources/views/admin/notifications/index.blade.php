@@ -4,9 +4,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/Admin/admin-notification.css') }}">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-@endsection
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">endsection
 @section('content')
 <div class="notification-wrapper">
 	<div class="notification-header">
@@ -49,7 +47,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 let currentPage = 1;
 let currentView = 'card';
@@ -87,10 +85,10 @@ async function handleSendNotification(){
 
 	if(!userId || !title || !message){
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/Validation Error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Validation Error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Validation Error',
 			text: 'All fields are required!',
-			timer: 2000,
+			timer: 3000,
 			showConfirmButton: true
 		});
 		return;
@@ -111,7 +109,7 @@ async function handleSendNotification(){
 
 		if(data.status === 'success'){
 			Swal.fire({
-				icon: 'success',
+				@if(file_exists(public_path('assets/icons/Gif/success2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 				title: 'Success!',
 				text: 'Notification sent successfully',
 				showConfirmButton: false,
@@ -129,7 +127,7 @@ async function handleSendNotification(){
 		}
 	} catch(error){
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error',
 			text: 'Failed to send notification',
 			confirmButtonColor: '#10B981'
@@ -141,7 +139,7 @@ async function handleMarkAllRead(){
 	const result = await Swal.fire({
 		title: 'Mark all as read?',
 		text: 'This will mark all notifications as read',
-		icon: 'question',
+		@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 		showCancelButton: true,
 		confirmButtonColor: '#10B981',
 		cancelButtonColor: '#6b7280',
@@ -157,7 +155,7 @@ async function handleMarkAllRead(){
 			});
 			
 			Swal.fire({
-				icon: 'success',
+				@if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 				title: 'Done!',
 				text: 'All notifications marked as read',
 				showConfirmButton: false,
@@ -165,7 +163,7 @@ async function handleMarkAllRead(){
 			}).then(() => loadNotifications());
 		} catch(error){
 			Swal.fire({
-				icon: 'error',
+				@if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Error',
 				text: 'Failed to mark all as read'
 			});
@@ -181,7 +179,7 @@ async function handleMarkRead(id){
 		});
 
 		Swal.fire({
-			icon: 'success',
+			@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 			title: 'Marked as read',
 			showConfirmButton: false,
 			timer: 1000,
@@ -190,7 +188,7 @@ async function handleMarkRead(id){
 		}).then(() => loadNotifications());
 	} catch(error){
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/mark as read fail1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error',
 			text: 'Failed to mark as read'
 		});

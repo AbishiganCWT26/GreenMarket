@@ -304,7 +304,7 @@ body {
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Check if this is a redirect from successful payment
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         Toast.fire({
-            icon: 'success',
+            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
             title: 'Payment completed successfully!',
             background: '#d1fae5',
             color: '#065f46'
@@ -334,3 +334,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+

@@ -4,6 +4,11 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/how-it-works.css') }}">
+<style>
+    .swal2-image {
+        margin: 0em auto 0em !important;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -197,7 +202,7 @@ return $configs[$key] ?? '';
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const statValues = document.querySelectorAll('.hw-stat-value');
@@ -325,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const successMessage = sessionStorage.getItem('successMessage');
     if (successMessage) {
         Swal.fire({
-            icon: 'success',
+            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
             title: 'Success!',
             text: successMessage,
             timer: 2000,
@@ -341,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorMessage = sessionStorage.getItem('errorMessage');
     if (errorMessage) {
         Swal.fire({
-            icon: 'error',
+            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: 'Oops...',
             text: errorMessage,
             background: '#ffffff',

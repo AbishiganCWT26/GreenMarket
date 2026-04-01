@@ -171,7 +171,7 @@ function showComingSoon(feature) {
     Swal.fire({
         title: `${feature} Coming Soon!`,
         text: 'This feature is currently under development.',
-        icon: 'info',
+        @if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
         confirmButtonColor: '#10B981',
         background: '#ffffff',
         color: '#0f1724',
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 this.style.transform = '';
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Refreshed!',
                     text: 'Statistics updated successfully',
                     timer: 1500,

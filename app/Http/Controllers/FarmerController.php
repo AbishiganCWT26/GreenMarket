@@ -571,7 +571,7 @@ class FarmerController extends Controller
             }
         }
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(12)->withQueryString();
 
         $allProducts = Product::where('farmer_id', $farmer->id)->get();
 
@@ -642,7 +642,8 @@ class FarmerController extends Controller
             })
             ->with(['category', 'subcategory'])
             ->orderBy('updated_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         $removedCount = $removedProducts->total();
 
@@ -692,7 +693,8 @@ class FarmerController extends Controller
 
         $orders = $query->with(['buyer', 'orderItems.product', 'payment'])
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         foreach ($orders as $order) {
             $order->items_total = $order->orderItems->sum('item_total');
@@ -710,7 +712,8 @@ class FarmerController extends Controller
         $orders = Order::where('farmer_id', $farmer->id)
             ->with(['buyer', 'orderItems.product', 'payment'])
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         foreach ($orders as $order) {
             if ($order->orderItems->isNotEmpty()) {
@@ -869,7 +872,8 @@ class FarmerController extends Controller
         $complaints = Complaint::where('complainant_user_id', $user->id)
             ->with(['againstUserInfo', 'relatedOrder.buyer'])
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         $openComplaints = Complaint::where('complainant_user_id', $user->id)
             ->where('status', 'new')

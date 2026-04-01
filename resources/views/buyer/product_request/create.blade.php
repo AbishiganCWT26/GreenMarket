@@ -5,7 +5,7 @@
 @section('page-title', 'Request Product')
 
 @section('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <style>
 :root {
     --primary-green: #10B981;
@@ -370,7 +370,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('productRequestForm');
@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (result.success) {
                 await Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Success!',
                     text: result.message,
                     confirmButtonColor: '#10B981',
@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         } catch (error) {
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error!',
                 text: error.message,
                 confirmButtonColor: '#ef4444'
@@ -448,3 +448,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+

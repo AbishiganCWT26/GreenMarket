@@ -175,7 +175,7 @@ class ProductController extends Controller
 
 		$sales = $query->orderBy('orders.created_at', 'desc')
 			->paginate(15)
-			->appends($request->query());
+			->withQueryString();
 
 		$leadFarmers = DB::table('lead_farmers')->orderBy('name')->get();
 

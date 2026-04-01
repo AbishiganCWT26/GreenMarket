@@ -164,7 +164,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 $(document).ready(function() {
 	const desc = $('#description');
@@ -195,7 +195,7 @@ $(document).ready(function() {
 
 		if (!type) {
 			Swal.fire({
-				icon: 'warning',
+				@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 				title: 'Required Field',
 				text: 'Please select a complaint type',
 				confirmButtonColor: '#10B981'
@@ -205,7 +205,7 @@ $(document).ready(function() {
 
 		if (!descVal) {
 			Swal.fire({
-				icon: 'warning',
+				@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 				title: 'Required Field',
 				text: 'Please enter a description',
 				confirmButtonColor: '#10B981'
@@ -215,7 +215,7 @@ $(document).ready(function() {
 
 		if (descVal.length < 10) {
 			Swal.fire({
-				icon: 'warning',
+				@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 				title: 'Too Short',
 				text: 'Description must be at least 10 characters',
 				confirmButtonColor: '#10B981'
@@ -242,7 +242,7 @@ $(document).ready(function() {
 				Swal.close();
 				if (res.success) {
 					Swal.fire({
-						icon: 'success',
+						@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 						title: 'Success!',
 						html: `
 							<div class="success-message">
@@ -261,7 +261,7 @@ $(document).ready(function() {
 				} else {
 					btn.prop('disabled', false).html('<i class="fas fa-paper-plane"></i> Submit Complaint');
 					Swal.fire({
-						icon: 'error',
+						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Error',
 						text: res.message || 'Submission failed',
 						confirmButtonColor: '#10B981'
@@ -280,7 +280,7 @@ $(document).ready(function() {
 				}
 
 				Swal.fire({
-					icon: 'error',
+					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Error',
 					text: msg,
 					confirmButtonColor: '#10B981'

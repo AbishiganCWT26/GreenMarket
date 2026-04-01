@@ -359,19 +359,19 @@
         window.showWelcomeMessage = function () {
             if (!window.welcomeShown) {
                 Swal.fire({
-                    icon: 'info',
-                    title: 'translate ready',
+                    @if (file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets / icons / Gif / info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
+                title: 'translate ready',
                     text: 'choose language from the compact menu',
-                    timer: 4500,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'bottom-end',
-                    background: '#ffffff',
-                    iconColor: '#3b82f6',
-                    customClass: { popup: 'swal-popup-compact' }
-                });
-                window.welcomeShown = true;
-            }
+                        timer: 4500,
+                            showConfirmButton: false,
+                                toast: true,
+                                    position: 'bottom-end',
+                                        background: '#ffffff',
+                                            iconColor: '#3b82f6',
+                                                customClass: { popup: 'swal-popup-compact' }
+            });
+            window.welcomeShown = true;
+        }
         };
         window.googleTranslateElementInit = function () {
             new google.translate.TranslateElement({
@@ -397,79 +397,79 @@
                             const currentText = gadget.innerText || '';
                             if (currentText !== previousLangText && currentText.trim() !== '') {
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: 'language updated',
+                                    @if (file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets / icons / Gif / success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                                title: 'language updated',
                                     text: 'page content will now appear in selected language.',
-                                    timer: 3500,
-                                    showConfirmButton: false,
-                                    background: '#ffffff',
-                                    iconColor: '#10B981',
-                                    toast: true,
-                                    position: 'bottom-end',
-                                    showClass: { popup: 'animate__animated animate__fadeInUp' },
-                                    hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-                                    customClass: { popup: 'swal-popup-compact' }
-                                });
-                                previousLangText = currentText;
-                            }
+                                        timer: 3500,
+                                            showConfirmButton: false,
+                                                background: '#ffffff',
+                                                    iconColor: '#10B981',
+                                                        toast: true,
+                                                            position: 'bottom-end',
+                                                                showClass: { popup: 'animate__animated animate__fadeInUp' },
+                                hideClass: { popup: 'animate__animated animate__fadeOutDown' },
+                                customClass: { popup: 'swal-popup-compact' }
+                            });
+                    previousLangText = currentText;
+                }
                         }
                     });
                 });
-                if (gadget) {
-                    observer.observe(gadget, { childList: true, subtree: true, characterData: true });
-                }
+        if (gadget) {
+            observer.observe(gadget, { childList: true, subtree: true, characterData: true });
+        }
             }, 800);
-            const observerRetry = new MutationObserver(function (mutations, obs) {
-                if (document.querySelector('.goog-te-gadget-simple')) {
-                    obs.disconnect();
-                    setTimeout(function () {
-                        const gadget = document.querySelector('.goog-te-gadget-simple');
-                        if (!gadget) return;
-                        let previousLangText = gadget.innerText || 'en';
-                        const observer = new MutationObserver(function (mutations) {
-                            mutations.forEach(function (mut) {
-                                if (mut.type === 'characterData' || mut.type === 'childList') {
-                                    const currentText = gadget.innerText || '';
-                                    if (currentText !== previousLangText && currentText.trim() !== '') {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'language updated',
-                                            text: 'page content will now appear in selected language.',
+        const observerRetry = new MutationObserver(function (mutations, obs) {
+            if (document.querySelector('.goog-te-gadget-simple')) {
+                obs.disconnect();
+                setTimeout(function () {
+                    const gadget = document.querySelector('.goog-te-gadget-simple');
+                    if (!gadget) return;
+                    let previousLangText = gadget.innerText || 'en';
+                    const observer = new MutationObserver(function (mutations) {
+                        mutations.forEach(function (mut) {
+                            if (mut.type === 'characterData' || mut.type === 'childList') {
+                                const currentText = gadget.innerText || '';
+                                if (currentText !== previousLangText && currentText.trim() !== '') {
+                                    Swal.fire({
+                                            @if (file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets / icons / Gif / success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                                    title: 'language updated',
+                                        text: 'page content will now appear in selected language.',
                                             timer: 3500,
-                                            showConfirmButton: false,
-                                            background: '#ffffff',
-                                            iconColor: '#10B981',
-                                            toast: true,
-                                            position: 'bottom-end',
-                                            showClass: { popup: 'animate__animated animate__fadeInUp' },
-                                            hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-                                            customClass: { popup: 'swal-popup-compact' }
-                                        });
-                                        previousLangText = currentText;
-                                    }
+                                                showConfirmButton: false,
+                                                    background: '#ffffff',
+                                                        iconColor: '#10B981',
+                                                            toast: true,
+                                                                position: 'bottom-end',
+                                                                    showClass: { popup: 'animate__animated animate__fadeInUp' },
+                                    hideClass: { popup: 'animate__animated animate__fadeOutDown' },
+                                    customClass: { popup: 'swal-popup-compact' }
+                                });
+                        previousLangText = currentText;
+                    }
                                 }
                             });
                         });
-                        observer.observe(gadget, { childList: true, subtree: true, characterData: true });
+        observer.observe(gadget, { childList: true, subtree: true, characterData: true });
                     }, 150);
                 }
             });
-            observerRetry.observe(document.body, { childList: true, subtree: true });
-            window.addEventListener('error', function (e) {
-                if (e.target && (e.target.src || '').includes('translate.google')) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'translation error',
-                        text: 'google translate failed to load. please refresh.',
+        observerRetry.observe(document.body, { childList: true, subtree: true });
+        window.addEventListener('error', function (e) {
+            if (e.target && (e.target.src || '').includes('translate.google')) {
+                e.preventDefault();
+                Swal.fire({
+                        @if (file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets / icons / Gif / error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                title: 'translation error',
+                    text: 'google translate failed to load. please refresh.',
                         confirmButtonColor: '#059669',
-                        background: '#ffffff',
-                        iconColor: '#f59e0b',
-                        customClass: { popup: 'swal-popup-compact' }
-                    });
+                            background: '#ffffff',
+                                iconColor: '#f59e0b',
+                                    customClass: { popup: 'swal-popup-compact' }
+            });
                 }
             }, true);
-        })();
+        }) ();
         (function () {
             if (document.body) {
                 document.body.style.marginTop = '0px';

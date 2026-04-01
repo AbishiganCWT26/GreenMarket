@@ -4,7 +4,7 @@
 @section('page-title', 'Change Profile Photo')
 
 @section('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <style>
 	:root {
 		--primary-green: #10B981;
@@ -551,7 +551,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 	function previewPhoto(event) {
 		const file = event.target.files[0];
@@ -559,7 +559,7 @@
 
 		if (!file.type.match('image.*')) {
 			Swal.fire({
-				icon: 'error',
+				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Invalid File',
 				text: 'Please select an image file (JPG, PNG, GIF)',
 				timer: 3000,
@@ -570,7 +570,7 @@
 
 		if (file.size > 5 * 1024 * 1024) {
 			Swal.fire({
-				icon: 'error',
+				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'File Too Large',
 				text: 'Maximum file size is 5MB',
 				timer: 3000,
@@ -597,7 +597,7 @@
 		Swal.fire({
 			title: 'Remove Profile Photo?',
 			text: 'Your current profile photo will be removed and replaced with the default avatar.',
-			icon: 'warning',
+			@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 			showCancelButton: true,
 			confirmButtonColor: '#ef4444',
 			cancelButtonColor: '#6b7280',
@@ -620,7 +620,7 @@
 				if (!fileInput.files[0]) {
 					e.preventDefault();
 					Swal.fire({
-						icon: 'error',
+						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'No Photo Selected',
 						text: 'Please select a photo to upload',
 						timer: 3000,
@@ -640,7 +640,7 @@
 
 		@if(session('success'))
 			Swal.fire({
-				icon: 'success',
+				@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 				title: 'Success',
 				text: '{{ session('success') }}',
 				timer: 3000,
@@ -651,7 +651,7 @@
 
 		@if(session('error'))
 			Swal.fire({
-				icon: 'error',
+				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Error',
 				text: '{{ session('error') }}',
 				timer: 4000,
@@ -706,3 +706,4 @@
 	};
 </script>
 @endsection
+

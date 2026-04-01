@@ -7,7 +7,7 @@
 	<title>GreenMarket | Reset Password</title>
 	<link rel="stylesheet" href="{{ asset('css/login.css') }}" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
 	<script src="{{ asset('js/form-validation.js') }}"></script>
 	<style>
 		:root {
@@ -362,7 +362,7 @@
 				if (!result.isValid) {
 					e.preventDefault();
 					Swal.fire({
-						icon: 'warning',
+						@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 						title: 'Weak Password',
 						text: 'Please meet all 11 security requirements for a strong password.',
 						confirmButtonColor: '#10B981'
@@ -373,7 +373,7 @@
 				if (passValue !== confirmValue) {
 					e.preventDefault();
 					Swal.fire({
-						icon: 'error',
+						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Passwords Mismatch',
 						text: 'New password and confirmation do not match.',
 						confirmButtonColor: '#10B981'

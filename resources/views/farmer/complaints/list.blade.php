@@ -248,7 +248,7 @@ function getStatusIcon($status) {
 @endphp
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 function viewComplaint(id) {
 	Swal.fire({
@@ -315,12 +315,12 @@ function viewComplaint(id) {
 					confirmButtonColor: '#10B981'
 				});
 			} else {
-				Swal.fire({ icon: 'error', title: 'Error', text: res.message || 'Failed to load' });
+				Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: res.message || 'Failed to load' });
 			}
 		},
 		error: () => {
 			Swal.close();
-			Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load complaint' });
+			Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: 'Failed to load complaint' });
 		}
 	});
 }
@@ -344,7 +344,7 @@ function editComplaint(id) {
 				const c = res.complaint;
 				if (c.status !== 'new') {
 					Swal.fire({
-						icon: 'warning',
+						@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 						title: 'Cannot Edit',
 						text: 'Only new complaints can be edited',
 						confirmButtonColor: '#10B981'
@@ -422,19 +422,19 @@ function updateComplaint(id, data) {
 		success: function(res) {
 			if (res.success) {
 				Swal.fire({
-					icon: 'success',
+					@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 					title: 'Updated',
 					text: 'Complaint updated successfully',
 					timer: 1500,
 					showConfirmButton: false
 				}).then(() => location.reload());
 			} else {
-				Swal.fire({ icon: 'error', title: 'Error', text: res.message || 'Update failed' });
+				Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: res.message || 'Update failed' });
 			}
 		},
 		error: () => {
 			Swal.close();
-			Swal.fire({ icon: 'error', title: 'Error', text: 'Update failed' });
+			Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: 'Update failed' });
 		}
 	});
 }
@@ -443,7 +443,7 @@ function deleteComplaint(id) {
 	Swal.fire({
 		title: 'Delete Complaint',
 		text: 'This action cannot be undone',
-		icon: 'warning',
+		@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 		showCancelButton: true,
 		confirmButtonColor: '#ef4444',
 		cancelButtonColor: '#6b7280',
@@ -464,7 +464,7 @@ function deleteComplaint(id) {
 	}).then((r) => {
 		if (r.isConfirmed) {
 			Swal.fire({
-				icon: 'success',
+				@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 				title: 'Deleted',
 				text: 'Complaint deleted successfully',
 				timer: 1500,

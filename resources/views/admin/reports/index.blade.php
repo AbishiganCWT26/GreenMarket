@@ -212,7 +212,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 let currentReportId = null;
 
@@ -237,7 +237,7 @@ function generateReport() {
 
     if (!reportId) {
         Swal.fire({
-            icon: 'error',
+            @if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: 'Error',
             text: 'Please select a report',
             confirmButtonColor: '#10B981',
@@ -249,7 +249,7 @@ function generateReport() {
 
     if (!fromDate || !toDate) {
         Swal.fire({
-            icon: 'warning',
+            @if(file_exists(public_path('assets/icons/Gif/Calender alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Calender alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
             title: 'Warning',
             text: 'Please select both date ranges',
             confirmButtonColor: '#10B981',
@@ -261,7 +261,7 @@ function generateReport() {
 
     if (new Date(fromDate) > new Date(toDate)) {
         Swal.fire({
-            icon: 'error',
+            @if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: 'Invalid Date',
             text: 'From date cannot be after to date',
             confirmButtonColor: '#10B981',
@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
     toDateInput.addEventListener('change', function() {
         if (this.value < fromDateInput.value) {
             Swal.fire({
-                icon: 'warning',
+                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 title: 'Date Error',
                 text: 'To date cannot be before from date',
                 confirmButtonColor: '#10B981',

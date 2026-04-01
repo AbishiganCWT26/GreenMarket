@@ -4,7 +4,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <link rel="stylesheet" href="{{ asset('css/Admin/sales-view.css') }}">
 @endsection
 
@@ -145,7 +145,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
 		const leadFarmerSelect = document.getElementById('filter-lead-farmer');
@@ -286,7 +286,7 @@
 		Swal.fire({
 			title: 'Reset Filters?',
 			text: 'This will clear all filter selections',
-			icon: 'question',
+			@if(file_exists(public_path('assets/icons/Gif/question3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 			showCancelButton: true,
 			confirmButtonColor: '#10B981',
 			cancelButtonColor: '#6B7280',
@@ -317,7 +317,7 @@
 		Swal.fire({
 			title: 'Export Sales Report',
 			text: 'Generate PDF report with current filters?',
-			icon: 'question',
+			@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 			showCancelButton: true,
 			confirmButtonColor: '#10B981',
 			cancelButtonColor: '#6B7280',
@@ -378,7 +378,7 @@
 		});
 
 		Toast.fire({
-			icon: 'success',
+			@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 			title: message
 		});
 	}
@@ -388,7 +388,7 @@
 			Swal.fire({
 				title: title,
 				text: text,
-				icon: 'error',
+				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				confirmButtonColor: '#EF4444'
 			});
 		} else {
@@ -405,7 +405,7 @@
 			});
 
 			Toast.fire({
-				icon: 'error',
+				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: title
 			});
 		}
@@ -415,6 +415,7 @@
 		Swal.fire({
 			title: message,
 			allowOutsideClick: false,
+			@if(file_exists(public_path('assets/icons/Gif/loading4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
 			didOpen: () => {
 				Swal.showLoading();
 			}
@@ -422,3 +423,4 @@
 	}
 </script>
 @endsection
+

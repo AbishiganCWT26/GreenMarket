@@ -5,7 +5,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/buyer/cart.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
@@ -171,7 +171,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await Swal.fire({
                 title: 'Remove item?',
                 text: `Are you sure you want to remove "${productName}" from your cart?`,
-                icon: 'warning',
+                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 showCancelButton: true,
                 confirmButtonText: 'Yes, remove it',
                 cancelButtonText: 'Cancel',
@@ -489,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await Swal.fire({
                 title: 'Clear cart?',
                 text: 'Are you sure you want to remove all items from your cart?',
-                icon: 'warning',
+                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 showCancelButton: true,
                 confirmButtonText: 'Yes, clear cart',
                 cancelButtonText: 'Cancel',
@@ -579,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await Swal.fire({
                 title: 'Select Payment Method',
                 text: 'Choose how you would like to pay for your order',
-                icon: 'question',
+                @if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
                 showCancelButton: true,
                 confirmButtonText: 'Cash on Delivery',
                 denyButtonText: 'Cancel',
@@ -599,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </ul>
                         </div>
                     `,
-                    icon: 'info',
+                    @if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
                     showCancelButton: true,
                     confirmButtonText: 'Confirm Order',
                     cancelButtonText: 'Go Back'
@@ -632,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <p class="text-muted">Check the invoice in "Order History"</p>
                                         </div>
                                     `,
-                                    icon: 'success',
+                                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                                     confirmButtonText: 'Go to Order History',
                                     confirmButtonColor: '#10B981'
                                 }).then(() => {
@@ -679,3 +679,4 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 </style>
 @endsection
+

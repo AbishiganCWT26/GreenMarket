@@ -443,7 +443,7 @@ textarea:focus {
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     $(document).ready(function() {
         const imagePreview = $('#imagePreview');
@@ -498,7 +498,7 @@ textarea:focus {
             if (!farmerSelect.val()) {
                 e.preventDefault();
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/farmer1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/farmer1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Validation Error',
                     text: 'Please select a farmer.'
                 });
@@ -508,7 +508,7 @@ textarea:focus {
             if (form.find('.error-message').length > 0) {
                 e.preventDefault();
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Form Errors',
                     text: 'Please fix all errors before submitting.'
                 });
@@ -559,3 +559,4 @@ textarea:focus {
     }
 </script>
 @endsection
+

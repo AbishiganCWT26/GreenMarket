@@ -82,7 +82,6 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 					<ul class="footer-links">
 						<li><a href="{{ url('/') }}"><i class="fas fa-home"></i><span>Home</span></a></li>
 						<li><a href="{{ url('/about-us') }}"><i class="fas fa-info-circle"></i><span>About Us</span></a></li>
-						<li><a href="{{ url('/how-it-works') }}"><i class="fas fa-cogs"></i><span>How It Works</span></a></li>
 						<li><a href="{{ url('/contact-us') }}"><i class="fas fa-envelope"></i><span>Contact</span></a></li>
 						<li><a href="{{ url('/register/buyer') }}"><i class="fas fa-user-plus"></i><span>Register</span></a></li>
 						<li><a href="{{ url('/login') }}"><i class="fas fa-sign-in-alt"></i><span>Login</span></a></li>
@@ -170,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (href === '#') {
 				e.preventDefault();
 				Swal.fire({
-					icon: 'info',
+					@if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
 					title: platform,
 					text: `Follow us on ${platform} for updates!`,
 					confirmButtonColor: '#10B981',
@@ -180,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			} else if (!href.startsWith('http')) {
 				e.preventDefault();
 				Swal.fire({
-					icon: 'error',
+					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Invalid Link',
 					text: 'This social media link needs configuration.',
 					confirmButtonColor: '#ef4444'
@@ -196,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (href === '#') {
 				e.preventDefault();
 				Swal.fire({
-					icon: 'info',
+					@if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
 					title: text,
 					text: `${text} Policy is being updated. Check back soon!`,
 					confirmButtonColor: '#10B981'
@@ -204,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			} else if (href.includes('.pdf')) {
 				e.preventDefault();
 				Swal.fire({
-					icon: 'question',
+					@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 					title: 'Download',
 					text: `Download ${text} Policy?`,
 					showCancelButton: true,
@@ -215,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					if (result.isConfirmed) {
 						window.open(href, '_blank');
 						Swal.fire({
-							icon: 'success',
+							@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							title: 'Success',
 							text: 'Download started!',
 							showConfirmButton: false,

@@ -5,7 +5,11 @@
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    .swal2-image {
+        margin: 0em auto 0em !important;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -248,7 +252,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script src="{{ asset('js/home-extras.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -310,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	@if(session('success'))
 		Swal.fire({
-			icon: 'success',
+			@if(file_exists(public_path('assets/icons/Gif/welcome1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/welcome1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 			title: 'Welcome!',
 			text: '{{ session('success') }}',
 			timer: 3000,
@@ -322,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	@if(session('error'))
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Oops...',
 			text: '{{ session('error') }}',
 			confirmButtonColor: '#10B981',

@@ -375,7 +375,7 @@
 				active: {{ $activeUsers }},
 				inactive: {{ $inactiveUsers }},
 				admins: {{ $adminUsers }}
-																					});
+																						});
 
 			function showLoading(show) {
 				loading = show;
@@ -422,7 +422,7 @@
 								leadFarmers = response.leadFarmers;
 							}
 							Swal.fire({
-								icon: 'success',
+								@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 								title: 'Success!',
 								text: 'Users loaded successfully',
 								timer: 1500,
@@ -430,7 +430,7 @@
 							});
 						} else {
 							Swal.fire({
-								icon: 'error',
+								@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 								title: 'Error',
 								text: 'Invalid response format',
 								confirmButtonColor: '#10B981'
@@ -440,7 +440,7 @@
 					},
 					error: function (xhr) {
 						Swal.fire({
-							icon: 'error',
+							@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 							title: 'Error',
 							text: 'Failed to load users',
 							confirmButtonColor: '#10B981'
@@ -451,39 +451,39 @@
 			}
 
 			const passwordRequirementsHtml = `
-																						<div id="password-validation-rules" class="password-requirements-grid mt-2 p-3 bg-light rounded shadow-sm border" style="display: none;">
-																							<h6 class="mb-2 text-dark" style="font-size: 0.8rem; font-weight: 600;"><i class="fas fa-shield-alt" style="margin-right: 8px;"></i>Security Standards</h6>
+																							<div id="password-validation-rules" class="password-requirements-grid mt-2 p-3 bg-light rounded shadow-sm border" style="display: none;">
+																								<h6 class="mb-2 text-dark" style="font-size: 0.8rem; font-weight: 600;"><i class="fas fa-shield-alt" style="margin-right: 8px;"></i>Security Standards</h6>
 
-																							<div class="password-strength mb-3">
-																								<div class="d-flex justify-content-between align-items-center mb-1">
-																									<small style="font-size: 11px; font-weight: 600; color: #64748b;">Strength: <span id="strengthText">None</span></small>
+																								<div class="password-strength mb-3">
+																									<div class="d-flex justify-content-between align-items-center mb-1">
+																										<small style="font-size: 11px; font-weight: 600; color: #64748b;">Strength: <span id="strengthText">None</span></small>
+																									</div>
+																									<div class="strength-bar" id="strengthBar" style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+																										<div class="strength-fill" style="width: 0%; height: 100%; transition: width 0.3s; background: #cbd5e1;"></div>
+																									</div>
 																								</div>
-																								<div class="strength-bar" id="strengthBar" style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
-																									<div class="strength-fill" style="width: 0%; height: 100%; transition: width 0.3s; background: #cbd5e1;"></div>
-																								</div>
-																							</div>
 
-																							<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-																								<div id="rule-length" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>8+ characters</div>
-																								<div id="rule-number" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Number</div>
-																								<div id="rule-capital" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Capital</div>
-																								<div id="rule-lowercase" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Lowercase</div>
-																								<div id="rule-special" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Special</div>
-																								<div id="rule-no-space" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No spaces</div>
-																								<div id="rule-no-repeat" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No 3x repeats</div>
-																								<div id="rule-no-sequence" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No sequences</div>
-																								<div id="rule-not-common" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Not common</div>
-																								<div id="rule-no-links" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No links</div>
-																								<div id="rule-no-personal" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No personal</div>
+																								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+																									<div id="rule-length" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>8+ characters</div>
+																									<div id="rule-number" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Number</div>
+																									<div id="rule-capital" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Capital</div>
+																									<div id="rule-lowercase" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Lowercase</div>
+																									<div id="rule-special" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Special</div>
+																									<div id="rule-no-space" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No spaces</div>
+																									<div id="rule-no-repeat" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No 3x repeats</div>
+																									<div id="rule-no-sequence" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No sequences</div>
+																									<div id="rule-not-common" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Not common</div>
+																									<div id="rule-no-links" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No links</div>
+																									<div id="rule-no-personal" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No personal</div>
+																								</div>
+																								<style>
+																									.rule-item.valid { color: #10B981 !important; font-weight: 600; }
+																									.rule-item.invalid { color: #ef4444 !important; }
+																									.rule-item.valid i { color: #10B981 !important; margin-right: 8px; }
+																									.rule-item.invalid i { color: #ef4444 !important; margin-right: 8px; }
+																								</style>
 																							</div>
-																							<style>
-																								.rule-item.valid { color: #10B981 !important; font-weight: 600; }
-																								.rule-item.invalid { color: #ef4444 !important; }
-																								.rule-item.valid i { color: #10B981 !important; margin-right: 8px; }
-																								.rule-item.invalid i { color: #ef4444 !important; margin-right: 8px; }
-																							</style>
-																						</div>
-																					`;
+																						`;
 
 			function updatePasswordRules(password, username, email) {
 				const result = validateAdvancedPassword(password, username, email);
@@ -521,21 +521,21 @@
 				Swal.fire({
 					title: 'Add New User',
 					html: `
-																								<div class="user-form">
-																									<div class="form-group">
-																										<label>User Type <span class="required">*</span></label>
-																										<select id="user-type" class="form-select" required>
-																											<option value="">Select Type</option>
-																											<option value="farmer">Farmer</option>
-																											<option value="lead_farmer">Lead Farmer</option>
-																											<option value="buyer">Buyer</option>
-																											<option value="facilitator">Facilitator</option>
-																											<option value="admin">Administrator</option>
-																										</select>
+																									<div class="user-form">
+																										<div class="form-group">
+																											<label>User Type <span class="required">*</span></label>
+																											<select id="user-type" class="form-select" required>
+																												<option value="">Select Type</option>
+																												<option value="farmer">Farmer</option>
+																												<option value="lead_farmer">Lead Farmer</option>
+																												<option value="buyer">Buyer</option>
+																												<option value="facilitator">Facilitator</option>
+																												<option value="admin">Administrator</option>
+																											</select>
+																										</div>
+																										<div id="role-specific-fields" style="display:none;"></div>
 																									</div>
-																									<div id="role-specific-fields" style="display:none;"></div>
-																								</div>
-																							`,
+																								`,
 					showCancelButton: true,
 					confirmButtonText: 'Create User',
 					cancelButtonText: 'Cancel',
@@ -550,418 +550,418 @@
 							switch (userType) {
 								case 'farmer':
 									html = `
-																												<div class="form-section">
-																													<h4>Farmer Details</h4>
-																													<div class="form-group">
-																														<label>Lead Farmer <span class="required">*</span></label>
-																														<select id="lead_farmer_id" class="form-select" required>
-																															<option value="" disabled selected>Select a lead farmer</option>
-																															${leadFarmers.map(lf => `<option value="${lf.id}">${lf.name} - ${lf.district}</option>`).join('')}
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<label>Full Name <span class="required">*</span></label>
-																														<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Username <span class="required">*</span></label>
-																														<input type="text" id="username" class="form-input" placeholder="Enter username" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Email</label>
-																														<input type="email" id="email" class="form-input" placeholder="Enter email">
-																													</div>
-																													<div class="form-group">
-																														<label>Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
-																														</div>
-																														${passwordRequirementsHtml}
-																													</div>
-																													<div class="form-group">
-																														<label>Confirm Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
-																														</div>
-																														<div id="passwordMatch" class="mt-2"></div>
-																													</div>
-																													<div class="form-group">
-																														<label>NIC Number <span class="required">*</span></label>
-																														<input type="text" id="farmer_nic" class="form-input" placeholder="Enter NIC" required>
-																														<div id="farmer_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
-																													</div>
-																													<div class="form-group">
-																														<label>Primary Mobile <span class="required">*</span></label>
-																														<input type="tel" id="farmer_mobile" class="form-input" placeholder="Enter mobile number" required>
-																													</div>
-																													<div class="form-group">
-																														<label>WhatsApp Number</label>
-																														<input type="tel" id="farmer_whatsapp" class="form-input" placeholder="Enter WhatsApp">
-																													</div>
-																													<div class="form-group">
-																														<label>Residential Address <span class="required">*</span></label>
-																														<textarea id="farmer_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
-																													</div>
-																													<div class="form-group">
-																														<label>District <span class="required">*</span></label>
-																														<select id="farmer_district" class="form-select" required>
-																															<option value="" disabled selected>Select District</option>
-																															${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<label>Divisional Secretariat <span class="required">*</span></label>
-																														<select id="farmer_ds" class="form-select" required disabled>
-																															<option value="" disabled selected>Select District First</option>
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<label>Grama Niladhari Division <span class="required">*</span></label>
-																														<select id="farmer_gnd" class="form-select" required disabled>
-																															<option value="" disabled selected>Select DS First</option>
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<label>GN Division Code</label>
-																														<input type="text" id="farmer_gn_code" class="form-input" placeholder="GN Code" readonly>
-																													</div>
-																													<div class="form-group">
-																														<label>Preferred Payment <span class="required">*</span></label>
-																														<select id="farmer_payment" class="form-select" required>
-																															<option value="bank">Bank Transfer</option>
-																															<option value="ezcash">EzCash</option>
-																															<option value="mcash">mCash</option>
-																															<option value="all">All Methods</option>
-																														</select>
-																													</div>
-																													<div id="farmer-bank-fields">
+																													<div class="form-section">
+																														<h4>Farmer Details</h4>
 																														<div class="form-group">
-																															<label>Account Number <span id="account-required" class="required" style="display:none;">*</span></label>
-																															<input type="text" id="farmer_account" class="form-input" placeholder="Enter account number">
+																															<label>Lead Farmer <span class="required">*</span></label>
+																															<select id="lead_farmer_id" class="form-select" required>
+																																<option value="" disabled selected>Select a lead farmer</option>
+																																${leadFarmers.map(lf => `<option value="${lf.id}">${lf.name} - ${lf.district}</option>`).join('')}
+																															</select>
 																														</div>
 																														<div class="form-group">
-																															<label>Account Holder Name <span id="account-name-required" class="required" style="display:none;">*</span></label>
-																															<input type="text" id="farmer_account_name" class="form-input" placeholder="Enter holder name">
+																															<label>Full Name <span class="required">*</span></label>
+																															<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
 																														</div>
 																														<div class="form-group">
-																															<label>Bank Name <span id="bank-required" class="required" style="display:none;">*</span></label>
-																															<input type="text" id="farmer_bank" class="form-input" placeholder="Enter bank name">
+																															<label>Username <span class="required">*</span></label>
+																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
 																														</div>
 																														<div class="form-group">
-																															<label>Bank Branch <span id="branch-required" class="required" style="display:none;">*</span></label>
-																															<input type="text" id="farmer_branch" class="form-input" placeholder="Enter branch">
+																															<label>Email</label>
+																															<input type="email" id="email" class="form-input" placeholder="Enter email">
+																														</div>
+																														<div class="form-group">
+																															<label>Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+																															</div>
+																															${passwordRequirementsHtml}
+																														</div>
+																														<div class="form-group">
+																															<label>Confirm Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+																															</div>
+																															<div id="passwordMatch" class="mt-2"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>NIC Number <span class="required">*</span></label>
+																															<input type="text" id="farmer_nic" class="form-input" placeholder="Enter NIC" required>
+																															<div id="farmer_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>Primary Mobile <span class="required">*</span></label>
+																															<input type="tel" id="farmer_mobile" class="form-input" placeholder="Enter mobile number" required>
+																														</div>
+																														<div class="form-group">
+																															<label>WhatsApp Number</label>
+																															<input type="tel" id="farmer_whatsapp" class="form-input" placeholder="Enter WhatsApp">
+																														</div>
+																														<div class="form-group">
+																															<label>Residential Address <span class="required">*</span></label>
+																															<textarea id="farmer_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
+																														</div>
+																														<div class="form-group">
+																															<label>District <span class="required">*</span></label>
+																															<select id="farmer_district" class="form-select" required>
+																																<option value="" disabled selected>Select District</option>
+																																${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<label>Divisional Secretariat <span class="required">*</span></label>
+																															<select id="farmer_ds" class="form-select" required disabled>
+																																<option value="" disabled selected>Select District First</option>
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<label>Grama Niladhari Division <span class="required">*</span></label>
+																															<select id="farmer_gnd" class="form-select" required disabled>
+																																<option value="" disabled selected>Select DS First</option>
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<label>GN Division Code</label>
+																															<input type="text" id="farmer_gn_code" class="form-input" placeholder="GN Code" readonly>
+																														</div>
+																														<div class="form-group">
+																															<label>Preferred Payment <span class="required">*</span></label>
+																															<select id="farmer_payment" class="form-select" required>
+																																<option value="bank">Bank Transfer</option>
+																																<option value="ezcash">EzCash</option>
+																																<option value="mcash">mCash</option>
+																																<option value="all">All Methods</option>
+																															</select>
+																														</div>
+																														<div id="farmer-bank-fields">
+																															<div class="form-group">
+																																<label>Account Number <span id="account-required" class="required" style="display:none;">*</span></label>
+																																<input type="text" id="farmer_account" class="form-input" placeholder="Enter account number">
+																															</div>
+																															<div class="form-group">
+																																<label>Account Holder Name <span id="account-name-required" class="required" style="display:none;">*</span></label>
+																																<input type="text" id="farmer_account_name" class="form-input" placeholder="Enter holder name">
+																															</div>
+																															<div class="form-group">
+																																<label>Bank Name <span id="bank-required" class="required" style="display:none;">*</span></label>
+																																<input type="text" id="farmer_bank" class="form-input" placeholder="Enter bank name">
+																															</div>
+																															<div class="form-group">
+																																<label>Bank Branch <span id="branch-required" class="required" style="display:none;">*</span></label>
+																																<input type="text" id="farmer_branch" class="form-input" placeholder="Enter branch">
+																															</div>
+																														</div>
+																														<div id="farmer-ezcash-fields" style="display:none;">
+																															<div class="form-group">
+																																<label>EzCash Mobile Number <span id="ezcash-required" class="required" style="display:none;">*</span></label>
+																																<input type="tel" id="farmer_ezcash" class="form-input" placeholder="e.g., 074/076/077xxxxxxx" maxlength="10">
+																																<div id="ezcash-error" class="error-text" style="display:none;">EzCash number must start with 074, 076 or 077</div>
+																															</div>
+																														</div>
+																														<div id="farmer-mcash-fields" style="display:none;">
+																															<div class="form-group">
+																																<label>mCash Mobile Number <span id="mcash-required" class="required" style="display:none;">*</span></label>
+																																<input type="tel" id="farmer_mcash" class="form-input" placeholder="e.g., 070/071xxxxxxx" maxlength="10">
+																																<div id="mcash-error" class="error-text" style="display:none;">mCash number must start with 070 or 071</div>
+																															</div>
 																														</div>
 																													</div>
-																													<div id="farmer-ezcash-fields" style="display:none;">
-																														<div class="form-group">
-																															<label>EzCash Mobile Number <span id="ezcash-required" class="required" style="display:none;">*</span></label>
-																															<input type="tel" id="farmer_ezcash" class="form-input" placeholder="e.g., 074/076/077xxxxxxx" maxlength="10">
-																															<div id="ezcash-error" class="error-text" style="display:none;">EzCash number must start with 074, 076 or 077</div>
-																														</div>
-																													</div>
-																													<div id="farmer-mcash-fields" style="display:none;">
-																														<div class="form-group">
-																															<label>mCash Mobile Number <span id="mcash-required" class="required" style="display:none;">*</span></label>
-																															<input type="tel" id="farmer_mcash" class="form-input" placeholder="e.g., 070/071xxxxxxx" maxlength="10">
-																															<div id="mcash-error" class="error-text" style="display:none;">mCash number must start with 070 or 071</div>
-																														</div>
-																													</div>
-																												</div>
-																											`;
+																												`;
 									break;
 								case 'lead_farmer':
 									html = `
-																												<div class="form-section">
-																													<h4>Lead Farmer Details</h4>
-																													<div class="form-group">
-																														<label>Full Name <span class="required">*</span></label>
-																														<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Username <span class="required">*</span></label>
-																														<input type="text" id="username" class="form-input" placeholder="Enter username" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Email</label>
-																														<input type="email" id="email" class="form-input" placeholder="Enter email">
-																													</div>
-																													<div class="form-group">
-																														<label>Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+																													<div class="form-section">
+																														<h4>Lead Farmer Details</h4>
+																														<div class="form-group">
+																															<label>Full Name <span class="required">*</span></label>
+																															<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
 																														</div>
-																														${passwordRequirementsHtml}
-																													</div>
-																													<div class="form-group">
-																														<label>Confirm Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+																														<div class="form-group">
+																															<label>Username <span class="required">*</span></label>
+																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
 																														</div>
-																														<div id="passwordMatch" class="mt-2"></div>
+																														<div class="form-group">
+																															<label>Email</label>
+																															<input type="email" id="email" class="form-input" placeholder="Enter email">
+																														</div>
+																														<div class="form-group">
+																															<label>Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+																															</div>
+																															${passwordRequirementsHtml}
+																														</div>
+																														<div class="form-group">
+																															<label>Confirm Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+																															</div>
+																															<div id="passwordMatch" class="mt-2"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>NIC Number <span class="required">*</span></label>
+																															<input type="text" id="lead_nic" class="form-input" placeholder="Enter NIC" required>
+																															<div id="lead_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>Primary Mobile <span class="required">*</span></label>
+																															<input type="tel" id="lead_mobile" class="form-input" placeholder="Enter mobile number" required>
+																														</div>
+																														<div class="form-group">
+																															<label>WhatsApp Number</label>
+																															<input type="tel" id="lead_whatsapp" class="form-input" placeholder="Enter WhatsApp">
+																														</div>
+																														<div class="form-group">
+																															<label>Residential Address <span class="required">*</span></label>
+																															<textarea id="lead_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
+																														</div>
+																														<div class="form-group">
+																															<label>District <span class="required">*</span></label>
+																															<select id="lead_district" class="form-select" required>
+																																<option value="" disabled selected>Select District</option>
+																																${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<label>Divisional Secretariat <span class="required">*</span></label>
+																															<select id="lead_ds" class="form-select" required disabled>
+																																<option value="" disabled selected>Select District First</option>
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<label>Grama Niladhari Division <span class="required">*</span></label>
+																															<select id="lead_gnd" class="form-select" required disabled>
+																																<option value="" disabled selected>Select DS First</option>
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<label>GN Division Code</label>
+																															<input type="text" id="lead_gn_code" class="form-input" placeholder="GN Code" readonly>
+																														</div>
+																														<div class="form-group">
+																															<label>Group Name <span class="required">*</span></label>
+																															<input type="text" id="lead_group_name" class="form-input" placeholder="Enter group name" required>
+																														</div>
+																														<div class="form-group">
+																															<label>Group Number <span class="required">*</span></label>
+																															<input type="text" id="lead_group_number" class="form-input" placeholder="Enter group number" required>
+																														</div>
+																														<div class="form-group">
+																															<label>Account Number <span class="required">*</span></label>
+																															<input type="text" id="lead_account" class="form-input" placeholder="Enter account number" required>
+																														</div>
+																														<div class="form-group">
+																															<label>Account Holder Name <span class="required">*</span></label>
+																															<input type="text" id="lead_account_name" class="form-input" placeholder="Enter holder name" required>
+																														</div>
+																														<div class="form-group">
+																															<label>Bank Name <span class="required">*</span></label>
+																															<input type="text" id="lead_bank" class="form-input" placeholder="Enter bank name" required>
+																														</div>
+																														<div class="form-group">
+																															<label>Bank Branch <span class="required">*</span></label>
+																															<input type="text" id="lead_branch" class="form-input" placeholder="Enter branch" required>
+																														</div>
 																													</div>
-																													<div class="form-group">
-																														<label>NIC Number <span class="required">*</span></label>
-																														<input type="text" id="lead_nic" class="form-input" placeholder="Enter NIC" required>
-																														<div id="lead_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
-																													</div>
-																													<div class="form-group">
-																														<label>Primary Mobile <span class="required">*</span></label>
-																														<input type="tel" id="lead_mobile" class="form-input" placeholder="Enter mobile number" required>
-																													</div>
-																													<div class="form-group">
-																														<label>WhatsApp Number</label>
-																														<input type="tel" id="lead_whatsapp" class="form-input" placeholder="Enter WhatsApp">
-																													</div>
-																													<div class="form-group">
-																														<label>Residential Address <span class="required">*</span></label>
-																														<textarea id="lead_address" class="form-input" placeholder="Enter address" rows="2" required></textarea>
-																													</div>
-																													<div class="form-group">
-																														<label>District <span class="required">*</span></label>
-																														<select id="lead_district" class="form-select" required>
-																															<option value="" disabled selected>Select District</option>
-																															${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<label>Divisional Secretariat <span class="required">*</span></label>
-																														<select id="lead_ds" class="form-select" required disabled>
-																															<option value="" disabled selected>Select District First</option>
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<label>Grama Niladhari Division <span class="required">*</span></label>
-																														<select id="lead_gnd" class="form-select" required disabled>
-																															<option value="" disabled selected>Select DS First</option>
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<label>GN Division Code</label>
-																														<input type="text" id="lead_gn_code" class="form-input" placeholder="GN Code" readonly>
-																													</div>
-																													<div class="form-group">
-																														<label>Group Name <span class="required">*</span></label>
-																														<input type="text" id="lead_group_name" class="form-input" placeholder="Enter group name" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Group Number <span class="required">*</span></label>
-																														<input type="text" id="lead_group_number" class="form-input" placeholder="Enter group number" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Account Number <span class="required">*</span></label>
-																														<input type="text" id="lead_account" class="form-input" placeholder="Enter account number" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Account Holder Name <span class="required">*</span></label>
-																														<input type="text" id="lead_account_name" class="form-input" placeholder="Enter holder name" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Bank Name <span class="required">*</span></label>
-																														<input type="text" id="lead_bank" class="form-input" placeholder="Enter bank name" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Bank Branch <span class="required">*</span></label>
-																														<input type="text" id="lead_branch" class="form-input" placeholder="Enter branch" required>
-																													</div>
-																												</div>
-																											`;
+																												`;
 									break;
 								case 'buyer':
 									html = `
-																												<div class="form-section">
-																													<h4>Buyer Details</h4>
-																													<div class="form-group">
-																														<label>Full Name <span class="required">*</span></label>
-																														<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Username <span class="required">*</span></label>
-																														<input type="text" id="username" class="form-input" placeholder="Enter username" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Email</label>
-																														<input type="email" id="email" class="form-input" placeholder="Enter email">
-																													</div>
-																													<div class="form-group">
-																														<label>Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+																													<div class="form-section">
+																														<h4>Buyer Details</h4>
+																														<div class="form-group">
+																															<label>Full Name <span class="required">*</span></label>
+																															<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
 																														</div>
-																														${passwordRequirementsHtml}
-																													</div>
-																													<div class="form-group">
-																														<label>Confirm Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+																														<div class="form-group">
+																															<label>Username <span class="required">*</span></label>
+																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
 																														</div>
-																														<div id="passwordMatch" class="mt-2"></div>
+																														<div class="form-group">
+																															<label>Email</label>
+																															<input type="email" id="email" class="form-input" placeholder="Enter email">
+																														</div>
+																														<div class="form-group">
+																															<label>Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+																															</div>
+																															${passwordRequirementsHtml}
+																														</div>
+																														<div class="form-group">
+																															<label>Confirm Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+																															</div>
+																															<div id="passwordMatch" class="mt-2"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>NIC Number</label>
+																															<input type="text" id="buyer_nic" class="form-input" placeholder="Enter NIC">
+																															<div id="buyer_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>Primary Mobile <span class="required">*</span></label>
+																															<input type="tel" id="buyer_mobile" class="form-input" placeholder="Enter mobile number" required>
+																														</div>
+																														<div class="form-group">
+																															<label>WhatsApp Number</label>
+																															<input type="tel" id="buyer_whatsapp" class="form-input" placeholder="Enter WhatsApp">
+																														</div>
+																														<div class="form-group">
+																															<label>Residential Address</label>
+																															<textarea id="buyer_address" class="form-input" placeholder="Enter address" rows="2"></textarea>
+																														</div>
+																														<div class="form-group">
+																															<label>District <span class="required">*</span></label>
+																															<select id="buyer_district" class="form-select" required>
+																																<option value="" disabled selected>Select District</option>
+																																${typeof gnData !== 'undefined' ? Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('') : ''}
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<label>Business Name</label>
+																															<input type="text" id="buyer_business" class="form-input" placeholder="Enter business name">
+																														</div>
+																														<div class="form-group">
+																															<label>Business Type</label>
+																															<select id="buyer_type" class="form-select">
+																																<option value="individual">Individual</option>
+																																<option value="restaurant">Restaurant</option>
+																																<option value="hotel">Hotel</option>
+																																<option value="retailer">Retailer</option>
+																																<option value="wholesaler">Wholesaler</option>
+																															</select>
+																														</div>
 																													</div>
-																													<div class="form-group">
-																														<label>NIC Number</label>
-																														<input type="text" id="buyer_nic" class="form-input" placeholder="Enter NIC">
-																														<div id="buyer_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
-																													</div>
-																													<div class="form-group">
-																														<label>Primary Mobile <span class="required">*</span></label>
-																														<input type="tel" id="buyer_mobile" class="form-input" placeholder="Enter mobile number" required>
-																													</div>
-																													<div class="form-group">
-																														<label>WhatsApp Number</label>
-																														<input type="tel" id="buyer_whatsapp" class="form-input" placeholder="Enter WhatsApp">
-																													</div>
-																													<div class="form-group">
-																														<label>Residential Address</label>
-																														<textarea id="buyer_address" class="form-input" placeholder="Enter address" rows="2"></textarea>
-																													</div>
-																													<div class="form-group">
-																														<label>District <span class="required">*</span></label>
-																														<select id="buyer_district" class="form-select" required>
-																															<option value="" disabled selected>Select District</option>
-																															${typeof gnData !== 'undefined' ? Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('') : ''}
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<label>Business Name</label>
-																														<input type="text" id="buyer_business" class="form-input" placeholder="Enter business name">
-																													</div>
-																													<div class="form-group">
-																														<label>Business Type</label>
-																														<select id="buyer_type" class="form-select">
-																															<option value="individual">Individual</option>
-																															<option value="restaurant">Restaurant</option>
-																															<option value="hotel">Hotel</option>
-																															<option value="retailer">Retailer</option>
-																															<option value="wholesaler">Wholesaler</option>
-																														</select>
-																													</div>
-																												</div>
-																											`;
+																												`;
 									break;
 								case 'facilitator':
 									html = `
-																												<div class="form-section">
-																													<h4>Facilitator Details</h4>
-																													<div class="form-group">
-																														<label>Full Name <span class="required">*</span></label>
-																														<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Username <span class="required">*</span></label>
-																														<input type="text" id="username" class="form-input" placeholder="Enter username" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Email</label>
-																														<input type="email" id="email" class="form-input" placeholder="Enter email">
-																													</div>
-																													<div class="form-group">
-																														<label>Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+																													<div class="form-section">
+																														<h4>Facilitator Details</h4>
+																														<div class="form-group">
+																															<label>Full Name <span class="required">*</span></label>
+																															<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
 																														</div>
-																														${passwordRequirementsHtml}
-																													</div>
-																													<div class="form-group">
-																														<label>Confirm Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+																														<div class="form-group">
+																															<label>Username <span class="required">*</span></label>
+																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
 																														</div>
-																														<div id="passwordMatch" class="mt-2"></div>
-																													</div>
-																													<div class="form-group">
-																														<label>NIC Number <span class="required">*</span></label>
-																														<input type="text" id="facilitator_nic" class="form-input" placeholder="Enter NIC" required>
-																														<div id="facilitator_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
-																													</div>
-																													<div class="form-group">
-																														<label>Primary Mobile <span class="required">*</span></label>
-																														<input type="tel" id="facilitator_mobile" class="form-input" placeholder="Enter mobile number" required>
-																													</div>
-																													<div class="form-group">
-																														<label>WhatsApp Number</label>
-																														<input type="tel" id="facilitator_whatsapp" class="form-input" placeholder="Enter WhatsApp">
-																													</div>
-																													<div class="form-group">
-																														<label>District <span class="required">*</span></label>
-																														<select id="facilitator_district" class="form-select" required>
-																															<option value="" disabled selected>Select District</option>
-																															${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<label>Divisional Secretariat & GN Divisions <span class="required">*</span></label>
-																														<div id="facilitator-assignments">
-																															<div class="assignment-item" style="border: 1px solid #e5e7eb; padding: 10px; margin-bottom: 10px; border-radius: 6px;">
-																																<div class="form-group">
-																																	<select class="form-select assign-ds" required disabled>
-																																		<option value="" disabled selected>Select District First</option>
-																																	</select>
-																																</div>
-																																<div class="form-group">
-																																	<select class="form-select assign-gn" required disabled>
-																																		<option value="" disabled selected>Select DS First</option>
-																																	</select>
-																																</div>
-																																<div class="form-group">
-																																	<input type="text" class="form-input assign-code" placeholder="GN Code" readonly>
+																														<div class="form-group">
+																															<label>Email</label>
+																															<input type="email" id="email" class="form-input" placeholder="Enter email">
+																														</div>
+																														<div class="form-group">
+																															<label>Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+																															</div>
+																															${passwordRequirementsHtml}
+																														</div>
+																														<div class="form-group">
+																															<label>Confirm Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+																															</div>
+																															<div id="passwordMatch" class="mt-2"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>NIC Number <span class="required">*</span></label>
+																															<input type="text" id="facilitator_nic" class="form-input" placeholder="Enter NIC" required>
+																															<div id="facilitator_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>Primary Mobile <span class="required">*</span></label>
+																															<input type="tel" id="facilitator_mobile" class="form-input" placeholder="Enter mobile number" required>
+																														</div>
+																														<div class="form-group">
+																															<label>WhatsApp Number</label>
+																															<input type="tel" id="facilitator_whatsapp" class="form-input" placeholder="Enter WhatsApp">
+																														</div>
+																														<div class="form-group">
+																															<label>District <span class="required">*</span></label>
+																															<select id="facilitator_district" class="form-select" required>
+																																<option value="" disabled selected>Select District</option>
+																																${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<label>Divisional Secretariat & GN Divisions <span class="required">*</span></label>
+																															<div id="facilitator-assignments">
+																																<div class="assignment-item" style="border: 1px solid #e5e7eb; padding: 10px; margin-bottom: 10px; border-radius: 6px;">
+																																	<div class="form-group">
+																																		<select class="form-select assign-ds" required disabled>
+																																			<option value="" disabled selected>Select District First</option>
+																																		</select>
+																																	</div>
+																																	<div class="form-group">
+																																		<select class="form-select assign-gn" required disabled>
+																																			<option value="" disabled selected>Select DS First</option>
+																																		</select>
+																																	</div>
+																																	<div class="form-group">
+																																		<input type="text" class="form-input assign-code" placeholder="GN Code" readonly>
+																																	</div>
 																																</div>
 																															</div>
+																															<button type="button" id="add-assignment" class="btn btn-sm btn-outline-primary" style="font-size: 12px; margin-top: 5px;">+ Add Another Division</button>
 																														</div>
-																														<button type="button" id="add-assignment" class="btn btn-sm btn-outline-primary" style="font-size: 12px; margin-top: 5px;">+ Add Another Division</button>
 																													</div>
-																												</div>
-																											`;
+																												`;
 									break;
 								case 'admin':
 									html = `
-																												<div class="form-section">
-																													<h4>Administrator Details</h4>
-																													<div class="form-group">
-																														<label>Full Name <span class="required">*</span></label>
-																														<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Username <span class="required">*</span></label>
-																														<input type="text" id="username" class="form-input" placeholder="Enter username" required>
-																													</div>
-																													<div class="form-group">
-																														<label>Email</label>
-																														<input type="email" id="email" class="form-input" placeholder="Enter email">
-																													</div>
-																													<div class="form-group">
-																														<label>Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+																													<div class="form-section">
+																														<h4>Administrator Details</h4>
+																														<div class="form-group">
+																															<label>Full Name <span class="required">*</span></label>
+																															<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
 																														</div>
-																														${passwordRequirementsHtml}
-																													</div>
-																													<div class="form-group">
-																														<label>Confirm Password <span class="required">*</span></label>
-																														<div class="password-container">
-																															<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
-																															<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+																														<div class="form-group">
+																															<label>Username <span class="required">*</span></label>
+																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
 																														</div>
-																														<div id="passwordMatch" class="mt-2"></div>
+																														<div class="form-group">
+																															<label>Email</label>
+																															<input type="email" id="email" class="form-input" placeholder="Enter email">
+																														</div>
+																														<div class="form-group">
+																															<label>Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
+																															</div>
+																															${passwordRequirementsHtml}
+																														</div>
+																														<div class="form-group">
+																															<label>Confirm Password <span class="required">*</span></label>
+																															<div class="password-container">
+																																<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
+																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
+																															</div>
+																															<div id="passwordMatch" class="mt-2"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>NIC Number</label>
+																															<input type="text" id="admin_nic" class="form-input" placeholder="Enter NIC">
+																															<div id="admin_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
+																														</div>
+																														<div class="form-group">
+																															<label>Phone Number <span class="required">*</span></label>
+																															<input type="tel" id="admin_phone" class="form-input" placeholder="Enter phone number" required>
+																														</div>
 																													</div>
-																													<div class="form-group">
-																														<label>NIC Number</label>
-																														<input type="text" id="admin_nic" class="form-input" placeholder="Enter NIC">
-																														<div id="admin_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
-																													</div>
-																													<div class="form-group">
-																														<label>Phone Number <span class="required">*</span></label>
-																														<input type="tel" id="admin_phone" class="form-input" placeholder="Enter phone number" required>
-																													</div>
-																												</div>
-																											`;
+																												`;
 									break;
 							}
 
@@ -1101,23 +1101,23 @@
 
 								$('#add-assignment').on('click', function () {
 									const newItem = $(`
-																												<div class="assignment-item" style="border: 1px solid #e5e7eb; padding: 10px; margin-bottom: 10px; border-radius: 6px; position: relative;">
-																													<button type="button" class="remove-assignment" style="position: absolute; right: 5px; top: 5px; border: none; background: none; color: #ef4444;">&times;</button>
-																													<div class="form-group">
-																														<select class="form-select assign-ds" required disabled>
-																															<option value="" disabled selected>Select District First</option>
-																														</select>
+																													<div class="assignment-item" style="border: 1px solid #e5e7eb; padding: 10px; margin-bottom: 10px; border-radius: 6px; position: relative;">
+																														<button type="button" class="remove-assignment" style="position: absolute; right: 5px; top: 5px; border: none; background: none; color: #ef4444;">&times;</button>
+																														<div class="form-group">
+																															<select class="form-select assign-ds" required disabled>
+																																<option value="" disabled selected>Select District First</option>
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<select class="form-select assign-gn" required disabled>
+																																<option value="" disabled selected>Select DS First</option>
+																															</select>
+																														</div>
+																														<div class="form-group">
+																															<input type="text" class="form-input assign-code" placeholder="GN Code" readonly>
+																														</div>
 																													</div>
-																													<div class="form-group">
-																														<select class="form-select assign-gn" required disabled>
-																															<option value="" disabled selected>Select DS First</option>
-																														</select>
-																													</div>
-																													<div class="form-group">
-																														<input type="text" class="form-input assign-code" placeholder="GN Code" readonly>
-																													</div>
-																												</div>
-																											`);
+																												`);
 									$('#facilitator-assignments').append(newItem);
 									setupAssignment(newItem);
 									newItem.find('.remove-assignment').on('click', function () {
@@ -1456,7 +1456,7 @@
 							success: function (response) {
 								if (response.success) {
 									Swal.fire({
-										icon: 'success',
+										@if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 										title: 'Success!',
 										text: response.message,
 										confirmButtonColor: '#10B981'
@@ -1465,7 +1465,7 @@
 									});
 								} else {
 									Swal.fire({
-										icon: 'error',
+										@if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 										title: 'Error',
 										text: response.message,
 										confirmButtonColor: '#10B981'
@@ -1483,18 +1483,18 @@
 								}
 
 								Swal.fire({
-									icon: 'error',
+									@if(file_exists(public_path('assets/icons/Gif/Failed1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 									title: 'Submission Failed',
 									html: `
-																												<div style="text-align: center;">
-																													<p style="margin: 0; color: #b91c1c; font-size: 14px; font-weight: 500;">
-																														${error}
-																													</p>
-																													<p style="margin: 8px 0 0 0; color: #6b7280; font-size: 12px;">
-																														Please check the details and try again.
-																													</p>
-																												</div>
-																											`,
+																													<div style="text-align: center;">
+																														<p style="margin: 0; color: #b91c1c; font-size: 14px; font-weight: 500;">
+																															${error}
+																														</p>
+																														<p style="margin: 8px 0 0 0; color: #6b7280; font-size: 12px;">
+																															Please check the details and try again.
+																														</p>
+																													</div>
+																												`,
 									confirmButtonText: 'OK',
 									confirmButtonColor: '#10B981',
 								});
@@ -1631,7 +1631,7 @@
 						Swal.fire({
 							title: 'Suspend User',
 							text: `Are you sure you want to suspend ${userName}?`,
-							icon: 'warning',
+							@if(file_exists(public_path('assets/icons/Gif/alert3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 							showCancelButton: true,
 							confirmButtonColor: '#10B981',
 							cancelButtonColor: '#6b7280',
@@ -1648,7 +1648,7 @@
 									success: function (response) {
 										if (response.success) {
 											Swal.fire({
-												icon: 'success',
+												@if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 												title: 'Suspended!',
 												text: response.message,
 												confirmButtonColor: '#10B981'
@@ -1657,7 +1657,7 @@
 											});
 										} else {
 											Swal.fire({
-												icon: 'error',
+												@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 												title: 'Error',
 												text: response.message,
 												confirmButtonColor: '#10B981'
@@ -1666,7 +1666,7 @@
 									},
 									error: function (xhr) {
 										Swal.fire({
-											icon: 'error',
+											@if(file_exists(public_path('assets/icons/Gif/Failed1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 											title: 'Error',
 											text: 'Failed to suspend user',
 											confirmButtonColor: '#10B981'
@@ -1686,7 +1686,7 @@
 							success: function (response) {
 								if (response.success) {
 									Swal.fire({
-										icon: 'success',
+										@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 										title: 'Activated!',
 										text: response.message,
 										confirmButtonColor: '#10B981'
@@ -1704,7 +1704,7 @@
 						Swal.fire({
 							title: 'Promote to Lead Farmer',
 							text: `Promote ${userName} to Lead Farmer role?`,
-							icon: 'question',
+							@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 							showCancelButton: true,
 							confirmButtonColor: '#10B981',
 							cancelButtonColor: '#6b7280',
@@ -1721,7 +1721,7 @@
 									success: function (response) {
 										if (response.success) {
 											Swal.fire({
-												icon: 'success',
+												@if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 												title: 'Promoted!',
 												text: response.message,
 												confirmButtonColor: '#10B981'
@@ -1730,7 +1730,7 @@
 											});
 										} else {
 											Swal.fire({
-												icon: 'error',
+												@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 												title: 'Error',
 												text: response.message,
 												confirmButtonColor: '#10B981'
@@ -1739,7 +1739,7 @@
 									},
 									error: function (xhr) {
 										Swal.fire({
-											icon: 'error',
+											@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 											title: 'Error',
 											text: xhr.responseJSON?.message || 'Failed to promote user',
 											confirmButtonColor: '#10B981'
@@ -1756,8 +1756,8 @@
 				Swal.fire({
 					title: 'Delete User',
 					html: `Are you sure you want to delete <strong>${userName}</strong>?<br><br>
-																								<small style="color: #6b7280;">This action cannot be undone and all related data will be permanently deleted.</small>`,
-					icon: 'warning',
+																									<small style="color: #6b7280;">This action cannot be undone and all related data will be permanently deleted.</small>`,
+					@if(file_exists(public_path('assets/icons/Gif/alert3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 					showCancelButton: true,
 					confirmButtonColor: '#ef4444',
 					cancelButtonColor: '#6b7280',
@@ -1775,7 +1775,7 @@
 							success: function (response) {
 								if (response.success) {
 									Swal.fire({
-										icon: 'success',
+										@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 										title: 'Deleted!',
 										text: response.message,
 										confirmButtonColor: '#10B981'
@@ -1786,7 +1786,7 @@
 									showLeadFarmerDeletionModal(userId, response);
 								} else {
 									Swal.fire({
-										icon: 'error',
+										@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 										title: 'Error',
 										text: response.message,
 										confirmButtonColor: '#10B981'
@@ -1795,7 +1795,7 @@
 							},
 							error: function (xhr) {
 								Swal.fire({
-									icon: 'error',
+									@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 									title: 'Error',
 									text: xhr.responseJSON?.message || 'Failed to delete user',
 									confirmButtonColor: '#10B981'
@@ -1822,37 +1822,37 @@
 						}
 
 						const modalHtml = `
-																									<p>${response.message}</p>
-																									<div class="deletion-options">
-																										<div class="option-card" data-action="delete_all">
-																											<div class="option-icon">
-																												<i class="fas fa-trash"></i>
+																										<p>${response.message}</p>
+																										<div class="deletion-options">
+																											<div class="option-card" data-action="delete_all">
+																												<div class="option-icon">
+																													<i class="fas fa-trash"></i>
+																												</div>
+																												<div class="option-content">
+																													<h4>Delete All Farmers</h4>
+																													<p>Permanently delete all ${response.farmers_count || 0} farmers under this lead farmer</p>
+																												</div>
 																											</div>
-																											<div class="option-content">
-																												<h4>Delete All Farmers</h4>
-																												<p>Permanently delete all ${response.farmers_count || 0} farmers under this lead farmer</p>
-																											</div>
-																										</div>
-																										<div class="option-card" data-action="transfer">
-																											<div class="option-icon">
-																												<i class="fas fa-exchange-alt"></i>
-																											</div>
-																											<div class="option-content">
-																												<h4>Transfer Farmers</h4>
-																												<p>Transfer all farmers to another lead farmer</p>
-																												<div class="transfer-select" style="display:none; margin-top:10px;">
-																													<select id="newLeadFarmerSelect" class="form-select">
-																														${leadFarmersHtml || '<option value="">No other lead farmers available</option>'}
-																													</select>
+																											<div class="option-card" data-action="transfer">
+																												<div class="option-icon">
+																													<i class="fas fa-exchange-alt"></i>
+																												</div>
+																												<div class="option-content">
+																													<h4>Transfer Farmers</h4>
+																													<p>Transfer all farmers to another lead farmer</p>
+																													<div class="transfer-select" style="display:none; margin-top:10px;">
+																														<select id="newLeadFarmerSelect" class="form-select">
+																															${leadFarmersHtml || '<option value="">No other lead farmers available</option>'}
+																														</select>
+																													</div>
 																												</div>
 																											</div>
 																										</div>
-																									</div>
-																									<div class="modal-actions" style="margin-top:20px; display:none;" id="modalActions">
-																										<button class="btn-secondary" id="cancelAction">Cancel</button>
-																										<button class="btn-primary" id="confirmAction" disabled>Confirm</button>
-																									</div>
-																								`;
+																										<div class="modal-actions" style="margin-top:20px; display:none;" id="modalActions">
+																											<button class="btn-secondary" id="cancelAction">Cancel</button>
+																											<button class="btn-primary" id="confirmAction" disabled>Confirm</button>
+																										</div>
+																									`;
 
 						$('#leadFarmerModalContent').html(modalHtml);
 						$('#leadFarmerDeletionModal').fadeIn();
@@ -1898,7 +1898,7 @@
 									if (response.success) {
 										$('#leadFarmerDeletionModal').fadeOut();
 										Swal.fire({
-											icon: 'success',
+											@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 											title: 'Success!',
 											text: response.message,
 											confirmButtonColor: '#10B981'
@@ -1907,7 +1907,7 @@
 										});
 									} else {
 										Swal.fire({
-											icon: 'error',
+											@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 											title: 'Error',
 											text: response.message,
 											confirmButtonColor: '#10B981'
@@ -1916,7 +1916,7 @@
 								},
 								error: function (xhr) {
 									Swal.fire({
-										icon: 'error',
+										@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 										title: 'Error',
 										text: xhr.responseJSON?.message || 'Failed to process deletion',
 										confirmButtonColor: '#10B981'
@@ -1931,7 +1931,7 @@
 					},
 					error: function (xhr) {
 						Swal.fire({
-							icon: 'error',
+							@if(file_exists(public_path('assets/icons/Gif/Failed1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 							title: 'Error',
 							text: 'Failed to load lead farmers',
 							confirmButtonColor: '#10B981'

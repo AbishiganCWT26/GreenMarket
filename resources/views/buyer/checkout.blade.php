@@ -4,7 +4,7 @@
 @section('page-title', 'Checkout')
 
 @section('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
@@ -699,7 +699,7 @@ body {
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -873,7 +873,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </small>
                 </div>
             `,
-            icon: 'question',
+            @if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
             showCancelButton: true,
             confirmButtonText: 'Confirm Payment',
             cancelButtonText: 'Cancel',
@@ -936,7 +936,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `,
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     showConfirmButton: false,
                     timer: 5000,
                     willClose: () => {
@@ -977,7 +977,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 `,
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#ef4444'
             });
@@ -990,3 +990,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+

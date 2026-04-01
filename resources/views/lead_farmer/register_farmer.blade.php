@@ -708,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'File too large',
                     text: 'Profile photo must be less than 5MB',
                     confirmButtonColor: '#10B981'
@@ -732,7 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const nicValue = nicInput.value.trim();
         if (nicValue && !validateNIC(nicValue)) {
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Invalid NIC',
                 text: 'Please enter a valid NIC number.',
                 confirmButtonColor: '#10B981'
@@ -746,28 +746,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (paymentMethod === 'ezcash' || paymentMethod === 'all') {
             if (!ezcash) {
-                Swal.fire({ icon: 'error', title: 'Missing EzCash', text: 'Please enter EzCash mobile number' });
+                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Missing EzCash', text: 'Please enter EzCash mobile number' });
                 return false;
             }
             if (!/^(074|076|077)[0-9]{7}$/.test(ezcash)) {
-                Swal.fire({ icon: 'error', title: 'Invalid EzCash', text: 'EzCash number must be exactly 10 digits and start with 074, 076, or 077' });
+                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Invalid EzCash', text: 'EzCash number must be exactly 10 digits and start with 074, 076, or 077' });
                 return false;
             }
         }
         if (paymentMethod === 'mcash' || paymentMethod === 'all') {
             if (!mcash) {
-                Swal.fire({ icon: 'error', title: 'Missing mCash', text: 'Please enter mCash mobile number' });
+                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Missing mCash', text: 'Please enter mCash mobile number' });
                 return false;
             }
             if (!/^(070|071)[0-9]{7}$/.test(mcash)) {
-                Swal.fire({ icon: 'error', title: 'Invalid mCash', text: 'mCash number must be exactly 10 digits and start with 070 or 071' });
+                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Invalid mCash', text: 'mCash number must be exactly 10 digits and start with 070 or 071' });
                 return false;
             }
         }
 
         if (!validatePasswordStrength()) {
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Password Does Not Meet Requirements',
                 html: 'Your password must satisfy all 11 security rules:<br><ul style="text-align:left;margin-top:8px;"><li>At least 8 characters</li><li>One number, one capital, one lowercase, one special character</li><li>No spaces, no 3× repeated chars, no sequences</li><li>Not a common password, no URLs, no personal info</li></ul>',
                 confirmButtonColor: '#10B981'
@@ -777,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!validatePasswordMatch()) {
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Passwords Mismatch',
                 text: 'Password and confirmation do not match.',
                 confirmButtonColor: '#10B981'
@@ -790,7 +790,7 @@ document.addEventListener('DOMContentLoaded', function() {
             for (const field of bankFields) {
                 if (!document.getElementById(field).value.trim()) {
                     Swal.fire({
-                        icon: 'error',
+                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Missing Information',
                         text: `Please fill in all ${field.replace('_', ' ')} fields.`,
                         confirmButtonColor: '#10B981'
@@ -801,7 +801,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (paymentMethod === 'ezcash') {
             if (!ezcash) {
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Missing Information',
                     text: 'Please enter EzCash mobile number.',
                     confirmButtonColor: '#10B981'
@@ -811,7 +811,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (paymentMethod === 'mcash') {
             if (!mcash) {
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Missing Information',
                     text: 'Please enter mCash mobile number.',
                     confirmButtonColor: '#10B981'
@@ -823,7 +823,7 @@ document.addEventListener('DOMContentLoaded', function() {
             for (const field of allFields) {
                 if (!document.getElementById(field).value.trim()) {
                     Swal.fire({
-                        icon: 'error',
+                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Missing Information',
                         text: `Please fill in all ${field.replace('_', ' ')} fields.`,
                         confirmButtonColor: '#10B981'
@@ -926,7 +926,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Farmer Registered Successfully!',
                     html: `
                         <div style="text-align: left; padding: 10px;">
@@ -954,7 +954,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Registration Failed',
                 text: error.message || 'An error occurred while registering the farmer.',
                 confirmButtonColor: '#10B981'

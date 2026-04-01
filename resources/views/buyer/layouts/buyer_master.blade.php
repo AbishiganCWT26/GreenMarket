@@ -988,7 +988,7 @@
 
             @if(session('success'))
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Success!',
                     text: '{{ session("success") }}',
                     timer: 3000,
@@ -1000,7 +1000,7 @@
 
             @if(session('error'))
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Oops...',
                     text: '{{ session("error") }}',
                     timer: 3000,
@@ -1012,7 +1012,7 @@
 
             @if($errors->any())
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Validation Error',
                     html: '{!! implode("<br>", $errors->all()) !!}',
                     timer: 4000,
@@ -1026,7 +1026,7 @@
         window.showWelcomeMessage = function () {
             if (!window.welcomeShown) {
                 Swal.fire({
-                    icon: 'info',
+                    @if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
                     title: 'translate ready',
                     text: 'choose language from the compact menu',
                     timer: 4500,
@@ -1064,7 +1064,7 @@
                             const currentText = gadget.innerText || '';
                             if (currentText !== previousLangText && currentText.trim() !== '') {
                                 Swal.fire({
-                                    icon: 'success',
+                                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                                     title: 'language updated',
                                     text: 'page content will now appear in selected language.',
                                     timer: 3500,
@@ -1099,7 +1099,7 @@
                                     const currentText = gadget.innerText || '';
                                     if (currentText !== previousLangText && currentText.trim() !== '') {
                                         Swal.fire({
-                                            icon: 'success',
+                                            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                                             title: 'language updated',
                                             text: 'page content will now appear in selected language.',
                                             timer: 3500,
@@ -1126,7 +1126,7 @@
                 if (e.target && (e.target.src || '').includes('translate.google')) {
                     e.preventDefault();
                     Swal.fire({
-                        icon: 'error',
+                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'translation error',
                         text: 'google translate failed to load. please refresh.',
                         confirmButtonColor: '#059669',

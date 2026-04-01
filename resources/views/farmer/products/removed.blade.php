@@ -185,7 +185,7 @@ function viewRemovedProduct(productId) {
     Swal.fire({
         title: 'Removed Product Details',
         text: 'Detailed view for removed product with ID: ' + productId,
-        icon: 'info',
+        @if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
         confirmButtonColor: '#10B981',
     });
 }

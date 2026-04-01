@@ -5,7 +5,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/lead_farmer/edit_product.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 @endsection
 
@@ -397,7 +397,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -533,7 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 otpSent = true;
                 startOtpTimer();
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'OTP Sent!',
                     text: 'OTP has been sent to farmer\'s mobile number',
                     timer: 2000,
@@ -541,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } else {
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Failed',
                     text: data.message || 'Failed to send OTP',
                 });
@@ -550,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error',
                 text: 'Failed to send OTP. Please try again.',
             });
@@ -563,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (enteredOtp.length !== 6) {
             Swal.fire({
-                icon: 'warning',
+                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 title: 'Incomplete OTP',
                 text: 'Please enter all 6 digits',
             });
@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitForm();
             } else {
                 Swal.fire({
-                    icon: 'error',
+                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Invalid OTP',
                     text: data.message || 'The OTP you entered is invalid or expired',
                 });
@@ -596,7 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error',
                 text: 'Failed to verify OTP. Please try again.',
             });
@@ -631,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (otpTimeLeft <= 0) {
                 clearInterval(otpTimer);
                 Swal.fire({
-                    icon: 'warning',
+                    @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                     title: 'OTP Expired',
                     text: 'The OTP has expired. Please request a new one.',
                 });
@@ -657,7 +657,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 Swal.fire({
-                    icon: 'success',
+                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Success!',
                     text: data.message || 'Product updated successfully',
                     confirmButtonText: 'OK'
@@ -671,7 +671,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     showOtpModal();
                 } else {
                     Swal.fire({
-                        icon: 'error',
+                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Error',
                         text: data.message || 'Failed to update product',
                         footer: data.errors ? Object.values(data.errors).join('<br>') : ''
@@ -682,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             Swal.fire({
-                icon: 'error',
+                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error',
                 text: 'An error occurred. Please try again.',
             });

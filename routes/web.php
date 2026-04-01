@@ -33,7 +33,7 @@ Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('password
 Route::get('/reset-password', [AuthController::class, 'showResetPassword'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset.submit');
 
-Route::view('/about-us', 'aboutus')->name('about');
+Route::get('/about-us', [PublicController::class, 'about'])->name('about');
 
 Route::get('/contact-us', [PublicController::class, 'contactForm'])->name('contact.form');
 Route::post('/contact-us/send', [PublicController::class, 'sendContact'])->name('contact.send');

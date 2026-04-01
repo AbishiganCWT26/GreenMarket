@@ -146,7 +146,7 @@
 	</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 	const today = new Date().toISOString().split('T')[0];
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	toDateInput.addEventListener('change', function() {
 		if (this.value < fromDateInput.value) {
 			Swal.fire({
-				icon: 'warning',
+				@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 				title: 'Date Error',
 				text: 'To date cannot be before from date',
 				confirmButtonColor: '#10B981',
@@ -241,7 +241,7 @@ function resetForm() {
 	document.getElementById('to_date').value = today;
 	
 	Swal.fire({
-		icon: 'success',
+		@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 		title: 'Form Reset',
 		text: 'All form fields have been reset',
 		confirmButtonColor: '#10B981',
@@ -262,7 +262,7 @@ document.getElementById('customReportForm').addEventListener('submit', function(
 	
 	if (!reportType) {
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Missing Information',
 			text: 'Please select a report type',
 			confirmButtonColor: '#10B981',
@@ -274,7 +274,7 @@ document.getElementById('customReportForm').addEventListener('submit', function(
 	
 	if (!fromDate || !toDate) {
 		Swal.fire({
-			icon: 'warning',
+			@if(file_exists(public_path('assets/icons/Gif/Missing Dates1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Missing Dates1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 			title: 'Missing Dates',
 			text: 'Please select both date ranges',
 			confirmButtonColor: '#10B981',
@@ -286,7 +286,7 @@ document.getElementById('customReportForm').addEventListener('submit', function(
 	
 	if (new Date(fromDate) > new Date(toDate)) {
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Invalid Date',
 			text: 'From date cannot be after to date',
 			confirmButtonColor: '#10B981',
@@ -299,6 +299,7 @@ document.getElementById('customReportForm').addEventListener('submit', function(
 	Swal.fire({
 		title: 'Generating Report',
 		text: 'Please wait while we generate your report...',
+		@if(file_exists(public_path('assets/icons/Gif/loading3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
 		allowOutsideClick: false,
 		background: '#ffffff',
 		color: '#0f1724',

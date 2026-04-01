@@ -173,7 +173,7 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 	let currentProductId = null;
 	let allProducts = [];
@@ -218,7 +218,7 @@
 			},
 			error: function(xhr) {
 				Swal.fire({
-					icon: 'error',
+					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Error',
 					text: 'Failed to load products. Please try again.',
 					position: 'center',
@@ -630,7 +630,7 @@
 			},
 			error: function(xhr) {
 				Swal.fire({
-					icon: 'error',
+					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Error',
 					text: 'Failed to load product details.',
 					position: 'center',
@@ -760,7 +760,7 @@
 			success: function(response) {
 				closeModal();
 				Swal.fire({
-					icon: 'success',
+					@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 					title: 'Success',
 					text: 'Product updated successfully!',
 					timer: 2000,
@@ -776,7 +776,7 @@
 						errors += error + '\n';
 					});
 					Swal.fire({
-						icon: 'error',
+						@if(file_exists(public_path('assets/icons/Gif/Validation Error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Validation Error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Validation Error',
 						text: errors,
 						position: 'center',
@@ -784,7 +784,7 @@
 					});
 				} else {
 					Swal.fire({
-						icon: 'error',
+						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Error',
 						text: 'Failed to update product. Please try again.',
 						position: 'center',
@@ -824,6 +824,7 @@
 					</div>
 				</div>
 			`,
+			@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			showCancelButton: true,
 			confirmButtonText: 'Mark as Removed',
 			cancelButtonText: 'Cancel',
@@ -850,7 +851,7 @@
 			},
 			success: function(response) {
 				Swal.fire({
-					icon: 'success',
+					@if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 					title: 'Success',
 					text: 'Product status changed to removed. SMS notifications sent to farmer and lead farmer.',
 					timer: 3000,
@@ -861,7 +862,7 @@
 			},
 			error: function(xhr) {
 				Swal.fire({
-					icon: 'error',
+					@if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Error',
 					text: 'Failed to update product status. Please try again.',
 					position: 'center',

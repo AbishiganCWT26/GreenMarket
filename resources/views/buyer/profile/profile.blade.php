@@ -5,7 +5,7 @@
 
 @section('styles')
 	<link rel="stylesheet" href="{{ asset('css/buyer/profile.css') }}">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	
 	<style>
 		.strength-bar {
 			height: 5px;
@@ -316,7 +316,7 @@
 @endsection
 
 @section('scripts')
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
 	<script src="{{ asset('js/form-validation.js') }}"></script>
 	<script src="{{ asset('js/gn-data.js') }}"></script>
 	<script>

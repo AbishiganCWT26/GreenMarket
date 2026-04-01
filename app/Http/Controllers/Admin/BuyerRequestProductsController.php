@@ -36,7 +36,7 @@ class BuyerRequestProductsController extends Controller
 			$view = $request->input('view', 'table');
 			$perPage = $view === 'card' ? 12 : 10;
 
-			$buyerRequests = $query->paginate($perPage);
+			$buyerRequests = $query->paginate($perPage)->withQueryString();
 
 			foreach ($buyerRequests as $requestItem) {
 				$requestItem->formatted_date = \Carbon\Carbon::parse($requestItem->needed_date)->format('M d, Y');
@@ -60,7 +60,7 @@ class BuyerRequestProductsController extends Controller
 			}
 		}
 
-		$buyerRequests = $query->paginate(10);
+		$buyerRequests = $query->paginate(10)->withQueryString();
 
 		foreach ($buyerRequests as $requestItem) {
 			$requestItem->formatted_date = \Carbon\Carbon::parse($requestItem->needed_date)->format('M d, Y');

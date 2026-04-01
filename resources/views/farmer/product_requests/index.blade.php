@@ -5,7 +5,7 @@
 @section('page-title', 'Buyer Product Requests')
 
 @section('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <style>
 :root {
 	--primary-green: #10B981;
@@ -800,7 +800,7 @@ body {
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 async function viewRequestDetails(requestId) {
 	try {
@@ -924,7 +924,7 @@ async function viewRequestDetails(requestId) {
 
 		} else {
 			Swal.fire({
-				icon: 'error',
+				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Error!',
 				text: data.message || 'Failed to load request details',
 				confirmButtonColor: '#ef4444',
@@ -935,7 +935,7 @@ async function viewRequestDetails(requestId) {
 
 	} catch (error) {
 		Swal.fire({
-			icon: 'error',
+			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error!',
 			text: 'Failed to load request details. Please try again.',
 			confirmButtonColor: '#ef4444',
@@ -1055,3 +1055,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+
