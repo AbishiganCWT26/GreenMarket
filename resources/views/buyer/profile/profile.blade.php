@@ -325,7 +325,7 @@
 				Swal.fire({
 					title: 'Success',
 					text: '{{ session('success') }}',
-					imageUrl: '{{ asset('assets/icons/success1.gif') }}',
+					imageUrl: '{{ asset('assets/icons/success3.gif') }}',
 					imageWidth: 80,
 					imageHeight: 80,
 					timer: 3000,
@@ -343,7 +343,7 @@
 				Swal.fire({
 					title: 'Error',
 					text: '{{ session('error') }}',
-					imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+					imageUrl: '{{ asset('assets/icons/error2.gif') }}',
 					imageWidth: 80,
 					imageHeight: 80,
 					timer: 4000,
@@ -366,7 +366,7 @@
 					Swal.fire({
 						title: 'Validation Error',
 						html: errorMessages.replace(/\n/g, '<br>'),
-						imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+						imageUrl: '{{ asset('assets/icons/Validation Error1.gif') }}',
 						imageWidth: 80,
 						imageHeight: 80,
 						showConfirmButton: true,
@@ -399,7 +399,7 @@
 								Swal.fire({
 									title: 'Validation Error',
 									html: errors.join('<br>'),
-									imageUrl: '{{ asset('assets/icons/error1.gif') }}',
+									imageUrl: '{{ asset('assets/icons/Validation Error1.gif') }}',
 									imageWidth: 80,
 									imageHeight: 80,
 									showConfirmButton: true,
@@ -416,6 +416,9 @@
 						Swal.fire({
 							title: 'Updating...',
 							text: 'Please wait while we update your information.',
+							imageUrl: '{{ asset('assets/icons/loading5.gif') }}',
+							imageWidth: 80,
+							imageHeight: 80,
 							allowOutsideClick: false,
 							didOpen: () => {
 								Swal.showLoading();
@@ -557,7 +560,7 @@
 		function requestNICEdit() {
 			Swal.fire({
 				title: 'Contact System Administrator to change NIC No.',
-				imageUrl: '{{ asset('assets/icons/info1.gif') }}',
+				imageUrl: '{{ asset('assets/icons/info3.gif') }}',
 				imageWidth: 80,
 				imageHeight: 80,
 				showCancelButton: true,

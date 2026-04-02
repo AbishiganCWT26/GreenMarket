@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await Swal.fire({
                 title: 'Remove item?',
                 text: `Are you sure you want to remove "${productName}" from your cart?`,
-                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 showCancelButton: true,
                 confirmButtonText: 'Yes, remove it',
                 cancelButtonText: 'Cancel',
@@ -489,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await Swal.fire({
                 title: 'Clear cart?',
                 text: 'Are you sure you want to remove all items from your cart?',
-                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 showCancelButton: true,
                 confirmButtonText: 'Yes, clear cart',
                 cancelButtonText: 'Cancel',
@@ -577,82 +577,72 @@ document.addEventListener('DOMContentLoaded', function() {
     if (proceedToPaymentBtn) {
         proceedToPaymentBtn.addEventListener('click', async function() {
             const result = await Swal.fire({
-                title: 'Select Payment Method',
-                text: 'Choose how you would like to pay for your order',
-                @if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+                title: 'Order Confirmation',
+                html: `
+                    <div class="text-start">
+                    <center>
+                        <p><strong>Order Pick-up process:</strong> <br>You will directly contact the Seller for pickup</p>
+                    </center>
+                    </div>
+                `,
+                @if(file_exists(public_path('assets/icons/Gif/Order Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Order Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
                 showCancelButton: true,
-                confirmButtonText: 'Cash on Delivery',
-                denyButtonText: 'Cancel',
+                confirmButtonText: 'Confirm Order',
+                cancelButtonText: 'Cancel',
                 confirmButtonColor: '#10B981',
-                denyButtonColor: '#6B7280'
+                cancelButtonColor: '#6B7280'
             });
 
             if (result.isConfirmed) {
-                // Cash on Delivery selected
-                Swal.fire({
-                    title: 'Cash on Delivery Selected',
-                    html: `
-                        <div class="text-start">
-                            <p><strong>How Cash on Delivery works:</strong></p>
-                            <ul>
-                                <li>You will directly contact the lead farmer for pickup</li>
-                            </ul>
-                        </div>
-                    `,
-                    @if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
-                    showCancelButton: true,
-                    confirmButtonText: 'Confirm Order',
-                    cancelButtonText: 'Go Back'
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        // Place order with COD
-                        try {
-                            const response = await fetch('/buyer/checkout/place-order', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': csrfToken,
-                                    'Accept': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    payment_method: 'cod'
-                                })
-                            });
+                // Place order with COD
+                try {
+                    const response = await fetch('/buyer/checkout/place-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            payment_method: 'cod'
+                        })
+                    });
 
-                            const data = await response.json();
+                    const data = await response.json();
 
-                            if (data.success) {
-                                // Show the specific message you requested
-                                Swal.fire({
-                                    title: 'Order Placed Successfully!',
-                                    html: `
-                                        <div class="text-center">
-                                            <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
-                                            <p class="h5">Contact the seller for the pickup</p>
-                                            <p class="text-muted">Check the invoice in "Order History"</p>
-                                        </div>
-                                    `,
-                                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-                                    confirmButtonText: 'Go to Order History',
-                                    confirmButtonColor: '#10B981'
-                                }).then(() => {
-                                    // Redirect to order history page
-                                    if (data.redirect_url) {
-                                        window.location.href = data.redirect_url;
-                                    } else {
-                                        // Fallback redirect
-                                        window.location.href = '/buyer/history';
-                                    }
-                                });
+                    if (data.success) {
+                        // Show success message
+                        Swal.fire({
+                            title: 'Order Placed Successfully!',
+                            html: `
+                                <div class="text-center">
+                                    @if(file_exists(public_path('assets/icons/Gif/Order Success2.gif')))
+                                        <img src="{{ asset('assets/icons/Gif/Order Success2.gif') }}" width="150" height="150" class="mb-3" alt="Success">
+                                    @else
+                                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                                    @endif
+                                    <p class="h5">Contact the seller for the pickup</p>
+                                    <p class="text-muted">Check the invoice in "Order History"</p>
+                                </div>
+                            `,
+                            confirmButtonText: 'Go to Order History',
+                            confirmButtonColor: '#10B981'
+                        }).then(() => {
+                            // Redirect to order history page
+                            if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
                             } else {
-                                showAlert(data.message || 'Failed to place order', 'error');
+                                // Fallback redirect
+                                window.location.href = '/buyer/history';
                             }
-                        } catch (error) {
-                            console.error('Error:', error);
-                            showAlert('Failed to place order. Please try again.', 'error');
-                        }
+                        });
+                    } else {
+                        showAlert(data.message || 'Failed to place order', 'error');
                     }
-                });
+                } catch (error) {
+                    console.error('Error:', error);
+                    showAlert('Failed to place order. Please try again.', 'error');
+                }
             }
         });
     }

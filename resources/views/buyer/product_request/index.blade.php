@@ -658,7 +658,7 @@ async function viewRequestDetails(requestId) {
 
     } catch (error) {
         Swal.fire({
-            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: 'Error!',
             text: error.message,
             confirmButtonColor: '#ef4444'

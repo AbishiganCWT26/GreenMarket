@@ -1509,6 +1509,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <textarea id="feedbackComment" rows="3" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem;" placeholder="Share your experience (optional)"></textarea>
                     </div>
                 `,
+                @if(file_exists(public_path('assets/icons/Gif/Rate Order1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Rate Order1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
                 showCancelButton: true,
                 confirmButtonText: 'Submit Rating',
                 cancelButtonText: 'Cancel',
@@ -1631,6 +1632,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             ` : ''}
                         </div>
                     `,
+                    @if(file_exists(public_path('assets/icons/Gif/info5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
                     showCloseButton: true,
                     showConfirmButton: false,
                     customClass: {

@@ -274,6 +274,7 @@ $(document).ready(function() {
         Swal.fire({
             title: 'Submitting Complaint',
             text: 'Please wait while we process your complaint...',
+            @if(file_exists(public_path('assets/icons/Gif/loading4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
             allowOutsideClick: false,
             showConfirmButton: false,
             willOpen: () => {
@@ -293,7 +294,7 @@ $(document).ready(function() {
 
                 if (response.success) {
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/success2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                         title: 'Complaint Submitted!',
                         html: `
                             <div class="success-message">
@@ -326,7 +327,7 @@ $(document).ready(function() {
                     });
                 } else {
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Submission Failed',
                         text: response.message || 'Failed to submit complaint. Please try again.',
                         confirmButtonColor: '#10B981'
@@ -347,7 +348,7 @@ $(document).ready(function() {
                 }
 
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Submission Error',
                     html: `
                         <div class="error-message">

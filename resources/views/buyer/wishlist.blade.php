@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             toast: true,
             position: 'top-end',
-            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
             title: "{{ session('success') }}",
             showConfirmButton: false,
             timer: 3000,
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             toast: true,
             position: 'top-end',
-            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: "{{ session('error') }}",
             showConfirmButton: false,
             timer: 3000,
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
                     title: 'Error',
                     text: 'Delete form not found. Please try again.',
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     confirmButtonColor: '#ef4444'
                 });
                 return;
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
                     title: 'Remove from wishlist?',
                     text: `Are you sure you want to remove "${productName}" from your wishlist?`,
-                    @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                     showCancelButton: true,
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#6b7280',

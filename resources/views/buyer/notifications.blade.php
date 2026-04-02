@@ -71,7 +71,7 @@
             Swal.fire({
                 title: 'Refreshing',
                 text: 'Checking for new notifications...',
-                @if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/loading1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
                 timer: 1500,
                 showConfirmButton: false
             }).then(() => {
@@ -83,7 +83,7 @@
             Swal.fire({
                 title: 'Mark all as read?',
                 text: 'All notifications will be marked as read.',
-                @if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/question4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
                 showCancelButton: true,
                 confirmButtonColor: '#10B981',
                 cancelButtonColor: '#6b7280',
@@ -93,7 +93,7 @@
                     Swal.fire({
                         title: 'Success!',
                         text: 'All notifications marked as read.',
-                        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                         timer: 2000,
                         showConfirmButton: false
                     });
@@ -122,7 +122,7 @@
             Swal.fire({
                 title: 'Marked as read',
                 text: 'Notification has been marked as read.',
-                @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                 timer: 1500,
                 showConfirmButton: false
             });

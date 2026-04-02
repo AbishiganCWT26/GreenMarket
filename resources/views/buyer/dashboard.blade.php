@@ -260,7 +260,7 @@
 <script>
     @if(session('success'))
     Swal.fire({
-        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+        @if(file_exists(public_path('assets/icons/Gif/success6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
         title: 'Success!',
         text: '{{ session('success') }}',
         timer: 3000,
@@ -270,7 +270,7 @@
 
     @if(session('error'))
     Swal.fire({
-        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+        @if(file_exists(public_path('assets/icons/Gif/error4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
         title: 'Error!',
         text: '{{ session('error') }}',
         timer: 4000,
@@ -280,7 +280,7 @@
 
     @if($errors->any())
     Swal.fire({
-        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+        @if(file_exists(public_path('assets/icons/Gif/Validation Error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Validation Error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
         title: 'Validation Error!',
         html: `@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach`,
         showConfirmButton: true
@@ -390,6 +390,7 @@
         const loadingAlert = Swal.fire({
             title: 'Applying Filters...',
             text: 'Please wait while we filter the products',
+            @if(file_exists(public_path('assets/icons/Gif/loading3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
@@ -405,7 +406,7 @@
         Swal.fire({
             title: 'Clear all filters?',
             text: 'This will reset all search and filter settings',
-            @if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/Clear filters1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Clear filters1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
             showCancelButton: true,
             confirmButtonColor: '#10B981',
             cancelButtonColor: '#6B7280',

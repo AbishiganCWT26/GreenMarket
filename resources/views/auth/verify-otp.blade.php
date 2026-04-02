@@ -156,7 +156,7 @@
 				clearInterval(timerInterval);
 				document.getElementById('timer').classList.add('expired');
 				document.getElementById('verifyBtn').disabled = true;
-				Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'OTP Expired', text: 'Please request new OTP' });
+				Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/Failed1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'OTP Expired', text: 'Please request new OTP' });
 			}
 			timerSeconds--;
 		}
@@ -169,7 +169,7 @@
 			Swal.fire({
 				title: 'Resend OTP?',
 				text: 'Send new code to your email',
-				@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 				showCancelButton: true,
 				confirmButtonColor: '#10B981',
 				cancelButtonColor: '#6b7280'
@@ -191,7 +191,7 @@
 							timerInterval = setInterval(updateTimer, 1000);
 							link.classList.add('disabled');
 							setTimeout(() => link.classList.remove('disabled'), 30000);
-							Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif, title: 'OTP Resent', timer: 1500, showConfirm: false });
+							Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif, title: 'OTP Resent', timer: 1500, showConfirm: false });
 						}
 					});
 				}
@@ -205,11 +205,11 @@
 			document.getElementById('otpForm').addEventListener('submit', function(e) {
 				if (document.getElementById('fullOtp').value.length !== 6) {
 					e.preventDefault();
-					Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Invalid OTP', text: 'Enter all 6 digits' });
+					Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Invalid OTP', text: 'Enter all 6 digits' });
 				}
 				if (timerSeconds <= 0) {
 					e.preventDefault();
-					Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'OTP Expired', text: 'Request new OTP' });
+					Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/Failed1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'OTP Expired', text: 'Request new OTP' });
 				}
 			});
 
