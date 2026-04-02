@@ -622,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/File Too Large1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/File Too Large1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'File too large',
                     text: 'Profile photo must be less than 5MB',
                     confirmButtonColor: '#10B981'
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const nicValue = nicInput.value.trim();
         if (nicValue && !validateNIC(nicValue)) {
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Invalid NIC1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Invalid NIC1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Invalid NIC',
                 text: 'Please enter a valid NIC number.',
                 confirmButtonColor: '#10B981'
@@ -660,21 +660,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (paymentMethod === 'ezcash' || paymentMethod === 'all') {
             if (!ezcash) {
-                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Missing EzCash', text: 'Please enter EzCash mobile number' });
+                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/alert3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Missing EzCash', text: 'Please enter EzCash mobile number' });
                 return false;
             }
             if (!/^(074|076|077)[0-9]{7}$/.test(ezcash)) {
-                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Invalid EzCash', text: 'EzCash number must be exactly 10 digits and start with 074, 076, or 077' });
+                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/alert3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Invalid EzCash', text: 'EzCash number must be exactly 10 digits and start with 074, 076, or 077' });
                 return false;
             }
         }
         if (paymentMethod === 'mcash' || paymentMethod === 'all') {
             if (!mcash) {
-                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Missing mCash', text: 'Please enter mCash mobile number' });
+                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/alert3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Missing mCash', text: 'Please enter mCash mobile number' });
                 return false;
             }
             if (!/^(070|071)[0-9]{7}$/.test(mcash)) {
-                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Invalid mCash', text: 'mCash number must be exactly 10 digits and start with 070 or 071' });
+                Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/alert3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Invalid mCash', text: 'mCash number must be exactly 10 digits and start with 070 or 071' });
                 return false;
             }
         }
@@ -684,7 +684,7 @@ document.addEventListener('DOMContentLoaded', function() {
             for (const field of bankFields) {
                 if (!document.getElementById(field).value.trim()) {
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/Search File1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Search File1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Missing Information',
                         text: `Please fill in all ${field.replace('_', ' ')} fields.`,
                         confirmButtonColor: '#10B981'
@@ -695,7 +695,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (paymentMethod === 'ezcash') {
             if (!ezcash) {
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/Search File1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Search File1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Missing Information',
                     text: 'Please enter EzCash mobile number.',
                     confirmButtonColor: '#10B981'
@@ -705,7 +705,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (paymentMethod === 'mcash') {
             if (!mcash) {
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/Search File1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Search File1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Missing Information',
                     text: 'Please enter mCash mobile number.',
                     confirmButtonColor: '#10B981'
@@ -717,7 +717,7 @@ document.addEventListener('DOMContentLoaded', function() {
             for (const field of allFields) {
                 if (!document.getElementById(field).value.trim()) {
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/Search File1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Search File1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Missing Information',
                         text: `Please fill in all ${field.replace('_', ' ')} fields.`,
                         confirmButtonColor: '#10B981'
@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (data.success) {
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Farmer Updated Successfully!',
                     text: data.message || 'Farmer details have been updated.',
                     confirmButtonColor: '#10B981'
@@ -791,7 +791,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/error4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Operation Failed',
                 text: 'An unexpected error occurred. Please try again.',
                 confirmButtonColor: '#10B981'
@@ -833,6 +833,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         autocapitalize: 'off',
                         autocorrect: 'off'
                     },
+                    @if(file_exists(public_path('assets/icons/Gif/otp sent success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/otp sent success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     showCancelButton: true,
                     confirmButtonText: 'Verify & Update',
                     confirmButtonColor: '#10B981',
@@ -849,7 +850,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else {
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Failed to Send OTP',
                     text: data.message || 'An error occurred while sending the OTP.',
                     confirmButtonColor: '#10B981'
@@ -858,7 +859,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error',
                 text: 'Could not connect to the server. Please check your connection.',
                 confirmButtonColor: '#10B981'
@@ -878,14 +879,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             errorList += '</ul>';
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Validation Failed',
                 html: `<p>Please fix the following errors:</p>${errorList}`,
                 confirmButtonColor: '#10B981'
             });
         } else {
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Update Failed',
                 text: errorMessage,
                 confirmButtonColor: '#10B981'

@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			Swal.fire({
 				title: 'Mark as Ready?',
 				text: 'Confirm products are ready for pickup',
-				@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 				showCancelButton: true,
 				confirmButtonColor: '#f59e0b',
 				cancelButtonColor: '#6b7280',
@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			Swal.fire({
 				title: 'Complete Order?',
 				text: 'Mark this order as completed',
-				@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 				showCancelButton: true,
 				confirmButtonColor: '#10B981',
 				cancelButtonColor: '#6b7280',
@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		Swal.fire({
 			title: 'Confirm Payment',
 			text: 'Mark this order as paid?',
-			@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 			showCancelButton: true,
 			confirmButtonColor: '#10B981',
 			cancelButtonColor: '#6b7280',
@@ -495,14 +495,14 @@ document.addEventListener('DOMContentLoaded', function() {
 				.then(res => res.json())
 				.then(data => {
 					if (data.success) {
-						Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif, title: 'Success', text: data.message, timer: 1500, showConfirm: false });
+						Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/success5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif, title: 'Success', text: data.message, timer: 1500, showConfirm: false });
 						closeModalFunc();
 						setTimeout(() => location.reload(), 1500);
 					} else {
-						Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: data.message });
+						Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: data.message });
 					}
 				})
-				.catch(() => Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: 'Network error' }));
+				.catch(() => Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: 'Network error' }));
 			}
 		});
 	});
@@ -522,10 +522,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif, title: 'Success', text: data.message, timer: 1500, showConfirm: false });
 				setTimeout(() => location.reload(), 1500);
 			} else {
-				Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: data.message });
+				Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: data.message });
 			}
 		})
-		.catch(() => Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: 'Network error' }));
+		.catch(() => Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif, title: 'Error', text: 'Network error' }));
 	}
 
 	// Animation delays

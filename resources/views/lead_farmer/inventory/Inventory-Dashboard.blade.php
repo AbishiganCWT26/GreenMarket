@@ -927,7 +927,7 @@ document.getElementById('stockUpdateForm')?.addEventListener('submit', async fun
 		if (data.success) {
 			closeUpdateModal();
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 				title: 'Success!',
 				text: data.message,
 				timer: 1500,
@@ -942,7 +942,7 @@ document.getElementById('stockUpdateForm')?.addEventListener('submit', async fun
 			});
 		} else {
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Error!',
 				text: data.message || 'Update failed',
 				background: '#ffffff',
@@ -955,7 +955,7 @@ document.getElementById('stockUpdateForm')?.addEventListener('submit', async fun
 		}
 	} catch (error) {
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error!',
 			text: 'Something went wrong',
 			background: '#ffffff',

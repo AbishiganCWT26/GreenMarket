@@ -320,7 +320,7 @@ $(document).ready(function() {
                 $(this).addClass('is-invalid');
                 
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                     title: 'Required Field',
                     text: 'Please fill all required fields before proceeding.',
                     confirmButtonColor: '#10B981'
@@ -443,7 +443,7 @@ $(document).ready(function() {
     function handleFile(file) {
         if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Invalid File1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Invalid File1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Invalid File',
                 text: 'Please upload only JPG or PNG images',
                 confirmButtonColor: '#10B981'
@@ -453,7 +453,7 @@ $(document).ready(function() {
         
         if (file.size > 5 * 1024 * 1024) {
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/File Too Large1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/File Too Large1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'File Too Large',
                 text: 'Maximum file size is 5MB',
                 confirmButtonColor: '#10B981'
@@ -484,7 +484,7 @@ $(document).ready(function() {
         
         if (!validateStep(currentStep)) {
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Validation Error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Validation Error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 title: 'Validation Error',
                 text: 'Please complete all required fields',
                 confirmButtonColor: '#10B981'
@@ -495,6 +495,7 @@ $(document).ready(function() {
         Swal.fire({
             title: 'Saving Product',
             text: 'Please wait...',
+            @if(file_exists(public_path('assets/icons/Gif/Loading5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Loading5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
@@ -513,7 +514,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                         title: 'Success!',
                         html: `
                             <div class="text-center">
@@ -556,7 +557,7 @@ $(document).ready(function() {
                     });
                 } else {
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Error',
                         text: response.message || 'Failed to add product',
                         confirmButtonColor: '#10B981'
@@ -588,7 +589,7 @@ $(document).ready(function() {
                 }
                 
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: errorMessage,
                     html: errorDetails || 'An unexpected error occurred. Please try again.',
                     confirmButtonColor: '#10B981',

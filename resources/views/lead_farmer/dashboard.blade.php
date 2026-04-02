@@ -155,7 +155,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 Swal.fire({
-@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 title: 'Success!',
 text: '{{ session('success') }}',
 confirmButtonColor: '#10B981',
@@ -172,7 +172,7 @@ color: '#0f1724'
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 Swal.fire({
-@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 title: 'Error!',
 text: '{{ session('error') }}',
 confirmButtonColor: '#ef4444',
@@ -189,7 +189,7 @@ color: '#0f1724'
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 Swal.fire({
-@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+@if(file_exists(public_path('assets/icons/Gif/Validation Error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Validation Error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 title: 'Validation Error',
 text: '{{ $errors->first() }}',
 confirmButtonColor: '#ef4444',

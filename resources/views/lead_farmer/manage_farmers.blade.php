@@ -507,7 +507,7 @@
 				.catch(error => {
 					console.error('Error:', error);
 					Swal.fire({
-						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+						@if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Error',
 						text: 'Failed to load farmer details. Please try again.',
 						confirmButtonColor: '#10B981'
@@ -701,7 +701,7 @@
 					</p>
 				</div>
 			`,
-				@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 				showCancelButton: true,
 				confirmButtonText: 'Yes, deactivate',
 				cancelButtonText: 'Cancel',
@@ -738,7 +738,7 @@
 						.catch(error => {
 							console.error('Error:', error);
 							Swal.fire({
-								@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+								@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 								title: 'Error',
 								text: 'Failed to deactivate farmer. Please try again.',
 								confirmButtonColor: '#10B981'

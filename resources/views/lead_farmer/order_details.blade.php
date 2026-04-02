@@ -378,6 +378,7 @@ function markPaymentReceived(orderId) {
 					Swal.fire({
 						title: 'Processing...',
 						text: 'Please wait',
+						@if(file_exists(public_path('assets/icons/Gif/loading4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
 						allowOutsideClick: false,
 						didOpen: () => {
 							Swal.showLoading();
@@ -389,7 +390,7 @@ function markPaymentReceived(orderId) {
 						Swal.fire({
 							title: 'Success!',
 							text: response.message,
-							@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							confirmButtonColor: '#10B981',
 							timer: 2000,
 							showConfirmButton: false
@@ -400,7 +401,7 @@ function markPaymentReceived(orderId) {
 						Swal.fire({
 							title: 'Error!',
 							text: response.message,
-							@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 							confirmButtonColor: '#EF4444'
 						});
 					}
@@ -410,7 +411,7 @@ function markPaymentReceived(orderId) {
 					Swal.fire({
 						title: 'Error!',
 						text: error.message || 'Something went wrong',
-						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+						@if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						confirmButtonColor: '#EF4444'
 					});
 				}
@@ -425,7 +426,7 @@ function updateOrderStatus(orderId, status) {
 	Swal.fire({
 		title: 'Update Order Status',
 		text: `Are you sure you want to mark this order as ${statusText}?`,
-		@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+		@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 		showCancelButton: true,
 		confirmButtonText: `Yes, mark as ${statusText}`,
 		confirmButtonColor: '#10B981',
@@ -446,6 +447,7 @@ function updateOrderStatus(orderId, status) {
 					Swal.fire({
 						title: 'Updating...',
 						text: 'Please wait',
+						@if(file_exists(public_path('assets/icons/Gif/loading3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 						allowOutsideClick: false,
 						didOpen: () => {
 							Swal.showLoading();
@@ -457,7 +459,7 @@ function updateOrderStatus(orderId, status) {
 						Swal.fire({
 							title: 'Success!',
 							text: response.message,
-							@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							confirmButtonColor: '#10B981',
 							timer: 1500,
 							showConfirmButton: false
@@ -468,7 +470,7 @@ function updateOrderStatus(orderId, status) {
 						Swal.fire({
 							title: 'Error!',
 							text: response.message,
-							@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 							confirmButtonColor: '#EF4444'
 						});
 					}
@@ -478,7 +480,7 @@ function updateOrderStatus(orderId, status) {
 					Swal.fire({
 						title: 'Error!',
 						text: error.message || 'Something went wrong',
-						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+						@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						confirmButtonColor: '#EF4444'
 					});
 				}

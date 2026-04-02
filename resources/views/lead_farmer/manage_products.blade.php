@@ -343,7 +343,7 @@ $(document).ready(function() {
 				<p style="font-size:14px;margin-bottom:8px">Delete <strong>${productName}</strong>?</p>
 				<p style="font-size:12px;color:#6b7280">This action cannot be undone</p>
 			</div>`,
-			@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 			showCancelButton: true,
 			confirmButtonColor: '#10B981',
 			cancelButtonColor: '#ef4444',
@@ -365,6 +365,7 @@ $(document).ready(function() {
 						Swal.fire({
 							title: 'Deleting...',
 							text: 'Please wait',
+							@if(file_exists(public_path('assets/icons/Gif/loading3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 							allowOutsideClick: false,
 							didOpen: () => {
 								Swal.showLoading();
@@ -374,7 +375,7 @@ $(document).ready(function() {
 					success: function(response) {
 						if (response.success) {
 							Swal.fire({
-								@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+								@if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 								title: 'Deleted!',
 								text: response.message,
 								confirmButtonColor: '#10B981',
@@ -385,7 +386,7 @@ $(document).ready(function() {
 							});
 						} else {
 							Swal.fire({
-								@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+								@if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 								title: 'Error!',
 								text: response.message,
 								confirmButtonColor: '#10B981'
@@ -394,7 +395,7 @@ $(document).ready(function() {
 					},
 					error: function() {
 						Swal.fire({
-							@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 							title: 'Error!',
 							text: 'Something went wrong',
 							confirmButtonColor: '#10B981'
@@ -424,7 +425,7 @@ $(document).ready(function() {
 			},
 			error: function() {
 				Swal.fire({
-					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+					@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Error',
 					text: 'Failed to load details',
 					confirmButtonColor: '#10B981'
