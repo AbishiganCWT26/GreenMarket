@@ -6,7 +6,12 @@
 	<title>👩‍🌾 Farmer Hub | @yield('title')</title>
 	<link rel="stylesheet" href="{{ asset('css/farmer/farmer-master.css') }}">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-	@yield('styles')
+	<style>
+        .swal2-image {
+            margin: 0em auto 0em !important;
+        }
+    </style>
+    @yield('styles')
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -943,7 +948,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					const notifDot = document.querySelector('.notif-dot');
 					if (notifDot) notifDot.remove();
 					Swal.fire({
-						@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+						@if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 						title: 'Success',
 						text: 'All notifications marked as read',
 						timer: 1500,
@@ -954,7 +959,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			})
 			.catch(error => {
 				Swal.fire({
-					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+					@if(file_exists(public_path('assets/icons/Gif/mark as read fail1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Error',
 					text: 'Failed to mark notifications as read',
 					confirmButtonColor: '#10B981',
@@ -970,7 +975,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	@if(session('success'))
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 			title: 'Success!',
 			text: '{{ session("success") }}',
 			timer: 3000,
@@ -983,7 +988,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	@endif
 	@if(session('error'))
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error!',
 			text: '{{ session("error") }}',
 			timer: 3000,
@@ -996,7 +1001,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	@endif
 	@if(session('warning'))
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/alert2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 			title: 'Warning!',
 			text: '{{ session("warning") }}',
 			timer: 3000,
@@ -1009,7 +1014,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	@endif
 	@if($errors->any())
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/Validation Error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Validation Error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Validation Error',
 			html: '{!! implode("<br>", $errors->all()) !!}',
 			timer: 4000,
@@ -1030,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
 				if (!validTypes.includes(file.type)) {
 					Swal.fire({
-						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+						@if(file_exists(public_path('assets/icons/Gif/Invalid File1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Invalid File1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Invalid File Type',
 						text: 'Please upload only JPEG, PNG, JPG or GIF images.',
 						confirmButtonColor: '#10B981',
@@ -1041,7 +1046,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 				if (file.size > 2 * 1024 * 1024) {
 					Swal.fire({
-						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+						@if(file_exists(public_path('assets/icons/Gif/File Too Large1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/File Too Large1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'File Too Large',
 						text: 'Image size should be less than 2MB.',
 						confirmButtonColor: '#10B981',
@@ -1102,7 +1107,7 @@ window.googleTranslateElementInit = function() {
 					const currentText = gadget.innerText || '';
 					if (currentText !== previousLangText && currentText.trim() !== '') {
 						Swal.fire({
-							@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/success5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							title: 'language updated',
 							text: 'page content will now appear in selected language.',
 							timer: 3500,
@@ -1137,7 +1142,7 @@ window.googleTranslateElementInit = function() {
 							const currentText = gadget.innerText || '';
 							if (currentText !== previousLangText && currentText.trim() !== '') {
 								Swal.fire({
-									@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+									@if(file_exists(public_path('assets/icons/Gif/success5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 									title: 'language updated',
 									text: 'page content will now appear in selected language.',
 									timer: 3500,
@@ -1164,7 +1169,7 @@ window.googleTranslateElementInit = function() {
 		if (e.target && (e.target.src || '').includes('translate.google')) {
 			e.preventDefault();
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'translation error',
 				text: 'google translate failed to load. please refresh.',
 				confirmButtonColor: '#059669',

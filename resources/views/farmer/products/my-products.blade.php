@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     @if(session('success'))
         Swal.fire({
-            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/success2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
             title: 'Success',
             text: '{{ session('success') }}',
             confirmButtonColor: '#10B981',
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     @if(session('error'))
         Swal.fire({
-            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
             title: 'Error',
             text: '{{ session('error') }}',
             confirmButtonColor: '#EF4444'
@@ -349,6 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             Swal.fire({
                 title: 'Loading...',
+                @if(file_exists(public_path('assets/icons/Gif/loading3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading3.gif') }}', imageWidth: 100, imageHeight: 60 @else icon: 'info' @endif,
                 allowOutsideClick: false,
                 showConfirmButton: false,
                 didOpen: () => {
@@ -486,7 +487,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } else {
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/Failed1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Error',
                     text: data.message || 'Failed to load product details.',
                     confirmButtonColor: '#10B981',
@@ -496,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error viewing product:', error);
             Swal.close();
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error',
                 text: 'Something went wrong. Please try again.',
                 confirmButtonColor: '#10B981',
@@ -565,7 +566,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } else {
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/farmer1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/farmer1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 title: 'No Lead Farmer Assigned',
                 html: `
                     <div style="text-align: left;">
@@ -634,7 +635,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } else {
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/farmer1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/farmer1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 title: 'No Lead Farmer Assigned',
                 text: 'You are not currently assigned to a Lead Farmer. Please contact support for assistance.',
                 confirmButtonColor: '#10B981',

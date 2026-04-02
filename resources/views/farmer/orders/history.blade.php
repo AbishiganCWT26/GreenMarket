@@ -180,6 +180,7 @@
         Swal.fire({
             title: 'Loading Order Details',
             text: 'Please wait...',
+            @if(file_exists(public_path('assets/icons/Gif/loading3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading3.gif') }}', imageWidth: 100, imageHeight: 60 @else icon: 'info' @endif,
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
@@ -284,7 +285,7 @@
                     });
                 } else {
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Error',
                         text: response.message
                     });
@@ -293,7 +294,7 @@
             error: function() {
                 Swal.close();
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Error',
                     text: 'Failed to load order details.'
                 });

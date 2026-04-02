@@ -335,6 +335,7 @@ async function viewOrderDetails(orderId) {
 	try {
 		Swal.fire({
 			title: 'Loading...',
+			@if(file_exists(public_path('assets/icons/Gif/loading3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading3.gif') }}', imageWidth: 100, imageHeight: 60 @else icon: 'info' @endif,
 			allowOutsideClick: false,
 			showConfirmButton: false,
 			didOpen: () => {
@@ -474,7 +475,7 @@ async function viewOrderDetails(orderId) {
 			});
 		} else {
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Error',
 				text: data.message || 'Failed to load order details.',
 				confirmButtonColor: '#10B981',
@@ -484,7 +485,7 @@ async function viewOrderDetails(orderId) {
 		console.error('Error viewing order:', error);
 		Swal.close();
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error',
 			text: 'Something went wrong. Please try again.',
 			confirmButtonColor: '#10B981',

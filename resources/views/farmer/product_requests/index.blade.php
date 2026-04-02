@@ -924,7 +924,7 @@ async function viewRequestDetails(requestId) {
 
 		} else {
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Error!',
 				text: data.message || 'Failed to load request details',
 				confirmButtonColor: '#ef4444',
@@ -935,7 +935,7 @@ async function viewRequestDetails(requestId) {
 
 	} catch (error) {
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error!',
 			text: 'Failed to load request details. Please try again.',
 			confirmButtonColor: '#ef4444',

@@ -356,7 +356,7 @@
 					displayOrderDetails(response.order);
 				} else {
 					Swal.fire({
-						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+						@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'Error',
 						text: response.message,
 						timer: 2000,
@@ -373,7 +373,7 @@
 				else if (xhr.status === 404) message = 'Order not found.';
 				
 				Swal.fire({
-					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+					@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Error',
 					text: message,
 					timer: 2000,
@@ -563,7 +563,7 @@
 		Swal.fire({
 			title: 'Mark as Ready for Pickup?',
 			text: 'This will notify the buyer that their order is ready for collection.',
-			@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 			showCancelButton: true,
 			confirmButtonColor: '#10B981',
 			cancelButtonColor: '#6b7280',
@@ -575,6 +575,7 @@
 				Swal.fire({
 					title: 'Processing...',
 					text: 'Please wait...',
+					@if(file_exists(public_path('assets/icons/Gif/loading4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
 					allowOutsideClick: false,
 					didOpen: () => {
 						Swal.showLoading();
@@ -591,7 +592,7 @@
 						Swal.close();
 						if (response.success) {
 							Swal.fire({
-								@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+								@if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 								title: 'Success!',
 								text: response.message,
 								timer: 1500,
@@ -602,7 +603,7 @@
 							}).then(() => location.reload());
 						} else {
 							Swal.fire({
-								@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+								@if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 								title: 'Error',
 								text: response.message,
 								timer: 2000,
@@ -620,7 +621,7 @@
 						else if (xhr.status === 404) message = 'Order not found.';
 						
 						Swal.fire({
-							@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 							title: 'Error',
 							text: message,
 							timer: 2000,
@@ -639,6 +640,7 @@
 		Swal.fire({
 			title: 'Refreshing Orders',
 			text: 'Please wait...',
+			@if(file_exists(public_path('assets/icons/Gif/loading3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading3.gif') }}', imageWidth: 100, imageHeight: 60 @else icon: 'info' @endif,
 			allowOutsideClick: false,
 			didOpen: () => {
 				Swal.showLoading();

@@ -117,7 +117,7 @@
         const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
         if (!validTypes.includes(file.type)) {
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Invalid File1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Invalid File1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Invalid File Type',
                 text: 'Please select JPG, PNG or GIF image only',
                 timer: 3000,
@@ -133,7 +133,7 @@
 
         if (file.size > 2 * 1024 * 1024) {
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/File Too Large1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/File Too Large1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'File Too Large',
                 text: 'Maximum file size is 5MB',
                 timer: 3000,
@@ -168,7 +168,7 @@
         Swal.fire({
             title: 'Remove Profile Photo?',
             text: 'Your current profile photo will be removed and default farmer icon will be restored.',
-            @if(file_exists(public_path('assets/icons/Gif/alert1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
@@ -198,7 +198,7 @@
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                            @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                            @if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                             title: 'Photo Removed!',
                             text: data.message,
                             timer: 3000,
@@ -223,7 +223,7 @@
                         });
                     } else {
                         Swal.fire({
-                            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                            @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                             title: 'Error',
                             text: data.message,
                             timer: 4000,
@@ -234,7 +234,7 @@
                 .catch(error => {
                     console.error('Error:', error);
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Error',
                         text: 'Failed to remove photo. Please try again.',
                         timer: 4000,
@@ -254,7 +254,7 @@
 
         @if(session('success'))
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                 title: 'Success!',
                 text: '{{ session('success') }}',
                 timer: 3000,
@@ -269,7 +269,7 @@
 
         @if(session('error'))
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error!',
                 text: '{{ session('error') }}',
                 timer: 4000,
@@ -289,7 +289,7 @@
                     e.preventDefault();
 
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'No Photo Selected',
                         text: 'Please select a photo to upload',
                         timer: 3000,

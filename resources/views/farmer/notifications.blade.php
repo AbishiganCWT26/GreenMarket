@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
             Swal.fire({
                 title: 'Mark All as Read?',
                 text: 'This will mark all notifications as read.',
-                @if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
                 showCancelButton: true,
                 confirmButtonColor: '#10B981',
                 cancelButtonColor: '#6b7280',
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             updateStats();
 
                             Swal.fire({
-                                @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                                @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                                 title: 'Success',
                                 text: 'All notifications marked as read!',
                                 timer: 2000,
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                         } else {
                             Swal.fire({
-                                @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                                @if(file_exists(public_path('assets/icons/Gif/mark as read fail1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                                 title: 'Error',
                                 text: data.message || 'Failed to mark notifications as read.'
                             });
@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     .catch(error => {
                         console.error('Error:', error);
                         Swal.fire({
-                            @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                            @if(file_exists(public_path('assets/icons/Gif/mark as read fail1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                             title: 'Error',
                             text: 'Failed to mark notifications as read.'
                         });
@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Show success message
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                         title: 'Success',
                         text: 'Notification marked as read!',
                         timer: 1500,
@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 } else {
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/mark as read fail1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Error',
                         text: data.message || 'Failed to mark notification as read.'
                     });
@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error:', error);
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/mark as read fail1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Error',
                     text: 'Failed to mark notification as read.'
                 });
