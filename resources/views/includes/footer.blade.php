@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			} else if (!href.startsWith('http')) {
 				e.preventDefault();
 				Swal.fire({
-					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+					@if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Invalid Link',
 					text: 'This social media link needs configuration.',
 					confirmButtonColor: '#ef4444'
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			} else if (href.includes('.pdf')) {
 				e.preventDefault();
 				Swal.fire({
-					@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+					@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 					title: 'Download',
 					text: `Download ${text} Policy?`,
 					showCancelButton: true,
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					if (result.isConfirmed) {
 						window.open(href, '_blank');
 						Swal.fire({
-							@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							title: 'Success',
 							text: 'Download started!',
 							showConfirmButton: false,

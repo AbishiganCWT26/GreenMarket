@@ -583,7 +583,7 @@
 							const currentText = gadget.innerText || '';
 							if (currentText !== previousLangText && currentText.trim() !== '') {
 								Swal.fire({
-									@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+									@if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 									title: 'language updated',
 									text: 'page content will now appear in selected language.',
 									timer: 1700,
@@ -613,7 +613,7 @@
 				if (e.target && (e.target.src || '').includes('translate.google')) {
 					e.preventDefault();
 					Swal.fire({
-						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+						@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 						title: 'translation error',
 						text: 'google translate failed to load. please refresh.',
 						confirmButtonColor: '#059669',
@@ -625,7 +625,7 @@
 
 			@if(session('success'))
 				Swal.fire({
-					@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+					@if(file_exists(public_path('assets/icons/Gif/welcome1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/welcome1.gif') }}', imageWidth: 100, imageHeight: 60 @else icon: 'success' @endif,
 					title: 'Welcome!',
 					html: `
 						<div style="text-align: center; padding: 10px;">
@@ -642,7 +642,7 @@
 
 			@if(session('error'))
 				Swal.fire({
-					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+					@if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Oops...',
 					text: '{{ session('error') }}',
 					confirmButtonColor: '#10B981',
@@ -653,7 +653,7 @@
 
 			@if($errors->any())
 				Swal.fire({
-					@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+					@if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 					title: 'Validation Error',
 					text: '{{ $errors->first() }}',
 					confirmButtonColor: '#10B981',
