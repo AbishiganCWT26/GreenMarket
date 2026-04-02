@@ -503,7 +503,7 @@ function viewComplaint(complaintId) {
 	const complaint = complaintsData.find(c => c.id === complaintId);
 
 	if (!complaint) {
-		Swal.fire({ title: 'Error', html: 'Complaint not found', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+		Swal.fire({ title: 'Error', html: 'Complaint not found', @if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		return;
 	}
 
@@ -580,7 +580,7 @@ function updateComplaintStatus(complaintId) {
 	const complaint = complaintsData.find(c => c.id === complaintId);
 
 	if (!complaint) {
-		Swal.fire({ title: 'Error', html: 'Complaint not found', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+		Swal.fire({ title: 'Error', html: 'Complaint not found', @if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		return;
 	}
 
@@ -666,17 +666,17 @@ function submitStatusUpdate(complaintId, data) {
 			Swal.fire({
 				title: 'Success!',
 				text: 'Complaint status updated successfully',
-				@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/success6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 				confirmButtonColor: '#10B981'
 			}).then(() => {
 				window.location.reload();
 			});
 		} else {
-			Swal.fire({ title: 'Error', html: data.message || 'Update failed', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+			Swal.fire({ title: 'Error', html: data.message || 'Update failed', @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		}
 	})
 	.catch(() => {
-		Swal.fire({ title: 'Error', html: 'Update failed', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+		Swal.fire({ title: 'Error', html: 'Update failed', @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 	});
 }
 </script>

@@ -357,7 +357,7 @@ window.addEventListener('load', function() {
 
 	@if(session('success'))
 	Swal.fire({
-		@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+		@if(file_exists(public_path('assets/icons/Gif/success3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 		title: 'Success!',
 		text: '{{ session('success') }}',
 		timer: 3000,
@@ -369,7 +369,7 @@ window.addEventListener('load', function() {
 
 	@if(session('error'))
 	Swal.fire({
-		@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+		@if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 		title: 'Error!',
 		text: '{{ session('error') }}',
 		timer: 3000,
@@ -590,7 +590,7 @@ async function showSaleDetails(id) {
 		});
 	} catch (error) {
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error',
 			text: 'Failed to fetch sale details: ' + error.message,
 			background: '#ffffff',

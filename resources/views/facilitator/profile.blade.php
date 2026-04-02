@@ -196,7 +196,7 @@ document.getElementById('profile_photo').addEventListener('change', function(e) 
 		const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
 		if (!validTypes.includes(file.type)) {
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/Invalid File1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Invalid File1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Invalid File',
 				text: 'Please upload only JPEG, PNG, JPG or GIF images.',
 				confirmButtonColor: '#10B981'
@@ -206,7 +206,7 @@ document.getElementById('profile_photo').addEventListener('change', function(e) 
 		}
 		if (file.size > 2 * 1024 * 1024) {
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/File Too Large1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/File Too Large1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'File Too Large',
 				text: 'Image size should be less than 2MB.',
 				confirmButtonColor: '#10B981'
@@ -244,14 +244,14 @@ document.getElementById('photoForm').addEventListener('submit', function(e) {
 		Swal.close();
 		if (data.success) {
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/photo updated success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 				title: 'Success!',
 				text: 'Profile photo updated successfully!',
 				confirmButtonColor: '#10B981'
 			}).then(() => location.reload());
 		} else {
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 				title: 'Failed',
 				text: data.message || 'Failed to upload photo',
 				confirmButtonColor: '#10B981'
@@ -261,7 +261,7 @@ document.getElementById('photoForm').addEventListener('submit', function(e) {
 	.catch(() => {
 		Swal.close();
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/error4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			title: 'Error',
 			text: 'An error occurred while uploading.',
 			confirmButtonColor: '#10B981'
@@ -318,7 +318,7 @@ document.getElementById('profileForm').addEventListener('submit', function(e) {
 		Swal.close();
 		if (data.success) {
 			Swal.fire({
-				@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 				title: 'Success!',
 				text: data.message || 'Profile updated successfully!',
 				confirmButtonColor: '#10B981'
@@ -384,7 +384,7 @@ document.getElementById('whatsapp_number').addEventListener('input', function() 
 function sendOTP(type) {
 	const number = document.getElementById(type).value;
 	if (number.length < 10) {
-		Swal.fire({ title: 'Error', html: 'Invalid phone number', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+		Swal.fire({ title: 'Error', html: 'Invalid phone number', @if(file_exists(public_path('assets/icons/Gif/error6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		return;
 	}
 
@@ -451,10 +451,10 @@ function sendOTP(type) {
 				}
 			});
 		} else {
-			Swal.fire({ title: 'Error', html: data.message, @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+			Swal.fire({ title: 'Error', html: data.message, @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		}
 	})
-	.catch(err => Swal.fire({ title: 'Error', html: 'Something went wrong', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif }));
+	.catch(err => Swal.fire({ title: 'Error', html: 'Something went wrong', @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif }));
 }
 
 function togglePasswordVisibility(fieldId, iconId) {
@@ -588,7 +588,7 @@ function changePassword() {
 		}
 	}).then(result => {
 		if (result.isConfirmed) {
-			Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif, title: 'Success!', text: 'Password changed successfully.', confirmButtonColor: '#10B981' }).then(() => location.reload());
+			Swal.fire({ @if(file_exists(public_path('assets/icons/Gif/success6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif, title: 'Success!', text: 'Password changed successfully.', confirmButtonColor: '#10B981' }).then(() => location.reload());
 		}
 	});
 }

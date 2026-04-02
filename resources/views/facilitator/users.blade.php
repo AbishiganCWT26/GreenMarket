@@ -813,11 +813,11 @@
 							});
 						}
 					} else {
-						Swal.fire({ title: 'Error', html: data.message || 'Failed to load profile', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+						Swal.fire({ title: 'Error', html: data.message || 'Failed to load profile', @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 					}
 				})
 				.catch(() => {
-					Swal.fire({ title: 'Error', html: 'Failed to load profile', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+					Swal.fire({ title: 'Error', html: 'Failed to load profile', @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 				});
 		}
 
@@ -825,7 +825,7 @@
 			Swal.fire({
 				title: 'Edit User',
 				text: 'OTP verification required. Send OTP to user?',
-				@if(file_exists(public_path('assets/icons/Gif/question1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 				showCancelButton: true,
 				confirmButtonText: 'Send OTP',
 				confirmButtonColor: '#10B981',
@@ -857,11 +857,11 @@
 					if (data.success) {
 						showOTPVerificationModal(userId, data.contact);
 					} else {
-						Swal.fire({ title: 'Error', html: data.message || 'Failed to send OTP', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+						Swal.fire({ title: 'Error', html: data.message || 'Failed to send OTP', @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 					}
 				})
 				.catch(() => {
-					Swal.fire({ title: 'Error', html: 'Failed to send OTP', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+					Swal.fire({ title: 'Error', html: 'Failed to send OTP', @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 				});
 		}
 
@@ -875,6 +875,7 @@
 					<p class="otp-timer">OTP expires in 5 minutes</p>
 				</div>
 			`,
+				@if(file_exists(public_path('assets/icons/Gif/otp sent success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/otp sent success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 				showCancelButton: true,
 				confirmButtonText: 'Verify',
 				confirmButtonColor: '#10B981',
@@ -916,17 +917,17 @@
 						Swal.fire({
 							title: 'Success!',
 							text: 'OTP verified',
-							@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/success5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							confirmButtonColor: '#10B981'
 						}).then(() => {
 							loadEditUserForm(userId);
 						});
 					} else {
-						Swal.fire({ title: 'Error', html: data.message || 'Invalid OTP', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+						Swal.fire({ title: 'Error', html: data.message || 'Invalid OTP', @if(file_exists(public_path('assets/icons/Gif/Invalid otp1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Invalid otp1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 					}
 				})
 				.catch(() => {
-					Swal.fire({ title: 'Error', html: 'Verification failed', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+					Swal.fire({ title: 'Error', html: 'Verification failed', @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 				});
 		}
 
@@ -945,11 +946,11 @@
 					if (data.success) {
 						showEditUserForm(data.user);
 					} else {
-						Swal.fire({ title: 'Error', html: data.message || 'Failed to load user data', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+						Swal.fire({ title: 'Error', html: data.message || 'Failed to load user data', @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 					}
 				})
 				.catch(() => {
-					Swal.fire({ title: 'Error', html: 'Failed to load user data', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+					Swal.fire({ title: 'Error', html: 'Failed to load user data', @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 				});
 		}
 
@@ -1474,17 +1475,17 @@
 						Swal.fire({
 							title: 'Success!',
 							text: 'User updated successfully',
-							@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/success6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success6.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							confirmButtonColor: '#10B981'
 						}).then(() => {
 							window.location.reload();
 						});
 					} else {
-						Swal.fire({ title: 'Error', html: data.message || 'Update failed', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+						Swal.fire({ title: 'Error', html: data.message || 'Update failed', @if(file_exists(public_path('assets/icons/Gif/Failed1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 					}
 				})
 				.catch(() => {
-					Swal.fire({ title: 'Error', html: 'Update failed', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+					Swal.fire({ title: 'Error', html: 'Update failed', @if(file_exists(public_path('assets/icons/Gif/Failed1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 				});
 		}
 
@@ -1524,17 +1525,17 @@
 								Swal.fire({
 									title: 'Success!',
 									text: `User ${actionText}d successfully`,
-									@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+									@if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 									confirmButtonColor: '#10B981'
 								}).then(() => {
 									window.location.reload();
 								});
 							} else {
-								Swal.fire({ title: 'Error', html: data.message || 'Operation failed', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+								Swal.fire({ title: 'Error', html: data.message || 'Operation failed', @if(file_exists(public_path('assets/icons/Gif/error5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 							}
 						})
 						.catch(() => {
-							Swal.fire({ title: 'Error', html: 'Operation failed', @if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+							Swal.fire({ title: 'Error', html: 'Operation failed', @if(file_exists(public_path('assets/icons/Gif/error2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 						});
 				}
 			});
