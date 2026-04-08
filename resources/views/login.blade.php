@@ -8,10 +8,14 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<style>
-		.swal2-image {
-			margin: 0em auto 0em !important;
-		}
-	</style>
+        .swal2-image {
+            margin: 0em auto 0em !important;
+        }
+
+        div:where(.swal2-container) h2:where(.swal2-title) {
+            padding: 0em 0em 0 !important;
+        }
+    </style>
 </head>
 <body>
 	@include('includes.loader')

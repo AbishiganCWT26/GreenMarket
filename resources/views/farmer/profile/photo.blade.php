@@ -234,7 +234,7 @@
                 .catch(error => {
                     console.error('Error:', error);
                     Swal.fire({
-                        @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        @if(file_exists(public_path('assets/icons/Gif/Failed3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                         title: 'Error',
                         text: 'Failed to remove photo. Please try again.',
                         timer: 4000,

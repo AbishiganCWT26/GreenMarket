@@ -561,39 +561,54 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             // Parse the exception message to provide a user-friendly error
-            $errorMessage = $e->getMessage();
-            
-            // Check for duplicate NIC error
-            if (strpos($errorMessage, 'farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
-                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
-                $nicNumber = $matches[1] ?? '';
-                
-                if ($nicNumber) {
-                    $errorMessage = 'Failed to update user because NIC No. "' . $nicNumber . '" already exists';
-                } else {
-                    $errorMessage = 'Failed to update user because NIC number already exists';
-                }
+            $rawMessage = $e->getMessage();
+
+            // Helper: extract value from PostgreSQL unique-violation detail
+            // e.g. "Key (nic_no)=(200302401725) already exists."
+            $extractValue = function (string $column, string $msg): string {
+                preg_match('/Key \(' . preg_quote($column, '/') . '\)=\(([^)]+)\) already exists/', $msg, $m);
+                return $m[1] ?? '';
+            };
+
+            $friendlyMessage = null;
+
+            // ── NIC duplicates ──────────────────────────────────────────────
+            if (preg_match('/buyers_nic_no_key|farmers_nic_no_key|lead_farmers_nic_no_key|facilitators_nic_no_key|admins_nic_no_key/', $rawMessage)) {
+                $nic = $extractValue('nic_no', $rawMessage);
+                $friendlyMessage = $nic
+                    ? "Error occurred while updating. \nBecause NIC No :- " . $nic . " already exists."
+                    : "Error occurred while updating. \nBecause the NIC number already exists.";
             }
-            // Check for duplicate NIC in admins table
-            elseif (strpos($errorMessage, 'admins_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
-                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
-                $nicNumber = $matches[1] ?? '';
-                
-                if ($nicNumber) {
-                    $errorMessage = 'Failed to update user because NIC No. "' . $nicNumber . '" already exists';
-                } else {
-                    $errorMessage = 'Failed to update user because NIC number already exists';
-                }
+
+            elseif (strpos($rawMessage, 'users_username_key') !== false) {
+                $val = $extractValue('username', $rawMessage);
+                $friendlyMessage = $val
+                    ? "Error occurred while updating. \nBecause username \"" . $val . "\" already exists."
+                    : "Error occurred while updating. \nBecause the username already exists.";
             }
-            // General database error handling to avoid showing raw SQL
-            elseif (strpos($errorMessage, 'SQLSTATE') !== false) {
-                \Log::error('Database Error during user update: ' . $errorMessage);
-                $errorMessage = 'A database error occurred while updating the user: ' . $errorMessage;
+
+            // ── Email duplicate ─────────────────────────────────────────────
+            elseif (strpos($rawMessage, 'users_email_key') !== false) {
+                $val = $extractValue('email', $rawMessage);
+                $friendlyMessage = $val
+                    ? "Error occurred while updating. \nBecause email \"" . $val . "\" already exists."
+                    : "Error occurred while updating. \nBecause the email address already exists.";
             }
-            
-            return response()->json(['success' => false, 'message' => $errorMessage], 500);
+
+            // ── Generic SQLSTATE — log raw error, show clean message ────────
+            elseif (strpos($rawMessage, 'SQLSTATE') !== false) {
+                \Log::error('Database Error during user update: ' . $rawMessage);
+                $friendlyMessage = 'Error occurred while updating. \n A database error was encountered. \nPlease try again.';
+            }
+
+            // ── Fallback ────────────────────────────────────────────────────
+            else {
+                $friendlyMessage = 'Error occurred while updating. \nplease try again.';
+            }
+
+            return response()->json(['success' => false, 'message' => $friendlyMessage], 500);
         }
     }
 

@@ -4,11 +4,6 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/how-it-works.css') }}">
-<style>
-    .swal2-image {
-        margin: 0em auto 0em !important;
-    }
-</style>
 @endsection
 
 @section('content')

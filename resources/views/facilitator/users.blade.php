@@ -817,7 +817,7 @@
 					}
 				})
 				.catch(() => {
-					Swal.fire({ title: 'Error', html: 'Failed to load profile', @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+					Swal.fire({ title: 'Error', html: 'Failed to load profile', @if(file_exists(public_path('assets/icons/Gif/Failed3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 				});
 		}
 

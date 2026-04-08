@@ -583,7 +583,7 @@ function updateComplaint(complaintId, data) {
                 });
             } else {
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/Failed3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                     title: 'Error',
                     text: response.message || 'Failed to update complaint',
                     confirmButtonColor: '#10B981'
@@ -593,7 +593,7 @@ function updateComplaint(complaintId, data) {
         error: function(xhr) {
             Swal.close();
             Swal.fire({
-                @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Failed3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
                 title: 'Error',
                 text: xhr.responseJSON?.message || 'Failed to update complaint. Please try again.',
                 confirmButtonColor: '#10B981'

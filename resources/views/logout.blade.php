@@ -32,6 +32,10 @@
         .swal2-image {
             margin: 0em auto 0em !important;
         }
+
+        div:where(.swal2-container) h2:where(.swal2-title) {
+            padding: 0em 0em 0 !important;
+        }
     </style>
     
     <!-- SweetAlert2 -->

@@ -672,11 +672,11 @@ function submitStatusUpdate(complaintId, data) {
 				window.location.reload();
 			});
 		} else {
-			Swal.fire({ title: 'Error', html: data.message || 'Update failed', @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+			Swal.fire({ title: 'Error', html: data.message || 'Update failed', @if(file_exists(public_path('assets/icons/Gif/Failed3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 		}
 	})
 	.catch(() => {
-		Swal.fire({ title: 'Error', html: 'Update failed', @if(file_exists(public_path('assets/icons/Gif/Failed2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+		Swal.fire({ title: 'Error', html: 'Update failed', @if(file_exists(public_path('assets/icons/Gif/Failed3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Failed3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
 	});
 }
 </script>

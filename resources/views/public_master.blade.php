@@ -6,6 +6,15 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<title>@yield('title', 'GreenMarket')</title>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<style>
+        .swal2-image {
+            margin: 0em auto 0em !important;
+        }
+
+        div:where(.swal2-container) h2:where(.swal2-title) {
+            padding: 0em 0em 0 !important;
+        }
+    </style>
 	@yield('styles')
 </head>
 <body>
