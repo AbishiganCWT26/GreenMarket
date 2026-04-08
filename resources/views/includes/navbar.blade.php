@@ -318,11 +318,11 @@
 				</a>
 				<a href="{{ url('/about-us') }}" class="nav-item {{ request()->is('about-us') || request()->is('about-us/*') ? 'active' : '' }}">
 					<i class="fas fa-info-circle"></i>
-					<span>About</span>
+					<span>About Us</span>
 				</a>
 				<a href="{{ url('/contact-us') }}" class="nav-item {{ request()->is('contact-us') || request()->is('contact-us/*') ? 'active' : '' }}">
 					<i class="fas fa-envelope"></i>
-					<span>Contact</span>
+					<span>Contact Us</span>
 				</a>
 			</nav>
 
@@ -427,11 +427,11 @@
 			</a>
 			<a href="{{ url('/about-us') }}" class="mobile-nav-item {{ request()->is('about-us') || request()->is('about-us/*') ? 'active' : '' }}">
 				<i class="fas fa-info-circle"></i>
-				<span>About</span>
+				<span>About Us</span>
 			</a>
 			<a href="{{ url('/contact-us') }}" class="mobile-nav-item {{ request()->is('contact-us') || request()->is('contact-us/*') ? 'active' : '' }}">
 				<i class="fas fa-envelope"></i>
-				<span>Contact</span>
+				<span>Contact Us</span>
 			</a>
 
 			@guest

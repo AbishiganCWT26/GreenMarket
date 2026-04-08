@@ -106,6 +106,41 @@ function getHowItWorksConfig($key, $configs) {
 			</div>
 		</section>
 
+
+		<section class="how-it-works">
+			<div class="section-header">
+				<h2 class="section-title">How GreenMarket Works</h2>
+				<p>Simple. Transparent. Direct from Farm to Table.</p>
+			</div>
+			<div class="hw-grid">
+				<div class="hw-card">
+					<div class="hw-header"><i class="fas fa-shopping-cart"></i><h3>For Buyers</h3></div>
+					<div class="hw-image">
+						@php $buyerImage = getHowItWorksConfig('How_Works_For_Buyers_image', $howItWorksConfigs); @endphp
+						<img src="{{ asset('assets/images/' . $buyerImage) }}" alt="Buyer process" onerror="this.style.display='none'">
+					</div>
+					@php $buyerInstructions = getHowItWorksConfig('How_Works_For_Buyers_para', $howItWorksConfigs); $buyerParagraphs = explode("\n\n", $buyerInstructions); @endphp
+					@foreach($buyerParagraphs as $paragraph) @if(trim($paragraph)) <p><i class="fas fa-circle"></i> {{ trim($paragraph) }}</p> @endif @endforeach
+				</div>
+				<div class="hw-card">
+					<div class="hw-header"><i class="fas fa-seedling"></i><h3>For Sellers</h3></div>
+					<div class="hw-image">
+						@php $farmerImage = getHowItWorksConfig('How_Works_For_Farmer_image', $howItWorksConfigs); @endphp
+						<img src="{{ asset('assets/images/' . $farmerImage) }}" alt="Farmer process" onerror="this.style.display='none'">
+					</div>
+					@php $farmerInstructions = getHowItWorksConfig('How_Works_For_Farmers_para', $howItWorksConfigs); $farmerParagraphs = explode("\n\n", $farmerInstructions); @endphp
+					@foreach($farmerParagraphs as $paragraph) @if(trim($paragraph)) <p><i class="fas fa-circle"></i> {{ trim($paragraph) }}</p> @endif @endforeach
+				</div>
+			</div>
+			<div class="hw-stats">
+				<div class="hw-stat"><span class="hw-stat-value">{{ $stats['total_categories'] ?? 0 }}+</span><span>Categories</span></div>
+				<div class="hw-stat"><span class="hw-stat-value">{{ $stats['total_products'] ?? 0 }}+</span><span>Products</span></div>
+				<div class="hw-stat"><span class="hw-stat-value">{{ $stats['active_farmers'] ?? 0 }}+</span><span>Farmers</span></div>
+				<div class="hw-stat"><span class="hw-stat-value">{{ $stats['total_buyers'] ?? 0 }}+</span><span>Buyers</span></div>
+			</div>
+		</section>
+
+
 		<section class="what-we-offer">
 			<div class="section-header">
 				<h2 class="section-title">What We Offer</h2>
@@ -133,39 +168,6 @@ function getHowItWorksConfig($key, $configs) {
 				<div class="value-card"><i class="fas fa-users"></i><h3>Build Community Trust</h3><p>Fostering trust between farmers and buyers through transparent processes and verified profiles.</p></div>
 				<div class="value-card"><i class="fas fa-balance-scale"></i><h3>Fair Pricing</h3><p>Ensuring fair compensation for farmers while providing competitive prices for buyers.</p></div>
 				<div class="value-card"><i class="fas fa-heart"></i><h3>Quality Commitment</h3><p>Dedicated to maintaining high quality standards for all products listed on our platform.</p></div>
-			</div>
-		</section>
-
-		<section class="how-it-works">
-			<div class="section-header">
-				<h2 class="section-title">How GreenMarket Works</h2>
-				<p>Simple. Transparent. Direct from Farm to Table.</p>
-			</div>
-			<div class="hw-grid">
-				<div class="hw-card">
-					<div class="hw-header"><i class="fas fa-shopping-cart"></i><h3>For Buyers</h3></div>
-					<div class="hw-image">
-						@php $buyerImage = getHowItWorksConfig('How_Works_For_Buyers_image', $howItWorksConfigs); @endphp
-						<img src="{{ asset('assets/images/' . $buyerImage) }}" alt="Buyer process" onerror="this.style.display='none'">
-					</div>
-					@php $buyerInstructions = getHowItWorksConfig('How_Works_For_Buyers_para', $howItWorksConfigs); $buyerParagraphs = explode("\n\n", $buyerInstructions); @endphp
-					@foreach($buyerParagraphs as $paragraph) @if(trim($paragraph)) <p><i class="fas fa-circle"></i> {{ trim($paragraph) }}</p> @endif @endforeach
-				</div>
-				<div class="hw-card">
-					<div class="hw-header"><i class="fas fa-seedling"></i><h3>For Farmers</h3></div>
-					<div class="hw-image">
-						@php $farmerImage = getHowItWorksConfig('How_Works_For_Farmer_image', $howItWorksConfigs); @endphp
-						<img src="{{ asset('assets/images/' . $farmerImage) }}" alt="Farmer process" onerror="this.style.display='none'">
-					</div>
-					@php $farmerInstructions = getHowItWorksConfig('How_Works_For_Farmers_para', $howItWorksConfigs); $farmerParagraphs = explode("\n\n", $farmerInstructions); @endphp
-					@foreach($farmerParagraphs as $paragraph) @if(trim($paragraph)) <p><i class="fas fa-circle"></i> {{ trim($paragraph) }}</p> @endif @endforeach
-				</div>
-			</div>
-			<div class="hw-stats">
-				<div class="hw-stat"><span class="hw-stat-value">{{ $stats['total_categories'] ?? 0 }}+</span><span>Categories</span></div>
-				<div class="hw-stat"><span class="hw-stat-value">{{ $stats['total_products'] ?? 0 }}+</span><span>Products</span></div>
-				<div class="hw-stat"><span class="hw-stat-value">{{ $stats['active_farmers'] ?? 0 }}+</span><span>Farmers</span></div>
-				<div class="hw-stat"><span class="hw-stat-value">{{ $stats['total_buyers'] ?? 0 }}+</span><span>Buyers</span></div>
 			</div>
 		</section>
 
