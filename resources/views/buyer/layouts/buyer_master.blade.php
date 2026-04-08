@@ -941,6 +941,7 @@
 
             <section class="dashboard-body">
                 @yield('content')
+                @include('includes.buyer_footer')
             </section>
         </main>
     </div>
