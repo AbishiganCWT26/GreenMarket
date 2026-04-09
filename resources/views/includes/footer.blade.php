@@ -30,7 +30,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 						<div class="brand-header">
 							<a href="{{ url('/') }}" class="brand-link">
 								<img src="{{ asset('assets/images/Logo Green Market.png') }}" alt="GreenMarket" class="brand-logo" oncontextmenu="return false;">
-								<div class="brand-info">
+								<div class="brand-info" translate="no">
 									<h3>GreenMarket</h3>
 									<span>Fresh & Simple</span>
 								</div>
@@ -74,7 +74,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 						</div>
 					</div>
 				</div>
-				<div class="footer-col">
+				<div class="footer-col" translate="no">
 					<div class="section-header1">
 						<i class="fas fa-link"></i>
 						<h4>Quick Links</h4>
@@ -87,7 +87,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 						<li><a href="{{ url('/login') }}"><i class="fas fa-sign-in-alt"></i><span>Login</span></a></li>
 					</ul>
 				</div>
-				<div class="footer-col">
+				<div class="footer-col" translate="no">
 					<div class="section-header1">
 						<i class="fas fa-address-card"></i>
 						<h4>Contact Info</h4>
@@ -128,7 +128,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 			</div>
 		</div>
 	</div>
-	<div class="footer-bottom">
+	<div class="footer-bottom" translate="no">
 		<div class="container">
 			<div class="bottom-content">
 				<div class="copyright">{!! $copyright !!}</div>

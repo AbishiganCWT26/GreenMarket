@@ -1,4 +1,4 @@
-<div class="footer-wrapper">
+<div class="footer-wrapper" translate="no">
 	<footer class="site-footer">
 		<div class="footer-container">
 			<div class="footer-row">

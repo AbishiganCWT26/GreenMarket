@@ -301,34 +301,34 @@
 <body>
 	@include('includes.loader')
 	<header class="site-header">
-		<div class="header-container">
+		<div class="header-container" translate="no">
 			<div class="logo-wrapper">
 				<a href="{{ url('/') }}" class="logo-link" oncontextmenu="return false;">
 					<div class="logo-image-wrapper">
 						<img src="{{ asset('assets/images/Logo Green Market.png') }}" alt="GreenMarket" class="logo-img" draggable="false">
 					</div>
-					<span class="logo-text">GreenMarket</span>
+					<span class="logo-text" translate="no">GreenMarket</span>
 				</a>
 			</div>
 
 			<nav class="nav-menu">
 				<a href="{{ url('/') }}" class="nav-item {{ request()->is('/') ? 'active' : '' }}">
 					<i class="fas fa-home"></i>
-					<span>Home</span>
+					<span translate="no">Home</span>
 				</a>
 				<a href="{{ url('/about-us') }}" class="nav-item {{ request()->is('about-us') || request()->is('about-us/*') ? 'active' : '' }}">
 					<i class="fas fa-info-circle"></i>
-					<span>About Us</span>
+					<span translate="no">About Us</span>
 				</a>
 				<a href="{{ url('/contact-us') }}" class="nav-item {{ request()->is('contact-us') || request()->is('contact-us/*') ? 'active' : '' }}">
 					<i class="fas fa-envelope"></i>
-					<span>Contact Us</span>
+					<span translate="no">Contact Us</span>
 				</a>
 			</nav>
 
 			<div class="header-actions">
 				@guest
-					<div class="auth-group">
+					<div class="auth-group" translate="no">
 						<a href="{{ url('/register/buyer') }}" class="btn btn-register">
 							<i class="fas fa-user-plus"></i>
 							<span>Register</span>
@@ -384,7 +384,7 @@
 							<span class="user-name">{{ Auth::user()->username ?? 'User' }}</span>
 							<i class="fas fa-chevron-down"></i>
 						</button>
-						<div class="dropdown-menu" id="dropdownMenu">
+						<div class="dropdown-menu" id="dropdownMenu" translate="no">
 							<a href="{{ url($dashboardUrl) }}" class="dropdown-item">
 								<i class="fas fa-tachometer-alt"></i>
 								<span>Dashboard</span>
@@ -420,7 +420,7 @@
 			</div>
 		</div>
 
-		<div class="mobile-nav" id="mobileNav">
+		<div class="mobile-nav" id="mobileNav" translate="no">
 			<a href="{{ url('/') }}" class="mobile-nav-item {{ request()->is('/') ? 'active' : '' }}">
 				<i class="fas fa-home"></i>
 				<span>Home</span>
@@ -435,7 +435,7 @@
 			</a>
 
 			@guest
-				<div class="mobile-auth-group">
+				<div class="mobile-auth-group" translate="no">
 					<a href="{{ url('/register/buyer') }}" class="mobile-btn mobile-btn-register">
 						<i class="fas fa-user-plus"></i>
 						<span>Register</span>
@@ -446,7 +446,7 @@
 					</a>
 				</div>
 			@else
-				<div class="mobile-user-section">
+				<div class="mobile-user-section" translate="no">
 					<div class="mobile-user-info">
 						<div class="mobile-user-avatar">
 							<img src="{{ asset('uploads/profile_pictures/' . (Auth::user()->profile_photo ?? 'default-avatar.png')) }}" alt="{{ Auth::user()->username ?? 'User' }}">

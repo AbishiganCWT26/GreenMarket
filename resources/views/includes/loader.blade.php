@@ -1,5 +1,5 @@
 {{-- Page Loader --}}
-<div id="page-loader">
+<div id="page-loader" translate="no">
 	<div class="particles-container"></div>
 
 	<div class="orbit-container">
