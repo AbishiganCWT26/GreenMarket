@@ -202,6 +202,10 @@
 			font-weight: 500 !important;
 			display: block !important;
 		}
+
+		.swal2-html-container {
+			white-space: normal !important;
+		}
 	</style>
 @endsection
 
