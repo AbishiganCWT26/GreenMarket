@@ -67,5 +67,23 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
         });
+
+        // View Composer for Buyer Views
+        view()->composer(['buyer.*', 'buyer.layouts.*'], function ($view) {
+            if (auth()->check() && auth()->user()->role === 'buyer') {
+                $user = auth()->user();
+
+                $notifications = \App\Models\Notification::where('user_id', $user->id)
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get();
+
+                $unreadNotifications = \App\Models\Notification::where('user_id', $user->id)
+                    ->where('is_read', false)
+                    ->count();
+
+                $view->with(compact('notifications', 'unreadNotifications'));
+            }
+        });
     }
 }

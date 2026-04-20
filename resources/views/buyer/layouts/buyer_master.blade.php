@@ -891,8 +891,13 @@
 
 
                         <div class="notif-dropdown" id="notifDropdown">
-                            <div class="notif-header">
+                            <div class="notif-header" style="display: flex; justify-content: space-between; align-items: center;">
                                 <span>Notifications</span>
+                                @if(isset($unreadNotifications) && $unreadNotifications > 0)
+                                    <button onclick="masterMarkAllRead(event)" class="master-mark-all-btn" title="Mark all as read" style="background: none; border: none; color: #10B981; cursor: pointer; font-size: 0.9rem;">
+                                        <i class="fas fa-check-double"></i>
+                                    </button>
+                                @endif
                             </div>
 
                             <div class="notif-list">
@@ -900,13 +905,18 @@
                                     <div class="notif-item">No notifications</div>
                                 @else
                                     @foreach($notifications as $n)
-                                        <div class="notif-item {{ $n->is_read ? 'read' : 'unread' }}">
+                                        <div class="notif-item {{ $n->is_read ? 'read' : 'unread' }}" id="master-notif-{{ $n->id }}">
                                             <div class="notif-left">
                                                 <div class="notif-title">{{ $n->title }}</div>
                                                 <div class="notif-msg">{{ Str::limit($n->message, 80) }}</div>
                                             </div>
-                                            <div class="notif-actions">
+                                            <div class="notif-actions" style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
                                                 <small>{{ \Carbon\Carbon::parse($n->created_at)->diffForHumans() }}</small>
+                                                @if(!$n->is_read)
+                                                    <button class="master-mark-read-btn" onclick="masterMarkAsRead(event, {{ $n->id }})" title="Mark as read" style="background: none; border: none; color: #10B981; cursor: pointer; padding: 0; font-size: 0.85rem;">
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </button>
+                                                @endif
                                             </div>
                                         </div>
                                     @endforeach
@@ -1162,6 +1172,118 @@
             });
             bodyObserver.observe(document.body, { attributes: true, attributeFilter: ['style'] });
         })();
+
+        function masterMarkAsRead(event, id) {
+            event.stopPropagation();
+            event.preventDefault();
+            fetch(`/buyer/notifications/mark-read/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    let item = document.getElementById('master-notif-' + id);
+                    if (item) {
+                        item.classList.remove('unread');
+                        item.classList.add('read');
+                        let markBtn = item.querySelector('.master-mark-read-btn');
+                        if (markBtn) markBtn.remove();
+                    }
+                    
+                    let notifBtns = document.querySelectorAll('.notif-dot');
+                    let unreadItems = document.querySelectorAll('.notif-item.unread');
+                    if(unreadItems.length === 0) {
+                       notifBtns.forEach(btn => btn.style.display = 'none');
+                       let markAllBtn = document.querySelector('.master-mark-all-btn');
+                       if (markAllBtn) markAllBtn.remove();
+                    }
+
+                    Swal.fire({
+                        title: 'Marked as read',
+                        text: 'Notification has been marked as read.',
+                        @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed',
+                        text: 'Failed to mark as read.',
+                        @if(file_exists(public_path('assets/icons/Gif/mark as read fail2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+            .catch(() => {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred.',
+                    @if(file_exists(public_path('assets/icons/Gif/mark as read fail2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            });
+        }
+
+        function masterMarkAllRead(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            
+            fetch('{{ route("buyer.notifications.markAllRead") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let items = document.querySelectorAll('.notif-item.unread');
+                    items.forEach(item => {
+                        item.classList.remove('unread');
+                        item.classList.add('read');
+                        let markBtn = item.querySelector('.master-mark-read-btn');
+                        if (markBtn) markBtn.remove();
+                    });
+                    let markAllBtn = document.querySelector('.master-mark-all-btn');
+                    if (markAllBtn) markAllBtn.remove();
+                    
+                    let notifBtns = document.querySelectorAll('.notif-dot');
+                    notifBtns.forEach(btn => btn.style.display = 'none');
+
+                    Swal.fire({
+                        title: 'Marked as read',
+                        text: 'All notifications marked as read.',
+                        @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed',
+                        text: 'Failed to mark all as read.',
+                        @if(file_exists(public_path('assets/icons/Gif/mark as read fail2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+            .catch(() => {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred.',
+                    @if(file_exists(public_path('assets/icons/Gif/mark as read fail2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read fail2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            });
+        }
     </script>
 </body>
 

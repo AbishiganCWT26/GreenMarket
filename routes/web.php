@@ -246,6 +246,8 @@ Route::prefix('buyer')
 
     // Notifications
     Route::get('/notifications', [BuyerController::class, 'notifications'])->name('buyer.notifications');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('buyer.notifications.markAllRead');
+    Route::post('/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('buyer.notifications.markRead');
 
     // Address Book
     Route::get('/addresses', [BuyerController::class, 'addressBook'])->name('buyer.addresses');

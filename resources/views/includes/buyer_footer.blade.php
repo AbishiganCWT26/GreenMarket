@@ -137,6 +137,14 @@
 		cursor: pointer;
 	}
 
+	.footer-actions a i {
+		color: var(--dark-green);
+	}
+
+	.footer-actions a:hover i {
+		color: white;
+	}
+
 	.footer-actions a:hover {
 		background: var(--primary-green);
 		color: white;
@@ -147,12 +155,12 @@
 	.float-cart,
 	.float-top {
 		position: fixed;
-		right: 18px;
-		width: 44px;
-		height: 44px;
+		right: 10px;
+		width: 30px;
+		height: 30px;
 		border-radius: 50%;
-		background: var(--card-bg);
-		border: 1px solid var(--border);
+		background: transparent;
+		border: 1px solid var(--muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -161,13 +169,22 @@
 		z-index: 999;
 	}
 
+	.float-cart i {
+		color: var(--dark-green);
+	}
+
+	.float-cart:hover i {
+		color: white;
+	}
+
 	.float-cart {
-		bottom: 80px;
+		bottom: 60px;
 	}
 
 	.float-top {
 		bottom: 20px;
 		display: none;
+		color: var(--dark-green);
 	}
 
 	.float-top.visible {

@@ -90,15 +90,61 @@
                 confirmButtonText: 'Yes, mark all'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'All notifications marked as read.',
-                        @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-                        timer: 2000,
-                        showConfirmButton: false
+                    fetch('{{ route("buyer.notifications.markAllRead") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let items = document.querySelectorAll('.notification-item.unread');
+                            items.forEach(item => {
+                                item.classList.remove('unread');
+                                item.classList.add('read');
+                                let badge = item.querySelector('.notification-badge');
+                                if (badge) badge.remove();
+                                let iconDiv = item.querySelector('.notification-icon');
+                                if (iconDiv) {
+                                    iconDiv.classList.remove('icon-unread');
+                                    iconDiv.classList.add('icon-read');
+                                    let icon = iconDiv.querySelector('i');
+                                    if (icon) {
+                                        icon.classList.remove('fa-bell');
+                                        icon.classList.add('fa-circle-info');
+                                    }
+                                }
+                                let markBtn = item.querySelector('.mark-read-btn');
+                                if (markBtn) markBtn.remove();
+                            });
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'All notifications marked as read.',
+                                @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        }
                     });
-                    let items = document.querySelectorAll('.notification-item.unread');
-                    items.forEach(item => {
+                }
+            });
+        }
+
+        function markAsRead(id) {
+            fetch(`/buyer/notifications/mark-read/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    let item = document.getElementById('notif-' + id);
+                    if (item) {
                         item.classList.remove('unread');
                         item.classList.add('read');
                         let badge = item.querySelector('.notification-badge');
@@ -108,41 +154,23 @@
                             iconDiv.classList.remove('icon-unread');
                             iconDiv.classList.add('icon-read');
                             let icon = iconDiv.querySelector('i');
-                            if (icon) icon.classList.remove('fa-bell');
-                            if (icon) icon.classList.add('fa-circle-info');
+                            if (icon) {
+                                icon.classList.remove('fa-bell');
+                                icon.classList.add('fa-circle-info');
+                            }
                         }
                         let markBtn = item.querySelector('.mark-read-btn');
                         if (markBtn) markBtn.remove();
+                    }
+                    Swal.fire({
+                        title: 'Marked as read',
+                        text: 'Notification has been marked as read.',
+                        @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                        timer: 3000,
+                        showConfirmButton: false
                     });
                 }
             });
-        }
-
-        function markAsRead(id) {
-            Swal.fire({
-                title: 'Marked as read',
-                text: 'Notification has been marked as read.',
-                @if(file_exists(public_path('assets/icons/Gif/mark as read1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/mark as read1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-                timer: 1500,
-                showConfirmButton: false
-            });
-            let item = document.getElementById('notif-' + id);
-            if (item) {
-                item.classList.remove('unread');
-                item.classList.add('read');
-                let badge = item.querySelector('.notification-badge');
-                if (badge) badge.remove();
-                let iconDiv = item.querySelector('.notification-icon');
-                if (iconDiv) {
-                    iconDiv.classList.remove('icon-unread');
-                    iconDiv.classList.add('icon-read');
-                    let icon = iconDiv.querySelector('i');
-                    if (icon) icon.classList.remove('fa-bell');
-                    if (icon) icon.classList.add('fa-circle-info');
-                }
-                let markBtn = item.querySelector('.mark-read-btn');
-                if (markBtn) markBtn.remove();
-            }
         }
     </script>
 @endsection
