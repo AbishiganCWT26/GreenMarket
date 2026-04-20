@@ -2,9 +2,13 @@
 
 @section('title', 'Admin Notifications')
 
+@section('page-title', 'Notifications')
+
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/Admin/admin-notification.css') }}">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">endsection
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+@endsection
+
 @section('content')
 <div class="notification-wrapper">
 	<div class="notification-header">
@@ -45,7 +49,9 @@
 
 	<div id="paginationContainer" class="pagination"></div>
 </div>
+@endsection
 
+@section('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 
 <script>

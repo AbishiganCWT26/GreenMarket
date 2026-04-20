@@ -1179,7 +1179,7 @@
                     <input type="hidden" id="categoryId" value="${id}">
                 </div>
             `,
-            @if(file_exists(public_path('assets/icons/Gif/editing1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/editing1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+            @if(file_exists(public_path('assets/icons/Gif/editing1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/editing1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif ,
             showCancelButton: true,
             confirmButtonText: 'Update Category',
             confirmButtonColor: '#10B981',
@@ -1278,7 +1278,7 @@
                     <input type="hidden" id="editCategoryId" value="${categoryId}">
                 </div>
             `,
-            @if(file_exists(public_path('assets/icons/Gif/editing1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/editing1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+            @if(file_exists(public_path('assets/icons/Gif/editing1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/editing1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif ,
             showCancelButton: true,
             confirmButtonText: 'Update Subcategory',
             confirmButtonColor: '#10B981',
@@ -1354,7 +1354,7 @@
                     <input type="hidden" id="editSubcategoryId" value="${subcategoryId}">
                 </div>
             `,
-            @if(file_exists(public_path('assets/icons/Gif/editing1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/editing1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif });
+            @if(file_exists(public_path('assets/icons/Gif/editing1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/editing1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif ,
             showCancelButton: true,
             confirmButtonText: 'Update Product',
             confirmButtonColor: '#10B981',
