@@ -7,8 +7,8 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<style>
 		:root {
-			--primary-green: #10B981;
-			--dark-green: #059669;
+			--primary-green: #99c866;
+			--dark-green: #77c820ff;
 			--body-bg: #f6f8fa;
 			--card-bg: #ffffff;
 			--text-color: #0f1724;
@@ -136,43 +136,15 @@
 		}
 
 		.btn-secondary {
-			background: white;
-			color: var(--text-color);
+			background: var(--primary-green);
+			color: white;
 			border: 1px solid var(--border);
 		}
 
 		.btn-secondary:hover {
-			background: var(--body-bg);
+			background: var(--dark-green);
 			border-color: var(--primary-green);
 			transform: translateY(-2px);
-		}
-
-		.help-links {
-			display: flex;
-			justify-content: center;
-			gap: 20px;
-			flex-wrap: wrap;
-			padding-top: 20px;
-			border-top: 1px solid var(--border);
-		}
-
-		.help-link {
-			font-size: 12px;
-			color: var(--muted);
-			text-decoration: none;
-			display: inline-flex;
-			align-items: center;
-			gap: 6px;
-			transition: all 0.2s ease;
-		}
-
-		.help-link i {
-			font-size: 11px;
-			color: var(--primary-green);
-		}
-
-		.help-link:hover {
-			color: var(--primary-green);
 		}
 
 		@media (max-width: 480px) {
