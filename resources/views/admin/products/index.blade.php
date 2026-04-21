@@ -824,7 +824,7 @@
 					</div>
 				</div>
 			`,
-			@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
 			showCancelButton: true,
 			confirmButtonText: 'Mark as Removed',
 			cancelButtonText: 'Cancel',

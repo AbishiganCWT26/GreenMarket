@@ -549,7 +549,7 @@
         Swal.fire({
             title: 'Remove Profile Photo?',
             text: 'Your current profile photo will be removed and default avatar will be restored.',
-            @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',

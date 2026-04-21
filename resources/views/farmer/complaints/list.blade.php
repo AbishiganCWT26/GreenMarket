@@ -448,7 +448,7 @@ function deleteComplaint(id) {
 	Swal.fire({
 		title: 'Delete Complaint',
 		text: 'This action cannot be undone',
-		@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+		@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
 		showCancelButton: true,
 		confirmButtonColor: '#ef4444',
 		cancelButtonColor: '#6b7280',

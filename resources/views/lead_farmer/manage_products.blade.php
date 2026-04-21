@@ -339,14 +339,13 @@ $(document).ready(function() {
 		Swal.fire({
 			title: 'Delete Product?',
 			html: `<div style="text-align:center">
-				<i class="fa-solid fa-trash" style="font-size:32px;color:#ef4444;margin-bottom:12px"></i>
 				<p style="font-size:14px;margin-bottom:8px">Delete <strong>${productName}</strong>?</p>
 				<p style="font-size:12px;color:#6b7280">This action cannot be undone</p>
 			</div>`,
-			@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 100, imageHeight: 100 @else icon: 'warning' @endif,
 			showCancelButton: true,
-			confirmButtonColor: '#10B981',
-			cancelButtonColor: '#ef4444',
+			confirmButtonColor: '#ef4444',
+			cancelButtonColor: '#10B981',
 			confirmButtonText: 'Delete',
 			cancelButtonText: 'Cancel',
 			reverseButtons: true,
@@ -375,11 +374,11 @@ $(document).ready(function() {
 					success: function(response) {
 						if (response.success) {
 							Swal.fire({
-								@if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+								@if(file_exists(public_path('assets/icons/Gif/Delete Success2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 								title: 'Deleted!',
 								text: response.message,
 								confirmButtonColor: '#10B981',
-								timer: 1500,
+								timer: 3000,
 								timerProgressBar: true
 							}).then(() => {
 								location.reload();

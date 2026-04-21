@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await Swal.fire({
                 title: 'Remove item?',
                 text: `Are you sure you want to remove "${productName}" from your cart?`,
-                @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 showCancelButton: true,
                 confirmButtonText: 'Yes, remove it',
                 cancelButtonText: 'Cancel',
@@ -489,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await Swal.fire({
                 title: 'Clear cart?',
                 text: 'Are you sure you want to remove all items from your cart?',
-                @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
                 showCancelButton: true,
                 confirmButtonText: 'Yes, clear cart',
                 cancelButtonText: 'Cancel',

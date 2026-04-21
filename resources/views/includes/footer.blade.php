@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			} else if (href.includes('.pdf')) {
 				e.preventDefault();
 				Swal.fire({
-					@if(file_exists(public_path('assets/icons/Gif/question2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/question2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+					@if(file_exists(public_path('assets/icons/Gif/download confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/download confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
 					title: 'Download',
 					text: `Download ${text} Policy?`,
 					showCancelButton: true,

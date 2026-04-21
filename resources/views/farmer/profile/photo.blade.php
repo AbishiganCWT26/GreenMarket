@@ -168,7 +168,7 @@
         Swal.fire({
             title: 'Remove Profile Photo?',
             text: 'Your current profile photo will be removed and default farmer icon will be restored.',
-            @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
@@ -198,7 +198,7 @@
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                            @if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                            @if(file_exists(public_path('assets/icons/Gif/Delete Success2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                             title: 'Photo Removed!',
                             text: data.message,
                             timer: 3000,

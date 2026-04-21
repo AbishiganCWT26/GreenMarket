@@ -606,7 +606,7 @@ function deleteComplaint(complaintId) {
     Swal.fire({
         title: 'Delete Complaint',
         text: 'Are you sure you want to delete this complaint? This action cannot be undone.',
-        @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+        @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#6b7280',
@@ -637,7 +637,7 @@ function deleteComplaint(complaintId) {
             Swal.fire({
                 title: 'Deleted!',
                 text: 'Complaint has been deleted successfully.',
-                @if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                @if(file_exists(public_path('assets/icons/Gif/Delete Success2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                 confirmButtonColor: '#10B981',
                 timer: 2000,
                 timerProgressBar: true

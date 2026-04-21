@@ -593,7 +593,7 @@
 				title: 'Delete Request',
 				html: `Are you sure you want to delete the request for<br><strong>"${productName}"</strong>?<br><br>
 					   <small class="text-muted">This will notify the buyer via email and SMS.</small>`,
-				@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 100, imageHeight: 100 @else icon: 'warning' @endif,
+				@if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 100, imageHeight: 100 @else icon: 'warning' @endif,
 				showCancelButton: true,
 				confirmButtonColor: '#10B981',
 				cancelButtonColor: '#d33',
@@ -623,7 +623,7 @@
 				if (result.isConfirmed) {
 					if (result.value && result.value.success) {
 						Swal.fire({
-							@if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+							@if(file_exists(public_path('assets/icons/Gif/Delete Success2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 							title: 'Deleted!',
 							text: result.value.message,
 							timer: 4000,

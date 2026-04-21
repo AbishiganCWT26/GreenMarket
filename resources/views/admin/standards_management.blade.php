@@ -383,7 +383,7 @@
         const result = await Swal.fire({
             title: 'Are you sure?',
             text: 'This will delete the standard!',
-            @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
+            @if(file_exists(public_path('assets/icons/Gif/Delete Request Confirmation2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Request Confirmation2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'warning' @endif,
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
@@ -405,7 +405,7 @@
 
             if (response.ok) {
                 Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/Delete Success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+                    @if(file_exists(public_path('assets/icons/Gif/Delete Success2.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Delete Success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Deleted!',
                     text: 'Standard has been deleted successfully',
                     showConfirmButton: false,
