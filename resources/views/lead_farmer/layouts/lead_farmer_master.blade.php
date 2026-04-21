@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lead Farmer @yield('title')</title>
-    <link rel="stylesheet" href="{{ asset('css/Lead_Farmer/lead_farmer-master.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/lead_farmer/lead_farmer-master.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .swal2-image {
