@@ -54,16 +54,16 @@
                 title: 'Confirm Logout',
                 html: `
                     <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-                        <img src="https://cdn-icons-gif.flaticon.com/7740/7740910.gif" 
+                        <img src="{{ asset('assets/icons/Gif/logout2.gif') }}" 
                              onerror="this.onerror=null; this.src='{{ asset('assets/icons/Gif/logout1.gif') }}';" 
                              alt="Logout Icon" 
                              style="width: 80px; height: 80px;">
                     </div>
-                    <p style="font-size: 1.1rem; color: #374151; margin: 0;">Are you sure you want to end your session?</p>
+                    <p style="font-size: 1.1rem; color: #374151; margin: 0;">Are you sure you want to Logout?</p>
                 `,
                 showCancelButton: true,
                 confirmButtonText: 'Yes, Logout',
-                cancelButtonText: 'Cancel',
+                cancelButtonText: 'No, Go Back',
                 confirmButtonColor: '#dc2626',
                 cancelButtonColor: '#059669',
                 reverseButtons: true,
