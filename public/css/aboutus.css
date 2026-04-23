@@ -549,9 +549,13 @@ section {
         gap: 12px;
     }
 
+    .vm-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .offer-grid,
     .values-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .hw-grid {
@@ -601,6 +605,10 @@ section {
         align-items: center;
     }
 
+    .vm-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
     .btn {
         width: 100%;
         justify-content: center;
@@ -613,7 +621,7 @@ section {
     }
 
     .hw-stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .story-features {

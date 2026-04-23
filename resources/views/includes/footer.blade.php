@@ -112,7 +112,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 							<div class="contact-icon"><i class="fas fa-fax"></i></div>
 							<div class="contact-content">
 								<span class="contact-label">Fax</span>
-								<a href="fax:+94{{ preg_replace('/^0/', '', preg_replace('/[^0-9]/', '', $faxNo)) }}" class="contact-value">{{ $faxNo }}</a>
+								<fax:+94{{ preg_replace('/^0/', '', preg_replace('/[^0-9]/', '', $faxNo)) }}" class="contact-value">{{ $faxNo }}</a>
 							</div>
 						</div>
 						@endif
@@ -120,7 +120,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 							<div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
 							<div class="contact-content">
 								<span class="contact-label">Address</span>
-								<span class="contact-value address">{{ $address }}</span>
+								<a href="https://maps.app.goo.gl/9GdYWPBXh2PafRxP9" class="contact-value address">{{ $address }}</a>
 							</div>
 						</div>
 					</div>
