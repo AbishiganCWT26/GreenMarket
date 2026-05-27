@@ -128,7 +128,7 @@
 <td>{{ $order->buyer->name ?? 'N/A' }}</td>
 <td>LKR {{ number_format($order->total_amount, 2) }}</td>
 <td>
-<span class="badge-status badge-{{ $order->order_status == 'pending' ? 'pending' : ($order->order_status == 'paid' ? 'paid' : ($order->order_status == 'completed' ? 'completed' : 'info')) }}">
+<span class="badge-status badge-{{ $order->order_status == 'Processing order' ? 'pending' : ($order->order_status == 'paid' ? 'paid' : ($order->order_status == 'completed' ? 'completed' : 'info')) }}">
 {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
 </span>
 </td>

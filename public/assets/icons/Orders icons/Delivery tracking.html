@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Order Tracking · Premium Large Display</title>
+
+  <!-- SweetAlert2 Library -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      --glass-bg: rgba(255, 255, 255, 0.95);
+      --text-main: #0f172a;
+      --icon-size: 6rem;
+      /* Default size for medium screens */
+      --gap: 1rem;
+      --arrow-size: 1.5rem;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      padding: 2rem;
+    }
+
+    .track-btn {
+      background: #0f172a;
+      border: none;
+      color: white;
+      font-weight: 800;
+      font-size: 1.2rem;
+      padding: 1.5rem 3rem;
+      border-radius: 100px;
+      cursor: pointer;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.4);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .track-btn:hover {
+      transform: translateY(-5px) scale(1.02);
+      background: #1e293b;
+      box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.5);
+    }
+
+    /* SweetAlert2 Modal Styling */
+    .order-tracking-popup {
+      border-radius: 3rem !important;
+      padding: 3rem 2rem !important;
+      background: var(--glass-bg) !important;
+      backdrop-filter: blur(20px) !important;
+      box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.2) !important;
+      max-width: 98vw !important;
+      width: auto !important;
+    }
+
+    .swal2-title.custom-title {
+      font-weight: 800;
+      font-size: 2.2rem;
+      color: var(--text-main);
+      margin-bottom: 2.5rem !important;
+      letter-spacing: -0.03em;
+    }
+
+    /* Journey Layout */
+    .tracking-journey {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: var(--gap);
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .step-node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+
+    .step-node:hover {
+      transform: scale(1.05);
+    }
+
+    .icon-container {
+      width: var(--icon-size);
+      height: var(--icon-size);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .icon-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+    }
+
+    .arrow-separator {
+      font-size: var(--arrow-size);
+      color: #94a3b8;
+      font-weight: 300;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* SPECIFIC BREAKPOINTS */
+
+    /* 1. ultralarge Ultrawide / XXXXL: 2560px - 5000px */
+    @media (min-width: 2560px) {
+      :root {
+        --icon-size: 8.5rem;
+        --gap: 2.5rem;
+        --arrow-size: 3.5rem;
+      }
+
+      .order-tracking-popup {
+        padding: 5rem !important;
+        border-radius: 5rem !important;
+      }
+
+      .swal2-title.custom-title {
+        font-size: 4rem;
+      }
+    }
+
+    /* 2. large Ultrawide / XXXL: 1501px - 2559px */
+    @media (min-width: 1501px) and (max-width: 2559px) {
+      :root {
+        --icon-size: 6.5rem;
+        --gap: 2rem;
+        --arrow-size: 2.5rem;
+      }
+
+      .order-tracking-popup {
+        padding: 4rem !important;
+      }
+
+      .swal2-title.custom-title {
+        font-size: 3rem;
+      }
+    }
+
+    /* 3. Ultrawide / XXL: 1400px - 1500px */
+    @media (min-width: 1400px) and (max-width: 1500px) {
+      :root {
+        --icon-size: 6.5rem;
+        --gap: 1.5rem;
+        --arrow-size: 2.2rem;
+      }
+
+      .swal2-title.custom-title {
+        font-size: 2.8rem;
+      }
+    }
+
+    /* 4. Extra Large Screens: 1200px - 1399px */
+    @media (min-width: 1200px) and (max-width: 1399px) {
+      :root {
+        --icon-size: 6.5rem;
+        --gap: 1.2rem;
+        --arrow-size: 2rem;
+      }
+    }
+
+    /* 5. Large Screens: 1001px - 1199px */
+    @media (min-width: 1001px) and (max-width: 1199px) {
+      :root {
+        --icon-size: 6.5rem;
+        --gap: 1rem;
+        --arrow-size: 1.8rem;
+      }
+    }
+
+    /* 6. Normal screen size: 1000px */
+    @media (width: 1000px) {
+      :root {
+        --icon-size: 7.5rem;
+        --gap: 0.8rem;
+        --arrow-size: 1.6rem;
+      }
+    }
+
+    /* 7. Normal Medium screen size: 999px - 992px */
+    @media (min-width: 992px) and (max-width: 999px) {
+      :root {
+        --icon-size: 5.5rem;
+        --gap: 0.8rem;
+      }
+    }
+
+    /* 8. Medium Screens (Tablets): 768px - 991px */
+    @media (min-width: 768px) and (max-width: 991px) {
+      :root {
+        --icon-size: 6.5rem;
+        --gap: 0.6rem;
+        --arrow-size: 1.4rem;
+      }
+
+      .order-tracking-popup {
+        padding: 2.5rem 1.5rem !important;
+      }
+
+      .tracking-journey {
+        flex-direction: column;
+      }
+
+      .arrow-separator {
+        transform: rotate(90deg);
+        margin: 0.5rem 0;
+      }
+    }
+
+    /* 9. Small Screens (Landscape): 576px - 767px */
+    @media (min-width: 576px) and (max-width: 767px) {
+      :root {
+        --icon-size: 5.5rem;
+        --gap: 0.5rem;
+        --arrow-size: 1.2rem;
+      }
+
+      .order-tracking-popup {
+        padding: 2rem 1rem !important;
+        border-radius: 2rem !important;
+      }
+
+      .swal2-title.custom-title {
+        font-size: 1.8rem;
+      }
+
+      .tracking-journey {
+        flex-direction: column;
+      }
+
+      .arrow-separator {
+        transform: rotate(90deg);
+        margin: 0.5rem 0;
+      }
+    }
+
+    /* 10. Extra Small Screens: 481px - 575px */
+    @media (min-width: 481px) and (max-width: 575px) {
+      :root {
+        --icon-size: 4.8rem;
+        --gap: 0.4rem;
+        --arrow-size: 1rem;
+      }
+
+      .order-tracking-popup {
+        padding: 1.5rem 0.5rem !important;
+      }
+
+      .tracking-journey {
+        flex-direction: column;
+      }
+
+      .arrow-separator {
+        transform: rotate(90deg);
+        margin: 0.4rem 0;
+      }
+    }
+
+    /* 11. Very Small Phones: 380px - 480px */
+    @media (min-width: 380px) and (max-width: 480px) {
+      :root {
+        --icon-size: 4.2rem;
+        --gap: 0.3rem;
+        --arrow-size: 0.8rem;
+      }
+
+      .swal2-title.custom-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem !important;
+      }
+
+      .tracking-journey {
+        flex-direction: column;
+      }
+
+      .arrow-separator {
+        transform: rotate(90deg);
+        margin: 0.3rem 0;
+      }
+    }
+
+    /* 12. ultra Small Phones: 379px and below */
+    @media (max-width: 379px) {
+      :root {
+        --icon-size: 3.8rem;
+        --gap: 0.2rem;
+        --arrow-size: 0.7rem;
+      }
+
+      .order-tracking-popup {
+        border-radius: 1.5rem !important;
+        padding: 1.2rem 0.3rem !important;
+      }
+
+      .swal2-title.custom-title {
+        font-size: 1.3rem;
+      }
+
+      .tracking-journey {
+        flex-direction: column;
+      }
+
+      .arrow-separator {
+        transform: rotate(90deg);
+        margin: 0.2rem 0;
+      }
+    }
+
+    /* Animation */
+    .swal2-show {
+      animation: swal2-show 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+  </style>
+</head>
+
+<body>
+
+  <button id="trackOrderButton" class="track-btn">
+    <span>🚚</span> Track Order Journey
+  </button>
+
+  <script>
+    const trackingSteps = [
+      { file: 'Order placed-1.svg', label: 'Order Placed' },
+      { file: 'processing order-1.svg', label: 'Processing' },
+      { file: 'order paid.svg', label: 'Paid' },
+      { file: 'Dispatched.svg', label: 'Dispatched' },
+      { file: 'Arrived to District.svg', label: 'District' },
+      { file: 'Order is on the way.svg', label: 'On the Way' },
+      { file: 'Order completed.svg', label: 'Completed' }
+    ];
+
+    function buildTrackingHTML() {
+      let html = '<div class="tracking-journey">';
+
+      trackingSteps.forEach((step, index) => {
+        html += `
+          <div class="step-node">
+            <div class="icon-container">
+              <img src="${step.file}" alt="${step.label}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/649/649730.png'; this.style.opacity='0.5'">
+            </div>
+          </div>
+        `;
+
+        // Add arrow separator except after last item
+        if (index < trackingSteps.length - 1) {
+          html += '<div class="arrow-separator">⟶</div>';
+        }
+      });
+
+      html += '</div>';
+      return html;
+    }
+
+    document.getElementById('trackOrderButton').addEventListener('click', () => {
+      Swal.fire({
+        title: 'Delivery Tracking',
+        html: buildTrackingHTML(),
+        customClass: {
+          popup: 'order-tracking-popup',
+          title: 'custom-title'
+        },
+        showCloseButton: true,
+        showConfirmButton: false,
+        background: 'transparent',
+        width: 'auto',
+        allowOutsideClick: true
+      });
+    });
+  </script>
+
+</body>
+
+</html>

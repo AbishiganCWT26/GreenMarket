@@ -39,26 +39,10 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 						@if($smallPara)
 						<p class="brand-desc">{{ $smallPara }}</p>
 						@endif
-						<div class="social-wrapper">
-							<div class="social-row">
-								<a href="{{ $socialLinks['facebook'] }}" class="social-btn facebook" data-platform="Facebook">
-									<i class="fab fa-facebook-f"></i>
-								</a>
-								<a href="{{ $socialLinks['youtube'] }}" class="social-btn youtube" data-platform="YouTube">
-									<i class="fab fa-youtube"></i>
-								</a>
-								<a href="{{ $socialLinks['twitter'] }}" class="social-btn twitter" data-platform="Twitter">
-									<i class="fab fa-twitter"></i>
-								</a>
-								<a href="{{ $socialLinks['blogspot'] }}" class="social-btn blog" data-platform="Blog">
-									<i class="fas fa-blog"></i>
-								</a>
-							</div>
-						</div>
 						<div class="partner-strip">
 							<div class="partner-item">
-								<a href="https://csiap.lk/" target="_blank">
-									<img src="{{ asset('assets/images/CSIAP Logo.png') }}" alt="CSIAP" class="partner-img vertical">
+								<a href="https://ruwanrekha.com/" target="_blank">
+									<img src="{{ asset('assets/images/Ruwan Rekha logo.png') }}" alt="CSIAP" class="partner-img vertical">
 								</a>
 							</div>
 							<div class="partner-item">
@@ -112,7 +96,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 							<div class="contact-icon"><i class="fas fa-fax"></i></div>
 							<div class="contact-content">
 								<span class="contact-label">Fax</span>
-								<fax:+94{{ preg_replace('/^0/', '', preg_replace('/[^0-9]/', '', $faxNo)) }}" class="contact-value">{{ $faxNo }}</a>
+								<a href="fax:+94{{ preg_replace('/^0/', '', preg_replace('/[^0-9]/', '', $faxNo)) }}" class="contact-value">{{ $faxNo }}</a>
 							</div>
 						</div>
 						@endif
@@ -120,7 +104,7 @@ $termsOfService = $footerData['footer_terms_of_service']->config_value ?? '#';
 							<div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
 							<div class="contact-content">
 								<span class="contact-label">Address</span>
-								<a href="https://maps.app.goo.gl/9GdYWPBXh2PafRxP9" class="contact-value address">{{ $address }}</a>
+								<a href="https://maps.app.goo.gl/Lm7mXLdK33LPXeH5A" class="contact-value address">{{ $address }}</a>
 							</div>
 						</div>
 					</div>

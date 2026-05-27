@@ -196,6 +196,22 @@
 							</div>
 
 							<div class="mb-3">
+								<label for="google_map_link" class="form-label required-field">Google Map Link of the Residential Address</label>
+								<div class="input-with-icon">
+									<i class="fas fa-map-marked-alt"></i>
+									<input type="url" class="form-control @error('google_map_link') is-invalid @enderror"
+										id="google_map_link" name="google_map_link" value="{{ old('google_map_link') }}"
+										placeholder="Enter Google Map link" required>
+								</div>
+								<small class="form-text text-muted">
+									<i class="fas fa-info-circle"></i> Mention product will be delivery to the Residential Address of the google map link
+								</small>
+								@error('google_map_link')
+									<div class="invalid-feedback d-block">{{ $message }}</div>
+								@enderror
+							</div>
+
+							<div class="mb-3">
 								<label for="district" class="form-label required-field">District</label>
 								<div class="input-with-icon">
 									<i class="fas fa-map-marker-alt"></i>

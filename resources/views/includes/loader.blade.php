@@ -1,4 +1,5 @@
 {{-- Page Loader --}}
+<link rel="preload" href="{{ asset('assets/images/Logo Green Market.png') }}" as="image" fetchpriority="high">
 <div id="page-loader" translate="no">
 	<div class="particles-container"></div>
 
@@ -18,7 +19,8 @@
 				<div class="logo-image-container">
 					<img src="{{ asset('assets/images/Logo Green Market.png') }}"
 						 class="logo-image"
-						 alt="GreenMarket Logo">
+						 alt="GreenMarket Logo"
+						 fetchpriority="high">
 				</div>
 				<div class="spinner-ring"></div>
 				<div class="spinner-ring spinner-ring-2"></div>
@@ -565,6 +567,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let startTime = Date.now();
     let isFinished = false;
 
+    // Maximum loading time fallback (5 seconds)
+    setTimeout(() => {
+        finishLoading();
+    }, 5000);
+
     if (totalImages === 0) {
         finishLoading();
         return;
@@ -583,9 +590,9 @@ document.addEventListener("DOMContentLoaded", () => {
         percentageEl.textContent = percent + "%";
 
         if (loadedImages >= totalImages && !isFinished) {
-            // Check if 40 seconds have passed
+            // Wait at least 1 second before hiding the loader
             const elapsedTime = Date.now() - startTime;
-            const remainingTime = Math.max(0, 2500 - elapsedTime);
+            const remainingTime = Math.max(0, 1000 - elapsedTime);
             
             if (remainingTime > 0) {
                 // Wait for the remaining time before finishing

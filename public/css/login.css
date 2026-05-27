@@ -45,7 +45,7 @@ body::before {
 	position: absolute;
 	inset: 0;
 	background: url('../assets/images/hero-bg-login.jpg') center/cover no-repeat;
-	opacity: 0.05;
+	opacity: 0.15;
 	z-index: -1;
 }
 

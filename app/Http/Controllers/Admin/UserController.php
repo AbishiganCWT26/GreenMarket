@@ -28,6 +28,7 @@ class UserController extends Controller
             ->leftJoin('buyers', 'users.id', '=', 'buyers.user_id')
             ->leftJoin('facilitators', 'users.id', '=', 'facilitators.user_id')
             ->leftJoin('admins', 'users.id', '=', 'admins.user_id')
+			->leftJoin('delivery_riders', 'users.id', '=', 'delivery_riders.user_id')
             ->select(
                 'users.*',
                 'farmers.name as farmer_name',
@@ -44,7 +45,10 @@ class UserController extends Controller
                 'facilitators.primary_mobile as facilitator_mobile',
                 'admins.full_name as admin_name',
                 'admins.nic_no as admin_nic',
-                'admins.phone_number as admin_phone'
+                'admins.phone_number as admin_phone',
+				'delivery_riders.name as delivery_rider_name',
+				'delivery_riders.nic_no as delivery_rider_nic',
+				'delivery_riders.primary_mobile as delivery_rider_mobile'
             )
             ->orderBy('users.created_at', 'desc');
 
@@ -68,12 +72,15 @@ class UserController extends Controller
                     ->orWhere('lead_farmers.primary_mobile', 'ILIKE', $search)
                     ->orWhere('buyers.primary_mobile', 'ILIKE', $search)
                     ->orWhere('facilitators.primary_mobile', 'ILIKE', $search)
-                    ->orWhere('admins.phone_number', 'ILIKE', $search);
+                    ->orWhere('admins.phone_number', 'ILIKE', $search)
+					->orWhere('delivery_riders.name', 'ILIKE', $search)
+					->orWhere('delivery_riders.nic_no', 'ILIKE', $search)
+					->orWhere('delivery_riders.primary_mobile', 'ILIKE', $search);
             });
         }
 
         // Role filter
-        $validRoles = ['farmer', 'lead_farmer', 'buyer', 'facilitator', 'admin'];
+        $validRoles = ['farmer', 'lead_farmer', 'buyer', 'facilitator', 'admin', 'delivery_rider'];
         if ($request->filled('role') && in_array($request->role, $validRoles)) {
             $query->where('users.role', $request->role);
         }
@@ -167,6 +174,12 @@ class UserController extends Controller
                 $user->contact_number = $user->admin_phone ?? 'N/A';
                 $user->nic_number = $user->admin_nic ?? '';
                 break;
+
+			case 'delivery_rider':
+				$user->display_name = $user->delivery_rider_name ?? $user->username;
+				$user->contact_number = $user->delivery_rider_mobile ?? 'N/A';
+				$user->nic_number = $user->delivery_rider_nic ?? '';
+				break;
         }
 
         return $user;
@@ -193,12 +206,31 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_type' => 'required|in:farmer,lead_farmer,buyer,facilitator,admin',
+            'user_type' => 'required|in:farmer,lead_farmer,buyer,facilitator,admin,delivery_rider',
             'username' => 'required|string|max:50|unique:users,username',
             'email' => 'nullable|email|max:100|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'name' => 'required|string|max:100'
         ]);
+
+		if ($validated['user_type'] == 'delivery_rider') {
+			$request->validate([
+				'nic_no' => 'required|string|max:12',
+				'vehicle_number' => 'required|string|max:50',
+				'vehicle_type' => 'required|string|max:50',
+				'max_kg_capacity' => 'required|numeric',
+				'assigned_districts' => 'required|array',
+				'extra_details' => 'nullable|string'
+			]);
+
+			$nicExists = DB::table('delivery_riders')->where('nic_no', $request->nic_no)->exists();
+			if ($nicExists) {
+				return response()->json([
+					'success' => false,
+					'message' => 'Failed to create user because NIC No. "' . $request->nic_no . '" already exists'
+				], 422);
+			}
+		}
 
         // Additional validation for farmer types
         if (in_array($validated['user_type'], ['farmer', 'lead_farmer'])) {
@@ -347,6 +379,7 @@ class UserController extends Controller
                     'primary_mobile' => $request->primary_mobile,
                     'whatsapp_number' => $request->whatsapp_number,
                     'residential_address' => $request->residential_address,
+                    'google_map_link' => $request->google_map_link,
                     'district' => $request->district,
                     'business_name' => $request->business_name,
                     'business_type' => $request->business_type ?? 'individual',
@@ -396,7 +429,24 @@ class UserController extends Controller
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
-            }
+			} elseif ($validated['user_type'] == 'delivery_rider') {
+				DB::table('delivery_riders')->insert([
+					'user_id' => $userId,
+					'name' => $request->name,
+					'nic_no' => $request->nic_no,
+					'primary_mobile' => $request->primary_mobile,
+					'email' => $validated['email'] ?? null,
+					'vehicle_number' => $request->vehicle_number,
+					'vehicle_type' => $request->vehicle_type,
+					'max_kg_capacity' => $request->max_kg_capacity,
+					'whatsapp_number' => $request->whatsapp_number,
+					'residential_address' => $request->residential_address,
+					'assigned_districts' => json_encode($request->assigned_districts),
+					'extra_details' => $request->extra_details,
+					'created_at' => now(),
+					'updated_at' => now()
+				]);
+			}
 
             DB::commit();
 
@@ -496,9 +546,19 @@ class UserController extends Controller
         $validated = $request->validate([
             'username' => 'required|string|max:50|unique:users,username,' . $id,
             'email' => 'nullable|email|max:100|unique:users,email,' . $id,
-            'role' => 'required|in:admin,facilitator,lead_farmer,farmer,buyer',
+            'role' => 'required|in:admin,facilitator,lead_farmer,farmer,buyer,delivery_rider',
             'is_active' => 'required|boolean'
         ]);
+
+		if ($validated['role'] == 'delivery_rider') {
+			$request->validate([
+				'nic_no' => 'required|string|max:12',
+				'licence_number' => 'nullable|string|max:50',
+				'vehicle_number' => 'required|string|max:50',
+				'vehicle_type' => 'required|string|max:50',
+				'max_kg_capacity' => 'required|numeric'
+			]);
+		}
 
         // Additional validation for farmer types
         if (in_array($validated['role'], ['farmer', 'lead_farmer'])) {
@@ -516,11 +576,17 @@ class UserController extends Controller
         $sensitiveDataCheck = $this->checkSensitiveDataChanges($user, $request);
         if ($sensitiveDataCheck['changed']) {
             if (!$this->isOtpVerified($user->id, $sensitiveDataCheck['actions'])) {
+                $msg = 'OTP verification required for updating sensitive data.';
+                if ($sensitiveDataCheck['actions'] == ['verify_nic']) {
+                    $msg = 'OTP verification required for updating sensitive NIC data.';
+                } elseif ($sensitiveDataCheck['actions'] == ['edit_payment']) {
+                    $msg = 'OTP verification required for updating sensitive payment data.';
+                } elseif ($sensitiveDataCheck['actions'] == ['verify_rider_profile']) {
+                    $msg = 'OTP verification required for updating sensitive Rider Profile data.';
+                }
                 return response()->json([
                     'success' => false, 
-                    'message' => 'OTP verification required for updating sensitive ' . 
-                                ($sensitiveDataCheck['actions'] == ['verify_nic'] ? 'NIC' : 
-                                ($sensitiveDataCheck['actions'] == ['edit_payment'] ? 'payment' : 'NIC and payment')) . ' data.'
+                    'message' => $msg
                 ], 403);
             }
         }
@@ -550,6 +616,8 @@ class UserController extends Controller
                 $this->updateFacilitatorDetails($user, $request, $id);
             } elseif ($validated['role'] == 'admin') {
                 $this->updateAdminDetails($user, $request, $id);
+            } elseif ($validated['role'] == 'delivery_rider') {
+                $this->updateDeliveryRiderDetails($user, $request, $id);
             }
 
             DB::commit();
@@ -810,6 +878,10 @@ class UserController extends Controller
             'business_name' => $request->business_name ?? ($buyer->business_name ?? ''),
             'business_type' => $request->business_type ?? ($buyer->business_type ?? 'individual'),
             'nic_no' => $request->buyer_nic_no ?? $request->nic_no ?? ($buyer->nic_no ?? ''),
+            'district' => $request->district ?? ($buyer->district ?? ''),
+            'residential_address' => $request->residential_address ?? ($buyer->residential_address ?? ''),
+            'google_map_link' => $request->google_map_link ?? ($buyer->google_map_link ?? ''),
+            'whatsapp_number' => $request->whatsapp_number ?? ($buyer->whatsapp_number ?? ''),
             'updated_at' => now(),
             'updated_by' => Auth::id()
         ];
@@ -947,6 +1019,42 @@ class UserController extends Controller
                 'user_id' => $userId,
                 'role' => $userRecord->role,
                 'zone_assigned_area' => 'Sri Lanka',
+                'created_at' => now()
+            ]));
+        }
+    }
+
+    private function updateDeliveryRiderDetails($user, $request, $userId)
+    {
+        $rider = DB::table('delivery_riders')->where('user_id', $userId)->first();
+
+        $updateData = [
+            'name' => $request->name ?? ($rider->name ?? $user->username),
+            'nic_no' => $request->nic_no ?? ($rider->nic_no ?? ''),
+            'licence_number' => $request->licence_number ?? ($rider->licence_number ?? ''),
+            'primary_mobile' => $request->primary_mobile ?? ($rider->primary_mobile ?? ''),
+            'email' => $request->email ?? ($rider->email ?? $user->email),
+            'vehicle_number' => $request->vehicle_number ?? ($rider->vehicle_number ?? ''),
+            'vehicle_type' => $request->vehicle_type ?? ($rider->vehicle_type ?? ''),
+            'max_kg_capacity' => $request->max_kg_capacity ?? ($rider->max_kg_capacity ?? 0),
+            'whatsapp_number' => $request->whatsapp_number ?? ($rider->whatsapp_number ?? null),
+            'residential_address' => $request->residential_address ?? ($rider->residential_address ?? null),
+            'updated_at' => now(),
+        ];
+        
+        if ($request->has('assigned_districts') && is_array($request->assigned_districts)) {
+            $updateData['assigned_districts'] = json_encode($request->assigned_districts);
+        }
+        
+        if ($request->has('extra_details')) {
+            $updateData['extra_details'] = $request->extra_details;
+        }
+
+        if ($rider) {
+            DB::table('delivery_riders')->where('user_id', $userId)->update($updateData);
+        } else {
+            DB::table('delivery_riders')->insert(array_merge($updateData, [
+                'user_id' => $userId,
                 'created_at' => now()
             ]));
         }
@@ -1100,16 +1208,16 @@ class UserController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'action' => 'required|in:edit_payment,verify_nic'
+            'action' => 'required|in:edit_payment,verify_nic,verify_rider_profile'
         ]);
 
         $user = DB::table('users')->find($request->user_id);
 
-        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer'])) {
+        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer', 'delivery_rider'])) {
             return response()->json(['success' => false, 'message' => 'OTP only required for sensitive roles'], 400);
         }
 
-        $table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : 'buyers')));
+        $table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : ($user->role == 'buyer' ? 'buyers' : 'delivery_riders'))));
         $details = DB::table($table)->where('user_id', $user->id)->first();
 
         if (!$details || !$details->primary_mobile) {
@@ -1129,7 +1237,9 @@ class UserController extends Controller
 
         $message = $request->action == 'verify_nic' 
             ? "Your OTP for NIC update is: $otp. Valid for 5 minutes."
-            : "Your OTP for payment details update is: $otp. Valid for 5 minutes.";
+            : ($request->action == 'verify_rider_profile'
+                ? "Your OTP for Rider Profile update is: $otp. Valid for 5 minutes."
+                : "Your OTP for payment details update is: $otp. Valid for 5 minutes.");
 
         $smsSent = $this->sendSmsOtpCustom($details->primary_mobile, $otp, $message);
 
@@ -1145,7 +1255,7 @@ class UserController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'otp' => 'required|digits:6',
-            'action' => 'required|in:edit_payment,verify_nic'
+            'action' => 'required|in:edit_payment,verify_nic,verify_rider_profile'
         ]);
 
         $otpRecord = DB::table('otp_verifications')
@@ -1175,11 +1285,11 @@ class UserController extends Controller
 
         $user = DB::table('users')->find($request->user_id);
 
-        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer'])) {
+        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer', 'delivery_rider'])) {
             return response()->json(['success' => false, 'message' => 'OTP only required for sensitive roles'], 400);
         }
 
-        $table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : 'buyers')));
+        $table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : ($user->role == 'buyer' ? 'buyers' : 'delivery_riders'))));
         $details = DB::table($table)->where('user_id', $user->id)->first();
 
         if (!$details || !$details->primary_mobile) {
@@ -1206,7 +1316,9 @@ class UserController extends Controller
 
         $message = $action == 'verify_nic' 
             ? "Your OTP for NIC update is: $otp. Valid for 5 minutes."
-            : "Your OTP for payment details update is: $otp. Valid for 5 minutes.";
+            : ($action == 'verify_rider_profile'
+                ? "Your OTP for Rider Profile update is: $otp. Valid for 5 minutes."
+                : "Your OTP for payment details update is: $otp. Valid for 5 minutes.");
 
         $smsSent = $this->sendSmsOtpCustom($details->primary_mobile, $otp, $message);
 
@@ -1446,6 +1558,9 @@ class UserController extends Controller
                     ];
                 }
                 break;
+            case 'delivery_rider':
+                $details = DB::table('delivery_riders')->where('user_id', $user->id)->first();
+                break;
         }
 
         return $details;
@@ -1454,12 +1569,13 @@ class UserController extends Controller
     private function sendUserCreationNotification($userId, $role, $plainPassword = null)
     {
         $user = DB::table('users')->find($userId);
+        $passwordText = $plainPassword ? "{$plainPassword}" : "";
 
         if ($user->email) {
             try {
                 Mail::to($user->email)->send(new UserUpdateNotification(
                     'Account Created',
-                    "Your account has been created successfully. Role: " . ucfirst($role),
+                    "Your GreenMarket " . str_replace('_', ' ', $role) . " account has been created successfully. \n\nUsername: {$user->username}\nPassword: {$passwordText}",
                     $user
                 ));
             } catch (\Exception $e) {
@@ -1470,10 +1586,7 @@ class UserController extends Controller
         $mobile = $this->getUserMobile($userId, $role);
 
         if ($mobile) {
-            // Use plain password if provided, otherwise skip password in SMS
-            $passwordText = $plainPassword ? "Password: {$plainPassword}" : "";
-            
-            $message = "Welcome to GreenMarket! Your account has been created.\nUsername: {$user->username}\nPassword: {$passwordText}";
+            $message = "Welcome to GreenMarket! Your " . str_replace('_', ' ', $role) . " account has been created.\nUsername: {$user->username}\nPassword: {$passwordText}";
             
             $this->sendSms($mobile, $message);
         }
@@ -1516,6 +1629,53 @@ class UserController extends Controller
 
         $details = $this->getUserDetails($user);
         if (!$details) return ['changed' => false, 'actions' => []];
+
+        if ($user->role == 'delivery_rider') {
+            // Check username & email on the user record
+            if ((string)$user->username !== (string)$request->username) {
+                $changed = true;
+                if (!in_array('verify_rider_profile', $actions)) $actions[] = 'verify_rider_profile';
+            }
+            if ((string)($user->email ?? '') !== (string)($request->email ?? '')) {
+                $changed = true;
+                if (!in_array('verify_rider_profile', $actions)) $actions[] = 'verify_rider_profile';
+            }
+
+            // Check details fields
+            $restrictedFields = [
+                'nic_no',
+                'licence_number',
+                'primary_mobile',
+                'whatsapp_number',
+                'vehicle_number',
+                'vehicle_type',
+                'max_kg_capacity',
+                'residential_address'
+            ];
+            foreach ($restrictedFields as $field) {
+                $oldVal = (string)($details->$field ?? '');
+                $newVal = (string)($request->$field ?? '');
+                if ($oldVal !== $newVal) {
+                    $changed = true;
+                    if (!in_array('verify_rider_profile', $actions)) $actions[] = 'verify_rider_profile';
+                }
+            }
+
+            // Check assigned_districts array/JSON
+            $oldDistricts = isset($details->assigned_districts) ? json_decode($details->assigned_districts, true) : [];
+            if (!is_array($oldDistricts)) $oldDistricts = [];
+            $newDistricts = $request->assigned_districts ?? [];
+            if (!is_array($newDistricts)) $newDistricts = [];
+            
+            sort($oldDistricts);
+            sort($newDistricts);
+            if ($oldDistricts !== $newDistricts) {
+                $changed = true;
+                if (!in_array('verify_rider_profile', $actions)) $actions[] = 'verify_rider_profile';
+            }
+
+            return ['changed' => $changed, 'actions' => $actions];
+        }
 
         // Check NIC change
         $currentNic = null;
@@ -1668,6 +1828,9 @@ class UserController extends Controller
         } elseif ($role == 'admin') {
             $admin = DB::table('admins')->where('user_id', $userId)->first();
             return $admin->phone_number ?? null;
+        } elseif ($role == 'delivery_rider') {
+            $rider = DB::table('delivery_riders')->where('user_id', $userId)->first();
+            return $rider->primary_mobile ?? null;
         }
 
         return null;
@@ -1693,6 +1856,8 @@ class UserController extends Controller
             return $this->deleteFacilitator($user);
         } elseif ($user->role == 'buyer') {
             return $this->deleteBuyer($user);
+        } elseif ($user->role == 'delivery_rider') {
+            return $this->deleteDeliveryRider($user);
         }
 
         return response()->json(['success' => false, 'message' => 'Unknown user role'], 400);
@@ -1981,6 +2146,42 @@ class UserController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to delete buyer: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function deleteDeliveryRider($user)
+    {
+        $rider = DB::table('delivery_riders')->where('user_id', $user->id)->first();
+
+        if (!$rider) {
+            return response()->json(['success' => false, 'message' => 'Delivery rider details not found'], 400);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            if ($rider->primary_mobile) {
+                $this->sendSms($rider->primary_mobile, "Your delivery rider account has been deleted from GreenMarket system.");
+            }
+
+            // Nullify the rider ID in deliveries so that they don't block deletion and can be reassigned
+            DB::table('rider_deliveries')->where('rider_id', $user->id)->update(['rider_id' => null]);
+
+            DB::table('notifications')->where('user_id', $user->id)->delete();
+            DB::table('complaints')
+                ->where('complainant_user_id', $user->id)
+                ->orWhere('against_user_id', $user->id)
+                ->delete();
+
+            DB::table('delivery_riders')->where('id', $rider->id)->delete();
+            DB::table('users')->where('id', $user->id)->delete();
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Delivery rider deleted successfully']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Failed to delete delivery rider: ' . $e->getMessage()], 500);
         }
     }
 

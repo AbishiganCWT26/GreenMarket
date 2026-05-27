@@ -126,6 +126,28 @@
                             <div class="col-md-6">
                                 <div class="card border-0 bg-light">
                                     <div class="card-body">
+                                        <div class="delivery-method-selection mb-4">
+                                            <label class="form-label fw-bold mb-3"><i class="fas fa-truck-loading me-2"></i>Select Delivery Method <span class="text-danger">*</span></label>
+                                            <div class="row g-2">
+                                                <div class="col-6">
+                                                    <input type="radio" class="btn-check" name="delivery_method" id="method_pickup" value="Pickup" autocomplete="off">
+                                                    <label class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 selection-card" for="method_pickup">
+                                                        <i class="fas fa-store fa-2x mb-2"></i>
+                                                        <span class="fw-bold">Cash on Pickup</span>
+                                                        <small class="text-muted mt-1">Payment Method: Cash</small>
+                                                    </label>
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="radio" class="btn-check" name="delivery_method" id="method_delivery" value="Delivery" autocomplete="off">
+                                                    <label class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 selection-card" for="method_delivery">
+                                                        <i class="fas fa-truck fa-2x mb-2"></i>
+                                                        <span class="fw-bold">Delivery to Doorstep</span>
+                                                        <small class="text-muted mt-1">Payment Method: Bank Transfer</small>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div class="d-flex justify-content-between mb-2">
                                             <span class="text-muted">Subtotal:</span>
                                             <span class="fw-semibold">Rs. {{ number_format($cartTotal, 2) }}</span>
@@ -138,7 +160,7 @@
                                             </span>
                                         </div>
                                         <!-- Changed checkout button to trigger payment method selection -->
-                                        <button type="button" class="btn btn-primary btn-lg w-100" id="proceedToPaymentBtn">
+                                        <button type="button" class="btn btn-primary btn-lg w-100" id="proceedToPaymentBtn" disabled>
                                             <i class="fas fa-lock me-2"></i> Proceed to Payment
                                         </button>
                                         <div class="text-center mt-3">
@@ -572,20 +594,84 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Proceed to Payment button
+    // Handle Delivery Method Selection
+    const methodRadios = document.querySelectorAll('input[name="delivery_method"]');
     const proceedToPaymentBtn = document.getElementById('proceedToPaymentBtn');
+
+    methodRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (proceedToPaymentBtn) {
+                proceedToPaymentBtn.disabled = false;
+
+                // Add visual feedback to cards
+                document.querySelectorAll('.selection-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                const selectedLabel = document.querySelector(`label[for="${this.id}"]`);
+                if (selectedLabel) selectedLabel.classList.add('active');
+            }
+        });
+    });
+
+    // Proceed to Payment button
     if (proceedToPaymentBtn) {
         proceedToPaymentBtn.addEventListener('click', async function() {
-            const result = await Swal.fire({
-                title: 'Order Confirmation',
-                html: `
+            const selectedMethod = document.querySelector('input[name="delivery_method"]:checked');
+
+            if (!selectedMethod) {
+                showAlert('Please select a delivery method first', 'warning');
+                return;
+            }
+
+            // Validation: Block Delivery to Doorstep
+            if (selectedMethod.value === 'Delivery') {
+                Swal.fire({
+                    title: 'Service Unavailable',
+                    html: 'At the moment the delivery rider is not available.<br><strong>Please choose Cash on Pickup.</strong>',
+                    icon: 'info',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#10B981'
+                });
+                
+                return;
+            }
+
+            const methodValue = selectedMethod.value;
+            let confirmTitle = 'Order Confirmation';
+            let confirmHtml = '';
+            let paymentMethod = 'cod'; // Default for Pickup
+
+            if (methodValue === 'Pickup') {
+                confirmHtml = `
                     <div class="text-start">
-                    <center>
-                        <p><strong>Order Pick-up process:</strong> <br>You will directly contact the Seller for pickup</p>
-                    </center>
+                        <center>
+                            <p><strong>Order Pick-up process:</strong> <br>You will directly contact the Seller for pickup</p>
+                            <p class="text-muted small">Payment Method: Cash on Pickup</p>
+                        </center>
                     </div>
-                `,
-                @if(file_exists(public_path('assets/icons/Gif/Order Confirmation1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Order Confirmation1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
+                `;
+            } else {
+                paymentMethod = 'bank_transfer';
+                confirmHtml = `
+                    <div class="text-start">
+                        <center>
+                            <p><strong>Delivery to Doorstep:</strong> <br>Pay and upload proof within 24 hours. <br>You will get Bank details after confirm order. <br>Upload payment proof to initiate delivery.</p>
+                            <p class="text-muted small">Payment Method: Bank Transfer</p>
+                        </center>
+                    </div>
+                `;
+            }
+
+            const result = await Swal.fire({
+                title: confirmTitle,
+                html: confirmHtml,
+                @if(file_exists(public_path('assets/icons/Gif/Order Confirmation1.gif')))
+                    imageUrl: '{{ asset('assets/icons/Gif/Order Confirmation1.gif') }}',
+                    imageWidth: 60,
+                    imageHeight: 60
+                @else
+                    icon: 'question'
+                @endif,
                 showCancelButton: true,
                 confirmButtonText: 'Confirm Order',
                 cancelButtonText: 'Cancel',
@@ -594,7 +680,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (result.isConfirmed) {
-                // Place order with COD
                 try {
                     const response = await fetch('/buyer/checkout/place-order', {
                         method: 'POST',
@@ -604,7 +689,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({
-                            payment_method: 'cod'
+                            order_type: methodValue,
+                            payment_method: paymentMethod
                         })
                     });
 
@@ -621,18 +707,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                     @else
                                         <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
                                     @endif
-                                    <p class="h5">Contact the seller for the pickup</p>
-                                    <p class="text-muted">Check the invoice in "Order History"</p>
+                                    <p class="h5">${methodValue === 'Pickup' ? 'Contact the seller for the pickup' : 'Please upload payment proof in Unpaid Orders'}</p>
+                                    <p class="text-muted">Check the Bank details & upload payment proof in "Unpaid Orders"</p>
                                 </div>
                             `,
-                            confirmButtonText: 'Go to Order History',
+                            confirmButtonText: 'Go to Unpaid Orders',
                             confirmButtonColor: '#10B981'
                         }).then(() => {
-                            // Redirect to order history page
                             if (data.redirect_url) {
                                 window.location.href = data.redirect_url;
                             } else {
-                                // Fallback redirect
                                 window.location.href = '/buyer/history';
                             }
                         });
@@ -653,14 +737,31 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-.success-pulse {
-    animation: pulse 0.5s ease-in-out;
+.selection-card {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background: #fff;
+    cursor: pointer;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+.selection-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.btn-check:checked + .selection-card {
+    background-color: #f0fdf4;
+    border-color: #10b981;
+    color: #065f46;
+}
+
+.selection-card i {
+    color: #6b7280;
+    transition: color 0.3s ease;
+}
+
+.btn-check:checked + .selection-card i {
+    color: #10b981;
 }
 
 .quantity-selector button:disabled {
@@ -669,4 +770,3 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 </style>
 @endsection
-

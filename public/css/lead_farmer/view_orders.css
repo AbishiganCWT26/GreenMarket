@@ -302,29 +302,60 @@ body {
     text-transform: uppercase;
 }
 
+.status-processing-order {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
 .status-confirmed {
-    background: #dbeafe;
-    color: #2563eb;
+    background: #DBEAFE;
+    color: #1E40AF;
 }
 
 .status-paid {
-    background: #d1fae5;
-    color: #059669;
+    background: #D1FAE5;
+    color: #065F46;
 }
 
-.status-ready_for_pickup {
-    background: #fef3c7;
-    color: #d97706;
+.status-ready-for-pickup {
+    background: #E0E7FF;
+    color: #3730A3;
+}
+
+.status-dispatched {
+    background: #E0F2FE;
+    color: #075985;
 }
 
 .status-completed {
-    background: #e0f2fe;
-    color: #0369a1;
+    background: #ECFDF5;
+    color: #065F46;
 }
 
 .status-cancelled {
-    background: #fee2e2;
-    color: #dc2626;
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.status-refunded {
+    background: #F3F4F6;
+    color: #374151;
+}
+
+.status-payment-pending {
+    background: #FFF7ED;
+    color: #9A3412;
+}
+
+.status-awaiting-verification {
+    background: #F0FDFA;
+    color: #0F766E;
+}
+
+.order-status i,
+.status-badge i {
+    margin-right: 4px;
+    font-size: 0.9em;
 }
 
 .card-body {

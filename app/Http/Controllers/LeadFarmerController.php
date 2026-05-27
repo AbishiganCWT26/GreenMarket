@@ -15,8 +15,16 @@ use App\Models\OtpVerification;
 use App\Models\ProductExample;
 use App\Models\SystemStandard;
 use App\Models\InventoryLog;
+use App\Models\OrderItem;
+use App\Models\BusDispatch;
+use App\Models\DispatchProduct;
+use App\Models\RiderDelivery;
+use App\Models\Invoice;
+use App\Models\PaymentDeliveryOrder;
+use App\Models\Buyer;
 use App\Services\InventoryService;
 use App\Mail\FarmerRegistrationMail;
+use App\Mail\BuyerPaymentRejection;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -40,7 +48,7 @@ class LeadFarmerController extends Controller
 
         $totalOrders = Order::where('lead_farmer_id', $leadFarmerId)->count();
         $pendingOrders = Order::where('lead_farmer_id', $leadFarmerId)
-            ->where('order_status', 'pending')
+            ->where('order_status', 'Processing order')
             ->count();
 
         $recentOrders = Order::with(['buyer', 'farmer'])
@@ -1790,6 +1798,401 @@ class LeadFarmerController extends Controller
                 'success' => false,
                 'message' => 'Error updating order status: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function verifyDeliveryPayment(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required|exists:orders,id',
+            'action' => 'required|in:confirm,reject',
+            'rejection_reason' => 'nullable|required_if:action,reject|string|max:255'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $leadFarmer = Auth::user()->leadFarmer;
+        if (!$leadFarmer) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized: Lead Farmer profile not found'], 403);
+        }
+        $leadFarmerId = $leadFarmer->id;
+
+        DB::beginTransaction();
+        try {
+            $order = Order::with(['buyer.user', 'paymentDeliveryOrder', 'orderItems', 'farmer.user'])
+                ->where('id', $request->order_id)
+                ->where('lead_farmer_id', $leadFarmerId)
+                ->firstOrFail();
+
+            $paymentRecord = $order->paymentDeliveryOrder;
+
+            if (!$paymentRecord) {
+                return response()->json(['success' => false, 'message' => 'Payment record not found'], 404);
+            }
+
+            if ($request->action === 'confirm') {
+                // Update Order Status
+                $order->order_status = 'confirmed';
+                $order->paid_date = now();
+                $order->save();
+
+                // Update Payment Record
+                $paymentRecord->update(['payment_status' => 'confirmed']);
+
+                // Generate Invoice
+                $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad($order->id, 6, '0', STR_PAD_LEFT);
+                Invoice::create([
+                    'invoice_number' => $invoiceNumber,
+                    'order_id' => $order->id,
+                    'invoice_path' => 'invoices/' . $invoiceNumber . '.pdf',
+                    'generated_at' => now()
+                ]);
+
+                // Create System Payment record
+                Payment::create([
+                    'order_id' => $order->id,
+                    'payment_reference' => $paymentRecord->transaction_id,
+                    'amount' => $order->total_amount,
+                    'payment_method' => 'bank',
+                    'payment_status' => 'completed',
+                    'payment_date' => now()
+                ]);
+
+                // Notify Buyer
+                if ($order->buyer) {
+                    Notification::create([
+                        'user_id' => $order->buyer->user_id,
+                        'recipient_type' => 'buyer',
+                        'title' => 'Payment Confirmed',
+                        'message' => "Your payment slip for order #{$order->order_number} has been verified. The order is now confirmed.",
+                        'notification_type' => 'payment_confirmation',
+                        'related_id' => $order->id,
+                        'is_read' => false
+                    ]);
+                    
+                    if ($order->buyer->primary_mobile) {
+                        $this->sendSMS($order->buyer->primary_mobile, "Your payment for order #{$order->order_number} has been confirmed. Thank you!");
+                    }
+                }
+
+                // Dual Notifications - Logistics Coordination
+                // Prepare item details for Farmer notification
+                $itemNames = $order->orderItems->pluck('product_name_snapshot')->implode(', ');
+                $itemQtys = $order->orderItems->map(function($item) {
+                    return $item->quantity_ordered . ($item->unit_of_measure ?? '');
+                })->implode(', ');
+
+                // 1. Notification to Lead Farmer (System + SMS)
+                $leadFarmerMsg = "New Delivery order [#{$order->order_number}] received from [" . ($order->buyer->name ?? 'Buyer') . "]. Collect the products from farmer for dispatch the products on Bus.";
+                
+                Notification::create([
+                    'user_id' => Auth::id(),
+                    'recipient_type' => 'lead_farmer',
+                    'title' => 'New Delivery Order Received',
+                    'message' => $leadFarmerMsg,
+                    'notification_type' => 'delivery_order_received',
+                    'related_id' => $order->id,
+                    'is_read' => false
+                ]);
+                
+                if (isset($leadFarmer->primary_mobile)) {
+                    $this->sendSMS($leadFarmer->primary_mobile, $leadFarmerMsg);
+                }
+
+                // 2. Notification to Farmer (SMS + System)
+                if ($order->farmer && $order->farmer->user) {
+                    $farmerMsg = "New order alert for [#{$order->order_number}]. Item: [{$itemNames}]. Total Qty: [{$itemQtys}]. Pack and hand over to Lead Farmer [" . ($leadFarmer->name ?? Auth::user()->username) . "].";
+                    
+                    Notification::create([
+                        'user_id' => $order->farmer->user_id,
+                        'recipient_type' => 'farmer',
+                        'title' => 'New Delivery Order Received',
+                        'message' => $farmerMsg,
+                        'notification_type' => 'order_confirmed',
+                        'related_id' => $order->id
+                    ]);
+                    
+                    if ($order->farmer->primary_mobile) {
+                        $this->sendSMS($order->farmer->primary_mobile, $farmerMsg);
+                    }
+                }
+
+            } else if ($request->action === 'reject') {
+                // Store Rejection Data
+                $paymentRecord->increment('resubmission_count');
+                $paymentRecord->update([
+                    'payment_status' => 'rejected',
+                    'rejection_reason' => $request->rejection_reason
+                ]);
+
+                // Execute Inventory Restock (Critical Rollback)
+                foreach ($order->orderItems as $item) {
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $product->increment('quantity', $item->quantity_ordered);
+                        
+                        // Create entry in inventory_logs
+                        InventoryLog::create([
+                            'product_id' => $product->id,
+                            'user_id' => Auth::id(),
+                            'order_id' => $order->id,
+                            'quantity_change' => $item->quantity_ordered,
+                            'new_quantity' => $product->quantity,
+                            'type' => 'restock',
+                            'reason' => "Payment rejected for Order [{$order->order_number}]"
+                        ]);
+                    }
+                }
+
+                // Lock Order Status
+                $order->order_status = 'Payment Pending';
+                $order->save();
+
+                // Trigger Multi-Channel Buyer Notifications
+                if ($order->buyer) {
+                    // 1. Email
+                    if ($order->buyer->user && $order->buyer->user->email) {
+                        try {
+                            Mail::to($order->buyer->user->email)->send(new BuyerPaymentRejection($order, $request->rejection_reason));
+                        } catch (\Exception $e) {
+                            \Log::error('Rejection email failed: ' . $e->getMessage());
+                        }
+                    }
+
+                    // 2. System Notification
+                    Notification::create([
+                        'user_id' => $order->buyer->user_id,
+                        'recipient_type' => 'buyer',
+                        'title' => 'Payment Rejected',
+                        'message' => "Payment rejected for Order [#{$order->order_number}]. Reason: {$request->rejection_reason}. To fix this, please re-upload your slip or contact the seller; we'll start your delivery as soon as payment is confirmed!",
+                        'notification_type' => 'payment_rejected',
+                        'related_id' => $order->id,
+                        'is_read' => false
+                    ]);
+                    
+                    // 3. SMS
+                    if ($order->buyer->primary_mobile) {
+                        $this->sendSMS($order->buyer->primary_mobile, "Payment rejected for Order [#{$order->order_number}]. Reason: {$request->rejection_reason}. To fix this, please re-upload your slip or contact the seller; we'll start your delivery as soon as payment is confirmed!");
+                    }
+                }
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Payment verification processed successfully.']);
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+            \Log::error('Payment verification error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
+            $message = $this->getFriendlyErrorMessage($e);
+            return response()->json(['success' => false, 'message' => $message], 500);
+        }
+    }
+
+    private function getFriendlyErrorMessage(\Throwable $e): string
+    {
+        $msg = $e->getMessage();
+
+        // Duplicate key / unique constraint violation
+        if (str_contains($msg, '23505') || str_contains($msg, 'duplicate key') || str_contains($msg, 'Unique violation')) {
+            // Try to extract the duplicate value from the error message
+            if (preg_match('/Key \(payment_reference\)=\(([^)]+)\)/', $msg, $m)) {
+                return 'Payment reference number "' . $m[1] . '" already exists.';
+            }
+            if (preg_match('/Detail: Key \(([^)]+)\)=\(([^)]+)\)/i', $msg, $m)) {
+                return ucfirst(str_replace('_', ' ', $m[1])) . ' "' . $m[2] . '" already exists.';
+            }
+            return 'A duplicate entry already exists. Please check your data.';
+        }
+
+        // Foreign key constraint
+        if (str_contains($msg, '23503') || str_contains($msg, 'foreign key')) {
+            return 'Related record not found. Please refresh and try again.';
+        }
+
+        // Not null constraint
+        if (str_contains($msg, '23502') || str_contains($msg, 'not-null constraint')) {
+            return 'A required field is missing. Please fill in all required fields.';
+        }
+
+        // Check constraint
+        if (str_contains($msg, '23514') || str_contains($msg, 'check constraint')) {
+            return 'Invalid value provided. Please check your input.';
+        }
+
+        // Generic fallback — short message only
+        return 'An error occurred. Please try again.';
+    }
+
+    public function deliveryOrderTransactions(Request $request)
+    {
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+        
+        $query = Order::with(['buyer', 'orderItems', 'paymentDeliveryOrder'])
+            ->where('lead_farmer_id', $leadFarmerId)
+            ->whereHas('paymentDeliveryOrder', function($q) {
+                $q->whereIn('payment_status', ['awaiting_verification', 'resubmitted']);
+            });
+
+        // Filtering
+        if ($request->filled('order_id')) {
+            $query->whereRaw('LOWER(order_number) LIKE ?', ['%' . strtolower($request->order_id) . '%']);
+        }
+        if ($request->filled('buyer_name')) {
+            $query->whereHas('buyer', function($q) use ($request) {
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->buyer_name) . '%']);
+            });
+        }
+        if ($request->filled('district')) {
+            $query->whereHas('buyer', function($q) use ($request) {
+                $q->where('district', $request->district);
+            });
+        }
+        if ($request->filled('product_name')) {
+            $query->whereHas('orderItems', function($q) use ($request) {
+                $q->whereRaw('LOWER(product_name_snapshot) LIKE ?', ['%' . strtolower($request->product_name) . '%']);
+            });
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+        
+        $districts = Buyer::distinct()->pluck('district')->filter()->values();
+
+        if ($request->ajax()) {
+            return view('lead_farmer.partials.delivery_transactions_table', compact('orders'))->render();
+        }
+
+        return view('lead_farmer.Delivery_Order_transactions', compact('orders', 'districts'));
+    }
+
+    public function deliveryProducts(Request $request)
+    {
+        $leadFarmerId = Auth::user()->leadFarmer->id;
+        
+        $query = Order::with(['buyer', 'orderItems', 'paymentDeliveryOrder'])
+            ->where('lead_farmer_id', $leadFarmerId)
+            ->whereHas('paymentDeliveryOrder', function($q) {
+                $q->where('payment_status', 'confirmed');
+            })
+            ->whereNotIn('order_status', ['Dispatched', 'completed', 'cancelled']);
+
+        // Filtering
+        if ($request->filled('order_id')) {
+            $query->whereRaw('LOWER(order_number) LIKE ?', ['%' . strtolower($request->order_id) . '%']);
+        }
+        if ($request->filled('buyer_name')) {
+            $query->whereHas('buyer', function($q) use ($request) {
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->buyer_name) . '%']);
+            });
+        }
+        if ($request->filled('district')) {
+            $query->whereHas('buyer', function($q) use ($request) {
+                $q->where('district', $request->district);
+            });
+        }
+        if ($request->filled('product_name')) {
+            $query->whereHas('orderItems', function($q) use ($request) {
+                $q->whereRaw('LOWER(product_name_snapshot) LIKE ?', ['%' . strtolower($request->product_name) . '%']);
+            });
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+        
+        $districts = Buyer::distinct()->pluck('district')->filter()->values();
+
+        if ($request->ajax()) {
+            return view('lead_farmer.partials.delivery_products_table', compact('orders'))->render();
+        }
+
+        return view('lead_farmer.Delivery_Products', compact('orders', 'districts'));
+    }
+
+    public function submitBusDispatch(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'bus_number' => 'required|string',
+            'bus_image' => 'nullable|image|max:10240',
+            'conductor_mobile' => 'required|string',
+            'conductor_name' => 'required|string',
+            'estimated_arrival_time' => 'required|date',
+            'selected_order_items' => 'required|array',
+            'selected_order_items.*' => 'exists:order_items,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $busImagePath = null;
+            if ($request->hasFile('bus_image')) {
+                $file = $request->file('bus_image');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/bus_photo'), $filename);
+                $busImagePath = 'uploads/bus_photo/' . $filename;
+            }
+
+            // Add 2 hours to the estimated arrival time
+            $estimatedArrival = Carbon::parse($request->estimated_arrival_time)->addHours(2);
+
+            $busDispatch = BusDispatch::create([
+                'bus_number' => $request->bus_number,
+                'bus_image' => $busImagePath,
+                'conductor_mobile' => $request->conductor_mobile,
+                'conductor_name' => $request->conductor_name,
+                'estimated_arrival_time' => $estimatedArrival,
+                'dispatch_status' => 'in_transit',
+                'lead_farmer_id' => Auth::id()
+            ]);
+
+            $orderIds = [];
+            foreach ($request->selected_order_items as $itemId) {
+                DispatchProduct::create([
+                    'bus_dispatch_id' => $busDispatch->id,
+                    'order_item_id' => $itemId
+                ]);
+                
+                $orderItem = OrderItem::find($itemId);
+                $orderIds[] = $orderItem->order_id;
+            }
+
+            $uniqueOrderIds = array_unique($orderIds);
+            foreach ($uniqueOrderIds as $orderId) {
+                $order = Order::find($orderId);
+                $order->order_status = 'Dispatched';
+                $order->save();
+
+                // Create Rider Delivery Record
+                RiderDelivery::create([
+                    'bus_dispatch_id' => $busDispatch->id,
+                    'order_id' => $order->id,
+                    'delivery_status' => 'assigned'
+                ]);
+
+                // Notify Buyer
+                Notification::create([
+                    'user_id' => $order->buyer->user_id,
+                    'recipient_type' => 'buyer',
+                    'title' => 'Order Dispatched',
+                    'message' => "Your order #{$order->order_number} has been dispatched ({$request->bus_number}). Conductor: {$request->conductor_name} ({$request->conductor_mobile}). Estimated Time of Arrival: {$estimatedArrival->format('Y-m-d h:i A')}.",
+                    'notification_type' => 'dispatch',
+                    'related_id' => $order->id
+                ]);
+                
+                $this->sendSMS($order->buyer->primary_mobile, "Order #{$order->order_number} dispatched {$request->bus_number}. Conductor: {$request->conductor_name} ({$request->conductor_mobile}). Estimated Time of Arrival: {$estimatedArrival->format('Y-m-d h:i A')}.");
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Dispatch recorded successfully!']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
 

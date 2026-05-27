@@ -232,26 +232,6 @@
 			@endforeach
 		</div>
 	</section>
-
-	<section class="coverage-section">
-		<div class="section-header">
-			<h2 class="section-title">Our Geographic Coverage</h2>
-			<p class="section-subtitle">Serving farmers across Sri Lanka</p>
-		</div>
-		<div class="coverage-container">
-			<div class="districts-wrapper">
-				<h3>Districts We Serve</h3>
-				<div class="districts-grid">
-					@foreach($districts as $district)
-					<div class="district-card">
-						<span class="district-name">{{ $district->district }}</span>
-						<span class="district-badge">{{ $district->farmer_count }} Farmers</span>
-					</div>
-					@endforeach
-				</div>
-			</div>
-		</div>
-	</section>
 </div>
 @endsection
 

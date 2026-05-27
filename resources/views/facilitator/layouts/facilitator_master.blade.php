@@ -1224,18 +1224,6 @@
         window.welcomeShown = false;
         window.showWelcomeMessage = function () {
             if (!window.welcomeShown) {
-                Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
-                    title: 'translate ready',
-                    text: 'choose language from the compact menu',
-                    timer: 4500,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'bottom-end',
-                    background: '#ffffff',
-                    iconColor: '#3b82f6',
-                    customClass: { popup: 'swal-popup-compact' }
-                });
                 window.welcomeShown = true;
             }
         };
@@ -1262,20 +1250,6 @@
                         if (mut.type === 'characterData' || mut.type === 'childList') {
                             const currentText = gadget.innerText || '';
                             if (currentText !== previousLangText && currentText.trim() !== '') {
-                                Swal.fire({
-                                    @if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-                                    title: 'language updated',
-                                    text: 'page content will now appear in selected language.',
-                                    timer: 3500,
-                                    showConfirmButton: false,
-                                    background: '#ffffff',
-                                    iconColor: '#10B981',
-                                    toast: true,
-                                    position: 'bottom-end',
-                                    showClass: { popup: 'animate__animated animate__fadeInUp' },
-                                    hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-                                    customClass: { popup: 'swal-popup-compact' }
-                                });
                                 previousLangText = currentText;
                             }
                         }
@@ -1297,20 +1271,6 @@
                                 if (mut.type === 'characterData' || mut.type === 'childList') {
                                     const currentText = gadget.innerText || '';
                                     if (currentText !== previousLangText && currentText.trim() !== '') {
-                                        Swal.fire({
-                                            @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-                                            title: 'language updated',
-                                            text: 'page content will now appear in selected language.',
-                                            timer: 3500,
-                                            showConfirmButton: false,
-                                            background: '#ffffff',
-                                            iconColor: '#10B981',
-                                            toast: true,
-                                            position: 'bottom-end',
-                                            showClass: { popup: 'animate__animated animate__fadeInUp' },
-                                            hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-                                            customClass: { popup: 'swal-popup-compact' }
-                                        });
                                         previousLangText = currentText;
                                     }
                                 }

@@ -12,6 +12,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <script>
+        /**
+         * Detects screen width and stores it in a cookie so the server can
+         * adjust the number of items fetched (e.g., product counts) for responsiveness.
+         */
+        (function() {
+            function updateScreenWidthCookie() {
+                const width = window.innerWidth;
+                document.cookie = "screen_width=" + width + "; path=/; max-age=31536000; SameSite=Lax";
+            }
+            updateScreenWidthCookie();
+            // Optional: update on resize, though changes will only take effect on reload
+            window.addEventListener('resize', updateScreenWidthCookie);
+        })();
+    </script>
+
     <!-- Google Translate Compact Card CSS -->
     <style>
         .goog-te-gadget-simple {
@@ -686,13 +703,7 @@
             }
         }
 
-        .swal2-toast {
-            position: fixed !important;
-            bottom: 24px !important;
-            right: 24px !important;
-            left: auto !important;
-            top: auto !important;
-        }
+
 
         @media (max-width: 767px) {
             .swal2-toast {
@@ -779,6 +790,23 @@
                         <a href="{{ route('buyer.history') }}"
                             class="menu-link {{ request()->routeIs('buyer.history') ? 'active' : '' }}">
                             <i class="fa-solid fa-clock-rotate-left"></i><span>Order History</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('buyer.unpaidDeliveryOrders') }}"
+                            class="menu-link {{ request()->routeIs('buyer.unpaidDeliveryOrders') ? 'active' : '' }}">
+                            <i class="fa-solid fa-receipt"></i><span>Unpaid Orders</span>
+                            @php
+                                $tempCount = DB::table('temporary_delivery_order_items')
+                                    ->where('buyer_id', Auth::id())
+                                    ->where('order_status', 'Processing order')
+                                    ->distinct('order_id')
+                                    ->count('order_id');
+                            @endphp
+                            @if($tempCount > 0)
+                                <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">{{ $tempCount }}</span>
+                            @endif
                         </a>
                     </li>
 
@@ -874,7 +902,7 @@
                             style="background-color:#ffffff; box-shadow:0 7px 15px rgba(15,23,36,0.08), 0 1px 3px rgba(15,23,36,0.04); border-radius:28px; padding:4px 10px; display:inline-flex; align-items:center; gap:8px; transition:all 0.25s ease; border:1px solid rgba(16,185,129,0.15); backdrop-filter:blur(2px);">
                             <div class="translate-icon"
                                 style="background:linear-gradient(145deg,#10B981,#059669); width:28px; height:28px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:white; font-size:1rem; box-shadow:0 6px 12px rgba(5,150,105,0.25); transition:0.2s ease;">
-                                <i class="fas fa-language"></i>
+                                    <i class="fas fa-language"></i>
                             </div>
                             <div id="google_translate_element"></div>
                         </div>
@@ -1046,18 +1074,6 @@
         window.welcomeShown = false;
         window.showWelcomeMessage = function () {
             if (!window.welcomeShown) {
-                Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
-                    title: 'translate ready',
-                    text: 'choose language from the compact menu',
-                    timer: 4500,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'bottom-end',
-                    background: '#ffffff',
-                    iconColor: '#3b82f6',
-                    customClass: { popup: 'swal-popup-compact' }
-                });
                 window.welcomeShown = true;
             }
         };
@@ -1084,20 +1100,6 @@
                         if (mut.type === 'characterData' || mut.type === 'childList') {
                             const currentText = gadget.innerText || '';
                             if (currentText !== previousLangText && currentText.trim() !== '') {
-                                Swal.fire({
-                                    @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-                                    title: 'language updated',
-                                    text: 'page content will now appear in selected language.',
-                                    timer: 3500,
-                                    showConfirmButton: false,
-                                    background: '#ffffff',
-                                    iconColor: '#10B981',
-                                    toast: true,
-                                    position: 'bottom-end',
-                                    showClass: { popup: 'animate__animated animate__fadeInUp' },
-                                    hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-                                    customClass: { popup: 'swal-popup-compact' }
-                                });
                                 previousLangText = currentText;
                             }
                         }
@@ -1119,20 +1121,6 @@
                                 if (mut.type === 'characterData' || mut.type === 'childList') {
                                     const currentText = gadget.innerText || '';
                                     if (currentText !== previousLangText && currentText.trim() !== '') {
-                                        Swal.fire({
-                                            @if(file_exists(public_path('assets/icons/Gif/success4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-                                            title: 'language updated',
-                                            text: 'page content will now appear in selected language.',
-                                            timer: 3500,
-                                            showConfirmButton: false,
-                                            background: '#ffffff',
-                                            iconColor: '#10B981',
-                                            toast: true,
-                                            position: 'bottom-end',
-                                            showClass: { popup: 'animate__animated animate__fadeInUp' },
-                                            hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-                                            customClass: { popup: 'swal-popup-compact' }
-                                        });
                                         previousLangText = currentText;
                                     }
                                 }

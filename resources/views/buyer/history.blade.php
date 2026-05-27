@@ -322,30 +322,177 @@ body {
     display: flex;
     align-items: center;
     gap: 0.375rem;
+    white-space: nowrap;
 }
 
-.status-badge.pending {
-    background: #fef3c7;
-    color: #92400e;
+/* 1. Processing order - Amber */
+.status-badge.Processing.order {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
 }
 
+/* 2. confirmed - Blue */
+.status-badge.confirmed {
+    background: #DBEAFE;
+    color: #1E40AF;
+    border: 1px solid #BFDBFE;
+}
+
+/* 3. paid - Green */
+.status-badge.paid {
+    background: #D1FAE5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+}
+
+/* 4. ready_for_pickup - Teal Gradient */
 .status-badge.ready_for_pickup {
     background: linear-gradient(135deg, #10B981, #059669);
     color: white;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 }
 
-.status-badge.paid {
-    background: #d1fae5;
-    color: #065f46;
-}
-
+/* 5. completed - Cyan Gradient */
 .status-badge.completed {
-    background: linear-gradient(135deg, rgba(12, 219, 233, 1), rgba(83, 208, 217, 1));
+    background: linear-gradient(135deg, #06B6D4, #0891B2);
     color: white;
+    box-shadow: 0 2px 4px rgba(6, 182, 212, 0.2);
+}
+
+/* 6. cancelled - Red */
+.status-badge.cancelled {
+    background: #FEE2E2;
+    color: #991B1B;
+    border: 1px solid #FECACA;
+}
+
+/* 7. refunded - Purple */
+.status-badge.refunded {
+    background: #F3E8FF;
+    color: #6B21A8;
+    border: 1px solid #E9D5FF;
+}
+
+/* 8. Payment Pending - Orange */
+.status-badge.Payment.Pending {
+    background: #FFEDD5;
+    color: #9A3412;
+    border: 1px solid #FED7AA;
+}
+
+/* 9. awaiting_verification - Indigo */
+.status-badge.awaiting_verification {
+    background: #E0E7FF;
+    color: #3730A3;
+    border: 1px solid #C7D2FE;
 }
 
 .order-body {
     padding: 1rem;
+}
+
+.rejection-alert {
+    background: #FEF2F2;
+    border: 1px solid #FEE2E2;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+    display: flex;
+    gap: 1rem;
+    animation: slideInDown 0.4s ease-out;
+}
+
+.rejection-icon {
+    background: #FEE2E2;
+    color: #EF4444;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+}
+
+.rejection-content h4 {
+    color: #991B1B;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.rejection-reason {
+    color: #B91C1C;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid #EF4444;
+}
+
+.rejection-note {
+    color: #7F1D1D;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Re-upload Modal Styling */
+.reupload-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+    padding: 1.5rem 1rem;
+}
+
+.reupload-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 500px;
+    margin: 2rem auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.reupload-header {
+    background: #f8fafc;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reupload-body {
+    padding: 1.5rem;
+}
+
+.drop-zone {
+    border: 2px dashed #cbd5e0;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.drop-zone:hover {
+    border-color: var(--primary-green);
+    background: #f0fdf4;
 }
 
 .order-info-grid {
@@ -446,33 +593,100 @@ body {
     transform: translateY(-1px);
 }
 
+/* Premium Responsive Pagination Styling - Image Match */
+.pagination-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    margin-top: 3rem;
+    padding: 2rem 0;
+    animation: fadeIn 0.8s ease;
+}
+
+.pagination-info {
+    font-size: 0.95rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
 .pagination {
     display: flex;
     justify-content: center;
-    margin-top: 1.5rem;
-    gap: 0.375rem;
+    align-items: center;
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .pagination-btn {
-    padding: 0.375rem 0.75rem;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid #e2e8f0;
     background: white;
-    border-radius: 5px;
-    color: var(--text-color);
-    font-size: 0.85rem;
+    border-radius: 12px;
+    color: #1e293b;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-.pagination-btn:hover {
-    background: #f8fafc;
+.pagination-btn:hover:not(:disabled) {
     border-color: var(--primary-green);
+    color: var(--primary-green);
+    transform: translateY(-1px);
 }
 
 .pagination-btn.active {
-    background: var(--primary-green);
+    background: #10B981;
     color: white;
-    border-color: var(--primary-green);
+    border-color: #10B981;
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+}
+
+.pagination-nav-btn {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: auto;
+    padding: 0 0.75rem;
+    color: #0f172a;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pagination-nav-btn i {
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Breakpoint-specific Responsive Adjustments */
+@media (max-width: 767px) {
+    .pagination { gap: 0.4rem; }
+    .pagination-btn { width: 38px; height: 38px; font-size: 0.9rem; border-radius: 10px; }
+    .pagination-nav-btn span { display: none; }
+    .pagination-nav-btn { padding: 0 0.4rem; }
+    .pagination-info { font-size: 0.85rem; }
+}
+
+@media (max-width: 480px) {
+    .pagination-btn { width: 34px; height: 34px; font-size: 0.85rem; border-radius: 8px; }
+    .pagination { gap: 0.25rem; }
 }
 
 .loading-overlay {
@@ -841,6 +1055,197 @@ body {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
+
+/* Order Tracking Styles */
+:root {
+  --tracking-primary: #10B981;
+  --tracking-bg: #f8fafc;
+  --tracking-text: #0f172a;
+  --icon-card-size: 100px;
+  --grid-gap: 40px;
+}
+
+.order-tracking-popup {
+  border-radius: 2rem !important;
+  padding: 2rem !important;
+  background: white !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1) !important;
+  max-width: 900px !important;
+  width: 95% !important;
+}
+
+.custom-tracking-title {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 800 !important;
+  color: var(--tracking-text) !important;
+  margin-bottom: 2rem !important;
+}
+
+.tracking-wrapper {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+.tracking-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--grid-gap);
+  position: relative;
+  z-index: 2;
+}
+
+.icon-wrapper {
+  background: white;
+  border-radius: 1.25rem;
+  width: var(--icon-card-size);
+  height: var(--icon-card-size);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 3;
+}
+
+.icon-wrapper:hover {
+  transform: translateY(-5px);
+}
+
+.icon-wrapper img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.icon-wrapper.active {
+  border-color: var(--tracking-primary);
+  background: #ecfdf5;
+}
+
+.icon-wrapper img.active-step {
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%) !important;
+}
+
+.svg-connector {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.path-line {
+  fill: none;
+  stroke: #e2e8f0;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.path-line.active {
+  stroke: var(--tracking-primary);
+}
+
+/* Breakpoints for Desktop S-curve */
+@media (min-width: 992px) {
+  .tracking-grid {
+    grid-template-rows: repeat(2, 1fr);
+  }
+}
+
+/* Breakpoints for Mobile Vertical View */
+@media (max-width: 991px) {
+  :root {
+    --icon-card-size: 150px;
+    --grid-gap: 30px;
+  }
+  .tracking-grid {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+  .icon-wrapper {
+    grid-row: auto !important;
+    grid-column: auto !important;
+    margin: 0 auto;
+  }
+  .order-tracking-popup {
+    max-width: 450px !important;
+  }
+}
+
+@media (max-width: 575px) {
+  :root {
+    --icon-card-size: 150px;
+    --grid-gap: 20px;
+  }
+}
+
+@media (max-width: 379px) {
+  :root {
+    --icon-card-size: 130px;
+    --grid-gap: 15px;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root { --icon-card-size: 180px; --grid-gap: 120px; }
+  .custom-tracking-title { font-size: 4rem !important; }
+}
+
+@media (min-width: 1501px) and (max-width: 2559px) {
+  .custom-tracking-title { font-size: 3.5rem !important; }
+}
+
+@media (min-width: 1400px) and (max-width: 1500px) {
+  :root { --icon-card-size: 120px; --grid-gap: 60px; }
+  .custom-tracking-title { font-size: 3rem !important; }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+  :root { --icon-card-size: 110px; --grid-gap: 50px; }
+  .custom-tracking-title { font-size: 2.5rem !important; }
+}
+
+@media (min-width: 1001px) and (max-width: 1199px) {
+  .custom-tracking-title { font-size: 2.25rem !important; }
+}
+
+@media (width: 1000px) {
+  .custom-tracking-title { font-size: 2rem !important; }
+}
+
+@media (min-width: 992px) and (max-width: 999px) {
+  .custom-tracking-title { font-size: 1.85rem !important; }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .custom-tracking-title { font-size: 1.75rem !important; }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+  .custom-tracking-title { font-size: 1.5rem !important; }
+}
+
+@media (min-width: 481px) and (max-width: 575px) {
+  .custom-tracking-title { font-size: 1.35rem !important; }
+}
+
+@media (min-width: 380px) and (max-width: 480px) {
+  .custom-tracking-title { font-size: 1.25rem !important; }
+}
+
+@media (max-width: 379px) {
+  :root { --icon-card-size: 130px; --grid-gap: 15px; }
+  .custom-tracking-title { font-size: 1.1rem !important; }
+}
+
 </style>
 @endsection
 
@@ -857,7 +1262,7 @@ body {
             $totalOrders = count($orders);
             $totalAmount = $orders->sum('total_amount');
             $completedOrders = $orders->where('order_status', 'completed')->count();
-            $pendingOrders = $orders->whereIn('order_status', ['pending', 'confirmed', 'paid', 'ready_for_pickup'])->count();
+            $pendingOrders = $orders->whereIn('order_status', ['Processing order', 'confirmed', 'paid', 'ready_for_pickup'])->count();
         @endphp
 
         <div class="stat-card">
@@ -903,8 +1308,15 @@ body {
                 <label class="filter-label">Status</label>
                 <select class="filter-select" id="statusFilter">
                     <option value="all">All Status</option>
+                    <option value="Processing order">Processing Order</option>
+                    <option value="confirmed">Confirmed</option>
                     <option value="paid">Paid</option>
+                    <option value="ready_for_pickup">Ready for Pickup</option>
                     <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="refunded">Refunded</option>
+                    <option value="Payment Pending">Payment Pending</option>
+                    <option value="awaiting_verification">Awaiting Verification</option>
                 </select>
             </div>
 
@@ -952,7 +1364,7 @@ body {
 
                     <div class="status-badge {{ $order->order_status }}">
                         @switch($order->order_status)
-                            @case('pending')
+                            @case('Processing order')
                                 <i class="fas fa-clock"></i>
                                 @break
                             @case('confirmed')
@@ -962,7 +1374,7 @@ body {
                                 <i class="fas fa-credit-card"></i>
                                 @break
                             @case('ready_for_pickup')
-                                <i class="fas fa-truck"></i>
+                                <i class="fas fa-truck-loading"></i>
                                 @break
                             @case('completed')
                                 <i class="fas fa-check-double"></i>
@@ -972,6 +1384,12 @@ body {
                                 @break
                             @case('refunded')
                                 <i class="fas fa-undo"></i>
+                                @break
+                            @case('Payment Pending')
+                                <i class="fas fa-hourglass-half"></i>
+                                @break
+                            @case('awaiting_verification')
+                                <i class="fas fa-user-check"></i>
                                 @break
                         @endswitch
                         {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
@@ -993,6 +1411,18 @@ body {
                             <span class="info-value">
                                 <i class="far fa-calendar-alt"></i>
                                 {{ \Carbon\Carbon::parse($order->created_at)->format('M d, Y') }}
+                            </span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Order Type</span>
+                            <span class="info-value">
+                                @if(($order->order_type ?? 'Pickup') == 'Delivery')
+                                    <i class="fas fa-truck"></i>
+                                @else
+                                    <i class="fas fa-store"></i>
+                                @endif
+                                {{ $order->order_type ?? 'Pickup' }}
                             </span>
                         </div>
 
@@ -1018,30 +1448,72 @@ body {
                         </div>
                     </div>
 
+                    @if(($order->delivery_payment_status ?? '') === 'rejected')
+                        <div class="rejection-alert">
+                            <div class="rejection-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="rejection-content">
+                                <h4>Payment Slip Rejected</h4>
+                                <div class="rejection-reason">
+                                    <strong>Reason:</strong> {{ $order->delivery_rejection_reason }}
+                                </div>
+                                <p class="rejection-note">
+                                    Please re-upload the payment slip or contact the seller if needed. Your order will continue after the payment is approved.
+                                    <br>
+                                    Also, the system could not find the old slip. If the old slip has any previous records, please merge the slips and resend them using iLovePDF or PDF24.
+
+                                </p>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="order-actions">
-                        <button class="action-btn btn-primary view-invoice-btn" data-order-id="{{ $order->id }}">
-                            <i class="fas fa-file-invoice"></i>
-                            View Invoice
-                        </button>
-
-                        @if($order->order_status == 'ready_for_pickup')
-                            <button class="action-btn btn-secondary track-pickup-btn" data-order-id="{{ $order->id }}">
-                                <i class="fas fa-map-marker-alt"></i>
-                                Track Pickup
+                        @if(($order->delivery_payment_status ?? '') === 'rejected')
+                            <button class="action-btn btn-primary re-upload-btn" 
+                                    data-order-id="{{ $order->id }}"
+                                    data-order-number="{{ $order->order_number }}"
+                                    data-amount="{{ $order->total_amount }}">
+                                <i class="fas fa-upload"></i>
+                                Re-upload Payment Slip
                             </button>
-                        @endif
-
-                        @if($order->order_status == 'completed')
-                            <button class="action-btn btn-secondary feedback-btn" data-order-id="{{ $order->id }}">
-                                <i class="fas fa-star"></i>
-                                Rate Order
+                        @else
+                            <button class="action-btn btn-primary view-invoice-btn" data-order-id="{{ $order->id }}">
+                                <i class="fas fa-file-invoice"></i>
+                                View Invoice
                             </button>
+
+                            @if(($order->order_type ?? 'Pickup') == 'Delivery' && !in_array($order->order_status, ['ready_for_pickup', 'cancelled', 'refunded', 'Payment Pending']))
+                                <button class="action-btn btn-secondary track-order-btn" 
+                                        data-order-id="{{ $order->id }}" 
+                                        data-order-status="{{ $order->order_status }}"
+                                        data-order-number="{{ $order->order_number }}">
+                                    <i class="fas fa-truck"></i>
+                                    Track Order
+                                </button>
+                            @endif
+
+                            @if($order->order_status == 'ready_for_pickup')
+                                <button class="action-btn btn-secondary track-pickup-btn" data-order-id="{{ $order->id }}">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Track Pickup
+                                </button>
+                            @endif
+
+                            @if($order->order_status == 'completed')
+                                <button class="action-btn btn-secondary feedback-btn" data-order-id="{{ $order->id }}">
+                                    <i class="fas fa-star"></i>
+                                    Rate Order
+                                </button>
+                            @endif
                         @endif
                     </div>
                 </div>
             </div>
         @endforeach
     </div>
+
+    <div class="pagination-section" id="paginationContainer"></div>
 
     @else
     <div class="empty-state">
@@ -1056,6 +1528,66 @@ body {
         </a>
     </div>
     @endif
+</div>
+
+<div class="reupload-modal" id="reUploadModal">
+    <div class="reupload-content">
+        <div class="reupload-header">
+            <h5 class="mb-0 fw-bold">
+                <i class="fas fa-cloud-upload-alt me-2 text-primary"></i>
+                Re-upload Payment Slip
+            </h5>
+            <button class="close-reupload" id="closeReUpload" style="background: none; border: none; font-size: 1.25rem; cursor: pointer;">
+                <i class="fas fa-times text-muted"></i>
+            </button>
+        </div>
+        <form id="reUploadForm" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="order_id" id="reupload_order_id">
+            <div class="reupload-body">
+                <div class="alert alert-primary mb-4" style="border-radius: 12px; background: #eff6ff; border: 1px solid #dbeafe; color: #1e40af; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle me-2"></i> 
+                    Order: <strong><span id="reupload_order_number"></span></strong><br>
+                    Amount: <strong>Rs. <span id="reupload_amount"></span></strong>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" style="font-weight: 600; color: #475569; margin-bottom: 0.5rem; display: block;">Transaction ID / Reference</label>
+                    <input type="text" name="transaction_id" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" placeholder="New bank reference number" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label class="form-label" style="font-weight: 600; color: #475569; margin-bottom: 0.5rem; display: block;">Date</label>
+                        <input type="date" name="transaction_date" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required max="{{ date('Y-m-d') }}">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-weight: 600; color: #475569; margin-bottom: 0.5rem; display: block;">Time</label>
+                        <input type="time" name="transaction_time" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" style="font-weight: 600; color: #475569; margin-bottom: 0.5rem; display: block;">Payment Slip Image</label>
+                    <div class="drop-zone" id="reUploadDropZone">
+                        <i class="fas fa-image" style="font-size: 2rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
+                        <p id="reUploadDropZoneText" style="margin-bottom: 0.25rem;">Click or Drag & Drop here</p>
+                        <small class="text-muted">JPG, PNG, or PDF (Max 5MB)</small>
+                        <input type="file" name="payment_slip" id="reUploadSlipInput" accept="image/*,.pdf" style="display: none" required>
+                    </div>
+                    <div id="reUploadPreview" class="mt-3 text-center" style="display: none">
+                        <img id="reUploadPreviewImg" src="#" alt="Preview" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 10px; border: 1px solid #e2e8f0;">
+                    </div>
+                </div>
+            </div>
+            <div style="background: #f8fafc; padding: 1.25rem 1.5rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 1rem;">
+                <button type="button" class="action-btn btn-secondary" id="cancelReUpload" style="width: auto;">Cancel</button>
+                <button type="submit" class="action-btn btn-primary" style="width: auto;" id="reSubmitBtn">
+                    <i class="fas fa-paper-plane me-2"></i>Submit Payment
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="loading-overlay" id="loadingOverlay" style="display: none;">
@@ -1092,6 +1624,128 @@ body {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const reUploadModal = document.getElementById('reUploadModal');
+    const reUploadForm = document.getElementById('reUploadForm');
+    const closeReUpload = document.getElementById('closeReUpload');
+    const cancelReUpload = document.getElementById('cancelReUpload');
+    const reUploadDropZone = document.getElementById('reUploadDropZone');
+    const reUploadSlipInput = document.getElementById('reUploadSlipInput');
+
+    // Use Event Delegation for Open Buttons
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.re-upload-btn');
+        if (btn) {
+            document.getElementById('reupload_order_id').value = btn.dataset.orderId;
+            document.getElementById('reupload_order_number').innerText = btn.dataset.orderNumber;
+            document.getElementById('reupload_amount').innerText = parseFloat(btn.dataset.amount).toLocaleString('en-US', {minimumFractionDigits: 2});
+            
+            reUploadForm.reset();
+            document.getElementById('reUploadPreview').style.display = 'none';
+            document.getElementById('reUploadDropZoneText').innerText = 'Click or Drag & Drop here';
+            
+            reUploadModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+    });
+
+    // Close Modal via Buttons and Backdrop (using delegation and direct listeners)
+    document.addEventListener('click', function(e) {
+        // Close via Buttons
+        if (e.target.closest('#closeReUpload') || e.target.closest('#cancelReUpload')) {
+            closeReUploadModal();
+        }
+        // Close via Backdrop
+        if (e.target === reUploadModal) {
+            closeReUploadModal();
+        }
+    });
+
+    // Explicitly handle the function to ensure it's defined
+    function closeReUploadModal() {
+        if (reUploadModal) {
+            reUploadModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    // File Upload Handlers
+    if(reUploadDropZone) {
+        reUploadDropZone.onclick = () => reUploadSlipInput.click();
+    }
+
+    if(reUploadSlipInput) {
+        reUploadSlipInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('reUploadDropZoneText').innerText = file.name;
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        document.getElementById('reUploadPreviewImg').src = e.target.result;
+                        document.getElementById('reUploadPreview').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    document.getElementById('reUploadPreview').style.display = 'none';
+                }
+            }
+        };
+    }
+
+    // Submit Form
+    if(reUploadForm) {
+        reUploadForm.onsubmit = async function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('reSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+
+            const formData = new FormData(this);
+            try {
+                const response = await fetch('{{ route("buyer.resubmitPaymentSlip") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    closeReUploadModal();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message,
+                        confirmButtonColor: '#10B981'
+                    }).then(() => {
+                        window.location.href = data.redirect_url;
+                    });
+                } else {
+                    closeReUploadModal();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Resubmission failed',
+                        confirmButtonColor: '#EF4444'
+                    });
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Payment';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'System Error',
+                    text: 'An unexpected error occurred.',
+                    confirmButtonColor: '#EF4444'
+                });
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Payment';
+            }
+        };
+    }
     const loadingOverlay = document.getElementById('loadingOverlay');
     const applyFiltersBtn = document.getElementById('applyFilters');
     const ordersContainer = document.getElementById('ordersContainer');
@@ -1154,14 +1808,116 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    let currentPage = 1;
+    let filteredCards = [];
+    const allOrderCards = Array.from(document.querySelectorAll('.order-card'));
+
+    function getItemsPerPage() {
+        const w = window.innerWidth;
+        
+        if (w >= 2560) return 8;
+        if (w >= 1500) return 8;
+        if (w >= 1200) return 8;
+        if (w >= 992) return 8;
+        if (w >= 768) return 6;
+        return 5;
+    }
+
+    function renderPagination(totalItems) {
+        const itemsPerPage = getItemsPerPage();
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const paginationContainer = document.getElementById('paginationContainer');
+        
+        if (!paginationContainer) return;
+        if (totalPages <= 1) {
+            paginationContainer.innerHTML = '';
+            return;
+        }
+
+        let html = `
+            <div class="pagination-info">
+                Showing ${currentPage === 1 ? 1 : (currentPage - 1) * itemsPerPage + 1} to ${Math.min(currentPage * itemsPerPage, totalItems)} of ${totalItems} orders
+            </div>
+            <div class="pagination">
+                <button class="pagination-btn pagination-nav-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i> <span>Previous</span>
+                </button>
+        `;
+
+        // Smart pagination logic (show current, neighbors, and first/last)
+        let startPage = Math.max(1, currentPage - 1);
+        let endPage = Math.min(totalPages, currentPage + 1);
+
+        if (startPage > 1) {
+            html += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
+            if (startPage > 2) html += `<button class="pagination-btn" disabled>...</button>`;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += `<button class="pagination-btn" disabled>...</button>`;
+            html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+        }
+
+        html += `
+                <button class="pagination-btn pagination-nav-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+                    <span>Next</span> <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        `;
+
+        paginationContainer.innerHTML = html;
+    }
+
+    window.changePage = function(page) {
+        currentPage = page;
+        displayOrders();
+        window.scrollTo({ top: ordersContainer.offsetTop - 100, behavior: 'smooth' });
+    }
+
+    function displayOrders() {
+        if (!ordersContainer) return;
+        
+        const itemsPerPage = getItemsPerPage();
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageCards = filteredCards.slice(start, end);
+
+        ordersContainer.innerHTML = '';
+
+        if (filteredCards.length === 0) {
+            ordersContainer.innerHTML = `
+                <div class="empty-state" style="margin-top: 1rem;">
+                    <div class="empty-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 style="color: var(--text-color); margin-bottom: 0.75rem; font-size: 1.2rem;">No Orders Found</h3>
+                    <p style="color: var(--muted);">Try adjusting your filters</p>
+                </div>
+            `;
+            const paginationContainer = document.getElementById('paginationContainer');
+            if (paginationContainer) paginationContainer.innerHTML = '';
+        } else {
+            pageCards.forEach((card, index) => {
+                card.style.animation = 'slideUp 0.4s ease';
+                card.style.animationDelay = `${index * 0.05}s`;
+                ordersContainer.appendChild(card);
+            });
+            renderPagination(filteredCards.length);
+        }
+    }
+
     function filterOrders() {
         const status = statusFilter ? statusFilter.value : 'all';
         const sort = sortFilter ? sortFilter.value : 'newest';
         const fromDate = fromDateInput ? fromDateInput.value : '';
         const toDate = toDateInput ? toDateInput.value : '';
 
-        const orderCards = document.querySelectorAll('.order-card');
-        let filteredCards = Array.from(orderCards);
+        // Capture filtered results from the original set
+        filteredCards = [...allOrderCards];
 
         if (status !== 'all') {
             filteredCards = filteredCards.filter(card => card.dataset.status === status);
@@ -1198,29 +1954,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        if (ordersContainer) {
-            ordersContainer.innerHTML = '';
-
-            if (filteredCards.length === 0) {
-                ordersContainer.innerHTML = `
-                    <div class="empty-state" style="margin-top: 1rem;">
-                        <div class="empty-icon">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <h3 style="color: var(--text-color); margin-bottom: 0.75rem; font-size: 1.2rem;">No Orders Found</h3>
-                        <p style="color: var(--muted);">Try adjusting your filters</p>
-                    </div>
-                `;
-            } else {
-                filteredCards.forEach(card => {
-                    card.style.animation = 'slideUp 0.3s ease';
-                    ordersContainer.appendChild(card);
-                });
-            }
-
+        currentPage = 1;
+        displayOrders();
+        
+        if (status !== 'all' || fromDate || toDate || sort !== 'newest') {
             showToast('Filters applied', 'success');
         }
     }
+
+    // Handle window resize for dynamic items per page
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            displayOrders();
+        }, 250);
+    });
+
+    // Initial call to set up view
+    filterOrders();
 
     if (applyFiltersBtn) {
         applyFiltersBtn.addEventListener('click', filterOrders);
@@ -1274,7 +2026,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Create pickup information HTML
             let pickupInfoHtml = '';
-            if (data.products_pickup_address) {
+            if (data.products_pickup_address && data.order_type !== 'Delivery') {
                 pickupInfoHtml = `
                     <div style="background: #e8f5e9; border-radius: 6px; padding: 10px; margin: 10px 0; border-left: 3px solid #4CAF50;">
                         <div style="font-weight: 600; color: #2e7d32; margin-bottom: 5px; font-size: 0.95rem;">
@@ -1291,13 +2043,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Create payment details HTML
             let paymentDetailsHtml = '';
-            if (data.paid_date) {
+            if (data.paid_date || data.order_type === 'Delivery') {
                 paymentDetailsHtml = `
                     <div class="detail-item">
-                        <h4>Payment Details</h4>
-                        <p><strong>Payment Method:</strong> ${data.payment_method || 'Credit Card'}</p>
-                        <p><strong>Paid Date:</strong> ${data.paid_date}</p>
-                        <p><strong>Status:</strong> ${data.payment_status}</p>
+                        <h4 style="color: #0f1724; font-size: 0.9rem; margin-bottom: 0.5rem; font-weight: 600;">Payment Details</h4>
+                        <p style="color: #6b7280; font-size: 0.85rem; margin-bottom: 0.25rem;"><strong>Payment Method:</strong> ${data.payment_method || 'Credit Card'}</p>
+                        ${data.paid_date ? `<p style="color: #6b7280; font-size: 0.85rem; margin-bottom: 0.25rem;"><strong>Paid Date:</strong> ${data.paid_date}</p>` : ''}
+                        ${data.transaction_id ? `<p style="color: #6b7280; font-size: 0.85rem; margin-bottom: 0.25rem;"><strong>Transaction ID:</strong> ${data.transaction_id}</p>` : ''}
+                        <p style="color: #6b7280; font-size: 0.85rem; margin-bottom: 0.25rem;"><strong>Status:</strong> ${data.payment_status}</p>
                     </div>
                 `;
             }
@@ -1322,6 +2075,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td style="width: 20%; vertical-align: middle; text-align: left; font-size: 13px;">
                                     <div><strong>Invoice No.</strong> : ${data.invoice_number}</div>
                                     <div><strong>Order No.</strong> : ${data.order_number}</div>
+                                    <div><strong>Order Type</strong> : ${data.order_type}</div>
                                     <div><strong>Date</strong> : ${data.order_date}</div>
                                 </td>
                             </tr>
@@ -1380,7 +2134,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         <!-- ================= FOOTER NOTES ================= -->
                         <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #6b7280; font-size: 0.85rem;">
-                            <p><strong>Notes:</strong> Thank you for your purchase! Please contact the seller for pickup arrangements.</p>
+                            <p><strong>Notes:</strong> ${data.order_type === 'Delivery' && data.order_status === 'Awaiting verification' ? 'Contact seller for Quick Payment verification.' : 'Thank you for your purchase! Please contact the seller for pickup arrangements.'}</p>
                         </div>
                     </div>
                 </div>
@@ -1648,6 +2402,186 @@ document.addEventListener('DOMContentLoaded', function() {
             } finally {
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
             }
+        });
+    });
+
+    // Track Order functionality
+    const trackingSteps = [
+        { file: 'Order placed-1.svg', label: 'Order Placed' },
+        { file: 'processing order-1.svg', label: 'Processing' },
+        { file: 'Awaiting payment verification.svg', label: 'Awaiting Verification' },
+        { file: 'order paid.svg', label: 'Paid' },
+        { file: 'Dispatched.svg', label: 'Dispatched' },
+        { file: 'Arrived to District.svg', label: 'District' },
+        { file: 'Order is on the way.svg', label: 'On the Way' },
+        { file: 'Order completed.svg', label: 'Completed' }
+    ];
+
+    window.getStepNumber = function(status) {
+        switch(status) {
+            case 'Processing order':
+                return 2;
+            case 'awaiting_verification':
+                return 3;
+            case 'confirmed':
+            case 'paid':
+                return 4;
+            case 'Dispatched':
+                return 5;
+            case 'arrived_to_district':
+                return 6;
+            case 'Order_is_on_the_way':
+                return 7;
+            case 'completed':
+                return 8;
+            default:
+                return 1;
+        }
+    }
+
+    window.buildTrackingHTML = function(currentStatus) {
+        const activeStep = getStepNumber(currentStatus);
+        const steps = [
+            { file: 'Order placed-1.svg', row: 1, col: 1 },
+            { file: 'processing order-1.svg', row: 1, col: 2 },
+            { file: 'Awaiting payment verification.svg', row: 1, col: 3 },
+            { file: 'order paid.svg', row: 1, col: 4 },
+            { file: 'Dispatched.svg', row: 2, col: 4 },
+            { file: 'Arrived to District.svg', row: 2, col: 3 },
+            { file: 'Order is on the way.svg', row: 2, col: 2 },
+            { file: 'Order completed.svg', row: 2, col: 1 }
+        ];
+
+        let html = `
+            <div class="tracking-wrapper">
+                <svg class="svg-connector" id="trackingSvg" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#e2e8f0" class="marker-fill" />
+                        </marker>
+                        <marker id="arrowhead-active" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#10B981" />
+                        </marker>
+                    </defs>
+                    <path id="journeyPathBase" class="path-line" marker-end="url(#arrowhead)" />
+                    <path id="journeyPathActive" class="path-line active" marker-end="url(#arrowhead-active)" />
+                </svg>
+                <div class="tracking-grid">
+        `;
+
+        steps.forEach((step, index) => {
+            const stepNum = index + 1;
+            const isActive = stepNum <= activeStep;
+            const gridStyle = `grid-row: ${step.row}; grid-column: ${step.col};`;
+            
+            html += `
+                <div class="icon-wrapper ${isActive ? 'active' : ''}" style="${gridStyle}" data-step="${stepNum}">
+                    <img src="/assets/icons/Orders icons/${step.file}" 
+                         class="${isActive ? 'active-step' : ''}"
+                         onerror="this.src='https://cdn-icons-png.flaticon.com/512/649/649730.png'; this.style.opacity='0.5'">
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+            </div>
+            <script>
+                setTimeout(drawTrackingPath, 100);
+            <\/script>
+        `;
+        return html;
+    }
+
+    window.drawTrackingPath = function() {
+        const wrapper = document.querySelector('.tracking-wrapper');
+        const svg = document.getElementById('trackingSvg');
+        const pathBase = document.getElementById('journeyPathBase');
+        const pathActive = document.getElementById('journeyPathActive');
+        if (!wrapper || !svg) return;
+
+        const rect = wrapper.getBoundingClientRect();
+        svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+
+        const getCenter = (stepNum) => {
+            const el = document.querySelector(`.icon-wrapper[data-step="${stepNum}"]`);
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return {
+                x: r.left - rect.left + r.width / 2,
+                y: r.top - rect.top + r.height / 2
+            };
+        };
+
+        const activeStep = getStepNumber(window.currentTrackingStatus);
+        const stepsNum = [1, 2, 3, 4, 5, 6, 7, 8];
+        const pts = stepsNum.map(getCenter).filter(p => p !== null);
+
+        if (pts.length < 2) return;
+
+        let d = `M ${pts[0].x} ${pts[0].y}`;
+        let dActive = `M ${pts[0].x} ${pts[0].y}`;
+
+        const isDesktop = window.innerWidth >= 992;
+
+        for (let i = 0; i < pts.length - 1; i++) {
+            const p1 = pts[i];
+            const p2 = pts[i+1];
+            let segment = '';
+
+            if (isDesktop) {
+                if (i === 3) { // 4 to 5: Curve from end of Row 1 to start of Row 2
+                    const cp1x = p1.x + 80;
+                    const cp1y = p1.y + 50;
+                    const cp2x = p2.x + 80;
+                    const cp2y = p2.y - 50;
+                    segment = ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+                } else {
+                    segment = ` L ${p2.x} ${p2.y}`;
+                }
+            } else {
+                // Mobile vertical line
+                segment = ` L ${p2.x} ${p2.y}`;
+            }
+
+            d += segment;
+            if (i < activeStep - 1) {
+                dActive += segment;
+            }
+        }
+
+        pathBase.setAttribute('d', d);
+        pathActive.setAttribute('d', dActive);
+    }
+
+    document.querySelectorAll('.track-order-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const status = this.getAttribute('data-order-status');
+            const orderNumber = this.getAttribute('data-order-number');
+            window.currentTrackingStatus = status;
+
+            Swal.fire({
+                title: 'Delivery Tracking: ' + orderNumber,
+                html: buildTrackingHTML(status),
+                customClass: {
+                    popup: 'order-tracking-popup',
+                    title: 'custom-tracking-title'
+                },
+                showCloseButton: true,
+                showConfirmButton: false,
+                background: 'transparent',
+                width: 'auto',
+                allowOutsideClick: true,
+                didOpen: () => {
+                    // Re-draw path on window resize
+                    window.addEventListener('resize', drawTrackingPath);
+                    // Initial draw
+                    setTimeout(drawTrackingPath, 150);
+                },
+                willClose: () => {
+                    window.removeEventListener('resize', drawTrackingPath);
+                }
+            });
         });
     });
 

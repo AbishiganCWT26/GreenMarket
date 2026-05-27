@@ -358,6 +358,15 @@ body {
 	border-top: 4px solid var(--yellow);
 }
 
+.rider-section {
+	border-top: 4px solid var(--accent-amber);
+}
+
+.vehicle-section {
+	border-top: 4px solid var(--blue);
+}
+
+
 .section-header {
 	display: flex;
 	align-items: center;
@@ -473,6 +482,8 @@ body {
 	font-weight: 500;
 	text-align: right;
 	flex: 1;
+	word-break: break-all;
+	overflow-wrap: break-word;
 }
 
 .user-actions-footer {

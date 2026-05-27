@@ -108,8 +108,9 @@
 					$buyerData = DB::table('buyers')->where('user_id', $user->id)->first();
 					$facilitatorData = DB::table('facilitators')->where('user_id', $user->id)->first();
 					$facilitatorAssignments = $facilitatorData ? DB::table('facilitator_assignments')->where('facilitator_id', $facilitatorData->id)->get() : collect();
+					$deliveryRiderData = DB::table('delivery_riders')->where('user_id', $user->id)->first();
 					
-					$userDetails = ($user->role == 'farmer' ? $farmerData : ($user->role == 'lead_farmer' ? $leadFarmerData : null)) ?? (object)[];
+					$userDetails = ($user->role == 'farmer' ? $farmerData : ($user->role == 'lead_farmer' ? $leadFarmerData : ($user->role == 'delivery_rider' ? $deliveryRiderData : null))) ?? (object)[];
 					
 					if (!isset($userDetails->preferred_payment)) $userDetails->preferred_payment = 'bank';
 					if (!isset($userDetails->nic_no)) $userDetails->nic_no = '';
@@ -433,6 +434,14 @@
 								</label>
 								<textarea name="residential_address" class="form-input" rows="2" {{ $user->role == 'buyer' ? 'required' : '' }}>{{ $buyerData->residential_address ?? '' }}</textarea>
 							</div>
+
+							<div class="form-group">
+								<label class="form-label">
+									<i class="fas fa-map-marked-alt"></i> Google Map Link of the Residential Address
+								</label>
+								<input type="url" name="google_map_link" class="form-input" value="{{ $buyerData->google_map_link ?? '' }}" {{ $user->role == 'buyer' ? 'required' : '' }}>
+								<small class="form-note">Mention product will be delivery to the Residential Address of the google map link</small>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -549,6 +558,129 @@
 								<button type="button" id="add-assignment" class="btn-secondary" style="font-size: 0.85rem; padding: 8px 15px;">
 									<i class="fas fa-plus"></i> Add Another Division
 								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				@endif
+
+				@if($user->role == 'delivery_rider')
+				<div id="delivery-rider-sections">
+					<div class="form-section rider-section">
+						<div class="section-header">
+							<div class="section-icon">
+								<i class="fas fa-motorcycle"></i>
+							</div>
+							<h3>Delivery Rider Details</h3>
+						</div>
+						<div class="form-fields">
+							<div class="form-row">
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-user"></i> Full Name
+									</label>
+									<input type="text" name="name" class="form-input" value="{{ $deliveryRiderData->name ?? '' }}" required>
+								</div>
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-id-card"></i> NIC Number
+									</label>
+									<div class="nic-input-wrapper">
+										<input type="text" name="nic_no" id="rider_nic" class="form-input" value="{{ $deliveryRiderData->nic_no ?? '' }}" required>
+										<div id="rider_nic_status" class="nic-status mt-1" style="font-size: 11px; min-height: 16px;"></div>
+									</div>
+									<small class="form-note mt-1" style="display: block; color: var(--text-muted);">
+										<i class="fas fa-info-circle"></i> Updating NIC requires OTP verification
+									</small>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-id-card-alt"></i> Licence Number
+									</label>
+									<input type="text" name="licence_number" id="rider_licence_number" class="form-input" value="{{ $deliveryRiderData->licence_number ?? '' }}" required>
+									<small class="form-note mt-1" style="display: block; color: var(--text-muted);">
+										<i class="fas fa-info-circle"></i> Updating Licence Number requires OTP verification
+									</small>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-phone"></i> Primary Mobile
+									</label>
+									<input type="text" name="primary_mobile" id="rider_mobile" class="form-input" value="{{ $deliveryRiderData->primary_mobile ?? '' }}" required>
+								</div>
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fab fa-whatsapp"></i> WhatsApp Number
+									</label>
+									<input type="text" name="whatsapp_number" id="rider_whatsapp" class="form-input" value="{{ $deliveryRiderData->whatsapp_number ?? '' }}">
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-truck"></i> Vehicle Type
+									</label>
+									<select name="vehicle_type" id="rider_vehicle_type" class="form-select" required>
+										<option value="" disabled {{ empty($deliveryRiderData->vehicle_type) ? 'selected' : '' }}>Select Vehicle Type</option>
+										<option value="Bicycle" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Bicycle' ? 'selected' : '' }}>Bicycle</option>
+										<option value="Motorbike" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Motorbike' ? 'selected' : '' }}>Motorbike</option>
+										<option value="Three-Wheeler" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Three-Wheeler' ? 'selected' : '' }}>Three-Wheeler</option>
+										<option value="Mini Truck" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Mini Truck' ? 'selected' : '' }}>Mini Truck</option>
+										<option value="Truck" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Truck' ? 'selected' : '' }}>Truck</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-car-side"></i> Vehicle Number
+									</label>
+									<input type="text" name="vehicle_number" id="rider_vehicle_number" class="form-input" value="{{ $deliveryRiderData->vehicle_number ?? '' }}" required>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-weight-hanging"></i> Max Capacity (KG)
+									</label>
+									<input type="number" name="max_kg_capacity" id="rider_max_kg_capacity" class="form-input" value="{{ $deliveryRiderData->max_kg_capacity ?? '' }}" required min="1">
+								</div>
+								<div class="form-group">
+									<label class="form-label">
+										<i class="fas fa-map-marked-alt"></i> Assigned District(s)
+									</label>
+									@php
+										$assignedDistricts = isset($deliveryRiderData->assigned_districts) ? json_decode($deliveryRiderData->assigned_districts, true) : [];
+										if(!is_array($assignedDistricts)) $assignedDistricts = [];
+										$districtsList = ['Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Moneragala', 'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'];
+									@endphp
+									<select name="assigned_districts[]" id="rider_assigned_districts" class="form-select" multiple style="height: 120px;">
+										@foreach($districtsList as $d)
+											<option value="{{ $d }}" {{ in_array($d, $assignedDistricts) ? 'selected' : '' }}>{{ $d }}</option>
+										@endforeach
+									</select>
+									<small class="form-note">Hold Ctrl (Windows) / Command (Mac) to select multiple districts</small>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label">
+									<i class="fas fa-home"></i> Residential Address
+								</label>
+								<textarea name="residential_address" id="rider_address" class="form-input" rows="2" required>{{ $deliveryRiderData->residential_address ?? '' }}</textarea>
+							</div>
+
+							<div class="form-group">
+								<label class="form-label">
+									<i class="fas fa-info-circle"></i> Extra Details
+								</label>
+								<textarea name="extra_details" id="rider_extra_details" class="form-input" rows="2">{{ $deliveryRiderData->extra_details ?? '' }}</textarea>
 							</div>
 						</div>
 					</div>
@@ -711,6 +843,7 @@ $(document).ready(function() {
 	setupNICListener('#farmer_nic', '#farmer_nic_status');
 	setupNICListener('#facilitator_nic', '#facilitator_nic_status');
 	setupNICListener('#buyer_nic', '#buyer_nic_status');
+	setupNICListener('#rider_nic', '#rider_nic_status');
 
 	// EzCash / mCash validation
 	$('#farmer_ezcash').on('input', function() {
@@ -728,6 +861,17 @@ $(document).ready(function() {
 			$('#mcash_error').show();
 		} else {
 			$('#mcash_error').hide();
+		}
+	});
+
+	$('#rider_mobile, #rider_whatsapp').on('input', function() {
+		const val = $(this).val();
+		const cleaned = val.replace(/\D/g, '');
+		if (val !== cleaned) {
+			$(this).val(cleaned);
+		}
+		if (cleaned.length > 10) {
+			$(this).val(cleaned.substring(0, 10));
 		}
 	});
 
@@ -769,6 +913,51 @@ $(document).ready(function() {
 					showError('Please enter a valid NIC number.');
 					return;
 				}
+			} else if (userRole === 'delivery_rider') {
+				const nic = $('#rider_nic').val();
+				if (nic && !validateNIC(nic)) {
+					showError('Please enter a valid NIC number.');
+					return;
+				}
+				const licenceNo = $('#rider_licence_number').val();
+				if (!licenceNo) {
+					showError('Licence Number is required.');
+					return;
+				}
+				const mobile = $('#rider_mobile').val();
+				if (!mobile) {
+					showError('Primary Mobile number is required.');
+					return;
+				}
+				if (!/^\d{10}$/.test(mobile)) {
+					showError('Primary Mobile number must be exactly 10 digits.');
+					return;
+				}
+				const whatsapp = $('#rider_whatsapp').val();
+				if (whatsapp && !/^\d{10}$/.test(whatsapp)) {
+					showError('WhatsApp number must be exactly 10 digits.');
+					return;
+				}
+				const vehicleNo = $('#rider_vehicle_number').val();
+				if (!vehicleNo) {
+					showError('Vehicle Number is required.');
+					return;
+				}
+				const maxCapacity = $('#rider_max_kg_capacity').val();
+				if (!maxCapacity || maxCapacity <= 0) {
+					showError('Valid Max KG Capacity is required.');
+					return;
+				}
+				const districts = $('#rider_assigned_districts').val();
+				if (!districts || districts.length === 0) {
+					showError('Please assign at least one district.');
+					return;
+				}
+				const address = $('#rider_address').val();
+				if (!address) {
+					showError('Residential Address is required.');
+					return;
+				}
 			}
 
 			formDataToSubmit = new FormData(this);
@@ -788,6 +977,38 @@ $(document).ready(function() {
 						index++;
 					}
 				});
+			}
+
+			if (userRole === 'delivery_rider') {
+				const isRiderChanged = checkDeliveryRiderChanges();
+				if (isRiderChanged) {
+					if (otpVerified) {
+						submitForm();
+						return;
+					}
+
+					Swal.fire({
+						title: 'OTP Verification Required',
+						html: `Changes to sensitive rider profile details require OTP verification.<br><br>
+									<small class="text-muted">An OTP will be sent to the rider's registered mobile number</small>`,
+						@if(file_exists(public_path('assets/icons/Gif/alert4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/alert4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
+						showCancelButton: true,
+						confirmButtonColor: '#10B981',
+						cancelButtonColor: '#6b7280',
+						confirmButtonText: 'Send OTP',
+						cancelButtonText: 'Cancel',
+						background: 'var(--card-bg)',
+						color: 'var(--text-color)'
+					}).then((result) => {
+						if (result.isConfirmed) {
+							sendOtpAndShowModal('verify_rider_profile');
+						}
+					});
+					return;
+				} else {
+					submitForm();
+					return;
+				}
 			}
 
 			const isNicChanged = checkNicChanges();
@@ -1174,6 +1395,63 @@ $(document).ready(function() {
 			return false;
 		}
 	}
+
+	@if($user->role == 'delivery_rider')
+	function checkDeliveryRiderChanges() {
+		try {
+			const originalData = {
+				username: {!! json_encode($user->username) !!},
+				email: {!! json_encode($user->email ?? "") !!},
+				nic_no: {!! json_encode($deliveryRiderData->nic_no ?? "") !!},
+				licence_number: {!! json_encode($deliveryRiderData->licence_number ?? "") !!},
+				primary_mobile: {!! json_encode($deliveryRiderData->primary_mobile ?? "") !!},
+				whatsapp_number: {!! json_encode($deliveryRiderData->whatsapp_number ?? "") !!},
+				vehicle_type: {!! json_encode($deliveryRiderData->vehicle_type ?? "") !!},
+				vehicle_number: {!! json_encode($deliveryRiderData->vehicle_number ?? "") !!},
+				max_kg_capacity: {!! json_encode($deliveryRiderData->max_kg_capacity ?? "") !!},
+				residential_address: {!! json_encode($deliveryRiderData->residential_address ?? "") !!}
+			};
+
+			const currentData = {
+				username: $('input[name="username"]').val() || "",
+				email: $('input[name="email"]').val() || "",
+				nic_no: $('#rider_nic').val() || "",
+				licence_number: $('#rider_licence_number').val() || "",
+				primary_mobile: $('#rider_mobile').val() || "",
+				whatsapp_number: $('#rider_whatsapp').val() || "",
+				vehicle_type: $('#rider_vehicle_type').val() || "",
+				vehicle_number: $('#rider_vehicle_number').val() || "",
+				max_kg_capacity: $('#rider_max_kg_capacity').val() || "",
+				residential_address: $('#rider_address').val() || ""
+			};
+
+			for (const key in originalData) {
+				const originalVal = (originalData[key] || "").toString().trim();
+				const currentVal = (currentData[key] || "").toString().trim();
+				if (originalVal !== currentVal) {
+					return true;
+				}
+			}
+
+			// Check assigned districts
+			const originalDistricts = {!! json_encode($assignedDistricts) !!} || [];
+			const currentDistricts = $('#rider_assigned_districts').val() || [];
+			if (originalDistricts.length !== currentDistricts.length) {
+				return true;
+			}
+			const sortedOrig = [...originalDistricts].sort();
+			const sortedCurr = [...currentDistricts].sort();
+			for (let i = 0; i < sortedOrig.length; i++) {
+				if (sortedOrig[i] !== sortedCurr[i]) {
+					return true;
+				}
+			}
+		} catch (e) {
+			console.error('Error checking rider changes:', e);
+		}
+		return false;
+	}
+	@endif
 
 	let currentOtpAction = 'edit_payment';
 

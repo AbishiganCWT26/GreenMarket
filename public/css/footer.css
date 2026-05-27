@@ -133,50 +133,7 @@
     padding: 6px 0;
     border-top: 1px dashed rgba(16, 185, 129, 0.15);
     border-bottom: 1px dashed rgba(16, 185, 129, 0.15);
-}
-
-.social-wrapper {
-    margin: 8px 0 10px;
-}
-
-.social-row {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-}
-
-.social-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: var(--radius-full);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 0.75rem;
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-.social-btn:hover {
-    transform: translateY(-2px) scale(1.1);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-}
-
-.social-btn.facebook {
-    background: #1877f2;
-}
-
-.social-btn.youtube {
-    background: #ff0000;
-}
-
-.social-btn.twitter {
-    background: #1da1f2;
-}
-
-.social-btn.blog {
-    background: #f57d00;
+    text-align: justify;
 }
 
 .partner-strip {
@@ -487,12 +444,6 @@
         font-size: 0.9rem;
     }
 
-    .social-btn {
-        width: 34px;
-        height: 34px;
-        font-size: 0.9rem;
-    }
-
     .partner-img {
         height: 45px;
     }
@@ -659,12 +610,6 @@
         font-size: 0.7rem;
     }
 
-    .social-btn {
-        width: 26px;
-        height: 26px;
-        font-size: 0.7rem;
-    }
-
     .partner-img {
         height: 28px;
     }
@@ -731,12 +676,6 @@
     .brand-desc {
         font-size: 0.65rem;
         padding: 4px 0;
-    }
-
-    .social-btn {
-        width: 24px;
-        height: 24px;
-        font-size: 0.65rem;
     }
 
     .partner-strip {
@@ -836,12 +775,6 @@
         margin: 4px 0;
     }
 
-    .social-btn {
-        width: 22px;
-        height: 22px;
-        font-size: 0.6rem;
-    }
-
     .partner-strip {
         padding: 4px 2px;
         gap: 4px;
@@ -919,7 +852,6 @@
     }
 
     .brand-card:hover,
-    .social-btn:hover,
     .partner-item:hover,
     .footer-links li a:hover,
     .contact-item:hover,

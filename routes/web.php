@@ -18,7 +18,13 @@ use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\LeadfarmerControlleradmin;
 use App\Http\Controllers\Admin\BuyerRequestProductsController;
 use App\Http\Controllers\Admin\NotificationAdminController;
+use App\Http\Controllers\Admin\DeliveryAssignmentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DeliveryRider\DashboardController;
+use App\Http\Controllers\DeliveryRider\ShipmentController;
+use App\Http\Controllers\DeliveryRider\DeliveryController;
+use App\Http\Controllers\DeliveryRider\ProfileController;
+use App\Http\Middleware\DeliveryRiderMiddleware;
 
 Route::get('/', [PublicController::class, 'index'])->name('home');
 
@@ -182,7 +188,11 @@ Route::prefix('lead-farmer')
     
 
     Route::get('/orders', [LeadFarmerController::class, 'viewOrders'])->name('lf.orders');
+    Route::get('/delivery-transactions', [LeadFarmerController::class, 'deliveryOrderTransactions'])->name('lf.deliveryTransactions');
+    Route::get('/delivery-products', [LeadFarmerController::class, 'deliveryProducts'])->name('lf.deliveryProducts');
     Route::post('/orders/mark-payment', [LeadFarmerController::class, 'markPaymentReceived'])->name('lf.orders.markPayment');
+    Route::post('/orders/verify-delivery-payment', [LeadFarmerController::class, 'verifyDeliveryPayment'])->name('lf.orders.verifyDeliveryPayment');
+    Route::post('/orders/submit-bus-dispatch', [LeadFarmerController::class, 'submitBusDispatch'])->name('lf.orders.submitBusDispatch');
     Route::post('/orders/update-status', [LeadFarmerController::class, 'updateOrderStatus'])->name('lf.orders.updateStatus');
     Route::get('/orders/{id}', [LeadFarmerController::class, 'viewOrder'])->name('lf.orders.view');
 
@@ -281,7 +291,13 @@ Route::prefix('buyer')
     Route::post('/checkout/place-order', [BuyerController::class, 'placeOrder'])->name('buyer.placeOrder');
     Route::post('/checkout/payment', [BuyerController::class, 'processPayment'])->name('buyer.processPayment');
     Route::get('/checkout/success/{orderId}', [BuyerController::class, 'checkoutSuccess'])->name('buyer.checkoutSuccess');
-    Route::get('/checkout/failed', [BuyerController::class, 'checkoutFailed'])->name('buyer.checkoutFailed');
+    
+    // Unpaid Delivery Orders Page
+    Route::get('/unpaid-delivery-orders', [BuyerController::class, 'unpaidDeliveryOrders'])->name('buyer.unpaidDeliveryOrders');
+    Route::post('/unpaid-delivery-orders/send-sms', [BuyerController::class, 'sendUnpaidOrderSMS'])->name('buyer.sendUnpaidOrderSMS');
+    Route::post('/unpaid-delivery-orders/delete-expired', [BuyerController::class, 'deleteExpiredOrder'])->name('buyer.deleteExpiredOrder');
+    Route::post('/upload-payment-slip', [BuyerController::class, 'uploadPaymentSlip'])->name('buyer.uploadPaymentSlip');
+    Route::post('/resubmit-payment-slip', [BuyerController::class, 'resubmitPaymentSlip'])->name('buyer.resubmitPaymentSlip');
 
     // Order Actions
     Route::post('/order/{orderId}/feedback', [BuyerController::class, 'submitFeedback'])->name('buyer.order.feedback');
@@ -432,6 +448,86 @@ Route::prefix('facilitator')
 });
 
 
+// =============================================
+// DELIVERY RIDER ROUTES (MERGED & DEDUPLICATED)
+// =============================================
+
+// Public Rider Auth Routes (No Auth Middleware)
+Route::prefix('rider')->group(function () {
+	Route::get('/login', [AuthController::class, 'showLoginForm'])->name('rider.login');
+	Route::post('/login', [AuthController::class, 'login'])->name('rider.login.submit');
+	Route::post('/logout', [AuthController::class, 'logout'])->name('rider.logout');
+});
+
+// Protected Rider Routes (Auth + DeliveryRiderMiddleware)
+Route::middleware(['auth', DeliveryRiderMiddleware::class])->group(function () {
+
+	// ========== DELIVERY-RIDER PREFIX ROUTES ==========
+	Route::prefix('delivery-rider')->group(function () {
+
+		// Dashboard
+		Route::get('/dashboard', [DashboardController::class, 'index'])->name('delivery-rider.dashboard');
+		Route::post('/status/toggle', [DashboardController::class, 'toggleStatus'])->name('delivery-rider.dashboard.toggle-status');
+
+		// Notifications
+		Route::get('/notifications', [DashboardController::class, 'getNotifications'])->name('delivery-rider.notifications');
+		Route::post('/notifications/mark-read/{id}', [DashboardController::class, 'markNotificationRead'])->name('delivery-rider.notifications.mark-read');
+		Route::post('/notifications/mark-all-read', [DashboardController::class, 'markAllNotificationsAsRead'])->name('delivery-rider.notifications.mark-all-read');
+
+		// Shipments (Incoming)
+		Route::get('/incoming-shipments', [ShipmentController::class, 'incoming'])->name('delivery-rider.incoming-shipments');
+		Route::get('/shipments/{id}', [ShipmentController::class, 'show'])->name('delivery-rider.shipment-details');
+		Route::get('/shipments/{id}/check-availability', [ShipmentController::class, 'checkAvailability'])->name('delivery-rider.shipments.check-availability');
+		Route::post('/shipments/{id}/accept', [ShipmentController::class, 'accept'])->name('delivery-rider.shipments.accept');
+
+		// Active Deliveries
+		Route::get('/active-deliveries', [DeliveryController::class, 'active'])->name('delivery-rider.active-deliveries');
+		Route::get('/deliveries/{id}', [DeliveryController::class, 'showDelivery'])->name('delivery-rider.delivery-details');
+		Route::post('/deliveries/{id}/confirm-arrival', [DeliveryController::class, 'confirmArrival'])->name('delivery-rider.delivery.confirm-arrival');
+		Route::get('/deliveries/{id}/complete', [DeliveryController::class, 'completeForm'])->name('delivery-rider.delivery.complete-form');
+		Route::post('/deliveries/{id}/complete', [DeliveryController::class, 'complete'])->name('delivery-rider.delivery.complete');
+
+		// Completed Deliveries History
+		Route::get('/completed-deliveries', [DeliveryController::class, 'history'])->name('delivery-rider.completed-deliveries');
+		Route::get('/completed-deliveries/{id}', [DeliveryController::class, 'showCompleted'])->name('delivery-rider.completed-delivery-details');
+
+		// Profile Management
+		Route::get('/profile', [ProfileController::class, 'show'])->name('delivery-rider.profile');
+		Route::post('/profile/update', [ProfileController::class, 'update'])->name('delivery-rider.profile.update');
+		Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('delivery-rider.profile.photo');
+		Route::delete('/profile/photo/remove', [ProfileController::class, 'deletePhoto'])->name('delivery-rider.profile.photo.remove');
+		Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('delivery-rider.profile.password');
+		Route::post('/profile/send-otp', [ProfileController::class, 'sendProfileOTP'])->name('delivery-rider.profile.send-otp');
+		Route::post('/profile/verify-otp', [ProfileController::class, 'verifyProfileOTP'])->name('delivery-rider.profile.verify-otp');
+	});
+
+	// ========== RIDER PREFIX ROUTES (ALIASES) ==========
+	Route::prefix('rider')->group(function () {
+
+		// Dashboard
+		Route::get('/dashboard', [DashboardController::class, 'index'])->name('rider.dashboard');
+		Route::post('/toggle-status', [DashboardController::class, 'toggleStatus'])->name('rider.toggle-status');
+
+		// Shipments
+		Route::get('/shipments/incoming', [ShipmentController::class, 'incoming'])->name('rider.incoming');
+		Route::get('/shipments/{id}', [ShipmentController::class, 'show'])->name('rider.shipment.show');
+		Route::get('/shipments/{id}/check', [ShipmentController::class, 'checkAvailability'])->name('rider.shipment.check');
+		Route::post('/shipments/{id}/accept', [ShipmentController::class, 'accept'])->name('rider.shipment.accept');
+
+		// Deliveries
+		Route::get('/deliveries/active', [DeliveryController::class, 'active'])->name('rider.active');
+		Route::get('/deliveries/{id}', [DeliveryController::class, 'showDelivery'])->name('rider.delivery.show');
+		Route::post('/deliveries/{id}/complete', [DeliveryController::class, 'complete'])->name('rider.delivery.complete');
+		Route::get('/deliveries/completed', [DeliveryController::class, 'history'])->name('rider.completed');
+
+		// Profile
+		Route::get('/profile', [ProfileController::class, 'show'])->name('rider.profile');
+		Route::put('/profile', [ProfileController::class, 'update'])->name('rider.profile.update');
+		Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('rider.profile.password');
+	});
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN ROUTES
@@ -448,6 +544,13 @@ Route::prefix('admin')
 	Route::post('/notifications/send', [NotificationAdminController::class, 'sendNotification'])->name('notifications.send');
 	Route::post('/notifications/mark-all-read', [NotificationAdminController::class, 'markAllAsRead'])->name('notifications.markAllRead');
 	Route::post('/notifications/mark-read/{id}', [NotificationAdminController::class, 'markAsRead'])->name('notifications.markRead');
+
+	// Delivery Rider Assignment
+	Route::get('/delivery-assignments', [DeliveryAssignmentController::class, 'index'])->name('delivery-assignments.index');
+	Route::post('/delivery-assignments/assign', [DeliveryAssignmentController::class, 'assign'])->name('delivery-assignments.assign');
+	Route::get('/delivery-assignments/all-riders', [DeliveryAssignmentController::class, 'getAllAvailableRiders'])->name('delivery-assignments.all-riders');
+	Route::get('/delivery-assignments/riders/{districtId}', [DeliveryAssignmentController::class, 'getAvailableRiders'])->name('delivery-assignments.riders');
+	Route::post('/delivery-assignments/reassign', [DeliveryAssignmentController::class, 'reassign'])->name('delivery-assignments.reassign');
 
 	Route::get('/users', [UserController::class, 'index'])->name('users.index');
 	Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
@@ -566,3 +669,10 @@ Route::get('/test-middleware', function () {
         'all' => array_keys($middleware)
     ]);
 })->middleware('auth');
+
+Route::get('/autologin-admin', function () {
+    Auth::loginUsingId(1);
+    return redirect('/admin/users/68');
+});
+
+

@@ -1,0 +1,63 @@
+/* completed-deliveries.css */
+/* Styles for completed deliveries history list */
+
+.delivery-list-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+    padding-bottom: 1rem;
+}
+
+/* Stats Cards */
+.stats-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.bg-light-primary { background-color: #e0e7ff; }
+.bg-light-success { background-color: #dcfce7; }
+.bg-light-info { background-color: #cffafe; }
+
+.text-info { color: #06b6d4 !important; }
+
+/* Filters Form */
+.filters-form .form-control,
+.filters-form .form-select {
+    border-color: var(--border, #e5e7eb);
+    font-size: 0.875rem;
+}
+
+.filters-form .form-control:focus,
+.filters-form .form-select:focus {
+    border-color: var(--primary-green, #10B981);
+    box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15);
+}
+
+.filters-form .input-group-text {
+    border-color: var(--border, #e5e7eb);
+}
+
+/* Pagination Overrides */
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-link {
+    color: var(--primary-green, #10B981);
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-green, #10B981);
+    border-color: var(--primary-green, #10B981);
+}
+
+.page-link:hover {
+    color: var(--dark-green, #059669);
+}
+
+.page-link:focus {
+    box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25);
+}

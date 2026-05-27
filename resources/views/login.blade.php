@@ -197,7 +197,7 @@
                     @if(file_exists(public_path('assets/icons/Gif/Login success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Login success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
                     title: 'Welcome {{ session('name') ?? 'User' }}',
                     text: 'Redirecting to dashboard...',
-                    timer: 2000,
+                    timer: 3500,
                     showConfirmButton: false
                 }).then(() => {
                     let url = '/';
@@ -207,6 +207,7 @@
                         case 'lead_farmer': url = '/lead-farmer/dashboard'; break;
                         case 'farmer': url = '/farmer/dashboard'; break;
                         case 'buyer': url = '/buyer/dashboard'; break;
+                        case 'delivery_rider': url = '/delivery-rider/dashboard'; break;
                     }
                     window.location.href = url;
                 });

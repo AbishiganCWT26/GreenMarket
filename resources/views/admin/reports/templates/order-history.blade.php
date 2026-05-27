@@ -20,7 +20,7 @@
                 <div class="stat-label">Completed Orders</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">{{ collect($data)->where('order_status', 'pending')->count() }}</div>
+                <div class="stat-value">{{ collect($data)->where('order_status', 'Processing order')->count() }}</div>
                 <div class="stat-label">Pending Orders</div>
             </div>
         </div>

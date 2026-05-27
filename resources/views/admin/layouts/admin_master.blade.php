@@ -70,6 +70,9 @@
                     <li><a href="{{ url('/admin/buyer-requests') }}"
                             class="menu-link {{ request()->is('admin/buyer-requests*') ? 'active' : '' }}"><i
                                 class="fa-solid fa-handshake"></i><span>Buyer Requests</span></a></li>
+                    <li><a href="{{ url('/admin/delivery-assignments') }}"
+                            class="menu-link {{ request()->is('admin/delivery-assignments*') ? 'active' : '' }}"><i
+                                class="fa-solid fa-truck-ramp-box"></i><span>Rider Assignment</span></a></li>
 
 
                     <li class="menu-heading">TAXONOMY</li>

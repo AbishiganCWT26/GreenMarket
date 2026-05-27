@@ -83,9 +83,26 @@
 					 data-farmer="{{ $order->farmer->name }}"
 					 data-id="{{ $order->id }}"
 					 data-amount="{{ $order->total_amount }}">
+					@php
+						$statusIcon = 'fa-file-invoice';
+						switch(strtolower($order->order_status)) {
+							case 'processing order': $statusIcon = 'fa-clock'; break;
+							case 'confirmed': $statusIcon = 'fa-check-circle'; break;
+							case 'paid': $statusIcon = 'fa-money-bill-wave'; break;
+							case 'ready_for_pickup': $statusIcon = 'fa-box-open'; break;
+							case 'dispatched': $statusIcon = 'fa-truck'; break;
+							case 'completed': $statusIcon = 'fa-check-double'; break;
+							case 'cancelled': $statusIcon = 'fa-times-circle'; break;
+							case 'refunded': $statusIcon = 'fa-undo'; break;
+							case 'payment pending': $statusIcon = 'fa-hourglass-half'; break;
+							case 'awaiting_verification': $statusIcon = 'fa-user-check'; break;
+						}
+					@endphp
 					<div class="card-head">
 						<div class="order-badge">#{{ $order->order_number }}</div>
-						<span class="order-status status-{{ $order->order_status }}">{{ str_replace('_', ' ', $order->order_status) }}</span>
+						<span class="order-status status-{{ strtolower(str_replace(' ', '-', $order->order_status)) }}">
+							<i class="fas {{ $statusIcon }}"></i> {{ str_replace('_', ' ', $order->order_status) }}
+						</span>
 					</div>
 					<div class="card-body">
 						<div class="order-users">
@@ -183,7 +200,22 @@
 								<td>{{ $order->buyer->name }}</td>
 								<td>{{ $order->farmer->name }}</td>
 								<td class="amount-cell">LKR {{ number_format($order->total_amount, 2) }}</td>
-								<td><span class="status-badge status-{{ $order->order_status }}">{{ str_replace('_', ' ', $order->order_status) }}</span></td>
+								@php
+									$statusIcon = 'fa-file-invoice';
+									switch(strtolower($order->order_status)) {
+										case 'processing order': $statusIcon = 'fa-clock'; break;
+										case 'confirmed': $statusIcon = 'fa-check-circle'; break;
+										case 'paid': $statusIcon = 'fa-money-bill-wave'; break;
+										case 'ready_for_pickup': $statusIcon = 'fa-box-open'; break;
+										case 'dispatched': $statusIcon = 'fa-truck'; break;
+										case 'completed': $statusIcon = 'fa-check-double'; break;
+										case 'cancelled': $statusIcon = 'fa-times-circle'; break;
+										case 'refunded': $statusIcon = 'fa-undo'; break;
+										case 'payment pending': $statusIcon = 'fa-hourglass-half'; break;
+										case 'awaiting_verification': $statusIcon = 'fa-user-check'; break;
+									}
+								@endphp
+								<td><span class="status-badge status-{{ strtolower(str_replace(' ', '-', $order->order_status)) }}"><i class="fas {{ $statusIcon }}"></i> {{ str_replace('_', ' ', $order->order_status) }}</span></td>
 								<td>
 									@if($payment)
 										<span class="pay-badge paid"><i class="fas fa-check-circle"></i> Paid</span>

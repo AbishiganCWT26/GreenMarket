@@ -16,6 +16,7 @@ use App\Mail\OrderNotificationMail;
 use Illuminate\Support\Facades\Log;
 use App\Services\InventoryService;
 use App\Models\Product;
+use App\Models\Order;
 
 class BuyerController extends Controller
 {
@@ -233,27 +234,25 @@ class BuyerController extends Controller
         $subcategories = $this->getFilteredSubcategories($request->category);
 
         // Determine the limit based on screen width (from cookie or request input)
-        $screenWidth = request()->cookie('screen_width') ?? request()->input('screen_width', 1200);
+        $screenWidth = (int) (request()->cookie('screen_width') ?? request()->input('screen_width', 1200));
 
         $limit = match(true) {
             // ultralarge Ultrawide / XXXXL Screens: 2560px - 5000px or above
             $screenWidth >= 2560 => 20,
             
             // large Ultrawide / XXXL Screens: 1501px - 2559px
-            $screenWidth >= 1501 && $screenWidth <= 2559 => 18,
+            $screenWidth >= 1501 && $screenWidth <= 2559 => 15,
             
             // Ultrawide / XXL Screens: 1400px - 1500px
-            $screenWidth >= 1400 && $screenWidth <= 1500 => 16,
+            $screenWidth >= 1400 && $screenWidth <= 1500 => 15,
             
-            // Extra Large Screens: 1200px - 1399px
-            // Large Screens: 1001px - 1199px
-            // Normal: 1000px and below down to 768px
+            // Extra Large Screens, Large Screens and Normal Tablets: 768px - 1399px
             $screenWidth >= 768 && $screenWidth <= 1399 => 12,
             
             // Small Screens: 576px - 767px
             $screenWidth >= 576 && $screenWidth <= 767 => 9,
             
-            // Extra Small to ultra Small: 575px and below (approx. 575, 480, 379)
+            // Extra Small to ultra Small: 575px and below
             $screenWidth <= 575 => 6,
             
             // Default fallback
@@ -451,10 +450,14 @@ class BuyerController extends Controller
                 'orders.*',
                 'farmers.name as farmer_name',
                 'lead_farmers.name as lead_farmer_name',
-                'lead_farmers.primary_mobile as lead_farmer_contact'
+                'lead_farmers.primary_mobile as lead_farmer_contact',
+                'payment_delivery_order.payment_status as delivery_payment_status',
+                'payment_delivery_order.rejection_reason as delivery_rejection_reason',
+                'payment_delivery_order.resubmission_count'
             )
             ->join('farmers', 'orders.farmer_id', '=', 'farmers.id')
             ->join('lead_farmers', 'orders.lead_farmer_id', '=', 'lead_farmers.id')
+            ->leftJoin('payment_delivery_order', 'orders.id', '=', 'payment_delivery_order.order_id')
             ->where('orders.buyer_id', $buyer->id)
             ->orderBy('orders.created_at', 'desc')
             ->get();
@@ -472,6 +475,9 @@ class BuyerController extends Controller
                 'payments.transaction_id',
                 'payments.payment_date',
                 'payments.payment_status',
+                'payment_delivery_order.transaction_id as delivery_transaction_id',
+                'payment_delivery_order.transaction_date as delivery_transaction_date',
+                'payment_delivery_order.transaction_time as delivery_transaction_time',
                 'invoices.invoice_number',
                 'invoices.invoice_path',
                 'farmers.name as farmer_name',
@@ -486,6 +492,7 @@ class BuyerController extends Controller
                 'products.pickup_map_link'
             )
             ->leftJoin('payments', 'orders.id', '=', 'payments.order_id')
+            ->leftJoin('payment_delivery_order', 'orders.id', '=', 'payment_delivery_order.order_id')
             ->leftJoin('invoices', 'orders.id', '=', 'invoices.order_id')
             ->leftJoin('farmers', 'orders.farmer_id', '=', 'farmers.id')
             ->leftJoin('lead_farmers', 'orders.lead_farmer_id', '=', 'lead_farmers.id')
@@ -570,10 +577,24 @@ class BuyerController extends Controller
         }
 
         $orderStatus = ucfirst(str_replace('_', ' ', $order->order_status));
+        $orderType = $order->order_type ?? 'Pickup';
+
+        // Custom logic for delivery order payment details
+        if ($orderType === 'Delivery') {
+            $paidDate = $order->delivery_transaction_date ? date('M d, Y', strtotime($order->delivery_transaction_date)) : null;
+            $paymentMethod = 'Bank Transfer';
+            // Use delivery transaction ID if available
+            $transactionId = $order->delivery_transaction_id ?: $order->transaction_id;
+        } else {
+            $paidDate = $order->payment_date ? date('M d, Y', strtotime($order->payment_date)) : null;
+            $paymentMethod = $order->payment_status === 'completed' ? 'Credit Card' : 'Cash on Delivery';
+            $transactionId = $order->transaction_id;
+        }
 
         return response()->json([
             'success' => true,
             'order_number' => $order->order_number,
+            'order_type' => $orderType,
             'order_date' => date('M d, Y', strtotime($order->created_at)),
             'order_status' => $orderStatus,
             'payment_status' => $paymentStatus,
@@ -592,8 +613,9 @@ class BuyerController extends Controller
             'items' => $formattedItems,
             'subtotal' => number_format($subtotal, 2),
             'total_amount' => number_format($order->total_amount, 2),
-            'paid_date' => $order->payment_date ? date('M d, Y', strtotime($order->payment_date)) : null,
-            'payment_method' => $order->payment_status === 'completed' ? 'Credit Card' : 'Cash on Delivery'
+            'paid_date' => $paidDate,
+            'payment_method' => $paymentMethod,
+            'transaction_id' => $transactionId
         ]);
     }
 
@@ -660,6 +682,7 @@ class BuyerController extends Controller
             'primary_mobile' => 'required|string|max:15',
             'whatsapp_number' => 'nullable|string|max:15',
             'residential_address' => 'nullable|string',
+            'google_map_link' => 'nullable|url',
         ]);
         User::where('id', $user->id)->update([
             'email' => $validated['email'],
@@ -674,6 +697,7 @@ class BuyerController extends Controller
                     'primary_mobile' => $validated['primary_mobile'],
                     'whatsapp_number' => $validated['whatsapp_number'],
                     'residential_address' => $validated['residential_address'],
+                    'google_map_link' => $validated['google_map_link'],
                     'updated_at' => now(),
                 ]);
         } else {
@@ -684,6 +708,7 @@ class BuyerController extends Controller
                 'primary_mobile' => $validated['primary_mobile'],
                 'whatsapp_number' => $validated['whatsapp_number'],
                 'residential_address' => $validated['residential_address'],
+                'google_map_link' => $validated['google_map_link'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -811,6 +836,7 @@ class BuyerController extends Controller
             'business_name' => 'nullable|string|max:100',
             'business_type' => 'nullable|string|in:individual,restaurant,hotel,retailer,wholesaler',
             'residential_address' => 'required|string',
+            'google_map_link' => 'required|url',
             'district' => 'required|string',
             'whatsapp_number' => 'nullable|string|max:15',
             'password' => 'required|string|min:8|confirmed',
@@ -844,6 +870,7 @@ class BuyerController extends Controller
                 'primary_mobile' => $request->primary_mobile,
                 'whatsapp_number' => $request->whatsapp_number,
                 'residential_address' => $request->residential_address,
+                'google_map_link' => $request->google_map_link,
                 'district' => $request->district,
                 'business_name' => $request->business_name,
                 'business_type' => $request->business_type ?? 'individual',
@@ -1392,7 +1419,7 @@ class BuyerController extends Controller
                 'buyer_id' => $buyer->id,
                 'farmer_id' => $firstCartItem->farmer_id,
                 'lead_farmer_id' => $firstCartItem->lead_farmer_id,
-                'order_status' => 'pending',
+                'order_status' => 'Processing order',
                 'total_amount' => $grandTotal,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -1538,25 +1565,17 @@ class BuyerController extends Controller
     $buyer = $this->getBuyer();
 
     $validated = $request->validate([
-        'payment_method' => 'required|string|in:cod,bank_card'
+        'payment_method' => 'required|string|in:cod,bank_transfer',
+        'order_type' => 'required|string|in:Pickup,Delivery'
     ]);
-
-    // If bank card is selected, show message that payment gateway will be available soon
-    if ($validated['payment_method'] === 'bank_card') {
-        return response()->json([
-            'success' => false,
-            'message' => 'Payment gateway will be available soon. Please use Cash on Delivery for now.',
-            'payment_method' => 'bank_card'
-        ], 400);
-    }
 
     // Get cart items with explicit reference to shopping_cart fields
     $cartItems = DB::table('shopping_cart')
         ->select(
             'shopping_cart.id as cart_id',
             'shopping_cart.product_id',
-            'shopping_cart.quantity as cart_quantity', // Explicitly name it
-            'shopping_cart.selling_price_snapshot as cart_price', // Explicitly name it
+            'shopping_cart.quantity as cart_quantity',
+            'shopping_cart.selling_price_snapshot as cart_price',
             'products.*',
             'farmers.id as farmer_id',
             'lead_farmers.id as lead_farmer_id'
@@ -1577,17 +1596,10 @@ class BuyerController extends Controller
     DB::beginTransaction();
 
     try {
-        $orderNumber = 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid());
-        $orderTotal = 0;
+        $orderNumberPrefix = 'ORD-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
+        $isDelivery = $validated['order_type'] === 'Delivery';
 
-        // Calculate total from cart items using cart fields
-        foreach ($cartItems as $item) {
-            $orderTotal += $item->cart_quantity * $item->cart_price;
-        }
-
-        $grandTotal = $orderTotal;
-
-        // Group items by lead_farmer_id to create separate orders for each lead farmer
+        // Group items by lead_farmer_id to create separate orders
         $groupedByLeadFarmer = [];
         foreach ($cartItems as $item) {
             $leadFarmerId = $item->lead_farmer_id;
@@ -1603,68 +1615,89 @@ class BuyerController extends Controller
         }
 
         $orderIds = [];
+        $temporaryOrderIds = [];
 
-        // Create order for each lead farmer
         foreach ($groupedByLeadFarmer as $leadFarmerId => $group) {
-            $firstItem = $group['items'][0];
+            $orderNumber = $orderNumberPrefix . '-' . $leadFarmerId;
 
-            $orderId = DB::table('orders')->insertGetId([
-                'order_number' => $orderNumber . '-' . $leadFarmerId,
-                'buyer_id' => $buyer->id,
-                'farmer_id' => $group['farmer_id'],
-                'lead_farmer_id' => $leadFarmerId,
-                'order_status' => 'pending', // For COD, status is 'pending' until lead farmer updates payment
-                'total_amount' => $group['subtotal'],
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-
-            $orderIds[] = $orderId;
-
-            // Add order items using cart fields
-            foreach ($group['items'] as $item) {
-                DB::table('order_items')->insert([
-                    'order_id' => $orderId,
-                    'product_id' => $item->product_id,
-                    'product_name_snapshot' => $item->product_name,
-                    'quantity_ordered' => $item->cart_quantity, // Use cart_quantity
-                    'unit_price_snapshot' => $item->cart_price, // Use cart_price
-                    'item_total' => $item->cart_quantity * $item->cart_price, // Use cart fields
+            if ($isDelivery) {
+                // For Delivery, use temporary table
+                // We'll use a numeric ID that combines buyer ID and timestamp for grouping if needed, 
+                // but since we group by lead farmer, we can generate a temporary unique ID
+                $tempOrderId = rand(100000, 999999); 
+                
+                foreach ($group['items'] as $item) {
+                    DB::table('temporary_delivery_order_items')->insert([
+                        'order_id' => $tempOrderId,
+                        'order_number' => $orderNumber,
+                        'buyer_id' => $buyer->id,
+                        'farmer_id' => $group['farmer_id'],
+                        'lead_farmer_id' => $leadFarmerId,
+                        'product_id' => $item->product_id,
+                        'product_name_snapshot' => $item->product_name,
+                        'quantity_ordered' => $item->cart_quantity,
+                        'unit_price_snapshot' => $item->cart_price,
+                        'item_total' => $item->cart_quantity * $item->cart_price,
+                        'order_status' => 'Processing order',
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+                }
+                $temporaryOrderIds[] = $tempOrderId;
+            } else {
+                // For Pickup (COD), create actual order immediately
+                $orderId = DB::table('orders')->insertGetId([
+                    'order_number' => $orderNumber,
+                    'buyer_id' => $buyer->id,
+                    'farmer_id' => $group['farmer_id'],
+                    'lead_farmer_id' => $leadFarmerId,
+                    'order_status' => 'Processing order',
+                    'order_type' => 'Pickup',
+                    'total_amount' => $group['subtotal'],
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
 
-                // Update product quantity using InventoryService
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    app(InventoryService::class)->updateStock(
-                        $product,
-                        -$item->cart_quantity,
-                        'order_placed',
-                        'Order #' . $orderNumber . ' placed via COD',
-                        $orderId
-                    );
+                $orderIds[] = $orderId;
+
+                foreach ($group['items'] as $item) {
+                    DB::table('order_items')->insert([
+                        'order_id' => $orderId,
+                        'product_id' => $item->product_id,
+                        'product_name_snapshot' => $item->product_name,
+                        'quantity_ordered' => $item->cart_quantity,
+                        'unit_price_snapshot' => $item->cart_price,
+                        'item_total' => $item->cart_quantity * $item->cart_price,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+
+                    // Update inventory for immediate orders
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        app(InventoryService::class)->updateStock(
+                            $product,
+                            -$item->cart_quantity,
+                            'order_placed',
+                            'Order #' . $orderNumber . ' placed via Pickup',
+                            $orderId
+                        );
+                    }
                 }
+
+                // Create invoice for Pickup order
+                $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
+                DB::table('invoices')->insert([
+                    'invoice_number' => $invoiceNumber,
+                    'order_id' => $orderId,
+                    'invoice_path' => 'invoices/' . $invoiceNumber . '.pdf',
+                    'generated_at' => now(),
+                    'updated_at' => now()
+                ]);
+
+                // Notifications
+                $this->sendOrderNotifications($orderId, $buyer);
             }
-
-            // Create invoice for this order
-            $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
-
-            // Get next available invoice ID
-            $lastInvoice = DB::table('invoices')->orderBy('id', 'desc')->first();
-            $nextInvoiceId = $lastInvoice ? $lastInvoice->id + 1 : 1;
-
-            DB::table('invoices')->insert([
-                'id' => $nextInvoiceId,
-                'invoice_number' => $invoiceNumber,
-                'order_id' => $orderId,
-                'invoice_path' => 'invoices/' . $invoiceNumber . '.pdf',
-                'generated_at' => now(),
-                'updated_at' => now()
-            ]);
-
-            // Send SMS and Email notifications to farmer and lead farmer
-            $this->sendOrderNotifications($orderId, $buyer);
         }
 
         // Clear shopping cart
@@ -1676,21 +1709,26 @@ class BuyerController extends Controller
 
         DB::commit();
 
-        // Return success response with the message you requested
+        if ($isDelivery) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Order placed successfully! Please upload payment proof in "Unpaid Delivery Orders".',
+                'redirect_url' => route('buyer.unpaidDeliveryOrders')
+            ]);
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Order placed successfully with Cash on Delivery! Contact the seller for the pickup. Check the invoice in "Order History".',
-            'order_ids' => $orderIds,
-            'order_number' => $orderNumber,
+            'message' => 'Order placed successfully with Cash on Delivery! Contact the seller for the pickup.',
             'redirect_url' => route('buyer.history')
         ]);
 
     } catch (\Exception $e) {
         DB::rollBack();
-        \Log::error('Order placement error: ' . $e->getMessage());
+        Log::error('Order placement error: ' . $e->getMessage());
         return response()->json([
             'success' => false,
-            'message' => 'Failed to place order. Please try again. Error: ' . $e->getMessage()
+            'message' => 'Failed to place order. Error: ' . $e->getMessage()
         ], 500);
     }
 }
@@ -1793,7 +1831,7 @@ class BuyerController extends Controller
         $order = DB::table('orders')
             ->where('id', $orderId)
             ->where('buyer_id', $buyer->id)
-            ->whereIn('order_status', ['pending', 'confirmed'])
+            ->whereIn('order_status', ['Processing order', 'confirmed'])
             ->first();
         if (!$order) {
             return response()->json([
@@ -2252,4 +2290,319 @@ class BuyerController extends Controller
             ], 500);
         }
     }
+
+    public function unpaidDeliveryOrders()
+    {
+        $buyer = $this->getBuyer();
+        
+        $tempItems = DB::table('temporary_delivery_order_items')
+            ->where('buyer_id', $buyer->id)
+            ->where('order_status', 'Processing order')
+            ->get();
+
+        // Group by base order number (removing suffix like -1, -2)
+        $orders = [];
+        foreach ($tempItems as $item) {
+            // Extract base order number (e.g., ORD-20260430-7B168-1 -> ORD-20260430-7B168)
+            $baseOrderNumber = preg_replace('/-\d+$/', '', $item->order_number);
+            
+            if (!isset($orders[$baseOrderNumber])) {
+                $orders[$baseOrderNumber] = [
+                    'base_order_number' => $baseOrderNumber,
+                    'created_at' => $item->created_at,
+                    'farmer_groups' => []
+                ];
+            }
+
+            if (!isset($orders[$baseOrderNumber]['farmer_groups'][$item->farmer_id])) {
+                $farmer = DB::table('farmers')->where('id', $item->farmer_id)->first();
+                $leadFarmer = DB::table('lead_farmers')->where('id', $item->lead_farmer_id)->first();
+                $orders[$baseOrderNumber]['farmer_groups'][$item->farmer_id] = [
+                    'farmer' => $farmer,
+                    'lead_farmer' => $leadFarmer,
+                    'order_id' => $item->order_id,
+                    'order_number' => $item->order_number,
+                    'lead_farmer_id' => $item->lead_farmer_id,
+                    'items' => [],
+                    'total' => 0
+                ];
+            }
+
+            $orders[$baseOrderNumber]['farmer_groups'][$item->farmer_id]['items'][] = $item;
+            $orders[$baseOrderNumber]['farmer_groups'][$item->farmer_id]['total'] += $item->item_total;
+        }
+
+        return view('buyer.unpaid-delivery_orders', [
+            'orders' => $orders
+        ]);
+    }
+
+    public function uploadPaymentSlip(Request $request)
+    {
+        $buyer = $this->getBuyer();
+        
+        $validated = $request->validate([
+            'order_id' => 'required',
+            'transaction_id' => 'required|string|max:100',
+            'transaction_date' => 'required|date',
+            'transaction_time' => 'required',
+            'payment_slip' => 'required|file|mimes:pdf,jpg,png|max:15360'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // Step 1: Read temporary data
+            $tempItems = DB::table('temporary_delivery_order_items')
+                ->where('order_id', $validated['order_id'])
+                ->where('buyer_id', $buyer->id)
+                ->where('order_status', 'Processing order')
+                ->get();
+
+            if ($tempItems->isEmpty()) {
+                throw new \Exception('No Processing order items found for this order grouping.');
+            }
+
+            $firstItem = $tempItems->first();
+            $totalAmount = $tempItems->sum('item_total');
+
+            // Handle file upload & Sanitization
+            $file = $request->file('payment_slip');
+            $originalName = $file->getClientOriginalName();
+            // Sanitize filename: remove special characters and spaces
+            $sanitizedName = preg_replace('/[^A-Za-z0-9.]/', '_', $originalName);
+            $filename = 'slip_' . time() . '_' . $sanitizedName;
+            
+            $uploadPath = public_path('uploads/payment_slips');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            $file->move($uploadPath, $filename);
+            $filePath = 'uploads/payment_slips/' . $filename;
+
+            // Step 2: Create Order
+            $orderId = DB::table('orders')->insertGetId([
+                'order_number' => $firstItem->order_number,
+                'buyer_id' => $buyer->id,
+                'farmer_id' => $firstItem->farmer_id,
+                'lead_farmer_id' => $firstItem->lead_farmer_id,
+                'order_status' => 'awaiting_verification',
+                'order_type' => 'Delivery',
+                'total_amount' => $totalAmount,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            // Step 3 & 5: Create Order Items & Update Inventory
+            foreach ($tempItems as $item) {
+                DB::table('order_items')->insert([
+                    'order_id' => $orderId,
+                    'product_id' => $item->product_id,
+                    'product_name_snapshot' => $item->product_name_snapshot,
+                    'quantity_ordered' => $item->quantity_ordered,
+                    'unit_price_snapshot' => $item->unit_price_snapshot,
+                    'item_total' => $item->item_total,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+
+                // Step 5: Update Inventory
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    app(InventoryService::class)->updateStock(
+                        $product,
+                        -$item->quantity_ordered,
+                        'order_deduction',
+                        'Stock deducted for delivery order #' . $orderId,
+                        $orderId
+                    );
+                }
+            }
+
+            // Step 4: Create Payment Record
+            DB::table('payment_delivery_order')->insert([
+                'order_id' => $orderId,
+                'transaction_id' => $validated['transaction_id'],
+                'transaction_date' => $validated['transaction_date'],
+                'transaction_time' => $validated['transaction_time'],
+                'payment_slip_path' => $filePath,
+                'payment_status' => 'awaiting_verification',
+                'created_at' => now()
+            ]);
+
+            // Step 6: Archive/Remove Temporary Records
+            DB::table('temporary_delivery_order_items')
+                ->where('order_id', $validated['order_id'])
+                ->where('buyer_id', $buyer->id)
+                ->delete();
+
+            // Invoice generation deferred to Lead Farmer verification phase
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment slip uploaded and order placed successfully! Your order is now pending verification.',
+                'redirect_url' => route('buyer.history')
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Payment slip upload error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to upload payment slip. Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteExpiredOrder(Request $request)
+    {
+        $request->validate(['order_id' => 'required']);
+        $buyer = $this->getBuyer();
+        
+        $deleted = DB::table('temporary_delivery_order_items')
+            ->where('order_id', $request->order_id)
+            ->where('buyer_id', $buyer->id)
+            ->where('created_at', '<', now()->subHours(24))
+            ->delete();
+
+        if ($deleted) {
+            return response()->json([
+                'success' => true, 
+                'message' => 'Expired order record has been permanently removed.'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false, 
+            'message' => 'Record not found or not yet expired.'
+        ], 400);
+    }
+
+    public function sendUnpaidOrderSMS(Request $request)
+    {
+        $validated = $request->validate([
+            'order_id' => 'required',
+            'order_number' => 'required|string'
+        ]);
+
+        $buyer = $this->getBuyer();
+        
+        // Check if SMS was already sent
+        $alreadySent = DB::table('temporary_delivery_order_items')
+            ->where('order_id', $validated['order_id'])
+            ->where('buyer_id', $buyer->id)
+            ->where('sms_sent', true)
+            ->exists();
+
+        if ($alreadySent) {
+            return response()->json(['success' => true, 'message' => 'SMS already sent.']);
+        }
+
+        // Get buyer phone number
+        $buyerPhone = DB::table('buyers')->where('id', $buyer->id)->value('primary_mobile');
+
+        if (!$buyerPhone) {
+            return response()->json(['success' => false, 'message' => 'Buyer phone number not found.'], 404);
+        }
+
+        $message = "Please pay your unpaid order ({$validated['order_number']}) with in 1 hour";
+        $this->sendSMS($buyerPhone, $message);
+
+        // Mark as sent for all items in this order
+        DB::table('temporary_delivery_order_items')
+            ->where('order_id', $validated['order_id'])
+            ->where('buyer_id', $buyer->id)
+            ->update(['sms_sent' => true]);
+
+        return response()->json(['success' => true, 'message' => 'SMS notification sent successfully.']);
+    }
+    public function resubmitPaymentSlip(Request $request)
+    {
+        $buyer = $this->getBuyer();
+        
+        $validated = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'transaction_id' => 'required|string|max:100',
+            'transaction_date' => 'required|date',
+            'transaction_time' => 'required',
+            'payment_slip' => 'required|file|mimes:pdf,jpg,png|max:5120'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $order = Order::with(['orderItems', 'paymentDeliveryOrder'])
+                ->where('id', $validated['order_id'])
+                ->where('buyer_id', $buyer->id)
+                ->firstOrFail();
+
+            $paymentRecord = $order->paymentDeliveryOrder;
+            if (!$paymentRecord || $paymentRecord->payment_status !== 'rejected') {
+                throw new \Exception('Invalid order for resubmission.');
+            }
+
+            // Handle file upload
+            $file = $request->file('payment_slip');
+            $originalName = $file->getClientOriginalName();
+            $sanitizedName = preg_replace('/[^A-Za-z0-9.]/', '_', $originalName);
+            $filename = 'reslip_' . time() . '_' . $sanitizedName;
+            
+            $uploadPath = public_path('uploads/payment_slips');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0755, true);
+            }
+            $file->move($uploadPath, $filename);
+            $filePath = 'uploads/payment_slips/' . $filename;
+
+            // Re-deduct Inventory (since it was restocked on rejection)
+            foreach ($order->orderItems as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    if ($product->quantity < $item->quantity_ordered) {
+                         throw new \Exception("Insufficient stock for {$product->product_name}. Please contact the seller.");
+                    }
+                    
+                    app(InventoryService::class)->updateStock(
+                        $product,
+                        -$item->quantity_ordered,
+                        'order_deduction',
+                        'Stock re-deducted for resubmitted delivery order #' . $order->id,
+                        $order->id
+                    );
+                }
+            }
+
+            // Update Order Status
+            $order->order_status = 'awaiting_verification';
+            $order->save();
+
+            // Update Payment Record
+            $paymentRecord->update([
+                'transaction_id' => $validated['transaction_id'],
+                'transaction_date' => $validated['transaction_date'],
+                'transaction_time' => $validated['transaction_time'],
+                'payment_slip_path' => $filePath,
+                'payment_status' => 'resubmitted',
+                'last_resubmitted_at' => now()
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment slip resubmitted successfully! Your order is now pending verification again.',
+                'redirect_url' => route('buyer.history')
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Payment slip resubmission error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to resubmit payment slip. ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

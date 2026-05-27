@@ -33,22 +33,41 @@
 					<span class="badge-icon"><i class="fas fa-hashtag"></i></span>
 					<span class="order-id-text">Order #{{ $order->order_number }}</span>
 				</div>
-				<div class="status-badge status-{{ strtolower(str_replace('_', '-', $order->order_status)) }}">
-					@if($order->order_status == 'pending')
-						<i class="fas fa-clock"></i>
-					@elseif($order->order_status == 'confirmed')
-						<i class="fas fa-check-circle"></i>
-					@elseif($order->order_status == 'paid')
-						<i class="fas fa-money-bill-wave"></i>
-					@elseif($order->order_status == 'ready_for_pickup')
-						<i class="fas fa-box-open"></i>
-					@elseif($order->order_status == 'completed')
-						<i class="fas fa-check-double"></i>
-					@elseif($order->order_status == 'cancelled')
-						<i class="fas fa-times-circle"></i>
-					@else
-						<i class="fas fa-file-invoice"></i>
-					@endif
+				<div class="status-badge status-{{ strtolower(str_replace(' ', '-', $order->order_status)) }}">
+					@switch(strtolower($order->order_status))
+						@case('processing order')
+							<i class="fas fa-clock"></i>
+							@break
+						@case('confirmed')
+							<i class="fas fa-check-circle"></i>
+							@break
+						@case('paid')
+							<i class="fas fa-money-bill-wave"></i>
+							@break
+						@case('ready_for_pickup')
+							<i class="fas fa-box-open"></i>
+							@break
+						@case('dispatched')
+							<i class="fas fa-truck"></i>
+							@break
+						@case('completed')
+							<i class="fas fa-check-double"></i>
+							@break
+						@case('cancelled')
+							<i class="fas fa-times-circle"></i>
+							@break
+						@case('refunded')
+							<i class="fas fa-undo"></i>
+							@break
+						@case('payment pending')
+							<i class="fas fa-hourglass-half"></i>
+							@break
+						@case('awaiting_verification')
+							<i class="fas fa-user-check"></i>
+							@break
+						@default
+							<i class="fas fa-file-invoice"></i>
+					@endswitch
 					<span class="status-text">{{ ucfirst(str_replace('_', ' ', $order->order_status)) }}</span>
 				</div>
 			</div>
@@ -65,34 +84,8 @@
 							<span class="info-value">{{ \Carbon\Carbon::parse($order->created_at)->format('Y-m-d h:i A') }}</span>
 						</div>
 						<div class="info-item">
-							<span class="info-label"><i class="fas fa-calendar-check"></i> Paid Date:</span>
-							<span class="info-value">
-								@if($order->paid_date)
-									{{ \Carbon\Carbon::parse($order->paid_date)->format('Y-m-d h:i A') }}
-								@else
-									<span class="text-muted">Not paid yet</span>
-								@endif
-							</span>
-						</div>
-						<div class="info-item">
-							<span class="info-label"><i class="fas fa-money-bill-wave"></i> Payment Status:</span>
-							<span class="info-value">
-								@php
-									$paymentStatus = 'Pending';
-									if($order->order_status == 'paid' || $order->order_status == 'completed') {
-										$paymentStatus = 'Completed';
-									} elseif($order->order_status == 'cancelled') {
-										$paymentStatus = 'Cancelled';
-									}
-								@endphp
-								<span class="payment-status-badge status-{{ strtolower($paymentStatus) }}">
-									{{ $paymentStatus }}
-								</span>
-							</span>
-						</div>
-						<div class="info-item">
-							<span class="info-label"><i class="fas fa-coins"></i> Total Amount:</span>
-							<span class="info-value total-amount">LKR {{ number_format($order->total_amount, 2) }}</span>
+							<span class="info-label"><i class="fas fa-tag"></i> Order Type:</span>
+							<span class="info-value">{{ ucfirst($order->order_type) }}</span>
 						</div>
 					</div>
 				</div>
@@ -134,7 +127,7 @@
 				<div class="pickup-info-section">
 					<div class="section-header">
 						<i class="fas fa-map-marker-alt"></i>
-						<h3>Pickup Information</h3>
+						<h3>{{ $order->order_type == 'Delivery' ? 'Delivery Information' : 'Pickup Information' }}</h3>
 					</div>
 					<div class="info-grid">
 						<div class="info-item">
@@ -297,7 +290,7 @@
 		</div>
 
 		<div class="action-buttons">
-			@if($order->order_status == 'pending' || $order->order_status == 'confirmed')
+			@if($order->order_status == 'Processing order' || $order->order_status == 'confirmed')
 			<button class="btn-mark-paid" onclick="markPaymentReceived({{ $order->id }})">
 				<i class="fas fa-money-bill-wave"></i> Mark as Paid
 			</button>

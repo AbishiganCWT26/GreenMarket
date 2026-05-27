@@ -44,12 +44,20 @@ class AppServiceProvider extends ServiceProvider
                 $farmer = \App\Models\Farmer::where('user_id', $user->id)->first();
 
                 if ($farmer) {
-                    $notifications = \App\Models\Notification::where('user_id', $user->id)
+                    // Base query for notifications
+                    $notificationsQuery = \App\Models\Notification::where(function($q) use ($user) {
+                        $q->where('user_id', $user->id)
+                          ->orWhere('recipient_type', 'system_wide');
+                    });
+
+                    // For the dropdown (limit 5)
+                    $notifications = (clone $notificationsQuery)
                         ->orderBy('created_at', 'desc')
                         ->limit(5)
                         ->get();
 
-                    $unreadNotifications = \App\Models\Notification::where('user_id', $user->id)
+                    // Total unread count
+                    $unreadNotifications = $notificationsQuery
                         ->where('is_read', false)
                         ->count();
 
@@ -63,7 +71,14 @@ class AppServiceProvider extends ServiceProvider
                             ->count()
                     ];
 
-                    $view->with(compact('notifications', 'unreadNotifications', 'sharedCounts'));
+                    $viewData = compact('unreadNotifications', 'sharedCounts');
+
+                    // Only share notifications if they aren't already explicitly passed (e.g., from a controller)
+                    if (!array_key_exists('notifications', $view->getData())) {
+                        $viewData['notifications'] = $notifications;
+                    }
+
+                    $view->with($viewData);
                 }
             }
         });
@@ -73,16 +88,27 @@ class AppServiceProvider extends ServiceProvider
             if (auth()->check() && auth()->user()->role === 'buyer') {
                 $user = auth()->user();
 
-                $notifications = \App\Models\Notification::where('user_id', $user->id)
+                $notificationsQuery = \App\Models\Notification::where(function($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                      ->orWhere('recipient_type', 'system_wide');
+                });
+
+                $notifications = (clone $notificationsQuery)
                     ->orderBy('created_at', 'desc')
                     ->limit(5)
                     ->get();
 
-                $unreadNotifications = \App\Models\Notification::where('user_id', $user->id)
+                $unreadNotifications = $notificationsQuery
                     ->where('is_read', false)
                     ->count();
 
-                $view->with(compact('notifications', 'unreadNotifications'));
+                $viewData = compact('unreadNotifications');
+
+                if (!array_key_exists('notifications', $view->getData())) {
+                    $viewData['notifications'] = $notifications;
+                }
+
+                $view->with($viewData);
             }
         });
     }

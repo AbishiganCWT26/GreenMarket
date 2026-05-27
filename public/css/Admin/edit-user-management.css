@@ -513,6 +513,35 @@ body {
 	font-style: italic;
 }
 
+textarea.form-input {
+	resize: vertical;
+	min-height: 60px;
+	line-height: 1.5;
+}
+
+select[multiple].form-select {
+	background-image: none;
+	padding-right: 12px;
+	overflow-y: auto;
+}
+
+select[multiple].form-select option {
+	padding: 6px 10px;
+	border-radius: 4px;
+	margin-bottom: 2px;
+	transition: background 0.2s ease;
+}
+
+select[multiple].form-select option:checked {
+	background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+	color: white;
+}
+
+.rider-section {
+	border-left: 4px solid #f59e0b;
+	background: linear-gradient(to right, #fffbeb, #ffffff);
+}
+
 .form-actions {
 	padding: 24px;
 	background: var(--hover-bg);

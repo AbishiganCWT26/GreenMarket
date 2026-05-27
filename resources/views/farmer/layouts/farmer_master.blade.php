@@ -41,15 +41,15 @@
 
     .translate-card {
         background-color: #ffffff !important;
-        box-shadow: 0 2px 5px rgba(15, 23, 36, 0.04), 0 1px 2px rgba(15, 23, 36, 0.02) !important;
-        border-radius: 14px !important;
-        padding: 1px 3px !important;
+        box-shadow: 0 7px 15px rgba(15, 23, 36, 0.08), 0 1px 3px rgba(15, 23, 36, 0.04) !important;
+        border-radius: 28px !important;
+        padding: 4px 10px !important;
         display: inline-flex !important;
         align-items: center !important;
-        gap: 1px !important;
+        gap: 8px !important;
         transition: all 0.25s ease !important;
-        border: 1px solid rgba(16, 185, 129, 0.1) !important;
-        backdrop-filter: blur(1px) !important;
+        border: 1px solid rgba(16, 185, 129, 0.15) !important;
+        backdrop-filter: blur(2px) !important;
     }
 
     .goog-te-gadget-simple:hover {
@@ -128,8 +128,17 @@
     }
 
     .translate-icon {
-        width: 30px !important;
-        height: 25px !important;
+        background: linear-gradient(145deg, #10B981, #059669) !important;
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: white !important;
+        font-size: 1rem !important;
+        box-shadow: 0 6px 12px rgba(5, 150, 105, 0.25) !important;
+        transition: 0.2s ease !important;
     }
 
     @media screen and (min-width: 2560px) and (max-width: 5000px) {
@@ -799,8 +808,8 @@
 			</div>
 			<div class="header-right-group">
 				<div class="translate-wrapper" style="display:flex;justify-content:center;margin:10px 0;">
-                    <div class="translate-card" style="background-color:#ffffff;box-shadow:0 7px 15px rgba(15,23,36,0.08),0 1px 3px rgba(15,23,36,0.04);border-radius:28px;padding:4px 10px;display:inline-flex;align-items:center;gap:8px;transition:all 0.25s ease;border:1px solid rgba(16,185,129,0.15);backdrop-filter:blur(2px);">
-                        <div class="translate-icon" style="background:linear-gradient(145deg,#10B981,#059669);width:28px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;box-shadow:0 6px 12px rgba(5,150,105,0.25);transition:0.2s ease;">
+                    <div class="translate-card">
+                        <div class="translate-icon">
                             <i class="fas fa-language"></i>
                         </div>
                         <div id="google_translate_element"></div>
@@ -1072,18 +1081,6 @@ document.addEventListener('DOMContentLoaded', function() {
 window.welcomeShown = false;
 window.showWelcomeMessage = function() {
 	if (!window.welcomeShown) {
-		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/info1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/info1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
-			title: 'translate ready',
-			text: 'choose language from the compact menu',
-			timer: 3000,
-			showConfirmButton: false,
-			toast: true,
-			position: 'bottom-end',
-			background: '#ffffff',
-			iconColor: '#3b82f6',
-			customClass: { popup: 'swal-popup-compact' }
-		});
 		window.welcomeShown = true;
 	}
 };
@@ -1110,20 +1107,6 @@ window.googleTranslateElementInit = function() {
 				if (mut.type === 'characterData' || mut.type === 'childList') {
 					const currentText = gadget.innerText || '';
 					if (currentText !== previousLangText && currentText.trim() !== '') {
-						Swal.fire({
-							@if(file_exists(public_path('assets/icons/Gif/success5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-							title: 'language updated',
-							text: 'page content will now appear in selected language.',
-							timer: 3500,
-							showConfirmButton: false,
-							background: '#ffffff',
-							iconColor: '#10B981',
-							toast: true,
-							position: 'bottom-end',
-							showClass: { popup: 'animate__animated animate__fadeInUp' },
-							hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-							customClass: { popup: 'swal-popup-compact' }
-						});
 						previousLangText = currentText;
 					}
 				}
@@ -1145,20 +1128,6 @@ window.googleTranslateElementInit = function() {
 						if (mut.type === 'characterData' || mut.type === 'childList') {
 							const currentText = gadget.innerText || '';
 							if (currentText !== previousLangText && currentText.trim() !== '') {
-								Swal.fire({
-									@if(file_exists(public_path('assets/icons/Gif/success5.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success5.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-									title: 'language updated',
-									text: 'page content will now appear in selected language.',
-									timer: 3500,
-									showConfirmButton: false,
-									background: '#ffffff',
-									iconColor: '#10B981',
-									toast: true,
-									position: 'bottom-end',
-									showClass: { popup: 'animate__animated animate__fadeInUp' },
-									hideClass: { popup: 'animate__animated animate__fadeOutDown' },
-									customClass: { popup: 'swal-popup-compact' }
-								});
 								previousLangText = currentText;
 							}
 						}

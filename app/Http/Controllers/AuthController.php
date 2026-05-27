@@ -87,10 +87,12 @@ class AuthController extends Controller
                 return redirect('/lead-farmer/dashboard');
             case 'farmer':
                 return redirect('/farmer/dashboard');
-            case 'buyer':
-                return redirect('/buyer/dashboard');
-            default:
-                return redirect('/');
+			case 'buyer':
+				return redirect('/buyer/dashboard');
+			case 'delivery_rider':
+				return redirect('/delivery-rider/dashboard');
+			default:
+				return redirect('/');
         }
     }
 
@@ -357,6 +359,18 @@ class AuthController extends Controller
                 ->value('primary_mobile');
         }
 
+        if (!$phone) {
+            $phone = DB::table('admins')
+                ->where('user_id', $userId)
+                ->value('phone_number');
+        }
+
+        if (!$phone) {
+            $phone = DB::table('delivery_riders')
+                ->where('user_id', $userId)
+                ->value('primary_mobile');
+        }
+
         return $phone;
     }
 
@@ -375,7 +389,7 @@ class AuthController extends Controller
             $text = urlencode("Your GreenMarket password reset OTP is: $otp.");
             $to = preg_replace('/[^0-9]/', '', $phone);
 
-            if (strlen($to) !== 10 || !preg_match('/^[0-9]{10}$/', $to)) {
+            if (strlen($to) < 9 || strlen($to) > 15) {
                 \Log::error('Invalid phone number format: ' . $phone);
                 return false;
             }
@@ -387,7 +401,8 @@ class AuthController extends Controller
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HEADER => false,
                 CURLOPT_TIMEOUT => 30,
-                CURLOPT_SSL_VERIFYPEER => false
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_FOLLOWLOCATION => true
             ]);
 
             $response = curl_exec($ch);
@@ -463,7 +478,7 @@ class AuthController extends Controller
             $text = urlencode("GreenMarket password reset successful.\nUsername: $username\nPassword: $password");
             $to = preg_replace('/[^0-9]/', '', $phone);
 
-            if (strlen($to) !== 10 || !preg_match('/^[0-9]{10}$/', $to)) {
+            if (strlen($to) < 9 || strlen($to) > 15) {
                 \Log::error('Invalid phone number format: ' . $phone);
                 return false;
             }
@@ -475,7 +490,8 @@ class AuthController extends Controller
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HEADER => false,
                 CURLOPT_TIMEOUT => 30,
-                CURLOPT_SSL_VERIFYPEER => false
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_FOLLOWLOCATION => true
             ]);
 
             $response = curl_exec($ch);

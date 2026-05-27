@@ -1,0 +1,50 @@
+/* Delivery Status Badge Styles */
+.delivery-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    flex-shrink: 0;
+    border: 1px solid transparent;
+}
+
+/* Assigned: Blue */
+.status-assigned {
+    background: #eff6ff;
+    color: var(--blue);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Arrived District / In Transit: Orange */
+.status-arrived {
+    background: #fffbeb;
+    color: var(--accent-amber);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+/* Delivered: Green */
+.status-delivered {
+    background: #ecfdf5;
+    color: var(--primary-green);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+/* Unassigned / Pending: Red */
+.status-unassigned {
+    background: #fef2f2;
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Crisis: Red Flashing */
+@keyframes flash-crisis {
+    0%, 100% { background: #fef2f2; color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+    50% { background: #ef4444; color: #fff; border-color: #ef4444; }
+}
+
+.status-crisis {
+    animation: flash-crisis 1.5s infinite;
+}

@@ -38,7 +38,7 @@ class LeadFarmerComposer
                     ->where('quantity', '<', 10)
                     ->count(),
                 'pendingOrders' => Order::where('lead_farmer_id', $leadFarmerId)
-                    ->where('order_status', 'pending')
+                    ->where('order_status', 'Processing order')
                     ->count(),
                 'unreadNotifications' => Notification::where(function($query) use ($leadFarmerId, $userId) {
                         $query->where('user_id', $userId)
