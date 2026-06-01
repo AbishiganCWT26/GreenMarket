@@ -107,6 +107,7 @@
 											id="username" name="username" value="{{ old('username') }}"
 											placeholder="Choose a username" required>
 									</div>
+									<div class="nic-status" id="usernameStatus"></div>
 									@error('username')
 										<div class="invalid-feedback d-block">{{ $message }}</div>
 									@enderror
@@ -439,6 +440,8 @@
 			const submitBtn = document.getElementById('submitBtn');
 			const nicInput = document.getElementById('nic_no');
 			const nicStatus = document.getElementById('nicStatus');
+			const usernameInput = document.getElementById('username');
+			const usernameStatus = document.getElementById('usernameStatus');
 
 			const districtSelect = document.getElementById('district');
 			if (districtSelect && typeof gnData !== 'undefined') {
@@ -577,6 +580,17 @@
 				if (nicValue && validateNIC(nicValue)) {
 					this.value = formatNIC(nicValue);
 				}
+			});
+
+			usernameInput.addEventListener('input', function () {
+				if (this.value.includes('.')) {
+					usernameStatus.className = 'nic-status invalid';
+					usernameStatus.innerHTML = '<i class="fas fa-times-circle"></i> Invalide username';
+				} else {
+					usernameStatus.className = 'nic-status';
+					usernameStatus.innerHTML = '';
+				}
+				this.value = this.value.replace(/\./g, '');
 			});
 
 			password.addEventListener('input', function () {
