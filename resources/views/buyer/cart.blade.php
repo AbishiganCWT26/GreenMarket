@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const methodValue = selectedMethod.value;
             let confirmTitle = 'Order Confirmation';
             let confirmHtml = '';
-            let paymentMethod = 'cod'; // Default for Pickup
+            let paymentMethod = 'cod';
 
             if (methodValue === 'Pickup') {
                 confirmHtml = `

@@ -187,7 +187,8 @@ class ReportController extends Controller
                         'username',
                         'role',
                         'last_login',
-                        DB::raw("CASE WHEN is_active = true THEN 'Active' ELSE 'Not Active' END as is_active")
+                        DB::raw("CASE WHEN is_active = true THEN 'Active' ELSE 'Not Active' END as is_active"),
+                        DB::raw("0 as login_count")
                     )
                     ->whereBetween('created_at', [$fromDate, $toDate])
                     ->orderBy('last_login', 'desc')

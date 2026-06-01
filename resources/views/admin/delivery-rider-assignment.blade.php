@@ -3,7 +3,7 @@
 @section('page-title', 'Delivery Rider Assignment')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/delivery-rider-assignment.css') }}">
+<link rel="stylesheet" href="{{ asset('css/Admin/delivery-rider-assignment.css') }}">
 @endsection
 
 @section('content')
