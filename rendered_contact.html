@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<meta name="csrf-token" content="">
+	<title>Contact Us</title>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<style>
+        .swal2-image {
+            margin: 0em auto 0em !important;
+        }
+
+        div:where(.swal2-container) h2:where(.swal2-title) {
+            padding: 0em 0em 0 !important;
+        }
+    </style>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<link rel="stylesheet" href="http://localhost:8000/css/contactus.css">
+</head>
+<body>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GreenMarket</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	
+	<link rel="stylesheet" href="http://localhost:8000/css/navbar.css">
+
+</head>
+<body>
+	<link rel="preload" href="http://localhost:8000/assets/images/Logo Green Market.png" as="image" fetchpriority="high">
+<div id="page-loader" translate="no">
+	<div class="particles-container"></div>
+
+	<div class="orbit-container">
+		<div class="leaf-particle p1"></div>
+		<div class="leaf-particle p2"></div>
+		<div class="leaf-particle p3"></div>
+		<div class="leaf-particle p4"></div>
+		<div class="leaf-particle p5"></div>
+	</div>
+
+	<div class="loader-container">
+		<div class="glow-effect"></div>
+
+		<div class="logo-wrapper1">
+			<div class="logo-spinner">
+				<div class="logo-image-container">
+					<img src="http://localhost:8000/assets/images/Logo Green Market.png"
+						 class="logo-image"
+						 alt="GreenMarket Logo"
+						 fetchpriority="high">
+				</div>
+				<div class="spinner-ring"></div>
+				<div class="spinner-ring spinner-ring-2"></div>
+				<div class="spinner-ring spinner-ring-3"></div>
+			</div>
+		</div>
+
+		<div class="loading-text">GREENMARKET</div>
+		<div class="percentage" id="percentage">0%</div>
+
+		<div class="loading-gif">
+			<img src="http://localhost:8000/assets/icons/Gif/loading2.gif" alt="loading">
+		</div>
+	</div>
+</div>
+
+<style>
+#page-loader {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	background: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(20px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+}
+
+.orbit-container {
+	position: absolute;
+	width: 400px;
+	height: 400px;
+	z-index: 1;
+}
+
+.leaf-particle {
+	position: absolute;
+	width: 14px;
+	height: 14px;
+	background: #034410ff;
+	border-radius: 0 100% 0 100%;
+	top: 50%;
+	left: 50%;
+	filter: drop-shadow(0 0 3px rgba(121, 236, 150, 0.4));
+	animation: orbit 5s linear infinite;
+}
+
+.p1 { animation-delay: 0s; }
+.p2 { animation-delay: -1s; }
+.p3 { animation-delay: -2s; }
+.p4 { animation-delay: -3s; }
+.p5 { animation-delay: -4s; }
+
+@keyframes orbit {
+	0%   { transform: rotate(0deg) translateX(160px) rotate(0deg); opacity: 0.3; }
+	50%  { transform: rotate(180deg) translateX(160px) rotate(-180deg); opacity: 0.6; }
+	100% { transform: rotate(360deg) translateX(160px) rotate(-360deg); opacity: 0.3; }
+}
+
+.loader-container {
+	position: relative;
+	z-index: 2;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.logo-wrapper1 {
+	width: 200px;
+	height: 150px;
+	margin-bottom: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.logo-spinner {
+	position: relative;
+	width: 120px;
+	height: 120px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.logo-image-container {
+	position: absolute;
+	width: 80px;
+	height: 80px;
+	z-index: 4;
+}
+
+.logo-image {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	animation: logoPulse 2s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+	0%, 100% { transform: scale(1); }
+	50% { transform: scale(1.05); }
+}
+
+.spinner-ring {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	border: 3px solid transparent;
+	border-top: 3px solid #11b94cff;
+	border-radius: 50%;
+	animation: spin 1.5s linear infinite;
+}
+
+.spinner-ring-2 {
+	width: 130%;
+	height: 130%;
+	top: -15%;
+	left: -15%;
+	border-top: 3px solid #0b8d39ff;
+	animation: spin 2s linear infinite reverse;
+	opacity: 0.7;
+}
+
+.spinner-ring-3 {
+	width: 80%;
+	height: 80%;
+	top: 10%;
+	left: 10%;
+	border-top: 3px solid #11b94cff;
+	animation: spin 1s linear infinite;
+	opacity: 0.5;
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}
+
+.loading-text {
+		font-family: 'Pacifico', cursive;
+		font-size: 2.5rem;
+		background:
+			linear-gradient(90deg, #023604ff, #11b94cff, #023604ff);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+		position: relative;
+	}
+
+	.loading-text::after {
+		content: "";
+		position: absolute;
+		width: 100%;
+		height: 10px;
+		background: linear-gradient(90deg, #023604ff, #11b94cff);
+		bottom: -5px;
+		left: 0;
+		opacity: 0.5;
+		border-radius: 50%;
+	}
+
+
+.percentage {
+	margin-top: 10px;
+	font-family: monospace;
+	font-size: 0.9rem;
+	color: rgba(0,0,0,0.6);
+}
+
+.glow-effect {
+	position: absolute;
+	inset: 0;
+	border-radius: 20px;
+	box-shadow:
+		0 0 50px rgba(34,197,94,0.1),
+		inset 0 0 50px rgba(34,197,94,0.05);
+}
+
+.loading-gif {
+	margin-top: 20px;
+}
+
+.loading-gif img {
+	width: 100px;
+	height: auto;
+}
+
+@media (min-width: 2560px) {
+	.orbit-container {
+		width: 600px;
+		height: 600px;
+	}
+	.leaf-particle {
+		width: 22px;
+		height: 22px;
+	}
+	@keyframes orbit {
+		0%   { transform: rotate(0deg) translateX(240px) rotate(0deg); opacity: 0.3; }
+		50%  { transform: rotate(180deg) translateX(240px) rotate(-180deg); opacity: 0.6; }
+		100% { transform: rotate(360deg) translateX(240px) rotate(-360deg); opacity: 0.3; }
+	}
+	.logo-wrapper1 {
+		width: 280px;
+		height: 210px;
+		margin-bottom: 28px;
+	}
+	.logo-spinner {
+		width: 170px;
+		height: 170px;
+	}
+	.logo-image-container {
+		width: 110px;
+		height: 110px;
+	}
+	.loading-text {
+		font-size: 1.9rem;
+		letter-spacing: 5px;
+	}
+	.percentage {
+		font-size: 1.2rem;
+		margin-top: 14px;
+	}
+	.loading-gif {
+		margin-top: 28px;
+	}
+	.loading-gif img {
+		width: 100px;
+	}
+}
+
+@media (min-width: 1501px) and (max-width: 2559px) {
+	.orbit-container {
+		width: 500px;
+		height: 500px;
+	}
+	.leaf-particle {
+		width: 18px;
+		height: 18px;
+	}
+	@keyframes orbit {
+		0%   { transform: rotate(0deg) translateX(200px) rotate(0deg); opacity: 0.3; }
+		50%  { transform: rotate(180deg) translateX(200px) rotate(-180deg); opacity: 0.6; }
+		100% { transform: rotate(360deg) translateX(200px) rotate(-360deg); opacity: 0.3; }
+	}
+	.logo-wrapper1 {
+		width: 240px;
+		height: 180px;
+		margin-bottom: 24px;
+	}
+	.logo-spinner {
+		width: 150px;
+		height: 150px;
+	}
+	.logo-image-container {
+		width: 100px;
+		height: 100px;
+	}
+	.loading-text {
+		font-size: 1.6rem;
+		letter-spacing: 4px;
+	}
+	.percentage {
+		font-size: 1rem;
+		margin-top: 12px;
+	}
+	.loading-gif {
+		margin-top: 24px;
+	}
+	.loading-gif img {
+		width: 60px;
+	}
+}
+
+@media (min-width: 1400px) and (max-width: 1500px) {
+	.orbit-container {
+		width: 450px;
+		height: 450px;
+	}
+	.leaf-particle {
+		width: 16px;
+		height: 16px;
+	}
+	@keyframes orbit {
+		0%   { transform: rotate(0deg) translateX(180px) rotate(0deg); opacity: 0.3; }
+		50%  { transform: rotate(180deg) translateX(180px) rotate(-180deg); opacity: 0.6; }
+		100% { transform: rotate(360deg) translateX(180px) rotate(-360deg); opacity: 0.3; }
+	}
+	.logo-wrapper1 {
+		width: 220px;
+		height: 165px;
+		margin-bottom: 22px;
+	}
+	.logo-spinner {
+		width: 135px;
+		height: 135px;
+	}
+	.logo-image-container {
+		width: 90px;
+		height: 90px;
+	}
+	.loading-text {
+		font-size: 1.45rem;
+		letter-spacing: 3.5px;
+	}
+	.percentage {
+		font-size: 0.95rem;
+		margin-top: 11px;
+	}
+	.loading-gif {
+		margin-top: 22px;
+	}
+	.loading-gif img {
+		width: 55px;
+	}
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+	.orbit-container {
+		width: 400px;
+		height: 400px;
+	}
+	.leaf-particle {
+		width: 14px;
+		height: 14px;
+	}
+	@keyframes orbit {
+		0%   { transform: rotate(0deg) translateX(160px) rotate(0deg); opacity: 0.3; }
+		50%  { transform: rotate(180deg) translateX(160px) rotate(-180deg); opacity: 0.6; }
+		100% { transform: rotate(360deg) translateX(160px) rotate(-360deg); opacity: 0.3; }
+	}
+	.logo-wrapper1 {
+		width: 200px;
+		height: 150px;
+		margin-bottom: 20px;
+	}
+	.logo-spinner {
+		width: 120px;
+		height: 120px;
+	}
+	.logo-image-container {
+		width: 80px;
+		height: 80px;
+	}
+	.loading-text {
+		font-size: 1.3rem;
+		letter-spacing: 3px;
+	}
+	.percentage {
+		font-size: 0.9rem;
+		margin-top: 10px;
+	}
+	.loading-gif {
+		margin-top: 20px;
+	}
+	.loading-gif img {
+		width: 50px;
+	}
+}
+
+@media (min-width: 1001px) and (max-width: 1199px) {
+	.orbit-container {
+		width: 380px;
+		height: 380px;
+	}
+	.leaf-particle {
+		width: 13px;
+		height: 13px;
+	}
+	@keyframes orbit {
+		0%   { transform: rotate(0deg) translateX(150px) rotate(0deg); opacity: 0.3; }
+		50%  { transform: rotate(180deg) translateX(150px) rotate(-180deg); opacity: 0.6; }
+		100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); opacity: 0.3; }
+	}
+	.logo-wrapper1 {
+		width: 190px;
+		height: 140px;
+		margin-bottom: 18px;
+	}
+	.logo-spinner {
+		width: 110px;
+		height: 110px;
+	}
+	.logo-image-container {
+		width: 75px;
+		height: 75px;
+	}
+	.loading-text {
+		font-size: 1.2rem;
+		letter-spacing: 2.8px;
+	}
+	.percentage {
+		font-size: 0.85rem;
+		margin-top: 8px;
+	}
+	.loading-gif {
+		margin-top: 18px;
+	}
+	.loading-gif img {
+		width: 100px;
+	}
+}
+
+@media (max-width: 1000px) {
+	.orbit-container {
+		width: 360px;
+		height: 360px;
+	}
+	.leaf-particle {
+		width: 12px;
+		height: 12px;
+	}
+	@keyframes orbit {
+		0%   { transform: rotate(0deg) translateX(140px) rotate(0deg); opacity: 0.3; }
+		50%  { transform: rotate(180deg) translateX(140px) rotate(-180deg); opacity: 0.6; }
+		100% { transform: rotate(360deg) translateX(140px) rotate(-360deg); opacity: 0.3; }
+	}
+	.logo-wrapper1 {
+		width: 180px;
+		height: 135px;
+		margin-bottom: 16px;
+	}
+	.logo-spinner {
+		width: 100px;
+		height: 100px;
+	}
+	.logo-image-container {
+		width: 70px;
+		height: 70px;
+	}
+	.loading-text {
+		font-size: 1.1rem;
+		letter-spacing: 2.5px;
+	}
+	.percentage {
+		font-size: 0.8rem;
+		margin-top: 8px;
+	}
+	.loading-gif {
+		margin-top: 16px;
+	}
+	.loading-gif img {
+		width: 42px;
+	}
+}
+
+@media (min-width: 992px) and (max-width: 999px) {
+	.orbit-container {
+		width: 340px;
+		height: 340px;
+	}
+	.leaf-particle {
+		width: 11px;
+		height: 11px;
+	}
+	@keyframes orbit {
+		0%   { transform: rotate(0deg) translateX(135px) rotate(0deg); opacity: 0.3; }
+		50%  { transform: rotate(180deg) translateX(135px) rotate(-180deg); opacity: 0.6; }
+		100% { transform: rotate(360deg) translateX(135px) rotate(-360deg); opacity: 0.3; }
+	}
+	.logo-wrapper1 {
+		width: 170px;
+		height: 130px;
+		margin-bottom: 15px;
+	}
+	.logo-spinner {
+		width: 95px;
+		height: 95px;
+	}
+	.logo-image-container {
+		width: 65px;
+		height: 65px;
+	}
+	.loading-text {
+		font-size: 1rem;
+		letter-spacing: 2.2px;
+	}
+	.percentage {
+		font-size: 0.75rem;
+		margin-top: 7px;
+	}
+	.loading-gif {
+		margin-top: 15px;
+	}
+	.loading-gif img {
+		width: 40px;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+	.orbit-container {
+		width: 320px;
+		height: 320px;
+	}
+	.leaf-particle {
+		width: 10px;
+		height: 10px;
+	}
+	@keyframes orbit {
+		0%   { transform: rotate(0deg) translateX(125px) rotate(0deg); opacity: 0.3; }
+		50%  { transform: rotate(180deg) translateX(125px) rotate(-180deg); opacity: 0.6; }
+		100% { transform: rotate(360deg) translateX(125px) rotate(-360deg); opacity: 0.3; }
+	}
+	.logo-wrapper1 {
+		width: 160px;
+		height: 120px;
+		margin-bottom: 14px;
+	}
+	.logo-spinner {
+		width: 90px;
+		height: 90px;
+	}
+	.logo-image-container {
+		width: 60px;
+		height: 60px;
+	}
+	.loading-text {
+		font-size: 0.95rem;
+		letter-spacing: 2px;
+	}
+	.percentage {
+		font-size: 0.7rem;
+		margin-top: 6px;
+	}
+	.loading-gif {
+		margin-top: 14px;
+	}
+	.loading-gif img {
+		width: 38px;
+	}
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const loader = document.getElementById("page-loader");
+    const percentageEl = document.getElementById("percentage");
+
+    const images = Array.from(document.images);
+    const totalImages = images.length;
+    let loadedImages = 0;
+    let startTime = Date.now();
+    let isFinished = false;
+
+    // Maximum loading time fallback (5 seconds)
+    setTimeout(() => {
+        finishLoading();
+    }, 5000);
+
+    if (totalImages === 0) {
+        finishLoading();
+        return;
+    }
+
+    function markLoaded(img) {
+        if (img.dataset.counted) return; // prevent double counting
+        img.dataset.counted = "true";
+
+        loadedImages++;
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const percent = Math.round((loadedImages / totalImages) * 100);
+        percentageEl.textContent = percent + "%";
+
+        if (loadedImages >= totalImages && !isFinished) {
+            // Wait at least 1 second before hiding the loader
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(0, 1000 - elapsedTime);
+            
+            if (remainingTime > 0) {
+                // Wait for the remaining time before finishing
+                setTimeout(() => {
+                    finishLoading();
+                }, remainingTime);
+            } else {
+                finishLoading();
+            }
+        }
+    }
+
+    images.forEach(img => {
+        // Already loaded or already failed
+        if (img.complete) {
+            markLoaded(img);
+        } else {
+            img.addEventListener("load", () => markLoaded(img), { once: true });
+            img.addEventListener("error", () => markLoaded(img), { once: true });
+        }
+    });
+
+    function finishLoading() {
+        if (isFinished) return;
+        isFinished = true;
+        
+        percentageEl.textContent = "100%";
+
+        loader.style.transition = "opacity 0.8s ease, transform 0.8s ease";
+        loader.style.opacity = "0";
+        loader.style.transform = "scale(0.95)";
+
+        setTimeout(() => {
+            loader.remove();
+        }, 800);
+    }
+});
+</script>	<header class="site-header">
+		<div class="header-container" translate="no">
+			<div class="logo-wrapper">
+				<a href="http://localhost:8000" class="logo-link" oncontextmenu="return false;">
+					<div class="logo-image-wrapper">
+						<img src="http://localhost:8000/assets/images/Logo Green Market.png" alt="GreenMarket" class="logo-img" draggable="false">
+					</div>
+					<span class="logo-text" translate="no">GreenMarket</span>
+				</a>
+			</div>
+
+			<nav class="nav-menu">
+				<a href="http://localhost:8000" class="nav-item active">
+					<i class="fas fa-home"></i>
+					<span translate="no">Home</span>
+				</a>
+				<a href="http://localhost:8000/about-us" class="nav-item ">
+					<i class="fas fa-info-circle"></i>
+					<span translate="no">About Us</span>
+				</a>
+				<a href="http://localhost:8000/contact-us" class="nav-item ">
+					<i class="fas fa-envelope"></i>
+					<span translate="no">Contact Us</span>
+				</a>
+			</nav>
+
+			<div class="header-actions">
+									<div class="auth-group" translate="no">
+						<a href="http://localhost:8000/register/buyer" class="btn btn-register">
+							<i class="fas fa-user-plus"></i>
+							<span>Register</span>
+						</a>
+						<a href="http://localhost:8000/login" class="btn btn-login">
+							<i class="fas fa-sign-in-alt"></i>
+							<span>Login</span>
+						</a>
+					</div>
+								<div class="translate-card">
+					<div class="translate-icon">
+													<img src="http://localhost:8000/assets/icons/translation logo.svg" alt="Translate" class="translation-logo">
+											</div>
+					<div id="google_translate_element"></div>
+				</div>
+				<button class="mobile-menu-btn" id="mobileMenuBtn">
+					<i class="fas fa-bars"></i>
+				</button>
+			</div>
+		</div>
+
+		<div class="mobile-nav" id="mobileNav" translate="no">
+			<a href="http://localhost:8000" class="mobile-nav-item active">
+				<i class="fas fa-home"></i>
+				<span>Home</span>
+			</a>
+			<a href="http://localhost:8000/about-us" class="mobile-nav-item ">
+				<i class="fas fa-info-circle"></i>
+				<span>About Us</span>
+			</a>
+			<a href="http://localhost:8000/contact-us" class="mobile-nav-item ">
+				<i class="fas fa-envelope"></i>
+				<span>Contact Us</span>
+			</a>
+
+							<div class="mobile-auth-group" translate="no">
+					<a href="http://localhost:8000/register/buyer" class="mobile-btn mobile-btn-register">
+						<i class="fas fa-user-plus"></i>
+						<span>Register</span>
+					</a>
+					<a href="http://localhost:8000/login" class="mobile-btn mobile-btn-login">
+						<i class="fas fa-sign-in-alt"></i>
+						<span>Login</span>
+					</a>
+				</div>
+					</div>
+	</header>
+
+	<script type="text/javascript">
+		function googleTranslateElementInit() {
+			new google.translate.TranslateElement({
+				pageLanguage: 'en',
+				includedLanguages: 'en,si,ta',
+				layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+			}, 'google_translate_element');
+		}
+		
+		window.welcomeShown = false;
+		
+		function showWelcomeMessage() {
+			if (!window.welcomeShown) {
+				window.welcomeShown = true;
+			}
+		}
+		
+		const originalInit = window.googleTranslateElementInit;
+		window.googleTranslateElementInit = function() {
+			originalInit();
+			setTimeout(showWelcomeMessage, 600);
+		};
+	</script>
+	<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+			const mobileNav = document.getElementById('mobileNav');
+			const userToggle = document.getElementById('userToggle');
+			const dropdownMenu = document.getElementById('dropdownMenu');
+			const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+
+			mobileMenuBtn.addEventListener('click', function(e) {
+				e.stopPropagation();
+				mobileNav.classList.toggle('active');
+				const icon = this.querySelector('i');
+				icon.classList.toggle('fa-bars');
+				icon.classList.toggle('fa-times');
+			});
+
+			if (userToggle && dropdownMenu) {
+				userToggle.addEventListener('click', function(e) {
+					e.stopPropagation();
+					dropdownMenu.classList.toggle('active');
+					const icon = this.querySelector('.fa-chevron-down');
+					if (icon) {
+						icon.style.transform = dropdownMenu.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+					}
+				});
+
+				document.addEventListener('click', function(e) {
+					if (!userToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+						dropdownMenu.classList.remove('active');
+						const icon = userToggle.querySelector('.fa-chevron-down');
+						if (icon) {
+							icon.style.transform = 'rotate(0)';
+						}
+					}
+				});
+			}
+
+			mobileNavItems.forEach(item => {
+				item.addEventListener('click', function() {
+					if (window.innerWidth <= 991) {
+						mobileNav.classList.remove('active');
+						mobileMenuBtn.querySelector('i').classList.remove('fa-times');
+						mobileMenuBtn.querySelector('i').classList.add('fa-bars');
+					}
+				});
+			});
+
+			window.addEventListener('resize', function() {
+				if (window.innerWidth > 991) {
+					mobileNav.classList.remove('active');
+					if (mobileMenuBtn.querySelector('i')) {
+						mobileMenuBtn.querySelector('i').classList.remove('fa-times');
+						mobileMenuBtn.querySelector('i').classList.add('fa-bars');
+					}
+				}
+			});
+
+			setTimeout(function() {
+				const gadget = document.querySelector('.goog-te-gadget-simple');
+				if (!gadget) return;
+
+				let previousLangText = gadget.innerText || 'en';
+
+				const observer = new MutationObserver(function(mutations) {
+					mutations.forEach(function(mut) {
+						if (mut.type === 'characterData' || mut.type === 'childList') {
+							const currentText = gadget.innerText || '';
+							if (currentText !== previousLangText && currentText.trim() !== '') {
+								previousLangText = currentText;
+							}
+						}
+					});
+				});
+
+				if (gadget) {
+					observer.observe(gadget, { childList: true, subtree: true, characterData: true });
+				}
+			}, 800);
+
+			window.addEventListener('error', function(e) {
+				if (e.target && (e.target.src || '').includes('translate.google')) {
+					e.preventDefault();
+					Swal.fire({
+						 imageUrl: 'http://localhost:8000/assets/icons/Gif/error2.gif', imageWidth: 60, imageHeight: 60 ,
+						title: 'translation error',
+						text: 'google translate failed to load. please refresh.',
+						confirmButtonColor: '#059669',
+						background: '#ffffff',
+						iconColor: '#f59e0b'
+					});
+				}
+			}, true);
+
+			
+			
+					});
+
+	</script>
+</body>
+</html>
+
+<main class="site-main" role="main">
+	<div class="contact-page">
+	<div class="page-header">
+		<div class="container">
+			<h1 class="page-title">Contact Us</h1>
+			<p class="page-subtitle">We'd love to hear from you</p>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="form-wrapper">
+			<div class="form-container">
+				<div class="form-card">
+					<div class="form-header">
+						<h2 class="form-heading">Send Message</h2>
+						<p class="form-info">We'll get back within 24h</p>
+					</div>
+
+					<form id="contactForm" method="POST" action="http://localhost:8000/contact-us/send">
+						<input type="hidden" name="_token" value="" autocomplete="off">
+						<div class="field-group">
+							<label for="name" class="field-label">
+								<i class="fas fa-user"></i>
+								<span>Full Name *</span>
+							</label>
+							<input type="text" id="name" name="name" class="field-input" value="" placeholder="John Doe" required>
+						</div>
+
+						<div class="field-group">
+							<label for="email" class="field-label">
+								<i class="fas fa-envelope"></i>
+								<span>Email *</span>
+							</label>
+							<input type="email" id="email" name="email" class="field-input" value="" placeholder="john@example.com" required>
+						</div>
+
+						<div class="field-group">
+							<label for="subject" class="field-label">
+								<i class="fas fa-tag"></i>
+								<span>Subject</span>
+							</label>
+							<input type="text" id="subject" name="subject" class="field-input" value="" placeholder="How can we help?">
+						</div>
+
+						<div class="field-group">
+							<label for="message" class="field-label">
+								<i class="fas fa-comment"></i>
+								<span>Message *</span>
+							</label>
+							<textarea id="message" name="message" class="field-input field-textarea" rows="3" placeholder="Your message..." required></textarea>
+						</div>
+
+						<button type="submit" class="send-btn" id="submitBtn">
+							<span class="btn-text">Send</span>
+							<i class="fas fa-paper-plane btn-icon"></i>
+							<div class="btn-loader">
+								<div class="loader-spin"></div>
+							</div>
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</main>
+
+<footer class="site-footer">
+	<div class="footer-main">
+		<div class="container">
+			<div class="footer-grid">
+				<div class="footer-col brand-col">
+					<div class="brand-card">
+						<div class="brand-header">
+							<a href="http://localhost:8000" class="brand-link">
+								<img src="http://localhost:8000/assets/images/Logo Green Market.png" alt="GreenMarket" class="brand-logo" oncontextmenu="return false;">
+								<div class="brand-info" translate="no">
+									<h3>GreenMarket</h3>
+									<span>Fresh & Simple</span>
+								</div>
+							</a>
+						</div>
+												<p class="brand-desc">Our system connects local farmers directly with buyers, creating a community-driven marketplace. Sellers can easily manage garden sales, while buyers browse and shop for fresh, home-grown produce. By cutting out the middleman, we foster secure transactions and support sustainable agriculture, making it simple to access quality products straight from the source.</p>
+												<div class="partner-strip">
+							<div class="partner-item">
+								<a href="https://ruwanrekha.com/" target="_blank">
+									<img src="http://localhost:8000/assets/images/Ruwan Rekha logo.png" alt="CSIAP" class="partner-img vertical">
+								</a>
+							</div>
+							<div class="partner-item">
+								<a href="https://doa.gov.lk/home-page/" target="_blank">
+									<img src="http://localhost:8000/assets/images/Sri Lank logo.png" alt="Sri Lanka" class="partner-img vertical">
+								</a>
+							</div>
+							<div class="partner-item">
+								<a href="https://www.worldbank.org/" target="_blank">
+									<img src="http://localhost:8000/assets/images/world bank logo.png" alt="World Bank" class="partner-img horizontal">
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="footer-col" translate="no">
+					<div class="section-header1">
+						<i class="fas fa-link"></i>
+						<h4>Quick Links</h4>
+					</div>
+					<ul class="footer-links">
+						<li><a href="http://localhost:8000"><i class="fas fa-home"></i><span>Home</span></a></li>
+						<li><a href="http://localhost:8000/about-us"><i class="fas fa-info-circle"></i><span>About Us</span></a></li>
+						<li><a href="http://localhost:8000/contact-us"><i class="fas fa-envelope"></i><span>Contact</span></a></li>
+						<li><a href="http://localhost:8000/register/buyer"><i class="fas fa-user-plus"></i><span>Register</span></a></li>
+						<li><a href="http://localhost:8000/login"><i class="fas fa-sign-in-alt"></i><span>Login</span></a></li>
+					</ul>
+				</div>
+				<div class="footer-col" translate="no">
+					<div class="section-header1">
+						<i class="fas fa-address-card"></i>
+						<h4>Contact Info</h4>
+					</div>
+					<div class="contact-cards">
+						<div class="contact-item">
+							<div class="contact-icon"><i class="fas fa-envelope"></i></div>
+							<div class="contact-content">
+								<span class="contact-label">Email</span>
+								<a href="mailto:info@ruwanrekha.com" class="contact-value">info@ruwanrekha.com</a>
+							</div>
+						</div>
+						<div class="contact-item">
+							<div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+							<div class="contact-content">
+								<span class="contact-label">Phone</span>
+								<a href="tel:0719006606" class="contact-value">071 900 6606</a>
+							</div>
+						</div>
+												<div class="contact-item">
+							<div class="contact-icon"><i class="fas fa-fax"></i></div>
+							<div class="contact-content">
+								<span class="contact-label">Fax</span>
+								<a href="fax:+94112053167" class="contact-value">011 205 3167</a>
+							</div>
+						</div>
+												<div class="contact-item">
+							<div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+							<div class="contact-content">
+								<span class="contact-label">Address</span>
+								<a href="https://maps.app.goo.gl/Lm7mXLdK33LPXeH5A" class="contact-value address">GreenMarket CSIAP
+No: 61/1,  M. D. H. Jayawardena Mawatha, 
+Madinnagoda, Rajagiriya, 
+Colombo, Sri Lanka.</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="footer-bottom" translate="no">
+		<div class="container">
+			<div class="bottom-content">
+				<div class="copyright">© 2026 GreenMarket. All rights reserved | Developed by Creative Web Technologies</div>
+				<div class="legal-links">
+					<a href="http://localhost:8000/uploads/Legal Documents/Privacy Policy.pdf" class="legal-link">Privacy</a>
+					<span class="separator">•</span>
+					<a href="http://localhost:8000/uploads/Legal Documents/Terms of Service.pdf" class="legal-link">Terms</a>
+					<span class="separator">•</span>
+					<span class="version">v1.0.0</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<button class="scroll-top" id="backToTop">
+		<i class="fas fa-arrow-up"></i>
+	</button>
+</footer>
+
+<link rel="stylesheet" href="http://localhost:8000/css/footer.css">
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	const backToTop = document.getElementById('backToTop');
+	const scrollHandler = () => {
+		backToTop.classList.toggle('visible', window.pageYOffset > 300);
+	};
+	window.addEventListener('scroll', scrollHandler);
+	scrollHandler();
+	backToTop.addEventListener('click', (e) => {
+		e.preventDefault();
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	});
+	const socialBtns = document.querySelectorAll('.social-btn');
+	socialBtns.forEach(btn => {
+		btn.addEventListener('click', function(e) {
+			const href = this.getAttribute('href');
+			const platform = this.dataset.platform;
+			if (href === '#') {
+				e.preventDefault();
+				Swal.fire({
+					 imageUrl: 'http://localhost:8000/assets/icons/Gif/info1.gif', imageWidth: 60, imageHeight: 60 ,
+					title: platform,
+					text: `Follow us on ${platform} for updates!`,
+					confirmButtonColor: '#10B981',
+					timer: 2000,
+					showConfirmButton: true
+				});
+			} else if (!href.startsWith('http')) {
+				e.preventDefault();
+				Swal.fire({
+					 imageUrl: 'http://localhost:8000/assets/icons/Gif/error6.gif', imageWidth: 60, imageHeight: 60 ,
+					title: 'Invalid Link',
+					text: 'This social media link needs configuration.',
+					confirmButtonColor: '#ef4444'
+				});
+			}
+		});
+	});
+	const legalLinks = document.querySelectorAll('.legal-link');
+	legalLinks.forEach(link => {
+		link.addEventListener('click', function(e) {
+			const href = this.getAttribute('href');
+			const text = this.textContent;
+			if (href === '#') {
+				e.preventDefault();
+				Swal.fire({
+					 imageUrl: 'http://localhost:8000/assets/icons/Gif/info1.gif', imageWidth: 60, imageHeight: 60 ,
+					title: text,
+					text: `${text} Policy is being updated. Check back soon!`,
+					confirmButtonColor: '#10B981'
+				});
+			} else if (href.includes('.pdf')) {
+				e.preventDefault();
+				Swal.fire({
+					 imageUrl: 'http://localhost:8000/assets/icons/Gif/download confirmation1.gif', imageWidth: 60, imageHeight: 60 ,
+					title: 'Download',
+					text: `Download ${text} Policy?`,
+					showCancelButton: true,
+					confirmButtonColor: '#10B981',
+					cancelButtonColor: '#6b7280',
+					confirmButtonText: 'Download'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						window.open(href, '_blank');
+						Swal.fire({
+							 imageUrl: 'http://localhost:8000/assets/icons/Gif/success4.gif', imageWidth: 60, imageHeight: 60 ,
+							title: 'Success',
+							text: 'Download started!',
+							showConfirmButton: false,
+							timer: 1500
+						});
+					}
+				});
+			}
+		});
+	});
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	const contactForm = document.getElementById('contactForm');
+	const submitBtn = document.getElementById('submitBtn');
+
+	
+	
+	
+	if (contactForm) {
+		contactForm.addEventListener('submit', async function(e) {
+			e.preventDefault();
+
+			if (!submitBtn) return;
+
+			const formData = new FormData(this);
+			const isValid = validateForm(formData);
+
+			if (!isValid) return;
+
+			submitBtn.classList.add('loading');
+			submitBtn.disabled = true;
+
+			try {
+				const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+				const response = await fetch('http://localhost:8000/contact-us/send', {
+					method: 'POST',
+					body: formData,
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+						'X-CSRF-TOKEN': csrfToken
+					}
+				});
+
+				const result = await response.json();
+
+				if (!response.ok) {
+					if (response.status === 422) {
+						const errors = result.errors || {};
+						const errorList = Object.values(errors).flat().join('<br>');
+						throw { type: 'validation', message: errorList, errors: errors };
+					} else if (response.status === 429) {
+						throw { type: 'rate', message: 'Too many requests. Please wait a moment.' };
+					} else {
+						let serverMsg = result.message || 'Server error occurred';
+						if (result.error) {
+							serverMsg += '<br><br><small style="color:red;">Error: ' + result.error + '</small>';
+						}
+						throw { type: 'server', message: serverMsg };
+					}
+				}
+
+				if (result.success) {
+					Swal.fire({
+						 imageUrl: 'http://localhost:8000/assets/icons/Gif/Send successfully1.gif', imageWidth: 60, imageHeight: 60 ,
+						title: 'Sent!',
+						text: undefined,
+						html: result.message || 'We\'ll reply soon.',
+						confirmButtonColor: '#10B981',
+						timer: 7500,
+						showConfirmButton: false
+					});
+					contactForm.reset();
+				} else {
+					throw { type: 'unknown', message: result.message || 'Failed to send message' };
+				}
+			} catch (error) {
+				let errorTitle = 'Error';
+				let errorMessage = error.message || 'Something went wrong';
+				let errorIcon = 'error';
+
+				if (error.type === 'validation') {
+					errorTitle = 'Validation Failed';
+					errorIcon = 'warning';
+					if (error.errors) {
+						let errorHtml = '<div style="text-align: left;"><ul style="margin-left: 20px;">';
+						Object.keys(error.errors).forEach(field => {
+							error.errors[field].forEach(msg => {
+								errorHtml += `<li style="color: #ef4444; margin-bottom: 5px;">${msg}</li>`;
+							});
+						});
+						errorHtml += '</ul></div>';
+						errorMessage = errorHtml;
+					}
+				} else if (error.type === 'rate') {
+					errorTitle = 'Too Many Requests';
+					errorMessage = 'Please wait a moment before trying again.';
+				} else if (error.type === 'server') {
+					errorTitle = 'Server Error';
+					errorMessage = 'Unable to process your request. Please try again later.';
+				}
+
+				Swal.fire({
+					title: errorTitle,
+					html: errorMessage,
+					confirmButtonColor: '#10B981',
+					 imageUrl: 'http://localhost:8000/assets/icons/Gif/error3.gif', imageWidth: 60, imageHeight: 60 				});
+			} finally {
+				submitBtn.classList.remove('loading');
+				submitBtn.disabled = false;
+			}
+		});
+	}
+
+	function validateForm(formData) {
+		clearErrors();
+
+		let isValid = true;
+		const errors = [];
+
+		const name = formData.get('name')?.trim();
+		const email = formData.get('email')?.trim();
+		const message = formData.get('message')?.trim();
+
+		if (!name || name.length < 2) {
+			showFieldError('name', 'Name must be at least 2 characters');
+			errors.push('Name is too short');
+			isValid = false;
+		} else if (name.length > 100) {
+			showFieldError('name', 'Name is too long');
+			errors.push('Name exceeds maximum length');
+			isValid = false;
+		}
+
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!email) {
+			showFieldError('email', 'Email is required');
+			errors.push('Email is required');
+			isValid = false;
+		} else if (!emailRegex.test(email)) {
+			showFieldError('email', 'Please enter a valid email address');
+			errors.push('Invalid email format');
+			isValid = false;
+		}
+
+		if (!message) {
+			showFieldError('message', 'Message is required');
+			errors.push('Message is required');
+			isValid = false;
+		} else if (message.length < 5) {
+			showFieldError('message', 'Message must be at least 5 characters');
+			errors.push('Message is too short');
+			isValid = false;
+		} else if (message.length > 1000) {
+			showFieldError('message', 'Message is too long (max 1000 characters)');
+			errors.push('Message exceeds maximum length');
+			isValid = false;
+		}
+
+		if (!isValid) {
+			let errorHtml = '<div style="text-align: left;"><ul style="margin-left: 20px;">';
+			errors.forEach(err => {
+				errorHtml += `<li style="color: #ef4444; margin-bottom: 5px;">${err}</li>`;
+			});
+			errorHtml += '</ul></div>';
+
+			Swal.fire({
+				 imageUrl: 'http://localhost:8000/assets/icons/Gif/alert1.gif', imageWidth: 60, imageHeight: 60 ,
+				title: 'Please Check Your Input',
+				html: errorHtml,
+				confirmButtonColor: '#10B981'
+			});
+		}
+
+		return isValid;
+	}
+
+	function showFieldError(fieldId, message) {
+		const field = document.getElementById(fieldId);
+		if (!field) return;
+
+		const group = field.closest('.field-group');
+		if (!group) return;
+
+		field.classList.add('error');
+
+		let errorDiv = group.querySelector('.error-msg');
+		if (!errorDiv) {
+			errorDiv = document.createElement('span');
+			errorDiv.className = 'error-msg';
+			group.appendChild(errorDiv);
+		}
+
+		errorDiv.textContent = message;
+	}
+
+	function clearErrors() {
+		document.querySelectorAll('.field-input.error').forEach(f => f.classList.remove('error'));
+		document.querySelectorAll('.error-msg').forEach(e => e.remove());
+	}
+
+	document.querySelectorAll('.field-input').forEach(input => {
+		input.addEventListener('input', function() {
+			if (this.classList.contains('error')) {
+				this.classList.remove('error');
+				this.closest('.field-group')?.querySelector('.error-msg')?.remove();
+			}
+		});
+	});
+
+	contactForm?.addEventListener('keypress', function(e) {
+		if (e.key === 'Enter' && e.target.type !== 'textarea') {
+			e.preventDefault();
+		}
+	});
+
+	});
+</script>
+<script src="http://localhost:8000/js/main.js"></script>
+</body>
+</html>

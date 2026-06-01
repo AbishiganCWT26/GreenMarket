@@ -85,12 +85,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	@if(session('success'))
 		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/success1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
+			@if(file_exists(public_path('assets/icons/Gif/Send successfully1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Send successfully1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
 			title: 'Success!',
-			text: '{{ session('success') }}',
+			html: '{!! session('success') !!}',
 			confirmButtonColor: '#10B981',
-			timer: 5000,
-			showConfirmButton: true
+			timer: 4000,
+			showConfirmButton: false
 		});
 	@endif
 
@@ -156,7 +156,11 @@ document.addEventListener('DOMContentLoaded', function() {
 					} else if (response.status === 429) {
 						throw { type: 'rate', message: 'Too many requests. Please wait a moment.' };
 					} else {
-						throw { type: 'server', message: result.message || 'Server error occurred' };
+						let serverMsg = result.message || 'Server error occurred';
+						if (result.error) {
+							serverMsg += '<br><br><small style="color:red;">Error: ' + result.error + '</small>';
+						}
+						throw { type: 'server', message: serverMsg };
 					}
 				}
 
@@ -203,8 +207,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				Swal.fire({
 					title: errorTitle,
 					html: errorMessage,
-					confirmButtonColor: '#10B981'
-					@if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
+					confirmButtonColor: '#10B981',
+					@if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif
 				});
 			} finally {
 				submitBtn.classList.remove('loading');

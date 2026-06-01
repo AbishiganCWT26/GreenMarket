@@ -150,19 +150,29 @@ class PublicController extends Controller
 
             \Log::info('Email sent successfully to: ' . $adminEmail);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Your message has been sent successfully!<br>We will respond within 24 hours.'
-            ]);
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Your message has been sent successfully!<br>We will respond within 24 hours.'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Your message has been sent successfully!<br>We will respond within 24 hours.');
 
         } catch (\Exception $e) {
             \Log::error('Contact form error: ' . $e->getMessage());
             \Log::error('Error trace: ' . $e->getTraceAsString());
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to send message. Please try again later or contact us directly.'
-            ], 500);
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send message. Please try again later or contact us directly.',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Failed to send message. Please try again later or contact us directly.')->withInput();
         }
     }
 
