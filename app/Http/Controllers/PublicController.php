@@ -142,9 +142,13 @@ class PublicController extends Controller
             // defer() executes the closure after the HTTP response has been sent to the user.
             // This prevents the 30s timeout issue while the SMTP server connects.
             defer(function () use ($adminEmail, $data) {
-                \Log::info('Background: Attempting to send email to: ' . $adminEmail);
-                Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
-                \Log::info('Background: Email sent successfully to: ' . $adminEmail);
+                try {
+                    \Log::info('Background: Attempting to send email to: ' . $adminEmail);
+                    Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
+                    \Log::info('Background: Email sent successfully to: ' . $adminEmail);
+                } catch (\Exception $e) {
+                    \Log::error('Background Email Error: ' . $e->getMessage());
+                }
             });
 
             if ($request->expectsJson() || $request->ajax()) {
