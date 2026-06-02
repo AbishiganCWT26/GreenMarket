@@ -142,12 +142,16 @@ class PublicController extends Controller
             // defer() executes the closure after the HTTP response has been sent to the user.
             // This prevents the 30s timeout issue while the SMTP server connects.
             defer(function () use ($adminEmail, $data) {
+                // Completely suppress any PHP warnings (like fsockopen timeouts)
+                // and output buffering to ensure no text leaks into the JSON response.
+                error_reporting(0);
+                ob_start();
                 try {
                     Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     // Silently fail to prevent JSON corruption on Railway.
-                    // The underlying issue is likely an SMTP connection timeout (blocked port).
                 }
+                ob_end_clean();
             });
 
             if ($request->expectsJson() || $request->ajax()) {
