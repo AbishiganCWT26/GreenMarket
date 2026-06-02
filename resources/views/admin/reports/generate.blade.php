@@ -103,7 +103,7 @@
 								<label><i class="fas fa-credit-card"></i> Payment</label>
 								<select id="payment_method" name="payment_method" class="form-control">
 									<option value="">All Methods</option>
-									<option value="COD">Cash on Delivery</option>
+									<option value="COD">Cash on Pickup</option>
 									<option value="online">Online Payment</option>
 								</select>
 							</div>

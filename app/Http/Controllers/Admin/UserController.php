@@ -28,7 +28,6 @@ class UserController extends Controller
             ->leftJoin('buyers', 'users.id', '=', 'buyers.user_id')
             ->leftJoin('facilitators', 'users.id', '=', 'facilitators.user_id')
             ->leftJoin('admins', 'users.id', '=', 'admins.user_id')
-			->leftJoin('delivery_riders', 'users.id', '=', 'delivery_riders.user_id')
             ->select(
                 'users.*',
                 'farmers.name as farmer_name',
@@ -46,9 +45,6 @@ class UserController extends Controller
                 'admins.full_name as admin_name',
                 'admins.nic_no as admin_nic',
                 'admins.phone_number as admin_phone',
-				'delivery_riders.name as delivery_rider_name',
-				'delivery_riders.nic_no as delivery_rider_nic',
-				'delivery_riders.primary_mobile as delivery_rider_mobile'
             )
             ->orderBy('users.created_at', 'desc');
 
@@ -72,15 +68,12 @@ class UserController extends Controller
                     ->orWhere('lead_farmers.primary_mobile', 'ILIKE', $search)
                     ->orWhere('buyers.primary_mobile', 'ILIKE', $search)
                     ->orWhere('facilitators.primary_mobile', 'ILIKE', $search)
-                    ->orWhere('admins.phone_number', 'ILIKE', $search)
-					->orWhere('delivery_riders.name', 'ILIKE', $search)
-					->orWhere('delivery_riders.nic_no', 'ILIKE', $search)
-					->orWhere('delivery_riders.primary_mobile', 'ILIKE', $search);
+                    ->orWhere('admins.phone_number', 'ILIKE', $search);
             });
         }
 
         // Role filter
-        $validRoles = ['farmer', 'lead_farmer', 'buyer', 'facilitator', 'admin', 'delivery_rider'];
+        $validRoles = ['farmer', 'lead_farmer', 'buyer', 'facilitator', 'admin'];
         if ($request->filled('role') && in_array($request->role, $validRoles)) {
             $query->where('users.role', $request->role);
         }
@@ -174,12 +167,6 @@ class UserController extends Controller
                 $user->contact_number = $user->admin_phone ?? 'N/A';
                 $user->nic_number = $user->admin_nic ?? '';
                 break;
-
-			case 'delivery_rider':
-				$user->display_name = $user->delivery_rider_name ?? $user->username;
-				$user->contact_number = $user->delivery_rider_mobile ?? 'N/A';
-				$user->nic_number = $user->delivery_rider_nic ?? '';
-				break;
         }
 
         return $user;
@@ -206,48 +193,12 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_type' => 'required|in:farmer,lead_farmer,buyer,facilitator,admin,delivery_rider',
+            'user_type' => 'required|in:farmer,lead_farmer,buyer,facilitator,admin',
             'username' => 'required|string|max:50|unique:users,username',
             'email' => 'nullable|email|max:100|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'name' => 'required|string|max:100'
-        ]);
-
-		if ($validated['user_type'] == 'delivery_rider') {
-			$request->validate([
-				'nic_no' => 'required|string|max:12',
-				'vehicle_number' => 'required|string|max:50',
-				'vehicle_type' => 'required|string|max:50',
-				'max_kg_capacity' => 'required|numeric',
-				'assigned_districts' => 'required|array',
-				'extra_details' => 'nullable|string'
-			]);
-
-			$nicExists = DB::table('delivery_riders')->where('nic_no', $request->nic_no)->exists();
-			if ($nicExists) {
-				return response()->json([
-					'success' => false,
-					'message' => 'Failed to create user because NIC No. "' . $request->nic_no . '" already exists'
-				], 422);
-			}
-		}
-
-        // Additional validation for farmer types
-        if (in_array($validated['user_type'], ['farmer', 'lead_farmer'])) {
-            $request->validate([
-                'nic_no' => 'required|string|max:12',
-                'grama_niladhari_division' => 'required|string|max:100'
-            ], [
-                'grama_niladhari_division.required' => 'Grama Niladhari Division field data is missing'
-            ]);
-            
-            // Check if NIC already exists in farmers or lead_farmers table
-            $nicExists = false;
-            $nicNumber = $request->nic_no;
-            
-            if ($validated['user_type'] == 'farmer') {
-                $nicExists = DB::table('farmers')->where('nic_no', $nicNumber)->exists();
-            } else {
+        ]); {
                 $nicExists = DB::table('lead_farmers')->where('nic_no', $nicNumber)->exists();
             }
             
@@ -429,46 +380,7 @@ class UserController extends Controller
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
-			} elseif ($validated['user_type'] == 'delivery_rider') {
-				DB::table('delivery_riders')->insert([
-					'user_id' => $userId,
-					'name' => $request->name,
-					'nic_no' => $request->nic_no,
-					'primary_mobile' => $request->primary_mobile,
-					'email' => $validated['email'] ?? null,
-					'vehicle_number' => $request->vehicle_number,
-					'vehicle_type' => $request->vehicle_type,
-					'max_kg_capacity' => $request->max_kg_capacity,
-					'whatsapp_number' => $request->whatsapp_number,
-					'residential_address' => $request->residential_address,
-					'assigned_districts' => json_encode($request->assigned_districts),
-					'extra_details' => $request->extra_details,
-					'created_at' => now(),
-					'updated_at' => now()
-				]);
-			}
-
-            DB::commit();
-
-            $this->sendUserCreationNotification($userId, $validated['user_type'], $plainPassword);
-        
-            return response()->json(['success' => true, 'message' => 'User created successfully']);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            // Parse the exception message to provide a user-friendly error
-            $errorMessage = $e->getMessage();
-            
-            // Check for duplicate NIC error
-            if (strpos($errorMessage, 'farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
-                // Extract NIC number from error message
-                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
-                $nicNumber = $matches[1] ?? '';
-                
-                if ($nicNumber) {
-                    $errorMessage = 'Failed to create user because NIC No. "' . $nicNumber . '" already exists';
-                } else {
+			} else {
                     $errorMessage = 'Failed to create user because NIC number already exists';
                 }
             }
@@ -546,237 +458,9 @@ class UserController extends Controller
         $validated = $request->validate([
             'username' => 'required|string|max:50|unique:users,username,' . $id,
             'email' => 'nullable|email|max:100|unique:users,email,' . $id,
-            'role' => 'required|in:admin,facilitator,lead_farmer,farmer,buyer,delivery_rider',
+            'role' => 'required|in:admin,facilitator,lead_farmer,farmer,buyer',
             'is_active' => 'required|boolean'
-        ]);
-
-		if ($validated['role'] == 'delivery_rider') {
-			$request->validate([
-				'nic_no' => 'required|string|max:12',
-				'licence_number' => 'nullable|string|max:50',
-				'vehicle_number' => 'required|string|max:50',
-				'vehicle_type' => 'required|string|max:50',
-				'max_kg_capacity' => 'required|numeric'
-			]);
-		}
-
-        // Additional validation for farmer types
-        if (in_array($validated['role'], ['farmer', 'lead_farmer'])) {
-            $request->validate([
-                'nic_no' => 'required|string|max:12',
-                'grama_niladhari_division' => 'required|string|max:100'
-            ], [
-                'grama_niladhari_division.required' => 'Grama Niladhari Division field data is missing'
-            ]);
-        }
-
-        $roleChanged = $validated['role'] != $user->role;
-
-        // Check for sensitive data changes and verify OTP
-        $sensitiveDataCheck = $this->checkSensitiveDataChanges($user, $request);
-        if ($sensitiveDataCheck['changed']) {
-            if (!$this->isOtpVerified($user->id, $sensitiveDataCheck['actions'])) {
-                $msg = 'OTP verification required for updating sensitive data.';
-                if ($sensitiveDataCheck['actions'] == ['verify_nic']) {
-                    $msg = 'OTP verification required for updating sensitive NIC data.';
-                } elseif ($sensitiveDataCheck['actions'] == ['edit_payment']) {
-                    $msg = 'OTP verification required for updating sensitive payment data.';
-                } elseif ($sensitiveDataCheck['actions'] == ['verify_rider_profile']) {
-                    $msg = 'OTP verification required for updating sensitive Rider Profile data.';
-                }
-                return response()->json([
-                    'success' => false, 
-                    'message' => $msg
-                ], 403);
-            }
-        }
-
-        if ($roleChanged && in_array($user->role, ['farmer', 'lead_farmer']) && in_array($validated['role'], ['farmer', 'lead_farmer'])) {
-            return $this->handleFarmerRoleChange($user, $validated, $request, $id);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            $oldData = (array) $user;
-
-            DB::table('users')->where('id', $id)->update([
-                'username' => $validated['username'],
-                'email' => $validated['email'],
-                'role' => $validated['role'],
-                'is_active' => $validated['is_active'],
-                'updated_at' => now()
-            ]);
-
-            if ($validated['role'] == 'farmer' || $validated['role'] == 'lead_farmer') {
-                $this->updateFarmerDetails($user, $validated['role'], $request, $id);
-            } elseif ($validated['role'] == 'buyer') {
-                $this->updateBuyerDetails($user, $request, $id);
-            } elseif ($validated['role'] == 'facilitator') {
-                $this->updateFacilitatorDetails($user, $request, $id);
-            } elseif ($validated['role'] == 'admin') {
-                $this->updateAdminDetails($user, $request, $id);
-            } elseif ($validated['role'] == 'delivery_rider') {
-                $this->updateDeliveryRiderDetails($user, $request, $id);
-            }
-
-            DB::commit();
-
-            $newData = (array) DB::table('users')->find($id);
-            $this->sendUpdateNotification($id, $oldData, $newData);
-
-            return response()->json(['success' => true, 'message' => 'User updated successfully']);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            // Parse the exception message to provide a user-friendly error
-            $rawMessage = $e->getMessage();
-
-            // Helper: extract value from PostgreSQL unique-violation detail
-            // e.g. "Key (nic_no)=(200302401725) already exists."
-            $extractValue = function (string $column, string $msg): string {
-                preg_match('/Key \(' . preg_quote($column, '/') . '\)=\(([^)]+)\) already exists/', $msg, $m);
-                return $m[1] ?? '';
-            };
-
-            $friendlyMessage = null;
-
-            // ── NIC duplicates ──────────────────────────────────────────────
-            if (preg_match('/buyers_nic_no_key|farmers_nic_no_key|lead_farmers_nic_no_key|facilitators_nic_no_key|admins_nic_no_key/', $rawMessage)) {
-                $nic = $extractValue('nic_no', $rawMessage);
-                $friendlyMessage = $nic
-                    ? "Error occurred while updating. \nBecause NIC No :- " . $nic . " already exists."
-                    : "Error occurred while updating. \nBecause the NIC number already exists.";
-            }
-
-            elseif (strpos($rawMessage, 'users_username_key') !== false) {
-                $val = $extractValue('username', $rawMessage);
-                $friendlyMessage = $val
-                    ? "Error occurred while updating. \nBecause username \"" . $val . "\" already exists."
-                    : "Error occurred while updating. \nBecause the username already exists.";
-            }
-
-            // ── Email duplicate ─────────────────────────────────────────────
-            elseif (strpos($rawMessage, 'users_email_key') !== false) {
-                $val = $extractValue('email', $rawMessage);
-                $friendlyMessage = $val
-                    ? "Error occurred while updating. \nBecause email \"" . $val . "\" already exists."
-                    : "Error occurred while updating. \nBecause the email address already exists.";
-            }
-
-            // ── Generic SQLSTATE — log raw error, show clean message ────────
-            elseif (strpos($rawMessage, 'SQLSTATE') !== false) {
-                \Log::error('Database Error during user update: ' . $rawMessage);
-                $friendlyMessage = 'Error occurred while updating. \n A database error was encountered. \nPlease try again.';
-            }
-
-            // ── Fallback ────────────────────────────────────────────────────
-            else {
-                $friendlyMessage = 'Error occurred while updating. \nplease try again.';
-            }
-
-            return response()->json(['success' => false, 'message' => $friendlyMessage], 500);
-        }
-    }
-
-    private function handleFarmerRoleChange($user, $validated, $request, $userId)
-    {
-        DB::beginTransaction();
-
-        try {
-            if ($user->role == 'farmer' && $validated['role'] == 'lead_farmer') {
-                $farmer = DB::table('farmers')->where('user_id', $userId)->first();
-
-                if ($farmer) {
-                    if ($farmer->preferred_payment !== 'bank') {
-                        return response()->json(['success' => false, 'message' => 'Lead farmer is only allowed preferred payment method as the bank transfer'], 400);
-                    }
-
-                    $leadFarmerId = DB::table('lead_farmers')->insertGetId([
-                        'user_id' => $userId,
-                        'name' => $farmer->name,
-                        'nic_no' => $farmer->nic_no,
-                        'primary_mobile' => $farmer->primary_mobile,
-                        'whatsapp_number' => $farmer->whatsapp_number,
-                        'residential_address' => $farmer->residential_address,
-                        'grama_niladhari_division' => $farmer->grama_niladhari_division,
-                        'district' => $farmer->district ?? 'Colombo',
-                        'group_name' => $request->group_name ?? ($farmer->name . "'s Group"),
-                        'group_number' => $request->group_number ?? ('GRP-' . strtoupper(Str::random(6))),
-                        'preferred_payment' => $farmer->preferred_payment,
-                        'account_number' => $farmer->account_number,
-                        'account_holder_name' => $farmer->account_holder_name,
-                        'bank_name' => $farmer->bank_name,
-                        'bank_branch' => $farmer->bank_branch,
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ]);
-
-                    DB::table('farmers')
-                        ->where('user_id', $userId)
-                        ->update(['lead_farmer_id' => $leadFarmerId]);
-                }
-            } elseif ($user->role == 'lead_farmer' && $validated['role'] == 'farmer') {
-                $leadFarmer = DB::table('lead_farmers')->where('user_id', $userId)->first();
-
-                if ($leadFarmer) {
-                    $otherLeadFarmer = DB::table('lead_farmers')
-                        ->where('id', '!=', $leadFarmer->id)
-                        ->first();
-
-                    if ($otherLeadFarmer) {
-                        DB::table('farmers')
-                            ->where('user_id', $userId)
-                            ->update(['lead_farmer_id' => $otherLeadFarmer->id]);
-
-                        DB::table('lead_farmers')->where('id', $leadFarmer->id)->delete();
-                    }
-                }
-            }
-
-            DB::table('users')->where('id', $userId)->update([
-                'role' => $validated['role'],
-                'updated_at' => now()
-            ]);
-
-            DB::commit();
-            return response()->json(['success' => true, 'message' => 'User role updated successfully']);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            $errorMessage = $e->getMessage();
-            if (strpos($errorMessage, 'lead_farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
-                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
-                $nicNumber = $matches[1] ?? '';
-                
-                if ($nicNumber) {
-                    $errorMessage = 'Failed to change role because NIC No. "' . $nicNumber . '" already exists as a Lead Farmer';
-                }
-            }
-            // General database error handling to avoid showing raw SQL
-            elseif (strpos($errorMessage, 'SQLSTATE') !== false) {
-                \Log::error('Database Error during role change: ' . $errorMessage);
-                $errorMessage = 'A database error occurred while changing the user role. Please try again later.';
-            }
-            
-            return response()->json(['success' => false, 'message' => $errorMessage], 500);
-        }
-    }
-
-    private function updateFarmerDetails($user, $role, $request, $userId)
-    {
-        $tables = $role == 'farmer' ? ['farmers'] : ['lead_farmers', 'farmers'];
-        $currentLeadFarmerId = null;
-
-        // Pre-fetch lead_farmer_id if it exists
-        if ($role == 'lead_farmer') {
-            $lf = DB::table('lead_farmers')->where('user_id', $userId)->select('id')->first();
-            if ($lf) {
-                $currentLeadFarmerId = $lf->id;
-            }
-        } else {
+        ]); {
             $f = DB::table('farmers')->where('user_id', $userId)->select('lead_farmer_id')->first();
             if ($f) {
                 $currentLeadFarmerId = $f->lead_farmer_id;
@@ -1024,41 +708,7 @@ class UserController extends Controller
         }
     }
 
-    private function updateDeliveryRiderDetails($user, $request, $userId)
-    {
-        $rider = DB::table('delivery_riders')->where('user_id', $userId)->first();
 
-        $updateData = [
-            'name' => $request->name ?? ($rider->name ?? $user->username),
-            'nic_no' => $request->nic_no ?? ($rider->nic_no ?? ''),
-            'licence_number' => $request->licence_number ?? ($rider->licence_number ?? ''),
-            'primary_mobile' => $request->primary_mobile ?? ($rider->primary_mobile ?? ''),
-            'email' => $request->email ?? ($rider->email ?? $user->email),
-            'vehicle_number' => $request->vehicle_number ?? ($rider->vehicle_number ?? ''),
-            'vehicle_type' => $request->vehicle_type ?? ($rider->vehicle_type ?? ''),
-            'max_kg_capacity' => $request->max_kg_capacity ?? ($rider->max_kg_capacity ?? 0),
-            'whatsapp_number' => $request->whatsapp_number ?? ($rider->whatsapp_number ?? null),
-            'residential_address' => $request->residential_address ?? ($rider->residential_address ?? null),
-            'updated_at' => now(),
-        ];
-        
-        if ($request->has('assigned_districts') && is_array($request->assigned_districts)) {
-            $updateData['assigned_districts'] = json_encode($request->assigned_districts);
-        }
-        
-        if ($request->has('extra_details')) {
-            $updateData['extra_details'] = $request->extra_details;
-        }
-
-        if ($rider) {
-            DB::table('delivery_riders')->where('user_id', $userId)->update($updateData);
-        } else {
-            DB::table('delivery_riders')->insert(array_merge($updateData, [
-                'user_id' => $userId,
-                'created_at' => now()
-            ]));
-        }
-    }
 
     public function deactivate($id)
     {
@@ -1213,11 +863,10 @@ class UserController extends Controller
 
         $user = DB::table('users')->find($request->user_id);
 
-        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer', 'delivery_rider'])) {
+        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer'])) {
             return response()->json(['success' => false, 'message' => 'OTP only required for sensitive roles'], 400);
         }
-
-        $table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : ($user->role == 'buyer' ? 'buyers' : 'delivery_riders'))));
+		$table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : ($user->role == 'buyer' ? 'buyers' : 'users'))));
         $details = DB::table($table)->where('user_id', $user->id)->first();
 
         if (!$details || !$details->primary_mobile) {
@@ -1285,11 +934,10 @@ class UserController extends Controller
 
         $user = DB::table('users')->find($request->user_id);
 
-        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer', 'delivery_rider'])) {
+        if (!in_array($user->role, ['farmer', 'lead_farmer', 'facilitator', 'buyer'])) {
             return response()->json(['success' => false, 'message' => 'OTP only required for sensitive roles'], 400);
         }
-
-        $table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : ($user->role == 'buyer' ? 'buyers' : 'delivery_riders'))));
+		$table = ($user->role == 'farmer' ? 'farmers' : ($user->role == 'lead_farmer' ? 'lead_farmers' : ($user->role == 'facilitator' ? 'facilitators' : ($user->role == 'buyer' ? 'buyers' : 'users'))));
         $details = DB::table($table)->where('user_id', $user->id)->first();
 
         if (!$details || !$details->primary_mobile) {
@@ -1558,9 +1206,6 @@ class UserController extends Controller
                     ];
                 }
                 break;
-            case 'delivery_rider':
-                $details = DB::table('delivery_riders')->where('user_id', $user->id)->first();
-                break;
         }
 
         return $details;
@@ -1629,13 +1274,6 @@ class UserController extends Controller
 
         $details = $this->getUserDetails($user);
         if (!$details) return ['changed' => false, 'actions' => []];
-
-        if ($user->role == 'delivery_rider') {
-            // Check username & email on the user record
-            if ((string)$user->username !== (string)$request->username) {
-                $changed = true;
-                if (!in_array('verify_rider_profile', $actions)) $actions[] = 'verify_rider_profile';
-            }
             if ((string)($user->email ?? '') !== (string)($request->email ?? '')) {
                 $changed = true;
                 if (!in_array('verify_rider_profile', $actions)) $actions[] = 'verify_rider_profile';
@@ -1828,10 +1466,6 @@ class UserController extends Controller
         } elseif ($role == 'admin') {
             $admin = DB::table('admins')->where('user_id', $userId)->first();
             return $admin->phone_number ?? null;
-        } elseif ($role == 'delivery_rider') {
-            $rider = DB::table('delivery_riders')->where('user_id', $userId)->first();
-            return $rider->primary_mobile ?? null;
-        }
 
         return null;
     }
@@ -1856,9 +1490,6 @@ class UserController extends Controller
             return $this->deleteFacilitator($user);
         } elseif ($user->role == 'buyer') {
             return $this->deleteBuyer($user);
-        } elseif ($user->role == 'delivery_rider') {
-            return $this->deleteDeliveryRider($user);
-        }
 
         return response()->json(['success' => false, 'message' => 'Unknown user role'], 400);
     }
@@ -2149,41 +1780,7 @@ class UserController extends Controller
         }
     }
 
-    private function deleteDeliveryRider($user)
-    {
-        $rider = DB::table('delivery_riders')->where('user_id', $user->id)->first();
 
-        if (!$rider) {
-            return response()->json(['success' => false, 'message' => 'Delivery rider details not found'], 400);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            if ($rider->primary_mobile) {
-                $this->sendSms($rider->primary_mobile, "Your delivery rider account has been deleted from GreenMarket system.");
-            }
-
-            // Nullify the rider ID in deliveries so that they don't block deletion and can be reassigned
-            DB::table('rider_deliveries')->where('rider_id', $user->id)->update(['rider_id' => null]);
-
-            DB::table('notifications')->where('user_id', $user->id)->delete();
-            DB::table('complaints')
-                ->where('complainant_user_id', $user->id)
-                ->orWhere('against_user_id', $user->id)
-                ->delete();
-
-            DB::table('delivery_riders')->where('id', $rider->id)->delete();
-            DB::table('users')->where('id', $user->id)->delete();
-
-            DB::commit();
-            return response()->json(['success' => true, 'message' => 'Delivery rider deleted successfully']);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to delete delivery rider: ' . $e->getMessage()], 500);
-        }
-    }
 
     public function getLeadFarmersForTransfer()
     {

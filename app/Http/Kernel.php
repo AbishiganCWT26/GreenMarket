@@ -64,6 +64,5 @@ class Kernel extends HttpKernel
         'lead_farmer' => \App\Http\Middleware\LeadFarmerMiddleware::class,
 		'buyer' => \App\Http\Middleware\BuyerMiddleware::class,
 		'facilitator' => \App\Http\Middleware\FacilitatorMiddleware::class,
-		'delivery_rider' => \App\Http\Middleware\DeliveryRiderMiddleware::class,
 	];
 }

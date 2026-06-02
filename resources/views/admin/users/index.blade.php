@@ -195,10 +195,6 @@
 			color: var(--danger-color);
 		}
 
-		.role-filter-item[data-value="delivery_rider"] i {
-			color: var(--warning-color);
-		}
-
 		.error-text {
 			color: #ef4444 !important;
 			font-size: 0.85rem !important;
@@ -256,14 +252,6 @@
 									<i class="fas fa-shopping-basket role-fa-fallback"></i>
 								</div>
 								Buyer
-							</div>
-							<div class="role-filter-item" data-value="delivery_rider">
-								<div class="role-icon-wrapper">
-									<img src="{{ asset('assets/images/Profiles/Delivery-Rider.png') }}"
-										class="role-img-icon" onerror="this.classList.add('error')">
-									<i class="fas fa-motorcycle role-fa-fallback"></i>
-								</div>
-								Delivery Rider
 							</div>
 							<div class="role-filter-item" data-value="facilitator">
 								<div class="role-icon-wrapper">
@@ -549,7 +537,6 @@
 																												<option value="buyer">Buyer</option>
 																												<option value="facilitator">Facilitator</option>
 																												<option value="admin">Administrator</option>
-																												<option value="delivery_rider">Delivery Rider</option>
 																											</select>
 																										</div>
 																										<div id="role-specific-fields" style="display:none;"></div>
@@ -987,92 +974,6 @@
 																													</div>
 																												`;
 									break;
-								case 'delivery_rider':
-									html = `
-																													<div class="form-section">
-																														<h4>Delivery Rider Details</h4>
-																														<div class="form-group">
-																															<label>Full Name <span class="required">*</span></label>
-																															<input type="text" id="name" class="form-input" placeholder="Enter full name" required>
-																														</div>
-																														<div class="form-group">
-																															<label>Username <span class="required">*</span></label>
-																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
-																														</div>
-																														<div class="form-group">
-																															<label>Email <span class="required">*</span></label>
-																															<input type="email" id="email" class="form-input" placeholder="Enter email" required>
-																														</div>
-																														<div class="form-group">
-																															<label>Password <span class="required">*</span></label>
-																															<div class="password-container">
-																																<input type="password" id="password" class="form-input" placeholder="Enter password" required oninput="updatePasswordRules(this.value, $('#username').val(), $('#email').val())">
-																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password')"></i>
-																															</div>
-																															${passwordRequirementsHtml}
-																														</div>
-																														<div class="form-group">
-																															<label>Confirm Password <span class="required">*</span></label>
-																															<div class="password-container">
-																																<input type="password" id="password_confirmation" class="form-input" placeholder="Confirm password" required>
-																																<i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('password_confirmation')"></i>
-																															</div>
-																															<div id="passwordMatch" class="mt-2"></div>
-																														</div>
-																														<div class="form-group">
-																															<label>NIC Number <span class="required">*</span></label>
-																															<input type="text" id="rider_nic" class="form-input" placeholder="Enter NIC" required>
-																															<div id="rider_nic_status" class="nic-status mt-1" style="font-size: 11px;"></div>
-																														</div>
-																														<div class="form-group">
-																															<label>Licence Number <span class="required">*</span></label>
-																															<input type="text" id="licence_number" class="form-input" placeholder="Enter Licence Number" required>
-																														</div>
-																														<div class="form-group">
-																															<label>Primary Mobile <span class="required">*</span></label>
-																															<input type="tel" id="rider_mobile" class="form-input" placeholder="Enter mobile number" required>
-																														</div>
-																														<div class="form-group">
-																															<label>WhatsApp Number</label>
-																															<input type="tel" id="rider_whatsapp" class="form-input" placeholder="Enter WhatsApp">
-																														</div>
-																														<div class="form-group">
-																															<label>Vehicle Number <span class="required">*</span></label>
-																															<input type="text" id="vehicle_number" class="form-input" placeholder="Enter vehicle number" required>
-																														</div>
-																														<div class="form-group">
-																															<label>Vehicle Type <span class="required">*</span></label>
-																															<select id="vehicle_type" class="form-select" required>
-																																<option value="" disabled selected>Select Vehicle Type</option>
-																																<option value="Bicycle">Bicycle</option>
-																																<option value="Motorbike">Motorbike</option>
-																																<option value="Three-Wheeler">Three-Wheeler</option>
-																																<option value="Mini Truck">Mini Truck</option>
-																																<option value="Truck">Truck</option>
-																															</select>
-																														</div>
-																														<div class="form-group">
-																															<label>Max KG Capacity <span class="required">*</span></label>
-																															<input type="number" id="max_kg_capacity" class="form-input" placeholder="Enter max capacity in KG" required min="1">
-																														</div>
-																														<div class="form-group">
-																															<label>Assigned District(s) <span class="required">*</span></label>
-																															<select id="assigned_districts" class="form-select" multiple required style="height: 120px; padding: 5px;">
-																																${Object.keys(gnData).map(d => `<option value="${d}">${d}</option>`).join('')}
-																															</select>
-																															<small class="text-muted d-block mt-1">Hold Ctrl (Windows) / Cmd (Mac) to select multiple districts</small>
-																														</div>
-																														<div class="form-group">
-																															<label>Residential Address <span class="required">*</span></label>
-																															<textarea id="rider_address" class="form-input" placeholder="Enter Residential Address" rows="2" required></textarea>
-																														</div>
-																														<div class="form-group">
-																															<label>Any Needed Details</label>
-																															<textarea id="extra_details" class="form-input" placeholder="availability, notes..." rows="2"></textarea>
-																														</div>
-																													</div>
-																												`;
-									break;
 							}
 
 							$('#role-specific-fields').html(html).show();
@@ -1242,7 +1143,6 @@
 								'lead_farmer': { mobile: '#lead_mobile', whatsapp: '#lead_whatsapp' },
 								'buyer': { mobile: '#buyer_mobile', whatsapp: '#buyer_whatsapp' },
 								'facilitator': { mobile: '#facilitator_mobile', whatsapp: '#facilitator_whatsapp' },
-								'delivery_rider': { mobile: '#rider_mobile', whatsapp: '#rider_whatsapp' }
 							};
 
 							if (roleMap[userType]) {
@@ -1313,7 +1213,6 @@
 							setupNICListener('#facilitator_nic', '#facilitator_nic_status');
 							setupNICListener('#buyer_nic', '#buyer_nic_status');
 							setupNICListener('#admin_nic', '#admin_nic_status');
-							setupNICListener('#rider_nic', '#rider_nic_status');
 
 							const validateWallet = (fieldId, errorId, prefixes) => {
 								$(document).on('input', fieldId, function () {
@@ -1551,12 +1450,6 @@
 							}
 							formData.nic_no = nic || '';
 							formData.phone_number = $('#admin_phone').val() || '';
-						} else if (userType === 'delivery_rider') {
-							const email = $('#email').val();
-							if (!email) {
-								Swal.showValidationMessage('Email Address is required');
-								return false;
-							}
 							const nic = $('#rider_nic').val();
 							if (!nic || !validateNIC(nic)) {
 								Swal.showValidationMessage('Valid NIC is required for Delivery Riders');

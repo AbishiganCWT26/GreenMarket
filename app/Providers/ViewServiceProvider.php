@@ -10,7 +10,6 @@ use App\Http\View\Composers\AdminComposer;
 use App\Http\View\Composers\DashboardComposer;
 use App\Http\View\Composers\LeadFarmerComposer;
 use App\Http\View\Composers\FacilitatorComposer;
-use App\Http\View\Composers\DeliveryRiderComposer;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -49,12 +48,6 @@ class ViewServiceProvider extends ServiceProvider
         View::composer(
             ['facilitator.*'],
             FacilitatorComposer::class
-        );
-
-        // Delivery Rider shared data
-        View::composer(
-            ['delivery-rider.*'],
-            DeliveryRiderComposer::class
         );
 
         // Share $unread variable with buyer_nav for all buyer views

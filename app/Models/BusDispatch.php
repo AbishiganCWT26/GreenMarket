@@ -25,9 +25,4 @@ class BusDispatch extends Model
     {
         return $this->hasMany(DispatchProduct::class);
     }
-
-    public function riderDeliveries()
-    {
-        return $this->hasMany(RiderDelivery::class);
-    }
 }

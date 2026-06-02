@@ -527,10 +527,6 @@
 								<span>Subtotal:</span>
 								<strong>LKR ${parseFloat(order.items_total || 0).toFixed(2)}</strong>
 							</div>
-							<div class="d-flex justify-content-between mb-1 small">
-								<span>Delivery:</span>
-								<strong>LKR ${parseFloat(order.delivery_fee || 0).toFixed(2)}</strong>
-							</div>
 							<hr class="my-1">
 							<div class="d-flex justify-content-between">
 								<span class="fw-bold">Total:</span>

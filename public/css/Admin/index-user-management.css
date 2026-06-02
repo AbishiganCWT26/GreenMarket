@@ -446,11 +446,6 @@ body {
 	color: var(--danger-color);
 }
 
-.role-delivery_rider {
-	background: var(--warning-bg);
-	color: var(--warning-color);
-}
-
 
 
 .user-email {

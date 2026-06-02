@@ -794,23 +794,6 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('buyer.unpaidDeliveryOrders') }}"
-                            class="menu-link {{ request()->routeIs('buyer.unpaidDeliveryOrders') ? 'active' : '' }}">
-                            <i class="fa-solid fa-receipt"></i><span>Unpaid Orders</span>
-                            @php
-                                $tempCount = DB::table('temporary_delivery_order_items')
-                                    ->where('buyer_id', Auth::id())
-                                    ->where('order_status', 'Processing order')
-                                    ->distinct('order_id')
-                                    ->count('order_id');
-                            @endphp
-                            @if($tempCount > 0)
-                                <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">{{ $tempCount }}</span>
-                            @endif
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="{{ route('buyer.productRequest.create') }}"
                             class="menu-link {{ request()->routeIs('buyer.productRequest.create') ? 'active' : '' }}">
                             <i class="fa-solid fa-plus-circle"></i><span>Request Product</span>

@@ -108,9 +108,8 @@
 					$buyerData = DB::table('buyers')->where('user_id', $user->id)->first();
 					$facilitatorData = DB::table('facilitators')->where('user_id', $user->id)->first();
 					$facilitatorAssignments = $facilitatorData ? DB::table('facilitator_assignments')->where('facilitator_id', $facilitatorData->id)->get() : collect();
-					$deliveryRiderData = DB::table('delivery_riders')->where('user_id', $user->id)->first();
 					
-					$userDetails = ($user->role == 'farmer' ? $farmerData : ($user->role == 'lead_farmer' ? $leadFarmerData : ($user->role == 'delivery_rider' ? $deliveryRiderData : null))) ?? (object)[];
+					$userDetails = ($user->role == 'farmer' ? $farmerData : ($user->role == 'lead_farmer' ? $leadFarmerData :null)) ?? (object)[];
 					
 					if (!isset($userDetails->preferred_payment)) $userDetails->preferred_payment = 'bank';
 					if (!isset($userDetails->nic_no)) $userDetails->nic_no = '';
@@ -563,129 +562,6 @@
 					</div>
 				</div>
 				@endif
-
-				@if($user->role == 'delivery_rider')
-				<div id="delivery-rider-sections">
-					<div class="form-section rider-section">
-						<div class="section-header">
-							<div class="section-icon">
-								<i class="fas fa-motorcycle"></i>
-							</div>
-							<h3>Delivery Rider Details</h3>
-						</div>
-						<div class="form-fields">
-							<div class="form-row">
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-user"></i> Full Name
-									</label>
-									<input type="text" name="name" class="form-input" value="{{ $deliveryRiderData->name ?? '' }}" required>
-								</div>
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-id-card"></i> NIC Number
-									</label>
-									<div class="nic-input-wrapper">
-										<input type="text" name="nic_no" id="rider_nic" class="form-input" value="{{ $deliveryRiderData->nic_no ?? '' }}" required>
-										<div id="rider_nic_status" class="nic-status mt-1" style="font-size: 11px; min-height: 16px;"></div>
-									</div>
-									<small class="form-note mt-1" style="display: block; color: var(--text-muted);">
-										<i class="fas fa-info-circle"></i> Updating NIC requires OTP verification
-									</small>
-								</div>
-							</div>
-
-							<div class="form-row">
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-id-card-alt"></i> Licence Number
-									</label>
-									<input type="text" name="licence_number" id="rider_licence_number" class="form-input" value="{{ $deliveryRiderData->licence_number ?? '' }}" required>
-									<small class="form-note mt-1" style="display: block; color: var(--text-muted);">
-										<i class="fas fa-info-circle"></i> Updating Licence Number requires OTP verification
-									</small>
-								</div>
-							</div>
-
-							<div class="form-row">
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-phone"></i> Primary Mobile
-									</label>
-									<input type="text" name="primary_mobile" id="rider_mobile" class="form-input" value="{{ $deliveryRiderData->primary_mobile ?? '' }}" required>
-								</div>
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fab fa-whatsapp"></i> WhatsApp Number
-									</label>
-									<input type="text" name="whatsapp_number" id="rider_whatsapp" class="form-input" value="{{ $deliveryRiderData->whatsapp_number ?? '' }}">
-								</div>
-							</div>
-
-							<div class="form-row">
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-truck"></i> Vehicle Type
-									</label>
-									<select name="vehicle_type" id="rider_vehicle_type" class="form-select" required>
-										<option value="" disabled {{ empty($deliveryRiderData->vehicle_type) ? 'selected' : '' }}>Select Vehicle Type</option>
-										<option value="Bicycle" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Bicycle' ? 'selected' : '' }}>Bicycle</option>
-										<option value="Motorbike" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Motorbike' ? 'selected' : '' }}>Motorbike</option>
-										<option value="Three-Wheeler" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Three-Wheeler' ? 'selected' : '' }}>Three-Wheeler</option>
-										<option value="Mini Truck" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Mini Truck' ? 'selected' : '' }}>Mini Truck</option>
-										<option value="Truck" {{ ($deliveryRiderData->vehicle_type ?? '') == 'Truck' ? 'selected' : '' }}>Truck</option>
-									</select>
-								</div>
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-car-side"></i> Vehicle Number
-									</label>
-									<input type="text" name="vehicle_number" id="rider_vehicle_number" class="form-input" value="{{ $deliveryRiderData->vehicle_number ?? '' }}" required>
-								</div>
-							</div>
-
-							<div class="form-row">
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-weight-hanging"></i> Max Capacity (KG)
-									</label>
-									<input type="number" name="max_kg_capacity" id="rider_max_kg_capacity" class="form-input" value="{{ $deliveryRiderData->max_kg_capacity ?? '' }}" required min="1">
-								</div>
-								<div class="form-group">
-									<label class="form-label">
-										<i class="fas fa-map-marked-alt"></i> Assigned District(s)
-									</label>
-									@php
-										$assignedDistricts = isset($deliveryRiderData->assigned_districts) ? json_decode($deliveryRiderData->assigned_districts, true) : [];
-										if(!is_array($assignedDistricts)) $assignedDistricts = [];
-										$districtsList = ['Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Moneragala', 'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'];
-									@endphp
-									<select name="assigned_districts[]" id="rider_assigned_districts" class="form-select" multiple style="height: 120px;">
-										@foreach($districtsList as $d)
-											<option value="{{ $d }}" {{ in_array($d, $assignedDistricts) ? 'selected' : '' }}>{{ $d }}</option>
-										@endforeach
-									</select>
-									<small class="form-note">Hold Ctrl (Windows) / Command (Mac) to select multiple districts</small>
-								</div>
-							</div>
-
-							<div class="form-group">
-								<label class="form-label">
-									<i class="fas fa-home"></i> Residential Address
-								</label>
-								<textarea name="residential_address" id="rider_address" class="form-input" rows="2" required>{{ $deliveryRiderData->residential_address ?? '' }}</textarea>
-							</div>
-
-							<div class="form-group">
-								<label class="form-label">
-									<i class="fas fa-info-circle"></i> Extra Details
-								</label>
-								<textarea name="extra_details" id="rider_extra_details" class="form-input" rows="2">{{ $deliveryRiderData->extra_details ?? '' }}</textarea>
-							</div>
-						</div>
-					</div>
-				</div>
-				@endif
 			</div>
 
 			<div class="form-actions">
@@ -913,12 +789,6 @@ $(document).ready(function() {
 					showError('Please enter a valid NIC number.');
 					return;
 				}
-			} else if (userRole === 'delivery_rider') {
-				const nic = $('#rider_nic').val();
-				if (nic && !validateNIC(nic)) {
-					showError('Please enter a valid NIC number.');
-					return;
-				}
 				const licenceNo = $('#rider_licence_number').val();
 				if (!licenceNo) {
 					showError('Licence Number is required.');
@@ -978,14 +848,6 @@ $(document).ready(function() {
 					}
 				});
 			}
-
-			if (userRole === 'delivery_rider') {
-				const isRiderChanged = checkDeliveryRiderChanges();
-				if (isRiderChanged) {
-					if (otpVerified) {
-						submitForm();
-						return;
-					}
 
 					Swal.fire({
 						title: 'OTP Verification Required',
@@ -1395,63 +1257,6 @@ $(document).ready(function() {
 			return false;
 		}
 	}
-
-	@if($user->role == 'delivery_rider')
-	function checkDeliveryRiderChanges() {
-		try {
-			const originalData = {
-				username: {!! json_encode($user->username) !!},
-				email: {!! json_encode($user->email ?? "") !!},
-				nic_no: {!! json_encode($deliveryRiderData->nic_no ?? "") !!},
-				licence_number: {!! json_encode($deliveryRiderData->licence_number ?? "") !!},
-				primary_mobile: {!! json_encode($deliveryRiderData->primary_mobile ?? "") !!},
-				whatsapp_number: {!! json_encode($deliveryRiderData->whatsapp_number ?? "") !!},
-				vehicle_type: {!! json_encode($deliveryRiderData->vehicle_type ?? "") !!},
-				vehicle_number: {!! json_encode($deliveryRiderData->vehicle_number ?? "") !!},
-				max_kg_capacity: {!! json_encode($deliveryRiderData->max_kg_capacity ?? "") !!},
-				residential_address: {!! json_encode($deliveryRiderData->residential_address ?? "") !!}
-			};
-
-			const currentData = {
-				username: $('input[name="username"]').val() || "",
-				email: $('input[name="email"]').val() || "",
-				nic_no: $('#rider_nic').val() || "",
-				licence_number: $('#rider_licence_number').val() || "",
-				primary_mobile: $('#rider_mobile').val() || "",
-				whatsapp_number: $('#rider_whatsapp').val() || "",
-				vehicle_type: $('#rider_vehicle_type').val() || "",
-				vehicle_number: $('#rider_vehicle_number').val() || "",
-				max_kg_capacity: $('#rider_max_kg_capacity').val() || "",
-				residential_address: $('#rider_address').val() || ""
-			};
-
-			for (const key in originalData) {
-				const originalVal = (originalData[key] || "").toString().trim();
-				const currentVal = (currentData[key] || "").toString().trim();
-				if (originalVal !== currentVal) {
-					return true;
-				}
-			}
-
-			// Check assigned districts
-			const originalDistricts = {!! json_encode($assignedDistricts) !!} || [];
-			const currentDistricts = $('#rider_assigned_districts').val() || [];
-			if (originalDistricts.length !== currentDistricts.length) {
-				return true;
-			}
-			const sortedOrig = [...originalDistricts].sort();
-			const sortedCurr = [...currentDistricts].sort();
-			for (let i = 0; i < sortedOrig.length; i++) {
-				if (sortedOrig[i] !== sortedCurr[i]) {
-					return true;
-				}
-			}
-		} catch (e) {
-			console.error('Error checking rider changes:', e);
-		}
-		return false;
-	}
-	@endif
 
 	let currentOtpAction = 'edit_payment';
 

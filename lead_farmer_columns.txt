@@ -1,1 +1,0 @@
-id,user_id,name,nic_no,primary_mobile,whatsapp_number,residential_address,grama_niladhari_division,group_name,group_number,preferred_payment,payment_details,created_at,updated_at,account_number,account_holder_name,bank_name,bank_branch,district,divisional_secretariat,gn_division_code

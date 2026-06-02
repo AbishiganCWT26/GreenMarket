@@ -799,20 +799,6 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('lf.deliveryTransactions') }}"
-                            class="menu-link {{ request()->routeIs('lf.deliveryTransactions') ? 'active' : '' }}">
-                            <i class="fa-solid fa-file-invoice-dollar"></i><span>Verify Payments</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('lf.deliveryProducts') }}"
-                            class="menu-link {{ request()->routeIs('lf.deliveryProducts') ? 'active' : '' }}">
-                            <i class="fa-solid fa-truck-loading"></i><span>Manage Dispatch</span>
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="{{ route('lf.reports.sales') }}"
                             class="menu-link {{ request()->routeIs('lf.reports.*') ? 'active' : '' }}">
                             <i class="fa-solid fa-chart-line"></i><span>Sales Reports</span>

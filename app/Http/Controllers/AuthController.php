@@ -89,8 +89,6 @@ class AuthController extends Controller
                 return redirect('/farmer/dashboard');
 			case 'buyer':
 				return redirect('/buyer/dashboard');
-			case 'delivery_rider':
-				return redirect('/delivery-rider/dashboard');
 			default:
 				return redirect('/');
         }
@@ -365,11 +363,6 @@ class AuthController extends Controller
                 ->value('phone_number');
         }
 
-        if (!$phone) {
-            $phone = DB::table('delivery_riders')
-                ->where('user_id', $userId)
-                ->value('primary_mobile');
-        }
 
         return $phone;
     }

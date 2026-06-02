@@ -264,7 +264,6 @@
                                 <span class="order-details-label">Order Summary:</span>
                                 <div class="order-details-value">
                                     <small><strong>Items Total:</strong> LKR ${parseFloat(order.items_total || order.total_amount).toFixed(2)}</small><br>
-                                    <small><strong>Delivery Fee:</strong> LKR ${parseFloat(order.delivery_fee || 0).toFixed(2)}</small><br>
                                     <small><strong>Grand Total:</strong> LKR ${parseFloat(order.total_amount).toFixed(2)}</small>
                                 </div>
                             </div>

@@ -11,7 +11,6 @@
                     'admin' => asset('assets/images/Profiles/default-avatar.png'),
                     'lead_farmer' => asset('assets/images/Profiles/lead-farmer.png'),
                     'facilitator' => asset('assets/images/Profiles/facilitator.png'),
-                    'delivery_rider' => asset('assets/images/Profiles/Delivery-Rider.png'),
                     default => asset('assets/images/Profiles/default-avatar.png')
                 };
 

@@ -445,7 +445,6 @@ class FarmerController extends Controller
             }
 
             $order->items_total = $order->orderItems->sum('item_total');
-            $order->delivery_fee = $order->total_amount - $order->items_total;
 
             return response()->json([
                 'success' => true,
@@ -698,7 +697,6 @@ class FarmerController extends Controller
 
         foreach ($orders as $order) {
             $order->items_total = $order->orderItems->sum('item_total');
-            $order->delivery_fee = $order->total_amount - $order->orderItems->sum('item_total');
         }
 
         return view('farmer.orders.active', compact('orders', 'pendingOrders'));

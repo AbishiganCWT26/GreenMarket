@@ -35,7 +35,7 @@
 						<div class="profile-meta">
 							<span class="role-badge role-{{ $user->role }}">
 								<i
-									class="fas fa-{{ $user->role == 'admin' ? 'crown' : ($user->role == 'farmer' ? 'tractor' : ($user->role == 'buyer' ? 'shopping-cart' : ($user->role == 'delivery_rider' ? 'motorcycle' : 'user'))) }}"></i>
+									class="fas fa-{{ $user->role == 'admin' ? 'crown' : ($user->role == 'farmer' ? 'tractor' : ($user->role == 'buyer' ? 'shopping-cart' :'user')) }}"></i>
 								{{ ucfirst(str_replace('_', ' ', $user->role)) }}
 							</span>
 							<span class="user-id">ID: HGH{{ str_pad($user->id, 4, '0', STR_PAD_LEFT) }}</span>
@@ -482,93 +482,6 @@
 						</div>
 					</div>
 				@endif
-
-				@if($user->role == 'delivery_rider')
-					{{-- Section 2: Delivery Rider Details --}}
-					<div class="details-section rider-section">
-						<div class="section-header">
-							<div class="section-icon">
-								<i class="fas fa-id-card"></i>
-							</div>
-							<h3>Delivery Rider Details</h3>
-						</div>
-						<div class="section-content">
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fas fa-user-circle"></i> Full Name
-								</div>
-								<div class="detail-value">{{ $details->name }}</div>
-							</div>
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fas fa-id-card"></i> NIC Number
-								</div>
-								<div class="detail-value">{{ $details->nic_no }}</div>
-							</div>
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fas fa-phone"></i> Mobile Number
-								</div>
-								<div class="detail-value">{{ $details->primary_mobile }}</div>
-							</div>
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fab fa-whatsapp"></i> WhatsApp Number
-								</div>
-								<div class="detail-value">{{ $details->whatsapp_number ?? 'Not provided' }}</div>
-							</div>
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fas fa-id-card-alt"></i> Licence Number
-								</div>
-								<div class="detail-value">{{ $details->licence_number ?? 'Not provided' }}</div>
-							</div>
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fas fa-home"></i> Residential Address
-								</div>
-								<div class="detail-value">{{ $details->residential_address ?? 'Not provided' }}</div>
-							</div>
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fas fa-info-circle"></i> Extra Details
-								</div>
-								<div class="detail-value">{{ $details->extra_details ?? 'No extra details' }}</div>
-							</div>
-						</div>
-					</div>
-
-					{{-- Section 3: Delivery Vehicle Details --}}
-					<div class="details-section vehicle-section">
-						<div class="section-header">
-							<div class="section-icon">
-								<i class="fas fa-motorcycle"></i>
-							</div>
-							<h3>Delivery Vehicle Details</h3>
-						</div>
-						<div class="section-content">
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fas fa-truck"></i> Vehicle Type
-								</div>
-								<div class="detail-value">{{ $details->vehicle_type ?? 'Not provided' }}</div>
-							</div>
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fas fa-car-side"></i> Vehicle Number
-								</div>
-								<div class="detail-value">{{ $details->vehicle_number ?? 'Not provided' }}</div>
-							</div>
-							<div class="detail-row">
-								<div class="detail-label">
-									<i class="fas fa-weight-hanging"></i> Capacity
-								</div>
-								<div class="detail-value">
-									@if(isset($details->max_kg_capacity) && $details->max_kg_capacity)
-										{{ $details->max_kg_capacity }} kg
-									@else
-										Not provided
-									@endif
 								</div>
 							</div>
 							<div class="detail-row">
