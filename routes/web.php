@@ -579,4 +579,12 @@ Route::get('/autologin-admin', function () {
     return redirect('/admin/users/68');
 });
 
-
+Route::get('/run-queue', function () {
+    try {
+        Artisan::call('queue:work', ['--stop-when-empty' => true]);
+        $output = Artisan::output();
+        return empty($output) ? "No jobs in queue." : "<pre>" . $output . "</pre>";
+    } catch (\Exception $e) {
+        return "Error running queue: " . $e->getMessage() . "<br><pre>" . $e->getTraceAsString() . "</pre>";
+    }
+});
