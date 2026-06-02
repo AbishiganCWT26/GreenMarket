@@ -1655,7 +1655,6 @@ class BuyerController extends Controller
 
                 // Notifications
                 $this->sendOrderNotifications($orderId, $buyer);
-            }
         }
 
         // Clear shopping cart
