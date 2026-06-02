@@ -135,20 +135,17 @@ class PublicController extends Controller
         ]);
 
         try {
-            $adminEmail = config('mail.admin_email') ?? env('MAIL_ADMIN_EMAIL') ?? 'koneswaramkovil@gmail.com';
+            $adminEmail = env('MAIL_ADMIN_EMAIL', 'trincoabishigan@gmail.com');
 
-            if (!$adminEmail) {
-                throw new \Exception('Admin email is not configured.');
-            }
-
-            \Log::info('Attempting to send email to: ' . $adminEmail);
-            \Log::info('Using mailer: ' . config('mail.default'));
-            \Log::info('From address: ' . config('mail.from.address'));
-
-            Mail::to($adminEmail)
-                ->queue(new ContactFormMail($request->all()));
-
-            \Log::info('Email sent successfully to: ' . $adminEmail);
+            $data = $request->all();
+            
+            // defer() executes the closure after the HTTP response has been sent to the user.
+            // This prevents the 30s timeout issue while the SMTP server connects.
+            defer(function () use ($adminEmail, $data) {
+                \Log::info('Background: Attempting to send email to: ' . $adminEmail);
+                Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
+                \Log::info('Background: Email sent successfully to: ' . $adminEmail);
+            });
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
