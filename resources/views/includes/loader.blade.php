@@ -20,7 +20,9 @@
 					<img src="{{ asset('assets/images/Logo Green Market.png') }}"
 						 class="logo-image"
 						 alt="GreenMarket Logo"
-						 fetchpriority="high">
+						 fetchpriority="high"
+						 loading="eager"
+						 decoding="sync">
 				</div>
 				<div class="spinner-ring"></div>
 				<div class="spinner-ring spinner-ring-2"></div>
@@ -567,10 +569,10 @@ document.addEventListener("DOMContentLoaded", () => {
     let startTime = Date.now();
     let isFinished = false;
 
-    // Maximum loading time fallback (5 seconds)
+    // Maximum loading time fallback (3 seconds)
     setTimeout(() => {
         finishLoading();
-    }, 5000);
+    }, 3000);
 
     if (totalImages === 0) {
         finishLoading();
