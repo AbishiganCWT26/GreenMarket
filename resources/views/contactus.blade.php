@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						text: undefined,
 						html: result.message || 'We\'ll reply soon.',
 						confirmButtonColor: '#10B981',
-						timer: 7500,
+						timer: 3000,
 						showConfirmButton: false
 					});
 					contactForm.reset();
@@ -201,13 +201,15 @@ document.addEventListener('DOMContentLoaded', function() {
 					errorMessage = 'Please wait a moment before trying again.';
 				} else if (error.type === 'server') {
 					errorTitle = 'Server Error';
-					errorMessage = 'Unable to process your request. Please try again later.';
+					errorMessage = error.message;
 				}
 
 				Swal.fire({
 					title: errorTitle,
 					html: errorMessage,
 					confirmButtonColor: '#10B981',
+					timer: 4000,
+					showConfirmButton: false,
 					@if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif
 				});
 			} finally {

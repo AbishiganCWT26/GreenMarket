@@ -198,17 +198,7 @@ class UserController extends Controller
             'email' => 'nullable|email|max:100|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'name' => 'required|string|max:100'
-        ]); {
-                $nicExists = DB::table('lead_farmers')->where('nic_no', $nicNumber)->exists();
-            }
-            
-            if ($nicExists) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Failed to create user because NIC No. "' . $nicNumber . '" already exists'
-                ], 422);
-            }
-        }
+        ]);
 
         // Additional validation for admin types
         if ($validated['user_type'] == 'admin') {
@@ -380,7 +370,23 @@ class UserController extends Controller
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
-			} else {
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'User created successfully!']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $errorMessage = $e->getMessage();
+
+            // Check for duplicate NIC error
+            if (strpos($errorMessage, 'farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
+                preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
+                $nicNumber = $matches[1] ?? '';
+                
+                if ($nicNumber) {
+                    $errorMessage = 'Failed to create user because NIC No. "' . $nicNumber . '" already exists';
+                } else {
                     $errorMessage = 'Failed to create user because NIC number already exists';
                 }
             }
@@ -1274,46 +1280,6 @@ class UserController extends Controller
 
         $details = $this->getUserDetails($user);
         if (!$details) return ['changed' => false, 'actions' => []];
-            if ((string)($user->email ?? '') !== (string)($request->email ?? '')) {
-                $changed = true;
-                if (!in_array('verify_rider_profile', $actions)) $actions[] = 'verify_rider_profile';
-            }
-
-            // Check details fields
-            $restrictedFields = [
-                'nic_no',
-                'licence_number',
-                'primary_mobile',
-                'whatsapp_number',
-                'vehicle_number',
-                'vehicle_type',
-                'max_kg_capacity',
-                'residential_address'
-            ];
-            foreach ($restrictedFields as $field) {
-                $oldVal = (string)($details->$field ?? '');
-                $newVal = (string)($request->$field ?? '');
-                if ($oldVal !== $newVal) {
-                    $changed = true;
-                    if (!in_array('verify_rider_profile', $actions)) $actions[] = 'verify_rider_profile';
-                }
-            }
-
-            // Check assigned_districts array/JSON
-            $oldDistricts = isset($details->assigned_districts) ? json_decode($details->assigned_districts, true) : [];
-            if (!is_array($oldDistricts)) $oldDistricts = [];
-            $newDistricts = $request->assigned_districts ?? [];
-            if (!is_array($newDistricts)) $newDistricts = [];
-            
-            sort($oldDistricts);
-            sort($newDistricts);
-            if ($oldDistricts !== $newDistricts) {
-                $changed = true;
-                if (!in_array('verify_rider_profile', $actions)) $actions[] = 'verify_rider_profile';
-            }
-
-            return ['changed' => $changed, 'actions' => $actions];
-        }
 
         // Check NIC change
         $currentNic = null;
@@ -1466,6 +1432,7 @@ class UserController extends Controller
         } elseif ($role == 'admin') {
             $admin = DB::table('admins')->where('user_id', $userId)->first();
             return $admin->phone_number ?? null;
+        }
 
         return null;
     }
@@ -1490,6 +1457,7 @@ class UserController extends Controller
             return $this->deleteFacilitator($user);
         } elseif ($user->role == 'buyer') {
             return $this->deleteBuyer($user);
+        }
 
         return response()->json(['success' => false, 'message' => 'Unknown user role'], 400);
     }
