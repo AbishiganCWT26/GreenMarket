@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					title: errorTitle,
 					html: errorMessage,
 					confirmButtonColor: '#10B981',
-					timer: 4000,
+					timer: 8000,
 					showConfirmButton: false,
 					@if(file_exists(public_path('assets/icons/Gif/error3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif
 				});
