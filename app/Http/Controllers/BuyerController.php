@@ -1460,7 +1460,7 @@ class BuyerController extends Controller
 
             $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
             $invoicePath = 'invoices/' . $invoiceNumber . '.pdf';
-            DB::table('invoices')->insert([
+            DB::table('invoices')->insertGetId([
                 'invoice_number' => $invoiceNumber,
                 'order_id' => $orderId,
                 'invoice_path' => $invoicePath,
@@ -1645,7 +1645,7 @@ class BuyerController extends Controller
 
                 // Create invoice for Pickup order
                 $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
-                DB::table('invoices')->insert([
+                DB::table('invoices')->insertGetId([
                     'invoice_number' => $invoiceNumber,
                     'order_id' => $orderId,
                     'invoice_path' => 'invoices/' . $invoiceNumber . '.pdf',
