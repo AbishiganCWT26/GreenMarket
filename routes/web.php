@@ -583,7 +583,11 @@ Route::get('/run-queue', function () {
     try {
         Artisan::call('queue:work', ['--stop-when-empty' => true]);
         $output = Artisan::output();
-        return empty($output) ? "No jobs in queue." : "<pre>" . $output . "</pre>";
+        
+        $failedJob = \Illuminate\Support\Facades\DB::table('failed_jobs')->orderBy('id', 'desc')->first();
+        $failedMsg = $failedJob ? "LATEST FAILED JOB ERROR:\n" . $failedJob->exception : "No failed jobs found.";
+        
+        return (empty($output) ? "No jobs in queue.\n\n" : "Output:\n" . $output . "\n\n") . "<pre>" . $failedMsg . "</pre>";
     } catch (\Exception $e) {
         return "Error running queue: " . $e->getMessage() . "<br><pre>" . $e->getTraceAsString() . "</pre>";
     }
