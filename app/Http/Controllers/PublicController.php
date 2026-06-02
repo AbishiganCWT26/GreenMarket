@@ -143,11 +143,10 @@ class PublicController extends Controller
             // This prevents the 30s timeout issue while the SMTP server connects.
             defer(function () use ($adminEmail, $data) {
                 try {
-                    \Log::info('Background: Attempting to send email to: ' . $adminEmail);
                     Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
-                    \Log::info('Background: Email sent successfully to: ' . $adminEmail);
                 } catch (\Exception $e) {
-                    \Log::error('Background Email Error: ' . $e->getMessage());
+                    // Silently fail to prevent JSON corruption on Railway.
+                    // The underlying issue is likely an SMTP connection timeout (blocked port).
                 }
             });
 
