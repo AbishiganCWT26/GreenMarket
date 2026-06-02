@@ -135,17 +135,53 @@ class PublicController extends Controller
         ]);
 
         try {
-            $adminEmail = env('MAIL_ADMIN_EMAIL', 'abifamily24@gmail.com');
-            $data = $request->all();
+            // Configure Brevo API (using modern v4.x official SDK)
+            $apiKey = env('BREVO_API_KEY');
             
-            // Queue the email to the database. This takes 10ms and guarantees
-            // the HTTP request will close immediately, preventing JSON corruption.
-            Mail::to($adminEmail)->queue(new \App\Mail\ContactFormMail($data));
+            if (!empty($apiKey)) {
+                $brevo = new \Brevo\Brevo($apiKey);
 
-            // Spawn a background worker to process the queue immediately.
-            // This runs completely disconnected from the web request.
-            if (function_exists('exec')) {
-                exec('php ' . base_path('artisan') . ' queue:work --stop-when-empty > /dev/null 2>&1 &');
+                // Prepare email content
+                $adminEmail = env('MAIL_ADMIN_EMAIL', 'abifamily24@gmail.com');
+                $userName = $request->name;
+                $userEmail = $request->email;
+                $userSubject = $request->subject ?? 'Contact Form Message';
+                $userMessage = $request->message;
+
+                $fromAddress = env('MAIL_FROM_ADDRESS', 'malabepasanga@gmail.com');
+                $fromName = env('MAIL_FROM_NAME', 'GreenMarket');
+
+                // Send transactional email using official Brevo HTTP API
+                $brevo->transactionalEmails->sendTransacEmail(
+                    new \Brevo\TransactionalEmails\Requests\SendTransacEmailRequest([
+                        'subject' => $userSubject,
+                        'sender' => new \Brevo\TransactionalEmails\Types\SendTransacEmailRequestSender([
+                            'email' => $fromAddress,
+                            'name' => $fromName,
+                        ]),
+                        'to' => [
+                            new \Brevo\TransactionalEmails\Types\SendTransacEmailRequestToItem([
+                                'email' => $adminEmail,
+                                'name' => 'Admin',
+                            ]),
+                        ],
+                        'htmlContent' => "
+                            <h2>New Contact Message</h2>
+                            <p><strong>Name:</strong> {$userName}</p>
+                            <p><strong>Email:</strong> {$userEmail}</p>
+                            <p><strong>Subject:</strong> {$userSubject}</p>
+                            <p><strong>Message:</strong></p>
+                            <p>" . nl2br(e($userMessage)) . "</p>
+                        ",
+                        'textContent' => "New Contact Message\n\nName: {$userName}\nEmail: {$userEmail}\nSubject: {$userSubject}\nMessage: {$userMessage}"
+                    ])
+                );
+            } else {
+                // Fallback to standard Laravel mailer (perfect for localhost where SMTP/Resend is configured)
+                $adminEmail = env('MAIL_ADMIN_EMAIL', 'abifamily24@gmail.com');
+                $data = $request->all();
+                
+                Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
             }
 
             if ($request->expectsJson() || $request->ajax()) {
@@ -158,7 +194,7 @@ class PublicController extends Controller
             return redirect()->back()->with('success', 'Your message has been sent successfully!<br>We will respond within 24 hours.');
 
         } catch (\Exception $e) {
-            \Log::error('Contact form error: ' . $e->getMessage());
+            \Log::error('Brevo API contact form error: ' . $e->getMessage());
             \Log::error('Error trace: ' . $e->getTraceAsString());
 
             if ($request->expectsJson() || $request->ajax()) {
