@@ -135,7 +135,7 @@ class PublicController extends Controller
         ]);
 
         try {
-            $adminEmail = env('MAIL_ADMIN_EMAIL', 'trincoabishigan@gmail.com');
+            $adminEmail = env('MAIL_ADMIN_EMAIL', 'abifamily24@gmail.com');
             $data = $request->all();
             
             // Queue the email to the database. This takes 10ms and guarantees
