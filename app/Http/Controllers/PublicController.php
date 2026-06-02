@@ -135,14 +135,18 @@ class PublicController extends Controller
         ]);
 
         try {
-            $adminEmail = env('MAIL_ADMIN_EMAIL', 'trincoabishigan@gmail.com');
+            $adminEmail = config('mail.admin_email') ?? env('MAIL_ADMIN_EMAIL') ?? 'koneswaramkovil@gmail.com';
+
+            if (!$adminEmail) {
+                throw new \Exception('Admin email is not configured.');
+            }
 
             \Log::info('Attempting to send email to: ' . $adminEmail);
             \Log::info('Using mailer: ' . config('mail.default'));
             \Log::info('From address: ' . config('mail.from.address'));
 
             Mail::to($adminEmail)
-                ->send(new ContactFormMail($request->all()));
+                ->queue(new ContactFormMail($request->all()));
 
             \Log::info('Email sent successfully to: ' . $adminEmail);
 
