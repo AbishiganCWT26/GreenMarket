@@ -136,23 +136,17 @@ class PublicController extends Controller
 
         try {
             $adminEmail = env('MAIL_ADMIN_EMAIL', 'trincoabishigan@gmail.com');
-
             $data = $request->all();
             
-            // defer() executes the closure after the HTTP response has been sent to the user.
-            // This prevents the 30s timeout issue while the SMTP server connects.
-            defer(function () use ($adminEmail, $data) {
-                // Completely suppress any PHP warnings (like fsockopen timeouts)
-                // and output buffering to ensure no text leaks into the JSON response.
-                error_reporting(0);
-                ob_start();
-                try {
-                    Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
-                } catch (\Throwable $e) {
-                    // Silently fail to prevent JSON corruption on Railway.
-                }
-                ob_end_clean();
-            });
+            // Queue the email to the database. This takes 10ms and guarantees
+            // the HTTP request will close immediately, preventing JSON corruption.
+            Mail::to($adminEmail)->queue(new \App\Mail\ContactFormMail($data));
+
+            // Spawn a background worker to process the queue immediately.
+            // This runs completely disconnected from the web request.
+            if (function_exists('exec')) {
+                exec('php ' . base_path('artisan') . ' queue:work --stop-when-empty > /dev/null 2>&1 &');
+            }
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
