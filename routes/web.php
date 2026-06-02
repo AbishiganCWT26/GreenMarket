@@ -581,6 +581,9 @@ Route::get('/autologin-admin', function () {
 
 Route::get('/run-queue', function () {
     try {
+        // Clear old failed jobs first
+        \Illuminate\Support\Facades\DB::table('failed_jobs')->truncate();
+        
         Artisan::call('queue:work', ['--stop-when-empty' => true]);
         $output = Artisan::output();
         
@@ -590,5 +593,29 @@ Route::get('/run-queue', function () {
         return (empty($output) ? "No jobs in queue.\n\n" : "Output:\n" . $output . "\n\n") . "<pre>" . $failedMsg . "</pre>";
     } catch (\Exception $e) {
         return "Error running queue: " . $e->getMessage() . "<br><pre>" . $e->getTraceAsString() . "</pre>";
+    }
+});
+
+// Direct email test — bypasses queue entirely
+Route::get('/test-send-direct', function () {
+    try {
+        $adminEmail = env('MAIL_ADMIN_EMAIL', 'trincoabishigan@gmail.com');
+        $data = [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'subject' => 'Direct Send Test',
+            'message' => 'This is a direct send test bypassing the queue. If you see this, email delivery is working!'
+        ];
+        
+        $info = "Mailer: " . config('mail.default') . "\n";
+        $info .= "From: " . config('mail.from.address') . "\n";
+        $info .= "To: " . $adminEmail . "\n";
+        $info .= "Resend Key Set: " . (env('RESEND_API_KEY') ? 'YES' : 'NO') . "\n\n";
+        
+        Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
+        
+        return "<pre>" . $info . "SUCCESS! Email sent to " . $adminEmail . "</pre>";
+    } catch (\Exception $e) {
+        return "<pre>" . ($info ?? '') . "FAILED!\n\n" . $e->getMessage() . "\n\n" . $e->getTraceAsString() . "</pre>";
     }
 });
