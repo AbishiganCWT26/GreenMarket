@@ -193,6 +193,22 @@ class PublicController extends Controller
 
             return redirect()->back()->with('success', 'Your message has been sent successfully!<br>We will respond within 24 hours.');
 
+        } catch (\Brevo\Exceptions\BrevoApiException $e) {
+            $errorMsg = 'Brevo API request failed. Code: ' . $e->getCode() . '. Response: ' . $e->getBody();
+            \Log::error($errorMsg);
+            \Log::error('Error trace: ' . $e->getTraceAsString());
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send message. Please try again later or contact us directly.',
+                    'error' => $errorMsg,
+                    'trace' => $e->getTraceAsString()
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Failed to send message. ' . $errorMsg)->withInput();
+
         } catch (\Exception $e) {
             \Log::error('Brevo API contact form error: ' . $e->getMessage());
             \Log::error('Error trace: ' . $e->getTraceAsString());
