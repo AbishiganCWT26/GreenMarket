@@ -47,39 +47,79 @@ Route::post('/register/buyer', [BuyerController::class, 'register'])->name('buye
 
 Route::get('/how-it-works', [PublicController::class, 'howItWorks'])->name('how.it.works');
 
-Route::get('/test-email', function() {
-    try {
-        // 1. Define the logo path
-        $logoPath = public_path('assets/images/Logo Green Market.png');
+Route::get('/test-email', function () {
+    /*
+    |----------------------------------------------------------------------
+    | SMTP DIAGNOSTIC ROUTE  –  REMOVE AFTER DEBUGGING
+    |----------------------------------------------------------------------
+    | 1. Dumps active mail configuration (credentials masked).
+    | 2. Sends a plain-text email synchronously via Mail::raw().
+    | 3. Catches ALL exceptions and shows the full error + stack trace.
+    |----------------------------------------------------------------------
+    */
 
-        // 2. Fallback check for SVG if PNG doesn't exist
-        if (!File::exists($logoPath)) {
-            $logoPath = public_path('assets/images/Logo-4.svg');
-        }
+    $output = '<pre style="font-family:monospace;font-size:13px;background:#1e1e2e;color:#cdd6f4;padding:24px;border-radius:8px;overflow-x:auto;">';
 
-        // 3. Send HTML email with embedded image
-        Mail::send([], [], function($message) use ($logoPath) {
-            $message->to('trincoabishigan@gmail.com')
-                    ->subject('Test Email with Logo');
+    // ── 1. Show resolved mail config ──────────────────────────────────
+    $cfg = config('mail');
+    $mailerName = $cfg['default'] ?? 'unknown';
+    $mailerCfg  = $cfg['mailers'][$mailerName] ?? [];
 
-            // Embed the logo
-            $logoCid = $message->embed($logoPath);
-
-            // Set the body as HTML
-            $message->html("
-                <div style='font-family: sans-serif; text-align: center;'>
-                    <img src='{$logoCid}' alt='GreenMarket' style='width: 150px;'>
-                    <hr>
-                    <h1>Test Email Successful!</h1>
-                    <p>This email confirms that your embedded logo system is working correctly.</p>
-                </div>
-            ");
-        });
-
-        return 'Email sent successfully with logo!';
-    } catch (\Exception $e) {
-        return 'Error: ' . $e->getMessage();
+    // Mask password for display
+    $masked = $mailerCfg;
+    if (isset($masked['password'])) {
+        $masked['password'] = str_repeat('*', min(strlen($masked['password']), 8));
     }
+
+    $output .= "<b style='color:#a6e3a1;'>═══ MAIL CONFIG (mailer: {$mailerName}) ═══</b>\n";
+    $output .= htmlspecialchars(print_r($masked, true));
+    $output .= "\n<b style='color:#a6e3a1;'>═══ FROM ═══</b>\n";
+    $output .= htmlspecialchars(print_r($cfg['from'] ?? [], true));
+
+    // ── 2. Warn about MAIL_ENCRYPTION vs MAIL_SCHEME ─────────────────
+    $encryptionEnv = env('MAIL_ENCRYPTION');
+    $schemeEnv     = env('MAIL_SCHEME');
+    if ($encryptionEnv && !$schemeEnv) {
+        $output .= "\n<b style='color:#f38ba8;'>⚠ WARNING:</b> You set <b>MAIL_ENCRYPTION={$encryptionEnv}</b> but your mail.php uses <b>MAIL_SCHEME</b> (Laravel 11+).\n";
+        $output .= "   → Add <b>MAIL_SCHEME=tls</b> to your Railway env vars (or change mail.php to read MAIL_ENCRYPTION).\n";
+        $output .= "   → Without this, Laravel connects to SMTP with <b>NO encryption</b>, which Brevo may reject.\n\n";
+    }
+
+    // ── 3. Attempt synchronous send ──────────────────────────────────
+    $recipient = 'trincoabishigan@gmail.com';  // ← change if needed
+    $output .= "<b style='color:#a6e3a1;'>═══ SENDING TEST EMAIL TO {$recipient} ═══</b>\n";
+
+    try {
+        \Illuminate\Support\Facades\Mail::raw(
+            'This is a synchronous test email from GreenMarket on Railway. Time: ' . now()->toDateTimeString(),
+            function ($message) use ($recipient) {
+                $message->to($recipient)
+                        ->subject('GreenMarket SMTP Test – ' . now()->format('H:i:s'));
+            }
+        );
+
+        $output .= "<b style='color:#a6e3a1;'>✅ Mail::raw() completed without throwing an exception.</b>\n";
+        $output .= "If you still don't receive the email, check your Brevo dashboard logs.\n";
+    } catch (\Throwable $e) {
+        $output .= "<b style='color:#f38ba8;'>❌ EXCEPTION CAUGHT</b>\n\n";
+        $output .= "<b>Class:</b>   " . get_class($e) . "\n";
+        $output .= "<b>Message:</b> " . htmlspecialchars($e->getMessage()) . "\n";
+        $output .= "<b>Code:</b>    " . $e->getCode() . "\n";
+        $output .= "<b>File:</b>    " . $e->getFile() . ':' . $e->getLine() . "\n\n";
+        $output .= "<b style='color:#fab387;'>─── STACK TRACE ───</b>\n";
+        $output .= htmlspecialchars($e->getTraceAsString()) . "\n";
+
+        // Show previous exception if chained
+        if ($prev = $e->getPrevious()) {
+            $output .= "\n<b style='color:#fab387;'>─── PREVIOUS EXCEPTION ───</b>\n";
+            $output .= "<b>Class:</b>   " . get_class($prev) . "\n";
+            $output .= "<b>Message:</b> " . htmlspecialchars($prev->getMessage()) . "\n";
+            $output .= "<b>Trace:</b>\n" . htmlspecialchars($prev->getTraceAsString()) . "\n";
+        }
+    }
+
+    $output .= '</pre>';
+    return $output;
 });
 
 Route::get('/mail-preview', function () {
