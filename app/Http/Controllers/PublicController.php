@@ -135,54 +135,12 @@ class PublicController extends Controller
         ]);
 
         try {
-            // Configure Brevo API (using modern v4.x official SDK)
-            $apiKey = env('BREVO_API_KEY');
+            // Get admin email (prioritizing the database value set in AppServiceProvider, fallback to env, then default)
+            $adminEmail = config('mail.admin_email') ?? env('MAIL_ADMIN_EMAIL', 'abifamily24@gmail.com');
+            $data = $request->all();
             
-            if (!empty($apiKey)) {
-                $brevo = new \Brevo\Brevo($apiKey);
-
-                // Prepare email content
-                $adminEmail = env('MAIL_ADMIN_EMAIL', 'abifamily24@gmail.com');
-                $userName = $request->name;
-                $userEmail = $request->email;
-                $userSubject = $request->subject ?? 'Contact Form Message';
-                $userMessage = $request->message;
-
-                $fromAddress = env('MAIL_FROM_ADDRESS', 'malabepasanga@gmail.com');
-                $fromName = env('MAIL_FROM_NAME', 'GreenMarket');
-
-                // Send transactional email using official Brevo HTTP API
-                $brevo->transactionalEmails->sendTransacEmail(
-                    new \Brevo\TransactionalEmails\Requests\SendTransacEmailRequest([
-                        'subject' => $userSubject,
-                        'sender' => new \Brevo\TransactionalEmails\Types\SendTransacEmailRequestSender([
-                            'email' => $fromAddress,
-                            'name' => $fromName,
-                        ]),
-                        'to' => [
-                            new \Brevo\TransactionalEmails\Types\SendTransacEmailRequestToItem([
-                                'email' => $adminEmail,
-                                'name' => 'Admin',
-                            ]),
-                        ],
-                        'htmlContent' => "
-                            <h2>New Contact Message</h2>
-                            <p><strong>Name:</strong> {$userName}</p>
-                            <p><strong>Email:</strong> {$userEmail}</p>
-                            <p><strong>Subject:</strong> {$userSubject}</p>
-                            <p><strong>Message:</strong></p>
-                            <p>" . nl2br(e($userMessage)) . "</p>
-                        ",
-                        'textContent' => "New Contact Message\n\nName: {$userName}\nEmail: {$userEmail}\nSubject: {$userSubject}\nMessage: {$userMessage}"
-                    ])
-                );
-            } else {
-                // Fallback to standard Laravel mailer (perfect for localhost where SMTP/Resend is configured)
-                $adminEmail = env('MAIL_ADMIN_EMAIL', 'abifamily24@gmail.com');
-                $data = $request->all();
-                
-                Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
-            }
+            // This will automatically use the 'brevo' mailer we configured in Railway!
+            Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
