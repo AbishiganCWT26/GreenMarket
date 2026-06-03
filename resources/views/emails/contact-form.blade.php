@@ -247,16 +247,9 @@
 			<div class="email-head">
 				<div class="email-logo">
 					@php
-						$logoPngPath = public_path('assets/images/Logo Green Market.png');
-						$logoSvgPath = public_path('assets/images/Logo-4.svg');
+						$logoUrl = asset('assets/images/Logo Green Market.png');
 					@endphp
-					@if(file_exists($logoPngPath))
-						<img src="{{ $message->embed($logoPngPath) }}" alt="GreenMarket" style="max-width: 70px; height: auto;">
-					@elseif(file_exists($logoSvgPath))
-						<img src="{{ $message->embed($logoSvgPath) }}" alt="GreenMarket" style="max-width: 70px; height: auto;">
-					@else
-						<h2 style="color: white; font-size: 16px; margin: 0;">GreenMarket</h2>
-					@endif
+					<img src="{{ $logoUrl }}" alt="GreenMarket" style="max-width: 70px; height: auto;">
 				</div>
 				<h1>New Message Received</h1>
 				<h2>GreenMarket</h2>
