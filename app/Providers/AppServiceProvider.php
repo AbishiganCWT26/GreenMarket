@@ -20,6 +20,16 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 
+        \Illuminate\Support\Facades\Mail::extend('brevo', function () {
+            return (new \Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory)->create(
+                new \Symfony\Component\Mailer\Transport\Dsn(
+                    'brevo+api',
+                    'default',
+                    config('services.brevo.key')
+                )
+            );
+        });
+
         try {
             if (Schema::hasTable('system_config')) {
                 $dbAdminEmail = \Illuminate\Support\Facades\DB::table('system_config')
