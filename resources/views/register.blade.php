@@ -11,9 +11,68 @@
 		.swal2-image {
 			margin: 0em auto 0em !important;
 		}
+
+		/* Base responsive styles for SweetAlert2 */
+		.responsive-swal-popup {
+		  border-radius: 20px !important;
+		  padding: 1.2rem !important;
+		}
+
+		.swal-title-responsive {
+		  font-size: clamp(18px, 5vw, 24px) !important;
+		}
+
+		.swal-text-responsive {
+		  font-size: clamp(14px, 4vw, 18px) !important;
+		}
+
+		.swal-button-responsive {
+		  font-size: clamp(12px, 3.5vw, 16px) !important;
+		  padding: 0.6rem 1.2rem !important;
+		}
+
+		/* Media queries for width */
+		@media (min-width: 2560px) {
+		  .swal2-popup { width: 35% !important; max-width: 600px !important; }
+		}
+		@media (min-width: 1501px) and (max-width: 2559px) {
+		  .swal2-popup { width: 40% !important; max-width: 550px !important; }
+		}
+		@media (min-width: 1400px) and (max-width: 1500px) {
+		  .swal2-popup { width: 45% !important; max-width: 500px !important; }
+		}
+		@media (min-width: 1200px) and (max-width: 1399px) {
+		  .swal2-popup { width: 50% !important; max-width: 480px !important; }
+		}
+		@media (min-width: 1001px) and (max-width: 1199px) {
+		  .swal2-popup { width: 60% !important; max-width: 450px !important; }
+		}
+		@media (min-width: 993px) and (max-width: 1000px) {
+		  .swal2-popup { width: 65% !important; max-width: 420px !important; }
+		}
+		@media (min-width: 992px) and (max-width: 999px) {
+		  .swal2-popup { width: 70% !important; max-width: 400px !important; }
+		}
+		@media (min-width: 768px) and (max-width: 991px) {
+		  .swal2-popup { width: 80% !important; max-width: 380px !important; }
+		}
+		@media (min-width: 576px) and (max-width: 767px) {
+		  .swal2-popup { width: 90% !important; max-width: 350px !important; }
+		}
+		@media (min-width: 481px) and (max-width: 575px) {
+		  .swal2-popup { width: 95% !important; max-width: 320px !important; }
+		}
+		@media (min-width: 380px) and (max-width: 480px) {
+		  .swal2-popup { width: 98% !important; max-width: 280px !important; }
+		}
+		@media (max-width: 379px) {
+		  .swal2-popup { width: 100% !important; margin: 0 10px !important; }
+		  .responsive-swal-popup { padding: 0.8rem !important; }
+		}
 	</style>
 
 	<script src="{{ asset('js/form-validation.js') }}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection
 
 @section('content')
@@ -119,7 +178,7 @@
 										<i class="fas fa-phone"></i>
 										<input type="tel" class="form-control @error('primary_mobile') is-invalid @enderror"
 											id="primary_mobile" name="primary_mobile" value="{{ old('primary_mobile') }}"
-											placeholder="07XXXXXXXX" required>
+											placeholder="07XXXXXXXX" maxlength="10" required>
 									</div>
 									@error('primary_mobile')
 										<div class="invalid-feedback d-block">{{ $message }}</div>
@@ -142,6 +201,7 @@
 								<i class="fas fa-briefcase"></i>
 								Business Information (Optional)
 							</h5>
+							<p class="text-muted small mb-3">If you do not have a business, leave 'Business Name' and 'Business Type' blank.</p>
 
 							<div class="row g-3">
 								<div class="col-md-6">
@@ -187,8 +247,8 @@
 								<div class="input-with-icon">
 									<i class="fas fa-home"></i>
 									<textarea class="form-control @error('residential_address') is-invalid @enderror"
-										id="residential_address" name="residential_address" rows="3"
-										placeholder="Enter your complete address"
+										id="residential_address" name="residential_address" rows="4"
+										placeholder="No.123,&#10;Main Street,&#10;Kandy Roady,&#10;Colombo."
 										required>{{ old('residential_address') }}</textarea>
 								</div>
 								@error('residential_address')
@@ -232,7 +292,7 @@
 									<i class="fab fa-whatsapp"></i>
 									<input type="tel" class="form-control @error('whatsapp_number') is-invalid @enderror"
 										id="whatsapp_number" name="whatsapp_number" value="{{ old('whatsapp_number') }}"
-										placeholder="Optional WhatsApp number">
+										placeholder="Optional WhatsApp number" maxlength="10">
 								</div>
 								@error('whatsapp_number')
 									<div class="invalid-feedback d-block">{{ $message }}</div>
@@ -443,6 +503,15 @@
 			const usernameInput = document.getElementById('username');
 			const usernameStatus = document.getElementById('usernameStatus');
 
+			const fullNameInput = document.getElementById('name');
+			const emailInput = document.getElementById('email');
+			const mobileInput = document.getElementById('primary_mobile');
+			const whatsappInput = document.getElementById('whatsapp_number');
+			const addressInput = document.getElementById('residential_address');
+			const mapLinkInput = document.getElementById('google_map_link');
+
+			const containsLink = (text) => /http:\/\/|https:\/\/|www\.|ftp:\/\//i.test(text);
+
 			const districtSelect = document.getElementById('district');
 			if (districtSelect && typeof gnData !== 'undefined') {
 				Object.keys(gnData).forEach(district => {
@@ -490,8 +559,22 @@
 						if (field.id === 'nic_no' && !validateNIC(field.value)) {
 							allValid = false;
 						}
+						if (field.id === 'google_map_link' && field.value.trim()) {
+							if (!/^(https?:\/\/|www\.)/i.test(field.value.trim())) {
+								allValid = false;
+							}
+						}
+						if (field.id === 'email' && field.value.trim()) {
+							const val = field.value.toLowerCase();
+							const outlookPattern = /@(outlook\.com|hotmail\.com|live\.com|msn\.com)$/i;
+							if (containsLink(val) || outlookPattern.test(val)) {
+								allValid = false;
+							}
+						}
 					});
-					btn.disabled = !nextStep || !allValid;
+					// Instead of disabling the button, we keep it enabled so we can show an error popup on click.
+					// We will only disable it if there's no nextStep
+					btn.disabled = !nextStep;
 				});
 				submitBtn.disabled = !validateAllSteps();
 			}
@@ -504,6 +587,18 @@
 					}
 					if (field.id === 'nic_no' && !validateNIC(field.value)) {
 						return false;
+					}
+					if (field.id === 'google_map_link' && field.value.trim()) {
+						if (!/^(https?:\/\/|www\.)/i.test(field.value.trim())) {
+							return false;
+						}
+					}
+					if (field.id === 'email' && field.value.trim()) {
+						const val = field.value.toLowerCase();
+						const outlookPattern = /@(outlook\.com|hotmail\.com|live\.com|msn\.com)$/i;
+						if (containsLink(val) || outlookPattern.test(val)) {
+							return false;
+						}
 					}
 					if (field.type === 'checkbox' && !field.checked) {
 						return false;
@@ -545,6 +640,69 @@
 				button.addEventListener('click', function () {
 					const nextStep = parseInt(this.dataset.next);
 					if (nextStep && currentStep < nextStep) {
+						const currentStepEl = document.getElementById(`step-${currentStep}`);
+						const requiredFields = currentStepEl.querySelectorAll('[required]');
+						let isValid = true;
+						let errorMessage = 'Please fill all required fields correctly.';
+
+						requiredFields.forEach(field => {
+							if (!isValid) return; // Stop at first error
+							let val = field.value.trim();
+							
+							if (!val) {
+								isValid = false;
+								let fieldName = document.querySelector(`label[for="${field.id}"]`) ? document.querySelector(`label[for="${field.id}"]`).innerText.replace('*', '').trim() : field.name;
+								errorMessage = `${fieldName} is required.<br><br>Please check your details and try again.`;
+							} else if (field.id === 'name' && (containsLink(val) || /[^a-zA-Z\s]/.test(val))) {
+								isValid = false;
+								errorMessage = 'Invalid Full Name: Full Name must contain only letters and spaces. No numbers, special characters, or links.<br><br>Please check your details and try again.';
+							} else if (field.id === 'nic_no' && !validateNIC(val)) {
+								isValid = false;
+								errorMessage = 'Invalid NIC Number: NIC Number can only contain digits, X, or V. Example: 123456789V<br><br>Please check your details and try again.';
+							} else if (field.id === 'email') {
+								const valLow = val.toLowerCase();
+								const outlookPattern = /@(outlook\.com|hotmail\.com|live\.com|msn\.com)$/i;
+								if (containsLink(valLow)) {
+									isValid = false;
+									errorMessage = 'Invalid Email Address: Email address cannot contain links.<br><br>Please check your details and try again.';
+								} else if (outlookPattern.test(valLow)) {
+									isValid = false;
+									errorMessage = 'Invalid Email Address: Outlook / Hotmail / Live addresses are not allowed. Please use a different email provider.<br><br>Please check your details and try again.';
+								}
+							} else if (field.id === 'username' && (containsLink(val) || /\s/.test(val))) {
+								isValid = false;
+								errorMessage = 'Invalid Username: Username cannot contain spaces or links. Use letters, numbers, underscores, or dots only.<br><br>Please check your details and try again.';
+							} else if ((field.id === 'primary_mobile' || field.id === 'whatsapp_number') && (val.length !== 10 || /[^0-9]/.test(val))) {
+								isValid = false;
+								const labelName = field.id === 'primary_mobile' ? 'Mobile Number' : 'WhatsApp Number';
+								errorMessage = `Invalid ${labelName}: ${labelName} must be exactly 10 digits (no spaces, no special characters).<br><br>Please check your details and try again.`;
+							} else if (field.id === 'google_map_link' && !/^(https?:\/\/|www\.|maps\.app\.goo\.gl)/i.test(val)) {
+								isValid = false;
+								errorMessage = 'Invalid Google Map Link of the Residential Address: Please enter a valid Google Maps link (e.g., https://maps.app.goo.gl/... or a full URL).<br><br>Please check your details and try again.';
+							}
+						});
+
+						if (!isValid) {
+							Swal.fire({
+								title: 'Validation Error',
+								html: errorMessage,
+								imageUrl: "{{ asset('assets/icons/Gif/error5.gif') }}",
+								imageWidth: 80,
+								imageHeight: 80,
+								imageAlt: 'Error Icon',
+								confirmButtonColor: '#3085d6',
+								confirmButtonText: 'OK',
+								width: 'auto',
+								customClass: {
+									popup: 'responsive-swal-popup',
+									title: 'swal-title-responsive',
+									htmlContainer: 'swal-text-responsive',
+									confirmButton: 'swal-button-responsive'
+								}
+							});
+							return;
+						}
+
 						updateStep(nextStep);
 					}
 				});
@@ -559,13 +717,69 @@
 				});
 			});
 
+			// 1. Full Name
+			fullNameInput.addEventListener('input', function (e) {
+				const originalValue = this.value;
+				let newValue = originalValue.replace(/[^a-zA-Z\s]/g, ''); // strip non-letters/spaces
+				newValue = newValue.replace(/\s{2,}/g, ' '); // single space max
+
+				if (containsLink(originalValue) || originalValue !== newValue) {
+					this.value = newValue;
+					Swal.fire({
+						title: 'Validation Error',
+						html: 'Full Name can only contain letters and spaces. No numbers, special characters, or links allowed.',
+						imageUrl: "{{ asset('assets/icons/Gif/error3.gif') }}",
+						imageWidth: 80,
+						imageHeight: 80,
+						imageAlt: 'Error Icon',
+						confirmButtonColor: '#3085d6',
+						confirmButtonText: 'OK',
+						width: 'auto',
+						customClass: {
+							popup: 'responsive-swal-popup',
+							title: 'swal-title-responsive',
+							htmlContainer: 'swal-text-responsive',
+							confirmButton: 'swal-button-responsive'
+						}
+					});
+				} else {
+					this.value = newValue;
+				}
+				updateNavigationButtons();
+			});
+
+			// 2. NIC Number
 			nicInput.addEventListener('input', function () {
-				const nicValue = this.value.trim().toUpperCase();
-				this.value = nicValue;
-				if (nicValue === '') {
+				const originalValue = this.value;
+				let newValue = originalValue.replace(/[^0-9xvXV]/g, '').toUpperCase();
+				
+				if (containsLink(originalValue) || originalValue !== newValue) {
+					this.value = newValue;
+					Swal.fire({
+						title: 'Validation Error',
+						html: 'NIC Number can only contain digits, X, or V. No other letters or special characters allowed.',
+						imageUrl: "{{ asset('assets/icons/Gif/error3.gif') }}",
+						imageWidth: 80,
+						imageHeight: 80,
+						imageAlt: 'Error Icon',
+						confirmButtonColor: '#3085d6',
+						confirmButtonText: 'OK',
+						width: 'auto',
+						customClass: {
+							popup: 'responsive-swal-popup',
+							title: 'swal-title-responsive',
+							htmlContainer: 'swal-text-responsive',
+							confirmButton: 'swal-button-responsive'
+						}
+					});
+				} else {
+					this.value = newValue;
+				}
+
+				if (newValue === '') {
 					nicStatus.className = 'nic-status';
 					nicStatus.textContent = '';
-				} else if (validateNIC(nicValue)) {
+				} else if (validateNIC(newValue)) {
 					nicStatus.className = 'nic-status valid';
 					nicStatus.innerHTML = '<i class="fas fa-check-circle"></i> Valid NIC format';
 				} else {
@@ -582,15 +796,194 @@
 				}
 			});
 
-			usernameInput.addEventListener('input', function () {
-				if (this.value.includes('.')) {
-					usernameStatus.className = 'nic-status invalid';
-					usernameStatus.innerHTML = '<i class="fas fa-times-circle"></i> Invalide username';
-				} else {
-					usernameStatus.className = 'nic-status';
-					usernameStatus.innerHTML = '';
+			// 3. Email Address
+			const validateEmailField = function() {
+				const val = emailInput.value.toLowerCase();
+				if (containsLink(val)) {
+					Swal.fire({
+						title: 'Validation Error',
+						html: 'Email address cannot contain links (http://, https://, www., etc.).',
+						imageUrl: "{{ asset('assets/icons/Gif/error3.gif') }}",
+						imageWidth: 80,
+						imageHeight: 80,
+						imageAlt: 'Error Icon',
+						confirmButtonColor: '#3085d6',
+						confirmButtonText: 'OK',
+						width: 'auto',
+						customClass: {
+							popup: 'responsive-swal-popup',
+							title: 'swal-title-responsive',
+							htmlContainer: 'swal-text-responsive',
+							confirmButton: 'swal-button-responsive'
+						}
+					});
+					return false;
 				}
-				this.value = this.value.replace(/\./g, '');
+				const outlookPattern = /@(outlook\.com|hotmail\.com|live\.com|msn\.com)$/i;
+				if (outlookPattern.test(val)) {
+					Swal.fire({
+						title: 'Validation Error',
+						html: 'Outlook email addresses (@outlook.com, @hotmail.com, etc.) are not allowed. Please use a different email provider.',
+						imageUrl: "{{ asset('assets/icons/Gif/error3.gif') }}",
+						imageWidth: 80,
+						imageHeight: 80,
+						imageAlt: 'Error Icon',
+						confirmButtonColor: '#3085d6',
+						confirmButtonText: 'OK',
+						width: 'auto',
+						customClass: {
+							popup: 'responsive-swal-popup',
+							title: 'swal-title-responsive',
+							htmlContainer: 'swal-text-responsive',
+							confirmButton: 'swal-button-responsive'
+						}
+					});
+					return false;
+				}
+				return true;
+			};
+			emailInput.addEventListener('blur', validateEmailField);
+
+			// 4. Username
+			usernameInput.addEventListener('input', function () {
+				const originalValue = this.value;
+				let newValue = originalValue.replace(/\s/g, ''); // strip spaces
+
+				if (containsLink(originalValue) || originalValue !== newValue) {
+					if (containsLink(originalValue)) newValue = ''; // completely remove if it's a link paste
+					this.value = newValue;
+					Swal.fire({
+						title: 'Validation Error',
+						html: 'Username cannot contain spaces or links. Use letters, numbers, underscores, or dots only.',
+						imageUrl: "{{ asset('assets/icons/Gif/error3.gif') }}",
+						imageWidth: 80,
+						imageHeight: 80,
+						imageAlt: 'Error Icon',
+						confirmButtonColor: '#3085d6',
+						confirmButtonText: 'OK',
+						width: 'auto',
+						customClass: {
+							popup: 'responsive-swal-popup',
+							title: 'swal-title-responsive',
+							htmlContainer: 'swal-text-responsive',
+							confirmButton: 'swal-button-responsive'
+						}
+					});
+				} else {
+					this.value = newValue;
+				}
+				
+				if (this.value.includes('.')) {
+					// Allowing dots per requirements, remove old specific logic rejecting it, but leaving status just in case
+				}
+				updateNavigationButtons();
+			});
+
+			// 5 & 9. Mobile and WhatsApp Number
+			const handlePhoneInput = function(e) {
+				const originalValue = this.value;
+				let newValue = originalValue.replace(/[^0-9]/g, '');
+				
+				if (newValue.length > 10) {
+					newValue = newValue.substring(0, 10);
+					if (originalValue !== newValue) {
+						this.value = newValue;
+						Swal.fire({
+							title: 'Validation Error',
+							html: `${this.id === 'primary_mobile' ? 'Mobile' : 'WhatsApp'} Number cannot exceed 10 digits.`,
+							imageUrl: "{{ asset('assets/icons/Gif/error3.gif') }}",
+							imageWidth: 80,
+							imageHeight: 80,
+							imageAlt: 'Error Icon',
+							confirmButtonColor: '#3085d6',
+							confirmButtonText: 'OK',
+							width: 'auto',
+							customClass: {
+								popup: 'responsive-swal-popup',
+								title: 'swal-title-responsive',
+								htmlContainer: 'swal-text-responsive',
+								confirmButton: 'swal-button-responsive'
+							}
+						});
+					}
+				} else if (containsLink(originalValue) || originalValue !== newValue) {
+					this.value = newValue;
+					Swal.fire({
+						title: 'Validation Error',
+						html: `${this.id === 'primary_mobile' ? 'Mobile' : 'WhatsApp'} Number can only contain digits (0-9). No letters, spaces, or special characters allowed.`,
+						imageUrl: "{{ asset('assets/icons/Gif/error3.gif') }}",
+						imageWidth: 80,
+						imageHeight: 80,
+						imageAlt: 'Error Icon',
+						confirmButtonColor: '#3085d6',
+						confirmButtonText: 'OK',
+						width: 'auto',
+						customClass: {
+							popup: 'responsive-swal-popup',
+							title: 'swal-title-responsive',
+							htmlContainer: 'swal-text-responsive',
+							confirmButton: 'swal-button-responsive'
+						}
+					});
+				} else {
+					this.value = newValue;
+				}
+				updateNavigationButtons();
+			};
+			mobileInput.addEventListener('input', handlePhoneInput);
+			if (whatsappInput) whatsappInput.addEventListener('input', handlePhoneInput);
+
+			// 7. Residential Address Comma
+			addressInput.addEventListener('keydown', function(e) {
+				if (e.key === ',') {
+					e.preventDefault();
+					const start = this.selectionStart;
+					const end = this.selectionEnd;
+					const value = this.value;
+					this.value = value.substring(0, start) + ',\n' + value.substring(end);
+					this.selectionStart = this.selectionEnd = start + 2;
+					updateNavigationButtons();
+				}
+			});
+
+			addressInput.addEventListener('paste', function(e) {
+				e.preventDefault();
+				let paste = (e.clipboardData || window.clipboardData).getData('text');
+				
+				// Replace comma followed by optional spaces (including newlines) with comma + newline
+				paste = paste.replace(/,\s*/g, ',\n');
+				
+				const start = this.selectionStart;
+				const end = this.selectionEnd;
+				const value = this.value;
+				
+				this.value = value.substring(0, start) + paste + value.substring(end);
+				this.selectionStart = this.selectionEnd = start + paste.length;
+				updateNavigationButtons();
+			});
+
+			// 8. Google Map Link
+			mapLinkInput.addEventListener('blur', function() {
+				const val = this.value.trim();
+				if (val && !/^(https?:\/\/|www\.)/i.test(val)) {
+					Swal.fire({
+						title: 'Validation Error',
+						html: 'Please enter a valid Google Maps link (e.g., https://maps.app.goo.gl/... or a full URL).',
+						imageUrl: "{{ asset('assets/icons/Gif/error3.gif') }}",
+						imageWidth: 80,
+						imageHeight: 80,
+						imageAlt: 'Error Icon',
+						confirmButtonColor: '#3085d6',
+						confirmButtonText: 'OK',
+						width: 'auto',
+						customClass: {
+							popup: 'responsive-swal-popup',
+							title: 'swal-title-responsive',
+							htmlContainer: 'swal-text-responsive',
+							confirmButton: 'swal-button-responsive'
+						}
+					});
+				}
 			});
 
 			password.addEventListener('input', function () {
@@ -627,6 +1020,25 @@
 
 			form.addEventListener('submit', async function (e) {
 				e.preventDefault();
+
+				// Validate email domain on submit
+				if (!validateEmailField()) {
+					return;
+				}
+
+				// Validate Google Maps Link on submit
+				const mapVal = mapLinkInput.value.trim();
+				if (mapVal && !/^(https?:\/\/|www\.)/i.test(mapVal)) {
+					Swal.fire({
+						icon: 'error',
+						title: 'Validation Error',
+						text: 'Please enter a valid Google Maps link (e.g., https://maps.app.goo.gl/... or a full URL).',
+						confirmButtonColor: '#3085d6',
+						confirmButtonText: 'OK'
+					});
+					return;
+				}
+
 				if (!validateAllSteps()) {
 					Swal.fire({
 						@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
