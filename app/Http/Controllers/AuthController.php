@@ -10,8 +10,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordResetOTP;
 use App\Mail\PasswordResetSuccess;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 class AuthController extends Controller
 {
@@ -428,29 +426,11 @@ class AuthController extends Controller
     private function sendPasswordEmail($email, $username, $password)
     {
         try {
-            $mail = new PHPMailer(true);
-
-            $mail->isSMTP();
-            $mail->Host = env('MAIL_HOST', 'smtp.gmail.com');
-            $mail->SMTPAuth = true;
-            $mail->Username = env('MAIL_USERNAME');
-            $mail->Password = env('MAIL_PASSWORD');
-            $mail->SMTPSecure = env('MAIL_ENCRYPTION', 'tls');
-            $mail->Port = env('MAIL_PORT', 587);
-
-            $mail->setFrom(env('MAIL_FROM_ADDRESS', 'noreply@greenmarket.com'), env('MAIL_FROM_NAME', 'GreenMarket'));
-            $mail->addAddress($email);
-
-            $mail->isHTML(true);
-            $mail->Subject = 'GreenMarket - Password Reset Successful';
-            $mail->Body = $this->getPasswordResetEmailBody($username, $password);
-            $mail->AltBody = "Your GreenMarket password has been reset successfully.\nUsername: $username\nPassword: $password\n\nPlease login at: " . url('/login');
-
-            $mail->send();
+            Mail::to($email)->send(new PasswordResetSuccess($username, $password));
             \Log::info('Password reset email sent to: ' . $email);
             return true;
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
             \Log::error('Failed to send password reset email: ' . $e->getMessage());
             return false;
         }
@@ -505,63 +485,5 @@ class AuthController extends Controller
         }
     }
 
-    private function getPasswordResetEmailBody($username, $password)
-    {
-        return '
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Password Reset Successful</title>
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 10px; }
-                .header { background: linear-gradient(135deg, #10B981, #059669); padding: 20px; border-radius: 10px 10px 0 0; color: white; text-align: center; }
-                .content { padding: 30px; background: white; border-radius: 0 0 10px 10px; }
-                .credentials { background: #f0f9ff; border: 2px solid #10B981; border-radius: 8px; padding: 20px; margin: 20px 0; }
-                .warning { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin: 20px 0; }
-                .btn { display: inline-block; background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; }
-                .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>GreenMarket</h1>
-                    <p>Password Reset Successful</p>
-                </div>
-                <div class="content">
-                    <h2>Your Password Has Been Reset</h2>
-                    <p>Hello ' . htmlspecialchars($username) . ',</p>
-                    <p>Your GreenMarket account password has been successfully reset.</p>
 
-                    <div class="credentials">
-                        <h3>Your New Login Credentials:</h3>
-                        <p><strong>Username:</strong> ' . htmlspecialchars($username) . '</p>
-                        <p><strong>Password:</strong> ' . htmlspecialchars($password) . '</p>
-                    </div>
-
-                    <div class="warning">
-                        <h4>⚠️ Security Notice:</h4>
-                        <p>For your security, please:</p>
-                        <ul>
-                            <li>Change your password immediately after logging in</li>
-                            <li>Never share your credentials with anyone</li>
-                            <li>Use a strong, unique password</li>
-                        </ul>
-                    </div>
-
-                    <p style="text-align: center; margin: 30px 0;">
-                        <a href="' . url('/login') . '" class="btn">Login to GreenMarket</a>
-                    </p>
-
-                    <div class="footer">
-                        <p>© ' . date('Y') . ' GreenMarket. All rights reserved.</p>
-                        <p>This email was sent to you regarding your GreenMarket account security.</p>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>';
-    }
 }
