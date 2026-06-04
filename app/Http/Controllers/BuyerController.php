@@ -875,12 +875,10 @@ class BuyerController extends Controller
                 $emailSent = false;
                 $emailError = $e->getMessage();
             }
-                $smsMessage = "Welcome to GreenMarket!
-                                Shop for fresh produce directly from farmers today.
-
-                                Your login details are:
-                                User: {$request->username}
-                                Pass: {$request->password}";
+                $smsMessage = "Welcome to GreenMarket!\n"
+                            . "Your login details:\n"
+                            . "Username: {$request->username}\n"
+                            . "Password: {$request->password}";
             try {
                 $smsSent = $this->sendSMS($request->primary_mobile, $smsMessage);
             } catch (\Exception $e) {
