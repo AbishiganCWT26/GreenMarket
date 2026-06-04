@@ -870,9 +870,10 @@ class BuyerController extends Controller
             try {
                 Mail::to($request->email)->send(new BuyerRegistrationMail($emailData));
                 $emailSent = true;
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 \Log::error('Email sending failed: ' . $e->getMessage());
                 $emailSent = false;
+                $emailError = $e->getMessage();
             }
                 $smsMessage = "Welcome to GreenMarket!
                                 Shop for fresh produce directly from farmers today.
@@ -901,11 +902,12 @@ class BuyerController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => $message,
+                    'email_error' => $emailError ?? null,
                     'redirect' => route('login')
                 ], 201);
             }
-            return redirect()->route('login')->with('success', $message);
-        } catch (\Exception $e) {
+            return redirect()->route('login')->with('success', $message)->with('email_error', $emailError ?? null);
+        } catch (\Throwable $e) {
             DB::rollBack();
             \Log::error('Registration error: ' . $e->getMessage());
             if ($request->ajax() || $request->wantsJson()) {

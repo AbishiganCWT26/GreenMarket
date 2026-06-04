@@ -47,59 +47,7 @@ Route::post('/register/buyer', [BuyerController::class, 'register'])->name('buye
 
 Route::get('/how-it-works', [PublicController::class, 'howItWorks'])->name('how.it.works');
 
-Route::get('/test-contact-form', function () {
-    $output = '<pre style="background:#1e1e2e;color:#cdd6f4;padding:24px;border-radius:8px;">';
-    
-    // 1. Check exactly what the database/config value is resolving to
-    $dbAdminEmail = null;
-    if (\Illuminate\Support\Facades\Schema::hasTable('system_config')) {
-        $dbAdminEmail = \Illuminate\Support\Facades\DB::table('system_config')->where('config_key', 'admin_email')->value('config_value');
-    }
-    
-    $configAdminEmail = config('mail.admin_email');
-    $envAdminEmail = env('MAIL_ADMIN_EMAIL', 'abifamily24@gmail.com');
-    
-    // The exact logic used in PublicController
-    $finalAdminEmail = $configAdminEmail ?? $envAdminEmail;
 
-    $output .= "<b style='color:#89b4fa;'>═══ EMAIL DESTINATION TRACE ═══</b>\n";
-    $output .= "Database 'system_config' value: " . ($dbAdminEmail ?: '(null)') . "\n";
-    $output .= "config('mail.admin_email'): " . ($configAdminEmail ?: '(null)') . "\n";
-    $output .= "env('MAIL_ADMIN_EMAIL'): " . $envAdminEmail . "\n";
-    $output .= "<b style='color:#a6e3a1;'>FINAL DESTINATION EMAIL: {$finalAdminEmail}</b>\n\n";
-
-    // 2. Check Brevo mailer setup
-    $mailerName = config('mail.default');
-    $output .= "<b style='color:#89b4fa;'>═══ MAILER SETUP ═══</b>\n";
-    $output .= "Default Mailer: {$mailerName}\n";
-    $output .= "Brevo API Key Exists: " . (config('services.brevo.key') ? 'YES' : 'NO') . "\n\n";
-
-    // 3. Attempt to send
-    $output .= "<b style='color:#89b4fa;'>═══ ATTEMPTING TO SEND ContactFormMail ═══</b>\n";
-    
-    $data = [
-        'name' => 'Diagnostic Test User',
-        'email' => 'test@example.com',
-        'subject' => 'Diagnostic Contact Form Test',
-        'message' => 'This is a test message to see if the contact form is actually dispatching.'
-    ];
-
-    try {
-        \Illuminate\Support\Facades\Mail::to($finalAdminEmail)->send(new \App\Mail\ContactFormMail($data));
-        $output .= "<b style='color:#a6e3a1;'>✅ Success! Mail::to()->send() executed without throwing any exceptions.</b>\n";
-        $output .= "If you still don't receive it at <b>{$finalAdminEmail}</b>, check:\n";
-        $output .= "1. Your Spam/Junk folder\n";
-        $output .= "2. Brevo Dashboard -> Transactional -> Logs (to see if Brevo blocked it)\n";
-    } catch (\Throwable $e) {
-        $output .= "<b style='color:#f38ba8;'>❌ FAILED! An exception was thrown:</b>\n";
-        $output .= "Class: " . get_class($e) . "\n";
-        $output .= "Message: " . $e->getMessage() . "\n";
-        $output .= "\nTrace:\n" . $e->getTraceAsString();
-    }
-
-    $output .= '</pre>';
-    return $output;
-});
 
 Route::get('/mail-preview', function () {
     $data = [
