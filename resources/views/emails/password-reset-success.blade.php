@@ -180,15 +180,9 @@
         <div class="header">
             <!-- Logo Section -->
             @php
-                $logoPngPath = public_path('assets/images/Logo Green Market.png');
-                $logoSvgPath = public_path('assets/images/Logo-4.svg');
+                $logoUrl = asset('assets/images/Logo Green Market.png');
             @endphp
-
-            @if(file_exists($logoPngPath))
-                <img src="{{ $message->embed($logoPngPath) }}" alt="GreenMarket Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 10px;">
-            @elseif(file_exists($logoSvgPath))
-                <img src="{{ $message->embed($logoSvgPath) }}" alt="GreenMarket Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 10px;">
-            @endif
+            <img src="{{ $logoUrl }}" alt="GreenMarket Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 10px;">
 
             <h1>GreenMarket</h1>
             <p>Password Reset Successful</p>

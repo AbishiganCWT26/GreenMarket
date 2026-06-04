@@ -178,17 +178,9 @@
     <div class="email-container">
         <div class="email-header">
             @php
-                $logoPngPath = public_path('assets/images/Logo Green Market.png');
-                $logoSvgPath = public_path('assets/images/Logo-4.svg');
+                $logoUrl = asset('assets/images/Logo Green Market.png');
             @endphp
-
-            @if(file_exists($logoPngPath))
-                <img src="{{ $message->embed($logoPngPath) }}" alt="GreenMarket Logo" style="max-width: 120px; height: auto; display: block; margin: 0 auto;">
-            @elseif(file_exists($logoSvgPath))
-                <img src="{{ $message->embed($logoSvgPath) }}" alt="GreenMarket Logo" style="max-width: 120px; height: auto; display: block; margin: 0 auto;">
-            @else
-                <h2 style="color: white; margin: 0;">GreenMarket</h2>
-            @endif
+            <img src="{{ $logoUrl }}" alt="GreenMarket Logo" style="max-width: 120px; height: auto; display: block; margin: 0 auto;">
             <h1>Admin Password Changed</h1>
         </div>
 

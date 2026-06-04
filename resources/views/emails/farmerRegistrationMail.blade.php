@@ -170,17 +170,9 @@ h1 {
 
 <div class="header">
 	@php
-		$logoPngPath = public_path('assets/images/Logo Green Market.png');
-		$logoSvgPath = public_path('assets/images/Logo-4.svg');
+		$logoUrl = asset('assets/images/Logo Green Market.png');
 	@endphp
-
-	@if(file_exists($logoPngPath))
-		<img src="{{ $message->embed($logoPngPath) }}" alt="GreenMarket" class="logo">
-	@elseif(file_exists($logoSvgPath))
-		<img src="{{ $message->embed($logoSvgPath) }}" alt="GreenMarket" class="logo">
-	@else
-		<h2 style="color: white;">GreenMarket</h2>
-	@endif
+	<img src="{{ $logoUrl }}" alt="GreenMarket" class="logo">
 
 	<h2>GreenMarket</h2>
 	<p>Fresh Garden Hub Marketplace</p>

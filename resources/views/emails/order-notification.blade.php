@@ -105,17 +105,9 @@
     <div class="container">
         <div class="header">
             @php
-				$logoPngPath = public_path('assets/images/Logo Green Market.png');
-				$logoSvgPath = public_path('assets/images/Logo-4.svg');
+				$logoUrl = asset('assets/images/Logo Green Market.png');
 			@endphp
-
-			@if(file_exists($logoPngPath))
-				<img src="{{ $message->embed($logoPngPath) }}" alt="GreenMarket Logo" style="max-width: 100px; height: auto; display: block; margin: 0 auto 15px;">
-			@elseif(file_exists($logoSvgPath))
-				<img src="{{ $message->embed($logoSvgPath) }}" alt="GreenMarket Logo" style="max-width: 100px; height: auto; display: block; margin: 0 auto 15px;">
-			@else
-				<h2 style="color: var(--primary-green); margin: 0 0 10px;">GreenMarket</h2>
-			@endif
+			<img src="{{ $logoUrl }}" alt="GreenMarket Logo" style="max-width: 100px; height: auto; display: block; margin: 0 auto 15px;">
 
             <h2 style="color: #4CAF50; margin-top: 10px;">
                 @if($mailData['type'] === 'farmer')

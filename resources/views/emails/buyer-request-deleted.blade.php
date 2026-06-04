@@ -173,16 +173,9 @@
     <div class="header">
         <div style="text-align: center; margin-bottom: 20px;">
             @php
-                // Define the logo paths
-                $logoPngPath = public_path('assets/images/Logo Green Market.png');
-                $logoSvgPath = public_path('assets/images/Logo-4.svg');
+                $logoUrl = asset('assets/images/Logo Green Market.png');
             @endphp
-
-            @if(file_exists($logoPngPath))
-                <img src="{{ $message->embed($logoPngPath) }}" alt="GreenMarket Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 10px;">
-            @elseif(file_exists($logoSvgPath))
-                <img src="{{ $message->embed($logoSvgPath) }}" alt="GreenMarket Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 10px;">
-            @endif
+            <img src="{{ $logoUrl }}" alt="GreenMarket Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 10px;">
                 <p style="font-weight: bold; font-size: 24px; color: #ffffff; margin: 10px 0;">GreenMarket</p>
 
         </div>

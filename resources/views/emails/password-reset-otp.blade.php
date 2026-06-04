@@ -143,15 +143,9 @@
         <div class="header">
             <!-- Logo Section -->
             @php
-                $logoPngPath = public_path('assets/images/Logo Green Market.png');
-                $logoSvgPath = public_path('assets/images/Logo-4.svg');
+                $logoUrl = asset('assets/images/Logo Green Market.png');
             @endphp
-
-            @if(file_exists($logoPngPath))
-                <img src="{{ $message->embed($logoPngPath) }}" alt="GreenMarket Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 10px;">
-            @elseif(file_exists($logoSvgPath))
-                <img src="{{ $message->embed($logoSvgPath) }}" alt="GreenMarket Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 10px;">
-            @endif
+            <img src="{{ $logoUrl }}" alt="GreenMarket Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 10px;">
 
             <h1>GreenMarket</h1>
             <p>Password Reset OTP</p>
@@ -177,7 +171,10 @@
                 <p>Never share this OTP with anyone. GreenMarket will never ask for your password or OTP.</p>
             </div>
 
-            <p>Need help? Contact our support team at <a href="mailto:support@smartmarket.com">support@smartmarket.com</a></p>
+            <p>Need help? Contact our support team from contact us page in our website.</p>
+            <div class="btn-wrapper">
+                <a href="{{ url('/contact') }}" class="dashboard-btn">Contact Us Page</a>
+            </div>
 
             <p style="margin-top: 30px;">
                 Best regards,<br>
