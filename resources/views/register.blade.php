@@ -686,7 +686,7 @@
 							Swal.fire({
 								title: 'Validation Error',
 								html: errorMessage,
-								imageUrl: "{{ asset('assets/icons/Gif/error5.gif') }}",
+								imageUrl: "{{ asset('assets/icons/Gif/error7.gif') }}",
 								imageWidth: 80,
 								imageHeight: 80,
 								imageAlt: 'Error Icon',
