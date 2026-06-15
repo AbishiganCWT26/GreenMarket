@@ -1444,72 +1444,19 @@
 							formData.business_type = $('#buyer_type').val() || 'individual';
 						} else if (userType === 'admin') {
 							const nic = $('#admin_nic').val();
-							if (nic && !validateNIC(nic)) {
-								Swal.showValidationMessage('Invalid NIC format');
-								return false;
-							}
-							formData.nic_no = nic || '';
-							formData.phone_number = $('#admin_phone').val() || '';
-							const nic = $('#rider_nic').val();
-							if (!nic || !validateNIC(nic)) {
-								Swal.showValidationMessage('Valid NIC is required for Delivery Riders');
-								return false;
-							}
-							const licenceNo = $('#licence_number').val();
-							if (!licenceNo) {
-								Swal.showValidationMessage('Licence Number is required');
-								return false;
-							}
-							const mobile = $('#rider_mobile').val();
-							if (!mobile) {
-								Swal.showValidationMessage('Phone Number is required');
-								return false;
-							}
-							if (!/^\d{10}$/.test(mobile)) {
-								Swal.showValidationMessage('Primary Mobile number must be exactly 10 digits and contain only numbers');
-								return false;
-							}
-							const whatsapp = $('#rider_whatsapp').val();
-							if (whatsapp && !/^\d{10}$/.test(whatsapp)) {
-								Swal.showValidationMessage('WhatsApp Number must be exactly 10 digits and contain only numbers');
-								return false;
-							}
-							const vehicleNo = $('#vehicle_number').val();
-							if (!vehicleNo) {
-								Swal.showValidationMessage('Vehicle Number is required');
-								return false;
-							}
-							const vehicleType = $('#vehicle_type').val();
-							if (!vehicleType) {
-								Swal.showValidationMessage('Vehicle Type is required');
-								return false;
-							}
-							const maxCapacity = $('#max_kg_capacity').val();
-							if (!maxCapacity || maxCapacity <= 0) {
-								Swal.showValidationMessage('Valid Max KG Capacity is required');
-								return false;
-							}
-							const districts = $('#assigned_districts').val();
-							if (!districts || districts.length === 0) {
-								Swal.showValidationMessage('Please assign at least one district');
-								return false;
-							}
-							const address = $('#rider_address').val();
-							if (!address) {
-								Swal.showValidationMessage('Residential Address is required');
-								return false;
-							}
-							formData.nic_no = nic;
-							formData.licence_number = licenceNo;
-							formData.primary_mobile = mobile;
-							formData.whatsapp_number = whatsapp || mobile;
-							formData.vehicle_number = vehicleNo;
-							formData.vehicle_type = vehicleType;
-							formData.max_kg_capacity = maxCapacity;
-							formData.assigned_districts = districts;
-							formData.residential_address = address;
-							formData.extra_details = $('#extra_details').val() || '';
+						const adminNic = $('#admin_nic').val();
+						if (adminNic && !validateNIC(adminNic)) {
+							Swal.showValidationMessage('Invalid NIC format');
+							return false;
 						}
+						const adminPhone = $('#admin_phone').val();
+						if (!adminPhone) {
+							Swal.showValidationMessage('Phone Number is required for Administrators');
+							return false;
+						}
+						formData.nic_no = adminNic || '';
+						formData.phone_number = adminPhone;
+					}
 
 						return formData;
 					}
@@ -1597,7 +1544,7 @@
 					return;
 				}
 
-				const result = validateAdvancedPassword(password, { username, email });
+				const result = validateAdvancedPassword(password, username, email);
 				rulesContainer.fadeIn();
 
 				// Update strength bar
