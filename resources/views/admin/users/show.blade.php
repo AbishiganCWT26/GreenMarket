@@ -479,11 +479,6 @@
 									@endif
 								</div>
 							</div>
-						</div>
-					</div>
-				@endif
-								</div>
-							</div>
 							<div class="detail-row">
 								<div class="detail-label">
 									<i class="fas fa-map-marked-alt"></i> Assigned Districts

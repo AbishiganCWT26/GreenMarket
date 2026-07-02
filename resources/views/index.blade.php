@@ -98,7 +98,7 @@
 							<i class="fas fa-tachometer-alt"></i> Dashboard
 						</a>
 					@else
-						<a href="{{ url('/login') }}" class="btn btn-primary btn-hero">
+						<a href="{{ url('/login') }}" class="btn btn-primary btn-hero" translate="no">
 							<i class="fas fa-sign-in-alt"></i> Login
 						</a>
 					@endif
