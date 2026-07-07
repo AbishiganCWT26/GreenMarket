@@ -413,7 +413,7 @@ textarea:focus {
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fas fa-upload"></i> Product Photo</label>
+                        <label><i class="fas fa-upload"></i> Product Photo <span class="required">*</span></label>
                         <div class="image-upload-area">
                             <div class="upload-preview" id="imagePreview">
                                 <i class="fas fa-cloud-upload-alt"></i>
@@ -443,8 +443,21 @@ textarea:focus {
 @endsection
 
 @section('scripts')
-
+@php
+    $createProductSwalConfigData = [
+        'error4' => file_exists(public_path('assets/icons/Gif/error4.gif')) ? ['imageUrl' => asset('assets/icons/Gif/error4.gif'), 'imageWidth' => 60, 'imageHeight' => 60] : ['icon' => 'error'],
+        'farmer1' => file_exists(public_path('assets/icons/Gif/farmer1.gif')) ? ['imageUrl' => asset('assets/icons/Gif/farmer1.gif'), 'imageWidth' => 60, 'imageHeight' => 60] : ['icon' => 'error'],
+    ];
+@endphp
+<script type="application/json" id="create-product-swal-config-data">
+{!! json_encode($createProductSwalConfigData) !!}
+</script>
 <script>
+    const createProductSwalConfig = JSON.parse(document.getElementById('create-product-swal-config-data').textContent);
+    function getCreateProductSwalIcon(key) {
+        return createProductSwalConfig[key] || { icon: 'info' };
+    }
+
     $(document).ready(function() {
         const imagePreview = $('#imagePreview');
         const productPhoto = $('#productPhoto');
@@ -494,24 +507,41 @@ textarea:focus {
             const form = $(this);
             const farmerSelect = $('#farmerSelect');
 
+            // Validate product photo
+            if ($('#productPhoto')[0].files.length === 0) {
+                e.preventDefault();
+                Swal.fire(Object.assign(
+                    getCreateProductSwalIcon('error4'),
+                    {
+                        title: 'Validation Error',
+                        text: 'Please upload a product photo.'
+                    }
+                ));
+                return;
+            }
+
             // Validate farmer selection
             if (!farmerSelect.val()) {
                 e.preventDefault();
-                Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/farmer1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/farmer1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
-                    title: 'Validation Error',
-                    text: 'Please select a farmer.'
-                });
+                Swal.fire(Object.assign(
+                    getCreateProductSwalIcon('farmer1'),
+                    {
+                        title: 'Validation Error',
+                        text: 'Please select a farmer.'
+                    }
+                ));
                 return;
             }
 
             if (form.find('.error-message').length > 0) {
                 e.preventDefault();
-                Swal.fire({
-                    @if(file_exists(public_path('assets/icons/Gif/error4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
-                    title: 'Form Errors',
-                    text: 'Please fix all errors before submitting.'
-                });
+                Swal.fire(Object.assign(
+                    getCreateProductSwalIcon('error4'),
+                    {
+                        title: 'Form Errors',
+                        text: 'Please fix all errors before submitting.'
+                    }
+                ));
             }
         });
 

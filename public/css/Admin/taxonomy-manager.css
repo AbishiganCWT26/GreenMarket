@@ -1,8 +1,8 @@
 :root {
-    --tx-accent: #6366f1;
-    --tx-accent-dark: #4f46e5;
-    --tx-accent-soft: rgba(99, 102, 241, 0.12);
-    --tx-teal: #0ea5a4;
+    --tx-accent: #10b981;
+    --tx-accent-dark: #16a34a;
+    --tx-accent-soft: rgba(34, 197, 94, 0.12);
+    --tx-teal: #22c55e;
     --tx-teal-soft: rgba(14, 165, 164, 0.12);
     --tx-amber: #f59e0b;
     --tx-amber-soft: rgba(245, 158, 11, 0.12);

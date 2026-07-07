@@ -351,6 +351,10 @@ class TaxonomyController extends Controller
                     }
                     $updateData['icon_filename'] = $filename;
                 }
+            } elseif ($request->input('remove_icon') == '1' && $category->icon_filename) {
+                // User clicked "Remove" on existing image without uploading a new one
+                Storage::disk('public_assets')->delete('taxonomy-icons/' . $category->icon_filename);
+                $updateData['icon_filename'] = null;
             }
 
             // Update the category

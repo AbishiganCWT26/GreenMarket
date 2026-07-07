@@ -72,7 +72,7 @@
                 <div class="form-step" data-step="2">
                     <div class="step-header">
                         <div class="step-number">2</div>
-                        <h4>Product Photo</h4>
+                        <h4>Product Photo <span class="text-danger">*</span></h4>
                     </div>
                     
                     <div class="form-group photo-upload-container">
@@ -80,7 +80,7 @@
                             <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
                             <p class="upload-text">Click or drag to upload product photo</p>
                             <p class="upload-subtext">Max file size: 5MB. Supported formats: JPG, PNG</p>
-                            <input type="file" name="product_photo" id="product_photo" accept="image/jpeg,image/png" class="file-input">
+                            <input type="file" name="product_photo" id="product_photo" accept="image/jpeg,image/png" class="file-input" required>
                         </div>
                         <div class="preview-container" id="previewContainer">
                             <img id="imagePreview" src="" alt="Preview" style="display: none;">

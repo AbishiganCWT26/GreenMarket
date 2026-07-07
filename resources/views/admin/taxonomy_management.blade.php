@@ -801,6 +801,11 @@
 	function removeImage(inputId, previewContainerId) {
 		document.getElementById(inputId).value = '';
 		document.getElementById(previewContainerId).style.display = 'none';
+		// Flag that existing icon should be removed from server
+		var removeFlag = document.getElementById('removeIcon');
+		if (removeFlag) {
+			removeFlag.value = '1';
+		}
 	}
 
 	function addSubcategory() {
@@ -1332,6 +1337,7 @@
 					</div>
 
 					<input type="hidden" id="categoryId" value="${id}">
+					<input type="hidden" id="removeIcon" value="0">
 				</div>
 			`,
 			...getSwalIcon('editing1'),
@@ -1381,6 +1387,10 @@
 				if (imageFile) {
 					formData.append('image', imageFile);
 				}
+
+				// Send remove_icon flag if user clicked Remove
+				var removeIconVal = document.getElementById('removeIcon').value;
+				formData.append('remove_icon', removeIconVal);
 
 				return formData;
 			}
