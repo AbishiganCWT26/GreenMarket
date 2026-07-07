@@ -541,7 +541,7 @@
 								</div>
 								<div class="detail-rating">
 									<span class="grade-badge">${product.quality_grade || 'Standard'} Grade</span>
-									<span class="views-count"><i class="fas fa-eye"></i> ${product.views_count || 0} views</span>
+									<span class="views-count"><i class="fas fa-tag"></i>ID: ${product.id}</span>
 									<span class="stock-status ${product.is_available ? 'text-green-500' : 'text-red-500'}">
 										<i class="fas ${product.is_available ? 'fa-check-circle' : 'fa-times-circle'}"></i>
 										${product.is_available ? 'In Stock' : 'Out of Stock'}

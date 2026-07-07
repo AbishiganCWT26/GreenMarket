@@ -319,6 +319,7 @@ class TaxonomyController extends Controller
                 'id' => 'required|exists:product_categories,id',
                 'name' => 'required|string|max:100|unique:product_categories,category_name,' . $request->id,
                 'description' => 'nullable|string',
+                'display_order' => 'nullable|integer|min:0',
                 'image' => 'nullable|image|mimes:png|max:5120'
             ]);
 
@@ -335,6 +336,7 @@ class TaxonomyController extends Controller
             $updateData = [
                 'category_name' => $request->name,
                 'description' => $request->description ?? null,
+                'display_order' => $request->display_order ?? 0,
                 'updated_at' => now()
             ];
 
@@ -352,21 +354,14 @@ class TaxonomyController extends Controller
             }
 
             // Update the category
-            $updated = DB::table('product_categories')
+            DB::table('product_categories')
                 ->where('id', $request->id)
                 ->update($updateData);
 
-            if ($updated) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Category updated successfully!'
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Category not found or no changes made'
-                ], 404);
-            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Category updated successfully!'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -384,6 +379,7 @@ class TaxonomyController extends Controller
                 'id' => 'required|exists:product_subcategories,id',
                 'name' => 'required|string|max:100',
                 'description' => 'nullable|string',
+                'display_order' => 'nullable|integer|min:0',
                 'category_id' => 'required|exists:product_categories,id'
             ]);
 
@@ -410,26 +406,20 @@ class TaxonomyController extends Controller
             }
 
             // Update the subcategory
-            $updated = DB::table('product_subcategories')
+            DB::table('product_subcategories')
                 ->where('id', $request->id)
                 ->update([
                     'category_id' => $request->category_id,
                     'subcategory_name' => $request->name,
                     'description' => $request->description ?? null,
+                    'display_order' => $request->display_order ?? 0,
                     'updated_at' => now()
                 ]);
 
-            if ($updated) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Subcategory updated successfully!'
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Subcategory not found or no changes made'
-                ], 404);
-            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Subcategory updated successfully!'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -447,6 +437,7 @@ class TaxonomyController extends Controller
                 'id' => 'required|exists:product_examples,id',
                 'name' => 'required|string|max:200',
                 'description' => 'nullable|string',
+                'display_order' => 'nullable|integer|min:0',
                 'subcategory_id' => 'required|exists:product_subcategories,id'
             ]);
 
@@ -473,26 +464,20 @@ class TaxonomyController extends Controller
             }
 
             // Update the product example
-            $updated = DB::table('product_examples')
+            DB::table('product_examples')
                 ->where('id', $request->id)
                 ->update([
                     'subcategory_id' => $request->subcategory_id,
                     'product_name' => $request->name,
                     'description' => $request->description ?? null,
+                    'display_order' => $request->display_order ?? 0,
                     'updated_at' => now()
                 ]);
 
-            if ($updated) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Product example updated successfully!'
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Product not found or no changes made'
-                ], 404);
-            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Product example updated successfully!'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

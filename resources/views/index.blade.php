@@ -296,28 +296,37 @@ document.addEventListener('DOMContentLoaded', function() {
 		observer.observe(statsSection);
 	}
 
-	@if(session('success'))
-		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/welcome1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/welcome1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-			title: 'Welcome!',
-			text: '{{ session('success') }}',
-			timer: 3000,
-			showConfirmButton: false,
-			background: '#ffffff',
-			color: '#0f1724'
-		});
-	@endif
+	var _successMsg = '{{ addslashes(session("success") ?? "") }}';
+	var _errorMsg   = '{{ addslashes(session("error") ?? "") }}';
+	var _welcomeGif = '{{ file_exists(public_path("assets/icons/Gif/welcome1.gif")) ? asset("assets/icons/Gif/welcome1.gif") : "" }}';
+	var _errorGif   = '{{ file_exists(public_path("assets/icons/Gif/error1.gif")) ? asset("assets/icons/Gif/error1.gif") : "" }}';
 
-	@if(session('error'))
-		Swal.fire({
-			@if(file_exists(public_path('assets/icons/Gif/error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
-			title: 'Oops...',
-			text: '{{ session('error') }}',
-			confirmButtonColor: '#10B981',
-			background: '#ffffff',
-			color: '#0f1724'
-		});
-	@endif
+	if (_successMsg) {
+		Swal.fire(Object.assign(
+			_welcomeGif ? { imageUrl: _welcomeGif, imageWidth: 60, imageHeight: 60 } : { icon: 'success' },
+			{
+				title: 'Welcome!',
+				text: _successMsg,
+				timer: 3000,
+				showConfirmButton: false,
+				background: '#ffffff',
+				color: '#0f1724'
+			}
+		));
+	}
+
+	if (_errorMsg) {
+		Swal.fire(Object.assign(
+			_errorGif ? { imageUrl: _errorGif, imageWidth: 60, imageHeight: 60 } : { icon: 'error' },
+			{
+				title: 'Oops...',
+				text: _errorMsg,
+				confirmButtonColor: '#10B981',
+				background: '#ffffff',
+				color: '#0f1724'
+			}
+		));
+	}
 });
 </script>
 @endsection
