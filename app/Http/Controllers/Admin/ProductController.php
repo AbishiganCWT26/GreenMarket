@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
-use PDF;
+use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\InventoryLog;
@@ -129,7 +130,7 @@ class ProductController extends Controller
 			->withInput();
 	}
 
-	public function viewSales(Request $request)
+	public function viewSales(Request $request): \Illuminate\Contracts\View\View
 	{
 		$requestedView = $request->input('view', 'table');
 		$requestedPerPage = $request->input('per_page');
@@ -199,10 +200,10 @@ class ProductController extends Controller
 		));
 	}
 
-	public function exportPDF(Request $request)
+	public function exportPDF(Request $request): \Symfony\Component\HttpFoundation\Response
 	{
 		try {
-			\Log::info('Export PDF called with params:', $request->all());
+			Log::info('Export PDF called with params:', $request->all());
 
 			$query = DB::table('orders')
 				->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
@@ -249,7 +250,7 @@ class ProductController extends Controller
 				'average_order_value' => $sales->count() > 0 ? $sales->avg('total_amount') : 0
 			];
 
-			$pdf = PDF::loadView('admin.sales.pdf_report', compact('sales', 'stats'))
+			$pdf = Pdf::loadView('admin.sales.pdf_report', compact('sales', 'stats'))
                 ->setPaper('A4', 'portrait')
                 ->setOptions([
                     'defaultFont' => 'arial',
@@ -267,8 +268,8 @@ class ProductController extends Controller
             return $pdf->download('sales-report-' . now()->format('Y-m-d-His') . '.pdf');
 
         } catch (\Exception $e) {
-            \Log::error('Export PDF failed: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            Log::error('Export PDF failed: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
 
             return response()->json([
                 'error' => 'Export failed. Please try again.',
@@ -277,7 +278,7 @@ class ProductController extends Controller
         }
     }
 
-	public function salesDetails($id)
+	public function salesDetails(int $id): \Illuminate\Contracts\View\View
 	{
 		$order = DB::table('orders')
 			->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
@@ -310,7 +311,7 @@ class ProductController extends Controller
 		return view('admin.sales.details', compact('order', 'orderItems'));
 	}
 
-	private function getFilteredProducts($request)
+	private function getFilteredProducts(Request $request)
 	{
 		$query = DB::table('products')
 			->leftJoin('farmers', 'products.farmer_id', '=', 'farmers.id')
@@ -389,7 +390,7 @@ class ProductController extends Controller
 		return $query->orderBy('products.created_at', 'desc')->get();
 	}
 
-	private function sendSMS($to, $message)
+	private function sendSMS(string $to, string $message)
 	{
 		try {
 			$user = env('SMS_USER');
@@ -403,12 +404,12 @@ class ProductController extends Controller
 
 			return $response->body();
 		} catch (\Exception $e) {
-			\Log::error('SMS sending failed: ' . $e->getMessage());
+			Log::error('SMS sending failed: ' . $e->getMessage());
 			return false;
 		}
 	}
 
-	public function destroy($productId)
+	public function destroy(int $productId)
 	{
 		$product = DB::table('products')->where('id', $productId)->first();
 		if (!$product) {
@@ -440,7 +441,7 @@ class ProductController extends Controller
 		]);
 	}
 
-	public function update(Request $request, $productId)
+	public function update(Request $request, int $productId)
 	{
 		$product = DB::table('products')->where('id', $productId)->first();
 		if (!$product) {
@@ -535,7 +536,7 @@ class ProductController extends Controller
 		return response()->json(['success' => true, 'message' => 'Product updated successfully.']);
 	}
 
-	public function paginatedProducts(Request $request)
+	public function paginatedProducts(Request $request): \Illuminate\Http\JsonResponse
 	{
 		$perPage = 20;
 		$page = $request->get('page', 1);
@@ -586,7 +587,7 @@ class ProductController extends Controller
 		]);
 	}
 
-	private function applyFilters($query, $filters)
+	private function applyFilters(\Illuminate\Database\Query\Builder $query, array $filters): void
 	{
 		foreach ($filters as $key => $value) {
 			if (!empty($value)) {
@@ -628,7 +629,7 @@ class ProductController extends Controller
 		}
 	}
 
-	private function applyPriceRangeFilter($query, $range)
+	private function applyPriceRangeFilter(\Illuminate\Database\Query\Builder $query, string $range): void
 	{
 		switch ($range) {
 			case '0-100':
@@ -649,7 +650,7 @@ class ProductController extends Controller
 		}
 	}
 
-	public function getFarmersByLeadFarmer($leadFarmerId)
+	public function getFarmersByLeadFarmer(int $leadFarmerId)
 	{
 		$farmers = DB::table('farmers')
 			->where('lead_farmer_id', $leadFarmerId)
@@ -659,7 +660,7 @@ class ProductController extends Controller
 		return response()->json(['farmers' => $farmers]);
 	}
 
-	public function getProductDetails($productId)
+	public function getProductDetails(int $productId)
 	{
 		$product = DB::table('products')
 			->leftJoin('farmers', 'products.farmer_id', '=', 'farmers.id')
@@ -691,27 +692,27 @@ class ProductController extends Controller
 		return response()->json(['product' => $product]);
 	}
 
-	public function filter(Request $request)
+	public function filter(Request $request): \Illuminate\Http\JsonResponse
 	{
 		$products = $this->getFilteredProducts($request);
 		return response()->json(['products' => $products]);
 	}
 
-	public function stockReport(Request $request)
+	public function stockReport(Request $request): \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\View\View
 	{
 		$products = Product::with(['leadFarmer', 'farmer', 'category'])
 			->orderBy('quantity', 'asc')
 			->get();
 
 		if ($request->has('export') && $request->export == 'pdf') {
-			$pdf = PDF::loadView('admin.inventory.reports.stock_pdf', compact('products'));
+			$pdf = Pdf::loadView('admin.inventory.reports.stock_pdf', compact('products'));
 			return $pdf->download('stock-report-' . date('Y-m-d') . '.pdf');
 		}
 
 		return view('admin.inventory.reports.stock', compact('products'));
 	}
 
-	public function movementReport(Request $request)
+	public function movementReport(Request $request): \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\View\View
 	{
 		$logsQuery = InventoryLog::with(['product', 'user', 'order'])
 			->orderBy('created_at', 'desc');
@@ -726,14 +727,14 @@ class ProductController extends Controller
 		$logs = $logsQuery->get();
 
 		if ($request->has('export') && $request->export == 'pdf') {
-			$pdf = PDF::loadView('admin.inventory.reports.Movement-Logs_pdf', compact('logs'));
+			$pdf = Pdf::loadView('admin.inventory.reports.Movement-Logs_pdf', compact('logs'));
 			return $pdf->download('movement-logs-report-' . date('Y-m-d') . '.pdf');
 		}
 
 		return view('admin.inventory.reports.movement_logs', compact('logs'));
 	}
 
-	public function inventory(Request $request)
+	public function inventory(Request $request): \Illuminate\Contracts\View\View
 	{
 		// Get products with relationships
 		$productsQuery = Product::with(['leadFarmer', 'farmer', 'category'])
