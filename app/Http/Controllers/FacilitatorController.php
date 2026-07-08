@@ -798,7 +798,7 @@ class FacilitatorController extends Controller
     {
         $user = Auth::user();
         $facilitator = $user->facilitator;
-        
+
         $assignedGnDivisions = \DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->pluck('gn_division')
@@ -1127,7 +1127,7 @@ class FacilitatorController extends Controller
         try {
             $user = Auth::user();
             $facilitator = $user->facilitator;
-            
+
             $assignedGnDivisions = \DB::table('facilitator_assignments')
                 ->where('facilitator_id', $facilitator->id)
                 ->pluck('gn_division')
@@ -1234,7 +1234,7 @@ class FacilitatorController extends Controller
             ]);
 
             $message = "Your GreenMarket OTP for updating your $type is: $otp. Valid for 5 minutes.";
-            
+
             // Send OTP to the CURRENT primary mobile number as requested
             $sendTo = $facilitator->primary_mobile;
             $smsSent = $this->sendSMS($sendTo, $message);
@@ -1411,7 +1411,7 @@ class FacilitatorController extends Controller
 
         $validated = $request->validate([
             'current_password' => 'required',
-            'new_password' => 'required|min:8|confirmed',
+            'new_password' => PasswordPolicy::rulesWithConfirmation(),
             'new_password_confirmation' => 'required'
         ]);
 
@@ -1445,7 +1445,7 @@ class FacilitatorController extends Controller
     public function markNotificationRead($id)
     {
         $user = Auth::user();
-        
+
         $notification = Notification::where('user_id', $user->id)
             ->where('id', $id)
             ->first();
@@ -1476,7 +1476,7 @@ class FacilitatorController extends Controller
             $user = Auth::user();
 
             $request->validate([
-                'new_password' => 'required|min:8',
+                'new_password' => PasswordPolicy::rules(),
             ]);
 
             // Update password
@@ -1505,7 +1505,7 @@ class FacilitatorController extends Controller
     {
         $user = Auth::user();
         $facilitator = $user->facilitator;
-        
+
         $assignedGnDivisions = \DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->pluck('gn_division')
@@ -1596,7 +1596,7 @@ class FacilitatorController extends Controller
             return response()->json(['success' => true, 'message' => 'Alert sent to lead farmer successfully!']);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Validation error: ' . implode(', ', $e->validator->errors()->all())
             ], 422);
         } catch (\Exception $e) {
@@ -1608,7 +1608,7 @@ class FacilitatorController extends Controller
     {
         $user = Auth::user();
         $facilitator = $user->facilitator;
-        
+
         $assignments = \DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->get();
@@ -1693,7 +1693,7 @@ class FacilitatorController extends Controller
     {
         $user = Auth::user();
         $facilitator = $user->facilitator;
-        
+
         $assignedGnDivisions = \DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->pluck('gn_division')
@@ -1732,7 +1732,7 @@ class FacilitatorController extends Controller
         // Assign ranks to all results before filtering
         // Or if we want persistent ranks regardless of current search results,
         // we should rank the entire set first.
-        
+
         $allGroupsWithRank = DB::table('lead_farmers as lf')
             ->leftJoin('users as u', 'lf.user_id', '=', 'u.id')
             ->whereIn('lf.grama_niladhari_division', $assignedGnDivisions)
@@ -1769,7 +1769,7 @@ class FacilitatorController extends Controller
     {
         $user = Auth::user();
         $facilitator = $user->facilitator;
-        
+
         $assignedDistrict = \DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->value('district');
@@ -1807,13 +1807,13 @@ class FacilitatorController extends Controller
 
             $to = preg_replace('/[^0-9]/', '', $to);
             $text = urlencode($message);
-            
+
             $baseurl = rtrim($baseurl, '/') . '/';
             $url = $baseurl . "?id=" . $user . "&pw=" . $password . "&to=" . $to . "&text=" . $text;
-            
+
             $ret = $this->get_web_page($url);
             $res = explode(":", $ret);
-            
+
             if (trim($res[0]) == "OK") {
                 \Log::info("SMS Sent successfully to $to. Response: $ret");
                 return true;

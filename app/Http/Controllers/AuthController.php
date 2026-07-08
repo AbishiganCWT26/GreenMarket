@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordResetOTP;
 use App\Mail\PasswordResetSuccess;
+use App\Services\PasswordPolicy;
 
 class AuthController extends Controller
 {
@@ -262,7 +263,7 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'password' => 'required|min:8|confirmed'
+            'password' => PasswordPolicy::rulesWithConfirmation(),
         ]);
 
         if (!session('otp_verified') || !session('reset_token') || !session('reset_user_id')) {

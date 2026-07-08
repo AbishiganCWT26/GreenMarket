@@ -44,17 +44,12 @@
             <div class="requirements mt-3">
                 <h6 class="mb-2" style="font-size: 0.9rem;">Requirements:</h6>
                 <ul class="list-unstyled mb-0" style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                    <li id="rule-length" class="text-danger"><i class="fas fa-times me-1"></i> 8+ chars</li>
-                    <li id="rule-number" class="text-danger"><i class="fas fa-times me-1"></i> Number</li>
-                    <li id="rule-capital" class="text-danger"><i class="fas fa-times me-1"></i> Capital</li>
-                    <li id="rule-lowercase" class="text-danger"><i class="fas fa-times me-1"></i> Lowercase</li>
-                    <li id="rule-special" class="text-danger"><i class="fas fa-times me-1"></i> Special</li>
-                    <li id="rule-no-space" class="text-danger"><i class="fas fa-times me-1"></i> No spaces</li>
-                    <li id="rule-no-repeat" class="text-danger"><i class="fas fa-times me-1"></i> No repeat</li>
-                    <li id="rule-no-sequence" class="text-danger"><i class="fas fa-times me-1"></i> No sequence</li>
-                    <li id="rule-not-common" class="text-danger"><i class="fas fa-times me-1"></i> Not common</li>
-                    <li id="rule-no-links" class="text-danger"><i class="fas fa-times me-1"></i> No links</li>
-                    <li id="rule-no-personal" class="text-danger"><i class="fas fa-times me-1"></i> No Personal Info</li>
+                    <li id="rule-length" class="text-danger"><i class="fas fa-times me-1"></i> Minimum 8 characters</li>
+                    <li id="rule-number" class="text-danger"><i class="fas fa-times me-1"></i> At least 1 number</li>
+                    <li id="rule-capital" class="text-danger"><i class="fas fa-times me-1"></i> At least 1 uppercase letter</li>
+                    <li id="rule-lowercase" class="text-danger"><i class="fas fa-times me-1"></i> At least 1 lowercase letter</li>
+                    <li id="rule-special" class="text-danger"><i class="fas fa-times me-1"></i> At least 1 special character</li>
+                    <li id="rule-no-space" class="text-danger"><i class="fas fa-times me-1"></i> No spaces allowed</li>
                 </ul>
             </div>
         </div>
@@ -138,7 +133,7 @@
             const matchIndicator = document.getElementById('passwordMatch');
             const success = matchIndicator.querySelector('.text-success');
             const error = matchIndicator.querySelector('.text-danger');
-            
+
             if (password.value && confirmPassword.value) {
                 if (match) {
                     success.classList.remove('d-none');

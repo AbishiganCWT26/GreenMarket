@@ -3,7 +3,7 @@
 @section('title', 'Admin Profile')
 
 @section('styles')
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="{{ asset('js/form-validation.js') }}"></script>
     <style>
@@ -736,7 +736,7 @@
             transition: all 0.3s ease;
             margin-top: 10px;
         }
-        
+
         .btn-otp-send:disabled {
             background: #cbd5e1;
             cursor: not-allowed;
@@ -877,13 +877,13 @@
                                         <i class="fas fa-edit"></i> Edit NIC
                                     </button>
                                 </div>
-                                <input type="text" class="form-control" id="currentNicDisplay" 
+                                <input type="text" class="form-control" id="currentNicDisplay"
                                     value="{{ $adminDetails->nic_no ?? 'Not set' }}" readonly>
-                                
+
                                 <div id="nicEditWrapper" class="nic-edit-container">
                                     <div class="mb-3">
                                         <label class="form-label">New NIC Number</label>
-                                        <input type="text" class="form-control" id="new_nic_no" 
+                                        <input type="text" class="form-control" id="new_nic_no"
                                             placeholder="e.g., 123456789V or 200123456789"
                                             oninput="validateNicInput(this.value)">
                                         <div id="nicStatus" class="nic-status"></div>
@@ -898,7 +898,7 @@
                                     <div id="otpInputGroup" class="otp-input-group">
                                         <div class="mb-3">
                                             <label class="form-label">Verification OTP</label>
-                                            <input type="text" class="form-control" id="nic_otp" maxlength="6" 
+                                            <input type="text" class="form-control" id="nic_otp" maxlength="6"
                                                 placeholder="Enter 6-digit OTP">
                                             <div id="otpTimer" class="timer-display"></div>
                                         </div>
@@ -924,28 +924,12 @@
                         <div class="requirements">
                             <h5><i class="fas fa-lightbulb"></i> Password Requirements</h5>
                             <ul>
-                                <li id="rule-length" class="rule-item invalid"><i class="fas fa-times-circle"></i> Minimum 8
-                                    characters</li>
-                                <li id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least
-                                    1 number (0–9)</li>
-                                <li id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least
-                                    1 capital letter (A–Z)</li>
-                                <li id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> At
-                                    least 1 lowercase letter (a–z)</li>
-                                <li id="rule-special" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least
-                                    1 special character</li>
-                                <li id="rule-no-space" class="rule-item invalid"><i class="fas fa-times-circle"></i> No
-                                    spaces allowed</li>
-                                <li id="rule-no-repeat" class="rule-item invalid"><i class="fas fa-times-circle"></i> No
-                                    consecutive repeated characters</li>
-                                <li id="rule-no-sequence" class="rule-item invalid"><i class="fas fa-times-circle"></i> No
-                                    sequential characters</li>
-                                <li id="rule-not-common" class="rule-item invalid"><i class="fas fa-times-circle"></i> No
-                                    common passwords</li>
-                                <li id="rule-no-links" class="rule-item invalid"><i class="fas fa-times-circle"></i> No
-                                    links or URLs</li>
-                                <li id="rule-no-personal" class="rule-item invalid"><i class="fas fa-times-circle"></i> No
-                                    personal info</li>
+                                <li id="rule-length" class="rule-item invalid"><i class="fas fa-times-circle"></i> 8+ characters</li>
+                                <li id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 number</li>
+                                <li id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 capital letter</li>
+                                <li id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 lowercase letter</li>
+                                <li id="rule-special" class="rule-item invalid"><i class="fas fa-times-circle"></i> 1 special character</li>
+                                <li id="rule-no-space" class="rule-item invalid"><i class="fas fa-times-circle"></i> No spaces</li>
                             </ul>
                         </div>
 
@@ -1025,7 +1009,7 @@
 @endsection
 
 @section('scripts')
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             @if(session('success'))
@@ -1162,14 +1146,14 @@
                         return;
                     }
 
-                    if (currentStrength < 5) {
+                    if (currentStrength < 6) {
                         Swal.fire({
                             imageUrl: '{{ asset('assets/icons/Gif/alert2.gif') }}',
                             imageWidth: 100,
                             imageHeight: 100,
                             imageAlt: 'Warning',
                             title: 'Weak Password',
-                            text: 'Please use a stronger password for better security.',
+                            text: 'Please make sure your password meets all six required criteria.',
                             background: 'white',
                             color: '#f59e0b',
                             toast: true,
@@ -1201,7 +1185,7 @@
                 } else {
                     errorElement.style.display = 'none';
                     confirmPasswordInput.classList.remove('input-error');
-                    submitBtn.disabled = currentStrength < 5;
+                    submitBtn.disabled = currentStrength < 6;
                 }
             }
 
@@ -1322,7 +1306,7 @@
         function validateNicInput(nic) {
             const status = document.getElementById('nicStatus');
             const btn = document.getElementById('btnSendOtp');
-            
+
             if (!nic) {
                 status.innerHTML = '';
                 btn.disabled = true;
@@ -1344,7 +1328,7 @@
             nic = nic.trim().toUpperCase();
             const oldNicPattern = /^[0-9]{9}[VX]$/;
             const newNicPattern = /^[0-9]{12}$/;
-            
+
             if (oldNicPattern.test(nic)) {
                 const days = parseInt(nic.substr(2, 3));
                 if (days > 500) return days <= 866;
@@ -1362,7 +1346,7 @@
         function sendNicOtp() {
             const btn = document.getElementById('btnSendOtp');
             const originalText = btn.innerHTML;
-            
+
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
@@ -1384,7 +1368,7 @@
                         toast: true, position: 'top-end',
                         showConfirmButton: false, timer: 3000
                     });
-                    
+
                     document.getElementById('otpInputGroup').style.display = 'block';
                     btn.style.display = 'none';
                     startOtpTimer();
@@ -1412,14 +1396,14 @@
         function startOtpTimer() {
             let timeLeft = 600; // 10 minutes
             const display = document.getElementById('otpTimer');
-            
+
             if (window.otpTimerInterval) clearInterval(window.otpTimerInterval);
-            
+
             window.otpTimerInterval = setInterval(() => {
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
                 display.innerHTML = `OTP expires in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                
+
                 if (--timeLeft < 0) {
                     clearInterval(window.otpTimerInterval);
                     display.innerHTML = 'OTP expired. Please try again.';
@@ -1433,7 +1417,7 @@
         function verifyAndSaveNic() {
             const nic = document.getElementById('new_nic_no').value;
             const otp = document.getElementById('nic_otp').value;
-            
+
             if (!otp || otp.length !== 6) {
                 Swal.fire({
                     imageUrl: '{{ asset('assets/icons/Gif/Wrong1.gif') }}',
@@ -1469,7 +1453,7 @@
                         toast: true, position: 'top-end',
                         showConfirmButton: false, timer: 3000
                     });
-                    
+
                     document.getElementById('currentNicDisplay').value = nic;
                     toggleNicEdit();
                 } else {
@@ -1515,6 +1499,7 @@
             const strengthFill = document.getElementById('strengthFill');
             const submitBtn = document.getElementById('securitySubmit');
 
+            currentStrength = result.score;
             strengthText.textContent = result.strengthText;
             strengthText.style.color = result.color;
             strengthFill.style.width = result.percent + '%';

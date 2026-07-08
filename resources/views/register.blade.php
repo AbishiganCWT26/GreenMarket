@@ -355,16 +355,6 @@
 												Special</li>
 											<li id="rule-no-space" class="text-danger"><i class="fas fa-times me-1"></i> No
 												spaces</li>
-											<li id="rule-no-repeat" class="text-danger"><i class="fas fa-times me-1"></i> No
-												repeat</li>
-											<li id="rule-no-sequence" class="text-danger"><i class="fas fa-times me-1"></i>
-												No sequence</li>
-											<li id="rule-not-common" class="text-danger"><i class="fas fa-times me-1"></i>
-												Not common</li>
-											<li id="rule-no-links" class="text-danger"><i class="fas fa-times me-1"></i> No
-												links</li>
-											<li id="rule-no-personal" class="text-danger"><i class="fas fa-times me-1"></i>
-												No Personal Info</li>
 										</ul>
 									</div>
 									@error('password')
@@ -629,7 +619,8 @@
 				fill.style.backgroundColor = result.color;
 				fill.style.width = result.percent + '%';
 
-				return result.isValid;
+				const requiredRules = ['length', 'number', 'capital', 'lowercase', 'special', 'no-space'];
+				return requiredRules.every(rule => result.rules[rule]);
 			}
 
 			function validatePasswordMatch() {

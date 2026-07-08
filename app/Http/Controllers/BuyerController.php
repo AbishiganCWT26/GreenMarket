@@ -15,6 +15,7 @@ use App\Mail\BuyerRegistrationMail;
 use App\Mail\OrderNotificationMail;
 use Illuminate\Support\Facades\Log;
 use App\Services\InventoryService;
+use App\Services\PasswordPolicy;
 use App\Models\Product;
 use App\Models\Order;
 
@@ -124,27 +125,27 @@ class BuyerController extends Controller
                 }
             });
         }
-        
+
         // Category filter
         if ($request->has('category') && $request->category != 'all' && !empty($request->category)) {
             $query->where('product_categories.category_name', 'LIKE', "%{$request->category}%");
         }
-        
+
         // Subcategory filter
         if ($request->has('subcategory') && !empty($request->subcategory)) {
             $query->where('product_subcategories.subcategory_name', 'LIKE', "%{$request->subcategory}%");
         }
-        
+
         // District filter
         if ($request->has('district') && !empty($request->district)) {
             $query->where('farmers.district', $request->district);
         }
-        
+
         // Grade filter
         if ($request->has('grade') && !empty($request->grade)) {
             $query->where('products.quality_grade', $request->grade);
         }
-        
+
         // Price filters
         if ($request->has('min_price') && is_numeric($request->min_price) && $request->min_price > 0) {
             $query->where('products.selling_price', '>=', $request->min_price);
@@ -152,7 +153,7 @@ class BuyerController extends Controller
         if ($request->has('max_price') && is_numeric($request->max_price) && $request->max_price > 0) {
             $query->where('products.selling_price', '<=', $request->max_price);
         }
-        
+
         // Sorting
         if ($request->has('sort')) {
             switch ($request->sort) {
@@ -239,28 +240,28 @@ class BuyerController extends Controller
         $limit = match(true) {
             // ultralarge Ultrawide / XXXXL Screens: 2560px - 5000px or above
             $screenWidth >= 2560 => 20,
-            
+
             // large Ultrawide / XXXL Screens: 1501px - 2559px
             $screenWidth >= 1501 && $screenWidth <= 2559 => 15,
-            
+
             // Ultrawide / XXL Screens: 1400px - 1500px
             $screenWidth >= 1400 && $screenWidth <= 1500 => 15,
-            
+
             // Extra Large Screens, Large Screens and Normal Tablets: 768px - 1399px
             $screenWidth >= 768 && $screenWidth <= 1399 => 12,
-            
+
             // Small Screens: 576px - 767px
             $screenWidth >= 576 && $screenWidth <= 767 => 9,
-            
+
             // Extra Small to ultra Small: 575px and below
             $screenWidth <= 575 => 6,
-            
+
             // Default fallback
             default => 12
         };
 
         $recommended = $query->limit($limit)->get();
-        
+
         return view('buyer.dashboard', array_merge([
             'orders_count' => $ordersCount,
             'wishlist_count' => $wishlistCount,
@@ -823,8 +824,10 @@ class BuyerController extends Controller
             'google_map_link' => 'required|url',
             'district' => 'required|string',
             'whatsapp_number' => 'nullable|string|max:15',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => PasswordPolicy::rulesWithConfirmation(),
             'terms' => 'required|accepted'
+        ], [
+            'password.regex' => PasswordPolicy::message()
         ]);
 
         if ($validator->fails()) {
@@ -1009,7 +1012,7 @@ class BuyerController extends Controller
     public function changePassword(Request $request)
     {
         $request->validate([
-            'new_password' => 'required|min:8|confirmed',
+            'new_password' => PasswordPolicy::rulesWithConfirmation(),
         ]);
         $user = Auth::user();
         $user->update([
@@ -2240,4 +2243,5 @@ class BuyerController extends Controller
         }
     }
 }
+
 

@@ -29,6 +29,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Services\PasswordPolicy;
+
 
 class LeadFarmerController extends Controller
 {
@@ -106,7 +108,7 @@ class LeadFarmerController extends Controller
             'name' => 'required|string|max:100',
             'nic_no' => 'required|string|max:20|unique:farmers,nic_no',
             'username' => 'required|string|max:50|unique:users,username',
-            'password' => 'required|string|min:6',
+            'password' => PasswordPolicy::rules(),
             'primary_mobile' => 'required|string|max:15',
             'whatsapp_number' => 'nullable|string|max:15',
             'email' => 'nullable|email|max:100',
@@ -203,7 +205,7 @@ class LeadFarmerController extends Controller
                 $messageBody .= "Your login details are:\n";
                 $messageBody .= "Username: " . $request->username . "\n";
                 $messageBody .= "Password: " . $request->password . "\n";
-                
+
                 $this->sendSMS($request->primary_mobile, $messageBody);
 
                 if ($request->email) {
@@ -352,18 +354,18 @@ class LeadFarmerController extends Controller
             if ($request->hasFile('product_photo')) {
                 $photo = $request->file('product_photo');
                 $filename = 'product_' . time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
-                
+
                 $uploadPath = public_path('uploads/product_images');
                 if (!file_exists($uploadPath)) {
                     mkdir($uploadPath, 0777, true);
                 }
-                
+
                 $photo->move($uploadPath, $filename);
                 $productPhoto = $filename;
             }
 
             $farmer = Farmer::find($request->farmer_id);
-            
+
             $product = Product::create([
                 'farmer_id' => $request->farmer_id,
                 'lead_farmer_id' => $leadFarmerId,
@@ -395,9 +397,9 @@ class LeadFarmerController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             \Log::error('Product creation error: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error adding product: ' . $e->getMessage(),
@@ -409,7 +411,7 @@ class LeadFarmerController extends Controller
             ], 500);
         }
     }
-    
+
     public function manageProducts(Request $request)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
@@ -485,7 +487,7 @@ class LeadFarmerController extends Controller
             'html' => $html
         ]);
     }
-    
+
     public function editProduct($id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
@@ -560,7 +562,7 @@ class LeadFarmerController extends Controller
 
         try {
             $otp = rand(100000, 999999);
-            
+
             \Log::info("Product Update OTP for Product {$id}: " . $otp);
 
             OtpVerification::create([
@@ -572,7 +574,7 @@ class LeadFarmerController extends Controller
             ]);
 
             $message = "Your GreenMarket OTP for updating product details is: $otp. \nThis code is valid for 10 minutes. \nIf Lead Farmer requests OTP, share only the OTP code.\nPlease do not share this with anyone.";
-            
+
             $smsSent = $this->sendSMS($farmerMobile, $message);
 
             if (!$smsSent) {
@@ -595,7 +597,7 @@ class LeadFarmerController extends Controller
             ], 500);
         }
     }
-    
+
     public function verifyProductUpdateOtp(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -642,7 +644,7 @@ class LeadFarmerController extends Controller
             ], 500);
         }
     }
-    
+
     public function updateProduct(Request $request, $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
@@ -688,7 +690,7 @@ class LeadFarmerController extends Controller
             'subcategory_id' => $product->subcategory_id,
             'product_examples_id' => $product->product_examples_id,
             'selling_price' => $product->selling_price,
-            'expected_availability_date' => $product->expected_availability_date ? 
+            'expected_availability_date' => $product->expected_availability_date ?
                 Carbon::parse($product->expected_availability_date)->format('Y-m-d') : null
         ];
 
@@ -736,19 +738,19 @@ class LeadFarmerController extends Controller
             if ($request->hasFile('product_photo')) {
                 $photo = $request->file('product_photo');
                 $filename = 'product_' . $id . '_' . time() . '.' . $photo->getClientOriginalExtension();
-                
+
                 $uploadPath = public_path('uploads/product_images');
                 if (!file_exists($uploadPath)) {
                     mkdir($uploadPath, 0777, true);
                 }
-                
+
                 if ($productPhoto && $productPhoto != 'product-placeholder.png') {
                     $oldPhotoPath = public_path('uploads/product_images/' . $productPhoto);
                     if (file_exists($oldPhotoPath)) {
                         unlink($oldPhotoPath);
                     }
                 }
-                
+
                 $photo->move($uploadPath, $filename);
                 $productPhoto = $filename;
             }
@@ -783,9 +785,9 @@ class LeadFarmerController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             \Log::error('Product update error: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating product: ' . $e->getMessage()
@@ -910,23 +912,7 @@ class LeadFarmerController extends Controller
     public function updatePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'new_password' => [
-                'required',
-                'string',
-                'min:8',
-                'confirmed',
-                function ($attribute, $value, $fail) {
-                    if (!preg_match('/[A-Z]/', $value)) {
-                        $fail('Password must contain at least one uppercase letter.');
-                    }
-                    if (!preg_match('/[0-9]/', $value)) {
-                        $fail('Password must contain at least one number.');
-                    }
-                    if (!preg_match('/[!@#$%^&*(),.?":{}|<>]/', $value)) {
-                        $fail('Password must contain at least one special character.');
-                    }
-                }
-            ],
+            'new_password' => PasswordPolicy::rulesWithConfirmation(),
         ]);
 
         if ($validator->fails()) {
@@ -995,7 +981,7 @@ class LeadFarmerController extends Controller
         try {
             $photo = $request->file('profile_photo');
             $filename = 'lead_farmer_' . $user->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
-            
+
             $uploadPath = public_path('uploads/profile_pictures');
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0777, true);
@@ -1007,9 +993,9 @@ class LeadFarmerController extends Controller
                     unlink($oldPhotoPath);
                 }
             }
-            
+
             $photo->move($uploadPath, $filename);
-            
+
             $user->profile_photo = $filename;
             $user->save();
 
@@ -1028,7 +1014,7 @@ class LeadFarmerController extends Controller
     public function inventoryMovementLogs(Request $request)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
-        
+
         $query = InventoryLog::with(['product.farmer', 'user', 'order'])
             ->whereHas('product', function($q) use ($leadFarmerId) {
                 $q->where('lead_farmer_id', $leadFarmerId);
@@ -1070,7 +1056,7 @@ class LeadFarmerController extends Controller
     public function inventoryMovementLogsPdf(Request $request)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
-        
+
         $query = InventoryLog::with(['product.farmer', 'user', 'order'])
             ->whereHas('product', function($q) use ($leadFarmerId) {
                 $q->where('lead_farmer_id', $leadFarmerId);
@@ -1146,7 +1132,7 @@ class LeadFarmerController extends Controller
         } elseif ($request->preferred_payment == 'all') {
             return "All Methods";
         }
-        
+
         return "Bank Transfer";
     }
 
@@ -1498,7 +1484,7 @@ class LeadFarmerController extends Controller
 
         try {
             $otp = rand(100000, 999999);
-            
+
             \Log::info("Farmer Update OTP for User " . Auth::id() . ": " . $otp);
 
             OtpVerification::create([
@@ -1511,7 +1497,7 @@ class LeadFarmerController extends Controller
 
             $mobileNumber = $farmer->primary_mobile;
             $message = "Your GreenMarket OTP for updating your Mobile Number/Payment Info is: $otp. \nThis code is valid for 10 minutes. \nIf Lead Farmer requests OTP, share only the OTP code.\nPlease do not share this with anyone.";
-            
+
             $this->sendSMS($mobileNumber, $message);
 
             return response()->json([
@@ -1583,13 +1569,13 @@ class LeadFarmerController extends Controller
 
             $to = preg_replace('/[^0-9]/', '', $to);
             $text = urlencode($message);
-            
+
             $baseurl = rtrim($baseurl, '/') . '/';
             $url = $baseurl . "?id=" . $user . "&pw=" . $password . "&to=" . $to . "&text=" . $text;
-            
+
             $ret = $this->get_web_page($url);
             $res = explode(":", $ret);
-            
+
             if (trim($res[0]) == "OK") {
                 \Log::info("SMS Sent successfully to $to. Response: $ret");
                 return true;
@@ -1859,11 +1845,11 @@ class LeadFarmerController extends Controller
         $totalInventoryValue = $products->sum(function($p) {
             return $p->quantity * $p->selling_price;
         });
-        
+
         $lowStockCount = $products->filter(function($p) {
             return $p->inventory_status == 'Low Stock' || $p->inventory_status == 'Critical';
         })->count();
-        
+
         $outOfStockCount = $products->filter(function($p) {
             return $p->inventory_status == 'Out of Stock';
         })->count();
@@ -1898,7 +1884,7 @@ class LeadFarmerController extends Controller
         }
 
         $products = $query->paginate(15)->withQueryString();
-        
+
         // Manual filter for stock status (since it's an accessor)
         if ($request->filled('status')) {
             $statusFilter = $request->status;
@@ -1937,7 +1923,7 @@ class LeadFarmerController extends Controller
             ->firstOrFail();
 
         $inventoryService = app(InventoryService::class);
-        
+
         try {
             if ($request->update_type === 'add') {
                 $inventoryService->updateStock($product, $request->quantity, 'manual_add', $request->reason);
@@ -1978,7 +1964,7 @@ class LeadFarmerController extends Controller
         }
 
         $products = $query->get();
-        
+
         if ($request->filled('status')) {
             $statusFilter = $request->status;
             $products = $products->filter(function ($product) use ($statusFilter) {

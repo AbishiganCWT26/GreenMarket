@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserUpdateNotification;
+use App\Services\PasswordPolicy;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
@@ -50,7 +51,7 @@ class UserController extends Controller
 
         if ($request->filled('q')) {
             $search = '%' . $request->q . '%';
-            
+
             $query->where(function($q) use ($search) {
                 $q->where('users.username', 'ILIKE', $search)
                     ->orWhere('users.email', 'ILIKE', $search)
@@ -80,7 +81,7 @@ class UserController extends Controller
 
         $viewType = $request->get('view', 'card');
         $perPage = $viewType === 'table' ? 15 : 6 ;
-        
+
         $usersPaginator = $query->paginate($perPage)->withQueryString();
 
         if ($request->ajax()) {
@@ -196,8 +197,10 @@ class UserController extends Controller
             'user_type' => 'required|in:farmer,lead_farmer,buyer,facilitator,admin',
             'username' => 'required|string|max:50|unique:users,username',
             'email' => 'nullable|email|max:100|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => PasswordPolicy::rulesWithConfirmation(),
             'name' => 'required|string|max:100'
+        ], [
+            'password.regex' => 'The password must contain at least 1 number, 1 uppercase letter, 1 lowercase letter, 1 special character (!@#$%^&*()-_+=), and no spaces.'
         ]);
 
         // Additional validation for admin types
@@ -205,13 +208,13 @@ class UserController extends Controller
             $request->validate([
                 'phone_number' => 'required|string|max:20'
             ]);
-            
+
             // Check if NIC already exists in admins table
             if ($request->has('nic_no') && $request->nic_no) {
                 $nicExists = DB::table('admins')->where('nic_no', $request->nic_no)->exists();
                 if ($nicExists) {
                     return response()->json([
-                        'success' => false, 
+                        'success' => false,
                         'message' => 'Failed to create user because NIC No. "' . $request->nic_no . '" already exists'
                     ], 422);
                 }
@@ -222,7 +225,7 @@ class UserController extends Controller
 
         try {
             $plainPassword = $validated['password'];
-            
+
             $userId = DB::table('users')->insertGetId([
                 'username' => $validated['username'],
                 'email' => $validated['email'],
@@ -383,7 +386,7 @@ class UserController extends Controller
             if (strpos($errorMessage, 'farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
                 preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
                 $nicNumber = $matches[1] ?? '';
-                
+
                 if ($nicNumber) {
                     $errorMessage = 'Failed to create user because NIC No. "' . $nicNumber . '" already exists';
                 } else {
@@ -394,7 +397,7 @@ class UserController extends Controller
             elseif (strpos($errorMessage, 'users_username_key') !== false && strpos($errorMessage, 'already exists') !== false) {
                 preg_match('/Key \(username\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
                 $username = $matches[1] ?? '';
-                
+
                 if ($username) {
                     $errorMessage = 'Failed to create user because username "' . $username . '" already exists';
                 } else {
@@ -405,7 +408,7 @@ class UserController extends Controller
             elseif (strpos($errorMessage, 'users_email_key') !== false && strpos($errorMessage, 'already exists') !== false) {
                 preg_match('/Key \(email\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
                 $email = $matches[1] ?? '';
-                
+
                 if ($email) {
                     $errorMessage = 'Failed to create user because email "' . $email . '" already exists';
                 } else {
@@ -416,7 +419,7 @@ class UserController extends Controller
             elseif (strpos($errorMessage, 'admins_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
                 preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
                 $nicNumber = $matches[1] ?? '';
-                
+
                 if ($nicNumber) {
                     $errorMessage = 'Failed to create user because NIC No. "' . $nicNumber . '" already exists';
                 } else {
@@ -428,7 +431,7 @@ class UserController extends Controller
                 \Log::error('Database Error during user creation: ' . $errorMessage);
                 $errorMessage = 'A database error occurred while creating the user: ' . $errorMessage;
             }
-            
+
             return response()->json(['success' => false, 'message' => $errorMessage], 500);
         }
     }
@@ -456,7 +459,7 @@ class UserController extends Controller
 
         // Prevent role modification for any user
         $request->merge(['role' => $user->role]);
-        
+
         if ($user->id == Auth::id()) {
             $request->merge(['is_active' => $user->is_active]);
         }
@@ -484,7 +487,7 @@ class UserController extends Controller
             $paymentFields = ['preferred_payment', 'account_number', 'account_holder_name',
                             'bank_name', 'bank_branch', 'ezcash_mobile', 'mcash_mobile'];
 
-            $profileFields = ['name', 'nic_no', 'primary_mobile', 'whatsapp_number', 'residential_address', 
+            $profileFields = ['name', 'nic_no', 'primary_mobile', 'whatsapp_number', 'residential_address',
                              'grama_niladhari_division', 'divisional_secretariat', 'gn_division_code', 'district', 'group_name', 'group_number'];
 
             foreach ($profileFields as $field) {
@@ -508,7 +511,7 @@ class UserController extends Controller
 
             if ($details) {
                 DB::table($table)->where('user_id', $userId)->update($updateData);
-                
+
                 // If we just updated lead_farmer record, ensure we have its ID for the next iteration
                 if ($table == 'lead_farmers') {
                     $currentLeadFarmerId = $details->id;
@@ -533,7 +536,7 @@ class UserController extends Controller
                 // Handle table-specific fields for insertion
                 if ($table == 'farmers') {
                     $createData['is_active'] = true;
-                    
+
                     // If this is a lead farmer, they are their own lead farmer
                     // If regular farmer, get from request or use existing/default
                     if ($role == 'lead_farmer') {
@@ -550,7 +553,7 @@ class UserController extends Controller
                 if ($table == 'lead_farmers') {
                     $createData['group_name'] = $request->group_name ?? ($userRecord->username . "'s Group");
                     $createData['group_number'] = $request->group_number ?? ('GRP-' . strtoupper(Str::random(6)));
-                    
+
                     $newId = DB::table($table)->insertGetId($createData);
                     $currentLeadFarmerId = $newId;
                 } else {
@@ -626,7 +629,7 @@ class UserController extends Controller
                     $updateData[$dbColumn] = $value;
                 }
             }
-            
+
             // Map the request's district/assigned_division to the DB's assigned_division column
             $districtValue = $request->input('district') ?? $request->input('facilitator_district') ?? $request->input('assigned_division') ?? $request->input('facilitator_assigned_division');
             if ($districtValue !== null) {
@@ -641,7 +644,7 @@ class UserController extends Controller
             if ($request->has('assignments') && is_array($request->assignments)) {
                 // Delete existing assignments first
                 DB::table('facilitator_assignments')->where('facilitator_id', $facilitator->id)->delete();
-                
+
                 foreach ($request->assignments as $assignment) {
                     DB::table('facilitator_assignments')->insert([
                         'facilitator_id' => $facilitator->id,
@@ -801,7 +804,7 @@ class UserController extends Controller
             $nicExists = DB::table('lead_farmers')->where('nic_no', $farmer->nic_no)->exists();
             if ($nicExists) {
                 return response()->json([
-                    'success' => false, 
+                    'success' => false,
                     'message' => 'Cannot promote because NIC No. "' . $farmer->nic_no . '" already exists as a Lead Farmer'
                 ], 400);
             }
@@ -844,17 +847,17 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             $errorMessage = $e->getMessage();
             if (strpos($errorMessage, 'lead_farmers_nic_no_key') !== false && strpos($errorMessage, 'already exists') !== false) {
                 preg_match('/Key \(nic_no\)=\(([^)]+)\) already exists/', $errorMessage, $matches);
                 $nicNumber = $matches[1] ?? '';
-                
+
                 if ($nicNumber) {
                     $errorMessage = 'Cannot promote because NIC No. "' . $nicNumber . '" already exists as a Lead Farmer';
                 }
             }
-            
+
             return response()->json(['success' => false, 'message' => $errorMessage], 500);
         }
     }
@@ -890,7 +893,7 @@ class UserController extends Controller
             'created_at' => now()
         ]);
 
-        $message = $request->action == 'verify_nic' 
+        $message = $request->action == 'verify_nic'
             ? "Your OTP for NIC update is: $otp. Valid for 5 minutes."
             : ($request->action == 'verify_rider_profile'
                 ? "Your OTP for Rider Profile update is: $otp. Valid for 5 minutes."
@@ -959,7 +962,7 @@ class UserController extends Controller
         $expiresAt = now()->addMinutes(5);
 
         $action = $request->action ?? 'edit_payment';
-        
+
         DB::table('otp_verifications')->insert([
             'user_id' => $user->id,
             'otp' => $otp,
@@ -968,7 +971,7 @@ class UserController extends Controller
             'created_at' => now()
         ]);
 
-        $message = $action == 'verify_nic' 
+        $message = $action == 'verify_nic'
             ? "Your OTP for NIC update is: $otp. Valid for 5 minutes."
             : ($action == 'verify_rider_profile'
                 ? "Your OTP for Rider Profile update is: $otp. Valid for 5 minutes."
@@ -1238,7 +1241,7 @@ class UserController extends Controller
 
         if ($mobile) {
             $message = "Welcome to GreenMarket! Your " . str_replace('_', ' ', $role) . " account has been created.\nUsername: {$user->username}\nPassword: {$passwordText}";
-            
+
             $this->sendSms($mobile, $message);
         }
     }
@@ -1319,7 +1322,7 @@ class UserController extends Controller
                 ->where('used', true)
                 ->where('used_at', '>=', now()->subMinutes(15))
                 ->exists();
-            
+
             if (!$verified) return false;
         }
         return true;
@@ -1640,11 +1643,11 @@ class UserController extends Controller
                 DB::table('farmers')
                     ->where('lead_farmer_id', $leadFarmer->id)
                     ->update(['lead_farmer_id' => $newLeadFarmerId]);
-                    
+
                 DB::table('products')
                     ->where('lead_farmer_id', $leadFarmer->id)
                     ->update(['lead_farmer_id' => $newLeadFarmerId]);
-                    
+
                 DB::table('orders')
                     ->where('lead_farmer_id', $leadFarmer->id)
                     ->update(['lead_farmer_id' => $newLeadFarmerId]);

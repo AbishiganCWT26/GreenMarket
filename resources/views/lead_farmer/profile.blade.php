@@ -7,7 +7,7 @@
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/lead_farmer/Profile.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
 @endsection
 
 @section('content')
@@ -275,11 +275,12 @@
                     <div class="password-requirements">
                         <p><i class="fas fa-shield-alt"></i> Password must contain:</p>
                         <ul>
-                            <li id="req-length"><i class="fas fa-times"></i> At least 8 characters</li>
+                            <li id="req-length"><i class="fas fa-times"></i> Minimum 8 characters</li>
                             <li id="req-number"><i class="fas fa-times"></i> At least 1 number</li>
                             <li id="req-upper"><i class="fas fa-times"></i> At least 1 uppercase letter</li>
                             <li id="req-lower"><i class="fas fa-times"></i> At least 1 lowercase letter</li>
                             <li id="req-special"><i class="fas fa-times"></i> At least 1 special character</li>
+                            <li id="req-nospace"><i class="fas fa-times"></i> No spaces allowed</li>
                         </ul>
                     </div>
                     <div class="modal-actions">
@@ -299,7 +300,7 @@
 @endsection
 
 @section('scripts')
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const tabBtns = document.querySelectorAll('.tab-btn');
@@ -381,7 +382,8 @@
                     number: /\d/.test(password),
                     upper: /[A-Z]/.test(password),
                     lower: /[a-z]/.test(password),
-                    special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+                    special: /[!@#$%^&*()\-_=+]/.test(password),
+                    nospace: !/\s/.test(password)
                 };
 
                 const reqLength = document.getElementById('req-length');
@@ -389,26 +391,30 @@
                 const reqUpper = document.getElementById('req-upper');
                 const reqLower = document.getElementById('req-lower');
                 const reqSpecial = document.getElementById('req-special');
+                const reqNospace = document.getElementById('req-nospace');
 
                 reqLength.className = checks.length ? 'valid' : 'invalid';
                 reqNumber.className = checks.number ? 'valid' : 'invalid';
                 reqUpper.className = checks.upper ? 'valid' : 'invalid';
                 reqLower.className = checks.lower ? 'valid' : 'invalid';
                 reqSpecial.className = checks.special ? 'valid' : 'invalid';
+                if (reqNospace) reqNospace.className = checks.nospace ? 'valid' : 'invalid';
 
                 reqLength.innerHTML = checks.length ? '<i class="fas fa-check"></i> At least 8 characters' : '<i class="fas fa-times"></i> At least 8 characters';
                 reqNumber.innerHTML = checks.number ? '<i class="fas fa-check"></i> At least 1 number' : '<i class="fas fa-times"></i> At least 1 number';
                 reqUpper.innerHTML = checks.upper ? '<i class="fas fa-check"></i> At least 1 uppercase letter' : '<i class="fas fa-times"></i> At least 1 uppercase letter';
                 reqLower.innerHTML = checks.lower ? '<i class="fas fa-check"></i> At least 1 lowercase letter' : '<i class="fas fa-times"></i> At least 1 lowercase letter';
                 reqSpecial.innerHTML = checks.special ? '<i class="fas fa-check"></i> At least 1 special character' : '<i class="fas fa-times"></i> At least 1 special character';
+                if (reqNospace) reqNospace.innerHTML = checks.nospace ? '<i class="fas fa-check"></i> No spaces allowed' : '<i class="fas fa-times"></i> No spaces allowed';
 
                 if (checks.length) strength++;
                 if (checks.number) strength++;
                 if (checks.upper) strength++;
                 if (checks.lower) strength++;
                 if (checks.special) strength++;
+                if (checks.nospace) strength++;
 
-                const percent = (strength / 5) * 100;
+                const percent = (strength / 6) * 100;
                 strengthProgress.style.width = percent + '%';
 
                 if (strength <= 2) {
@@ -419,7 +425,7 @@
                     strengthProgress.style.backgroundColor = '#f59e0b';
                     strengthText.textContent = 'Medium';
                     strengthText.style.color = '#f59e0b';
-                } else if (strength <= 4) {
+                } else if (strength <= 5) {
                     strengthProgress.style.backgroundColor = '#10B981';
                     strengthText.textContent = 'Strong';
                     strengthText.style.color = '#10B981';
@@ -429,7 +435,7 @@
                     strengthText.style.color = '#10B981';
                 }
 
-                return strength === 5;
+                return strength === 6;
             }
 
             newPassword.addEventListener('input', function () {
@@ -487,7 +493,10 @@
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({ new_password: newPass })
+                            body: JSON.stringify({
+                                new_password: newPass,
+                                new_password_confirmation: confirmPass
+                            })
                         })
                             .then(response => response.json())
                             .then(data => {
@@ -515,11 +524,11 @@
 
             window.showSweetAlert = function (type, title, message) {
                 const icons = {
-                    success: '{{ asset("assets/icons/success1.gif") }}',
-                    error: '{{ asset("assets/icons/error1.gif") }}',
-                    warning: '{{ asset("assets/icons/alert1.gif") }}',
-                    info: '{{ asset("assets/icons/info1.gif") }}',
-                    question: '{{ asset("assets/icons/question1.gif") }}'
+                    success: '{{ asset("assets/icons/Gif/success1.gif") }}',
+                    error: '{{ asset("assets/icons/Gif/error1.gif") }}',
+                    warning: '{{ asset("assets/icons/Gif/alert1.gif") }}',
+                    info: '{{ asset("assets/icons/Gif/info1.gif") }}',
+                    question: '{{ asset("assets/icons/Gif/question1.gif") }}'
                 };
 
                 const confirmColors = {

@@ -351,7 +351,7 @@ document.getElementById('primary_mobile').addEventListener('input', function() {
 	const original = "{{ $facilitator->primary_mobile }}";
 	const btn = document.getElementById('verify_primary_btn');
 	const status = document.getElementById('primary_mobile_status');
-	
+
 	if (current !== original) {
 		btn.style.display = 'block';
 		status.style.display = 'none';
@@ -368,7 +368,7 @@ document.getElementById('whatsapp_number').addEventListener('input', function() 
 	const original = "{{ $facilitator->whatsapp_number }}";
 	const btn = document.getElementById('verify_whatsapp_btn');
 	const status = document.getElementById('whatsapp_number_status');
-	
+
 	if (current !== original && current !== "") {
 		btn.style.display = 'block';
 		status.style.display = 'none';
@@ -493,17 +493,12 @@ function changePassword() {
 					<div class="requirements mt-3">
 						<h6 class="mb-2" style="font-size: 0.9rem;">Requirements:</h6>
 						<ul class="list-unstyled mb-0" style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-							<li id="rule-length" class="text-danger"><i class="fas fa-times me-1"></i> 8+ chars</li>
-							<li id="rule-number" class="text-danger"><i class="fas fa-times me-1"></i> Number</li>
-							<li id="rule-capital" class="text-danger"><i class="fas fa-times me-1"></i> Capital</li>
-							<li id="rule-lowercase" class="text-danger"><i class="fas fa-times me-1"></i> Lowercase</li>
-							<li id="rule-special" class="text-danger"><i class="fas fa-times me-1"></i> Special</li>
-							<li id="rule-no-space" class="text-danger"><i class="fas fa-times me-1"></i> No spaces</li>
-							<li id="rule-no-repeat" class="text-danger"><i class="fas fa-times me-1"></i> No repeat</li>
-							<li id="rule-no-sequence" class="text-danger"><i class="fas fa-times me-1"></i> No sequence</li>
-							<li id="rule-not-common" class="text-danger"><i class="fas fa-times me-1"></i> Not common</li>
-							<li id="rule-no-links" class="text-danger"><i class="fas fa-times me-1"></i> No links</li>
-							<li id="rule-no-personal" class="text-danger"><i class="fas fa-times me-1"></i> No Personal Info</li>
+						<li id="rule-length" class="text-danger"><i class="fas fa-times me-1"></i> Minimum 8 characters</li>
+						<li id="rule-number" class="text-danger"><i class="fas fa-times me-1"></i> At least 1 number</li>
+						<li id="rule-capital" class="text-danger"><i class="fas fa-times me-1"></i> At least 1 uppercase letter</li>
+						<li id="rule-lowercase" class="text-danger"><i class="fas fa-times me-1"></i> At least 1 lowercase letter</li>
+						<li id="rule-special" class="text-danger"><i class="fas fa-times me-1"></i> At least 1 special character</li>
+						<li id="rule-no-space" class="text-danger"><i class="fas fa-times me-1"></i> No spaces allowed</li>
 						</ul>
 					</div>
 				</div>
@@ -559,7 +554,7 @@ function changePassword() {
 				Swal.showValidationMessage('Passwords do not match');
 				return false;
 			}
-			
+
 			// Re-verify strength
 			const result = calculateStrength(newPass);
 			if (!result.allValid) {
@@ -594,10 +589,30 @@ function changePassword() {
 }
 
 function calculateStrength(password) {
-    const username = "{{ Auth::user()->username }}";
-    const email = "{{ Auth::user()->email }}";
-    
-    const result = validateAdvancedPassword(password, { username, email });
+    const checks = {
+        length: password.length >= 8,
+        number: /[0-9]/.test(password),
+        capital: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        special: /[!@#$%^&*()\-_=+]/.test(password),
+        'no-space': !/\s/.test(password)
+    };
+
+    const requiredRules = ['length', 'number', 'capital', 'lowercase', 'special', 'no-space'];
+    const allValid = requiredRules.every(rule => checks[rule]);
+    const passedCount = requiredRules.filter(rule => checks[rule]).length;
+    const percent = (passedCount / 6) * 100;
+
+    // Build a result compatible with updatePasswordRuleFeedback
+    const result = {
+        rules: checks,
+        isValid: allValid,
+        percent: percent,
+        allValid: allValid,
+        strengthText: percent < 34 ? 'Weak' : percent < 67 ? 'Fair' : percent < 100 ? 'Good' : 'Strong',
+        color: percent < 34 ? '#ef4444' : percent < 67 ? '#f59e0b' : percent < 100 ? '#3b82f6' : '#10B981'
+    };
+
     updatePasswordRuleFeedback(result);
     return result;
 }
@@ -606,7 +621,7 @@ function updateStrength(password) {
     const result = calculateStrength(password);
     const strengthText = document.getElementById('strengthText');
     const strengthBar = document.getElementById('strengthBar');
-    
+
     if (strengthText) {
         strengthText.textContent = result.strengthText;
         strengthText.style.color = result.color;

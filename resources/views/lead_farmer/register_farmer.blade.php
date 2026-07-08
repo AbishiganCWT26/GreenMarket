@@ -69,17 +69,12 @@
 							<div class="pass-rules">
 								<p><i class="fas fa-shield-alt"></i> Password Requirements:</p>
 								<ul class="rules-list" id="rulesList">
-									<li id="ruleLength"><i class="fas fa-times"></i> 8+ characters</li>
-									<li id="ruleUpper"><i class="fas fa-times"></i> Uppercase letter</li>
-									<li id="ruleLower"><i class="fas fa-times"></i> Lowercase letter</li>
-									<li id="ruleNumber"><i class="fas fa-times"></i> Number</li>
-									<li id="ruleSpecial"><i class="fas fa-times"></i> Special character</li>
-									<li id="ruleNospace"><i class="fas fa-times"></i> No spaces</li>
-									<li id="ruleRepeat"><i class="fas fa-times"></i> No 3x repeats</li>
-									<li id="ruleSequence"><i class="fas fa-times"></i> No sequences</li>
-									<li id="ruleCommon"><i class="fas fa-times"></i> Not common</li>
-									<li id="ruleNolinks"><i class="fas fa-times"></i> No links</li>
-									<li id="rulePersonal"><i class="fas fa-times"></i> No personal info</li>
+										<li id="ruleLength"><i class="fas fa-times"></i> Minimum 8 characters</li>
+										<li id="ruleNumber"><i class="fas fa-times"></i> At least 1 number</li>
+										<li id="ruleUpper"><i class="fas fa-times"></i> At least 1 uppercase letter</li>
+										<li id="ruleLower"><i class="fas fa-times"></i> At least 1 lowercase letter</li>
+										<li id="ruleSpecial"><i class="fas fa-times"></i> At least 1 special character</li>
+										<li id="ruleNospace"><i class="fas fa-times"></i> No spaces allowed</li>
 								</ul>
 							</div>
 						</div>
@@ -255,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			let submitBtn = document.getElementById('submitBtn');
 			submitBtn.disabled = true;
 			submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
-			
+
 			let formData = new FormData(this);
 			fetch(this.action, {
 				method: 'POST',
@@ -281,9 +276,9 @@ document.addEventListener('DOMContentLoaded', function() {
 				} else {
 					submitBtn.disabled = false;
 					submitBtn.innerHTML = 'Register Farmer';
-					
+
 					let errorMsg = res.body.message || 'An error occurred during registration.';
-					
+
 					if (res.status === 422 && res.body.errors) {
 						errorMsg = Object.values(res.body.errors).map(e => e.join('<br>')).join('<br>');
 					} else if (errorMsg.includes('users_email_key')) {
@@ -295,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					} else if (errorMsg.includes('SQLSTATE')) {
 						errorMsg = 'A database error occurred. Please try again.';
 					}
-					
+
 					showError('Registration Failed', errorMsg);
 				}
 			})
@@ -446,45 +441,23 @@ function validateAllFields() {
 }
 
 function validatePasswordStrength(pass) {
-	let username = document.getElementById('username').value;
-	let email = document.getElementById('email') ? document.getElementById('email').value : '';
-	let name = document.getElementById('fullName').value;
-	let mobile = document.getElementById('mobile') ? document.getElementById('mobile').value : '';
-	let personalInfo = [username, email.split('@')[0], name, mobile].filter(Boolean);
-
-	let seqChars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-	let hasSequence = false;
-	for (let i = 0; i < pass.length - 2; i++) {
-		let sub = pass.substring(i, i + 3).toLowerCase();
-		if (seqChars.includes(sub)) { hasSequence = true; break; }
-		let revSub = sub.split('').reverse().join('');
-		if (seqChars.includes(revSub)) { hasSequence = true; break; }
-	}
-
 	let checks = {
 		length: pass.length >= 8,
+		number: /[0-9]/.test(pass),
 		upper: /[A-Z]/.test(pass),
 		lower: /[a-z]/.test(pass),
-		number: /[0-9]/.test(pass),
-		special: /[!@#$%^&*(),.?":{}|<>\-_=+\[\]\\;'/`~]/.test(pass),
-		nospace: !/\s/.test(pass),
-		repeat: !/(.)\1{2}/.test(pass),
-		sequence: !hasSequence,
-		common: !/password|12345678|qwerty|admin123|letmein|welcome|monkey|dragon|master|login/.test(pass.toLowerCase()),
-		nolinks: !/https?:\/\/|www\.|ftp:\/\/|\.com|\.org|\.net|\.lk/.test(pass.toLowerCase()),
-		personal: !personalInfo.some(info => info && info.length >= 3 && pass.toLowerCase().includes(info.toLowerCase()))
+		special: /[!@#$%^&*()\-_=+]/.test(pass),
+		nospace: !/\s/.test(pass)
 	};
 
 	let ruleMap = {
-		length: 'ruleLength', upper: 'ruleUpper', lower: 'ruleLower', number: 'ruleNumber',
-		special: 'ruleSpecial', nospace: 'ruleNospace', repeat: 'ruleRepeat', sequence: 'ruleSequence',
-		common: 'ruleCommon', nolinks: 'ruleNolinks', personal: 'rulePersonal'
+		length: 'ruleLength', number: 'ruleNumber', upper: 'ruleUpper',
+		lower: 'ruleLower', special: 'ruleSpecial', nospace: 'ruleNospace'
 	};
 
 	let ruleLabels = {
-		length: '8+ characters', upper: 'Uppercase letter', lower: 'Lowercase letter', number: 'Number',
-		special: 'Special character', nospace: 'No spaces', repeat: 'No 3x repeats', sequence: 'No sequences',
-		common: 'Not common', nolinks: 'No links', personal: 'No personal info'
+		length: 'Minimum 8 characters', number: 'At least 1 number', upper: 'At least 1 uppercase letter',
+		lower: 'At least 1 lowercase letter', special: 'At least 1 special character', nospace: 'No spaces allowed'
 	};
 
 	Object.keys(ruleMap).forEach(rule => {
@@ -495,13 +468,12 @@ function validatePasswordStrength(pass) {
 		}
 	});
 
-	let rules = Object.keys(checks);
 	let strength = Object.values(checks).filter(Boolean).length;
-	let percent = (strength / rules.length) * 100;
+	let percent = (strength / 6) * 100;
 	let strengthFill = document.getElementById('strengthFill');
 	let strengthText = document.getElementById('strengthText');
-	let color = percent < 30 ? '#ef4444' : percent < 60 ? '#f59e0b' : percent < 90 ? '#3b82f6' : '#10B981';
-	let label = percent < 30 ? 'Weak' : percent < 60 ? 'Fair' : percent < 90 ? 'Good' : 'Strong';
+	let color = percent < 34 ? '#ef4444' : percent < 67 ? '#f59e0b' : percent < 100 ? '#3b82f6' : '#10B981';
+	let label = percent < 34 ? 'Weak' : percent < 67 ? 'Fair' : percent < 100 ? 'Good' : 'Strong';
 	if (strengthFill) { strengthFill.style.width = percent + '%'; strengthFill.style.backgroundColor = color; }
 	if (strengthText) { strengthText.textContent = label; strengthText.style.color = color; }
 	return Object.values(checks).every(Boolean);

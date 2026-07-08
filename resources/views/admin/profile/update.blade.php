@@ -885,16 +885,11 @@
                     <h5><i class="fas fa-lightbulb"></i> Password Requirements</h5>
                     <ul>
                         <li id="rule-length" class="rule-item invalid"><i class="fas fa-times-circle"></i> Minimum 8 characters</li>
-                        <li id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 number (0–9)</li>
-                        <li id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 capital letter (A–Z)</li>
-                        <li id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 lowercase letter (a–z)</li>
+                        <li id="rule-number" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 number</li>
+                        <li id="rule-capital" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 uppercase letter</li>
+                        <li id="rule-lowercase" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 lowercase letter</li>
                         <li id="rule-special" class="rule-item invalid"><i class="fas fa-times-circle"></i> At least 1 special character</li>
                         <li id="rule-no-space" class="rule-item invalid"><i class="fas fa-times-circle"></i> No spaces allowed</li>
-                        <li id="rule-no-repeat" class="rule-item invalid"><i class="fas fa-times-circle"></i> No consecutive repeated characters</li>
-                        <li id="rule-no-sequence" class="rule-item invalid"><i class="fas fa-times-circle"></i> No sequential characters</li>
-                        <li id="rule-not-common" class="rule-item invalid"><i class="fas fa-times-circle"></i> No common passwords</li>
-                        <li id="rule-no-links" class="rule-item invalid"><i class="fas fa-times-circle"></i> No links or URLs</li>
-                        <li id="rule-no-personal" class="rule-item invalid"><i class="fas fa-times-circle"></i> No personal info</li>
                     </ul>
                 </div>
 
@@ -1240,7 +1235,7 @@ function checkPasswordStrength(password) {
         strengthText.style.color = '#e5e7eb';
         strengthFill.style.width = '0%';
         strengthFill.style.backgroundColor = '#e5e7eb';
-        
+
         // Reset all 11 rules
         updatePasswordRuleFeedback({
             rules: {
@@ -1249,7 +1244,7 @@ function checkPasswordStrength(password) {
                 'not-common': false, 'no-links': false, 'no-personal': false
             }
         });
-        
+
         if (submitBtn) submitBtn.disabled = true;
         checkPasswordMatch();
         return;

@@ -22,6 +22,8 @@ use App\Models\BuyerProductRequest;
 use App\Models\InventoryLog;
 use App\Models\ProductCategory;
 use App\Services\InventoryService;
+use App\Services\PasswordPolicy;
+use App\Services\PasswordPolicy;
 
 class FarmerController extends Controller
 {
@@ -62,16 +64,7 @@ class FarmerController extends Controller
         // }
 
         $validator = Validator::make($request->all(), [
-            'new_password' => [
-                'required',
-                'string',
-                'min:8',
-                'confirmed',
-                'regex:/[a-z]/',
-                'regex:/[A-Z]/',
-                'regex:/[0-9]/',
-                'regex:/[@$!%*#?&]/',
-            ],
+            'new_password' => PasswordPolicy::rulesWithConfirmation(),
         ]);
 
         if ($validator->fails()) {
@@ -114,16 +107,7 @@ class FarmerController extends Controller
     public function updatePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'new_password' => [
-                'required',
-                'string',
-                'min:8',
-                'confirmed',
-                'regex:/[a-z]/',
-                'regex:/[A-Z]/',
-                'regex:/[0-9]/',
-                'regex:/[@$!%*#?&]/',
-            ],
+            'new_password' => PasswordPolicy::rulesWithConfirmation(),
         ]);
 
         if ($validator->fails()) {
@@ -888,10 +872,10 @@ class FarmerController extends Controller
         $totalComplaints = $complaints->total();
 
         return view('farmer.complaints.list', compact(
-            'complaints', 
-            'openComplaints', 
-            'inProgressComplaints', 
-            'resolvedComplaints', 
+            'complaints',
+            'openComplaints',
+            'inProgressComplaints',
+            'resolvedComplaints',
             'totalComplaints'
         ));
     }
@@ -1192,11 +1176,11 @@ class FarmerController extends Controller
     public function myInventory()
     {
         $farmerId = Auth::user()->farmer->id;
-        
+
         $products = Product::where('farmer_id', $farmerId)
             ->with(['category', 'subcategory'])
             ->get();
-            
+
         $logs = InventoryLog::whereHas('product', function($q) use ($farmerId) {
                 $q->where('farmer_id', $farmerId);
             })
@@ -1212,11 +1196,11 @@ class FarmerController extends Controller
         $totalInventoryValue = $products->sum(function($p) {
             return $p->quantity * $p->selling_price;
         });
-        
+
         $lowStockCount = $products->filter(function($p) {
             return $p->inventory_status == 'Low Stock' || $p->inventory_status == 'Critical';
         })->count();
-        
+
         $outOfStockCount = $products->filter(function($p) {
             return $p->inventory_status == 'Out of Stock';
         })->count();
@@ -1246,7 +1230,7 @@ class FarmerController extends Controller
         }
 
         $products = $query->paginate(15);
-        
+
         if ($request->filled('status')) {
             $statusFilter = $request->status;
             $products->setCollection(
@@ -1276,7 +1260,7 @@ class FarmerController extends Controller
         }
 
         $products = $query->get();
-        
+
         if ($request->filled('status')) {
             $statusFilter = $request->status;
             $products = $products->filter(function ($product) use ($statusFilter) {
@@ -1291,7 +1275,7 @@ class FarmerController extends Controller
     public function inventoryMovementLogsPdf(Request $request)
     {
         $farmerId = Auth::user()->farmer->id;
-        
+
         $query = InventoryLog::whereHas('product', function($q) use ($farmerId) {
                 $q->where('farmer_id', $farmerId);
             })

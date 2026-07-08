@@ -5,7 +5,7 @@
 
 @section('styles')
 	<link rel="stylesheet" href="{{ asset('css/buyer/profile.css') }}">
-	
+
 	<style>
 		.strength-bar {
 			height: 5px;
@@ -288,28 +288,12 @@
 						<h6 class="mb-2">Password Requirements:</h6>
 						<ul class="list-unstyled"
 							style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-							<li id="rule-length" class="text-danger"><i class="fas fa-times me-2"></i> Minimum 8 characters
-							</li>
-							<li id="rule-number" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 number
-								(0–9)</li>
-							<li id="rule-capital" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 capital
-								(A–Z)</li>
-							<li id="rule-lowercase" class="text-danger"><i class="fas fa-times me-2"></i> At least 1
-								lowercase (a–z)</li>
-							<li id="rule-special" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 special
-								char</li>
-							<li id="rule-no-space" class="text-danger"><i class="fas fa-times me-2"></i> No spaces allowed
-							</li>
-							<li id="rule-no-repeat" class="text-danger"><i class="fas fa-times me-2"></i> No consecutive
-								repeat</li>
-							<li id="rule-no-sequence" class="text-danger"><i class="fas fa-times me-2"></i> No sequential
-								chars</li>
-							<li id="rule-not-common" class="text-danger"><i class="fas fa-times me-2"></i> No common
-								passwords</li>
-							<li id="rule-no-links" class="text-danger"><i class="fas fa-times me-2"></i> No links or URLs
-							</li>
-							<li id="rule-no-personal" class="text-danger"><i class="fas fa-times me-2"></i> No personal info
-							</li>
+							<li id="rule-length" class="text-danger"><i class="fas fa-times me-2"></i> Minimum 8 characters</li>
+							<li id="rule-number" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 number</li>
+							<li id="rule-capital" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 capital letter</li>
+							<li id="rule-lowercase" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 lowercase letter</li>
+							<li id="rule-special" class="text-danger"><i class="fas fa-times me-2"></i> At least 1 special character</li>
+							<li id="rule-no-space" class="text-danger"><i class="fas fa-times me-2"></i> No spaces allowed</li>
 						</ul>
 					</div>
 
@@ -329,7 +313,7 @@
 @endsection
 
 @section('scripts')
-	
+
 	<script src="{{ asset('js/form-validation.js') }}"></script>
 	<script src="{{ asset('js/gn-data.js') }}"></script>
 	<script>

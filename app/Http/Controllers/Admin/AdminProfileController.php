@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Services\PasswordPolicy;
 use Illuminate\Support\Facades\Storage;
 use App\Mail\AdminPasswordChangedMail;
 use Illuminate\Support\Facades\Mail;
@@ -85,11 +86,18 @@ class AdminProfileController extends Controller
                 'required',
                 'string',
                 'min:8',
+                'regex:/[0-9]/',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[!@#$%^&*()\-_+=]/',
+                'regex:/^\S+$/',
                 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/'
             ],
         ], [
-            'new_password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+            'new_password.required' => 'New password is required.',
+            'new_password.min' => 'Password must be at least 8 characters.',
+            'new_password.regex' => 'Password must include at least one number, one uppercase letter, one lowercase letter, one special character, and no spaces.',
+            'new_password.confirmed' => 'The new password confirmation does not match.',
         ]);
 
         if ($validator->fails()) {
@@ -215,7 +223,7 @@ class AdminProfileController extends Controller
             }
 
             $otp = rand(100000, 999999);
-            
+
             // Log the OTP for development/testing
             \Log::info("NIC Update OTP for Admin (User ID: {$user->id}): " . $otp);
 
@@ -267,7 +275,7 @@ class AdminProfileController extends Controller
 
         try {
             $user = Auth::user();
-            
+
             $otpRecord = OtpVerification::where('user_id', $user->id)
                 ->where('otp', $request->otp)
                 ->where('action', 'nic_update')
@@ -343,13 +351,13 @@ class AdminProfileController extends Controller
 
             $to = preg_replace('/[^0-9]/', '', $to);
             $text = urlencode($message);
-            
+
             $baseurl = rtrim($baseurl, '/') . '/';
             $url = $baseurl . "?id=" . $user . "&pw=" . $password . "&to=" . $to . "&text=" . $text;
-            
+
             $ret = $this->get_web_page($url);
             $res = explode(":", $ret);
-            
+
             if (trim($res[0]) == "OK") {
                 \Log::info("SMS Sent successfully to $to for NIC Update. Response: $ret");
                 return true;

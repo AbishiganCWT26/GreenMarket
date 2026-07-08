@@ -476,11 +476,6 @@
 																									<div id="rule-lowercase" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Lowercase</div>
 																									<div id="rule-special" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>1 Special</div>
 																									<div id="rule-no-space" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No spaces</div>
-																									<div id="rule-no-repeat" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No 3x repeats</div>
-																									<div id="rule-no-sequence" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No sequences</div>
-																									<div id="rule-not-common" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>Not common</div>
-																									<div id="rule-no-links" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No links</div>
-																									<div id="rule-no-personal" class="rule-item" style="font-size: 11px; color: #64748b; display: flex; align-items: center;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 8px;"></i>No personal</div>
 																								</div>
 																								<style>
 																									.rule-item.valid { color: #10B981 !important; font-weight: 600; }
@@ -520,7 +515,8 @@
 					}
 				});
 
-				window.passwordValid = result.allValid;
+				const requiredRules = ['length', 'number', 'capital', 'lowercase', 'special', 'no-space'];
+				window.passwordValid = requiredRules.every(rule => result.rules[rule]);
 			}
 
 			function showAddUserModal() {
@@ -1265,8 +1261,10 @@
 						}
 
 						const advancedResult = validateAdvancedPassword(password, username, email);
-						if (!advancedResult.allValid) {
-							Swal.showValidationMessage('Your password must meet all 11 security standards listed.');
+						const requiredRules = ['length', 'number', 'capital', 'lowercase', 'special', 'no-space'];
+						const allRulesMet = requiredRules.every(rule => advancedResult.rules[rule]);
+						if (!allRulesMet) {
+							Swal.showValidationMessage('Your password must meet all 6 security standards listed.');
 							const rulesContainer = $('#password-validation-rules');
 							rulesContainer.fadeIn();
 							return false;
@@ -1557,10 +1555,11 @@
 				});
 				strengthText.text(result.strengthText).css('color', result.color);
 
-				// Update 11 rules grid
+				// Update rules grid
 				updatePasswordRuleFeedback(result);
 
-				window.passwordValid = result.allValid;
+				const requiredRules = ['length', 'number', 'capital', 'lowercase', 'special', 'no-space'];
+				window.passwordValid = requiredRules.every(rule => result.rules[rule]);
 			};
 
 			function isSequential(str) {

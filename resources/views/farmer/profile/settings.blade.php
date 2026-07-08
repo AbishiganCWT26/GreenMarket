@@ -30,7 +30,7 @@
                     </div>
                     <div class="info-text">
                         <h3>Secure Password Tips</h3>
-                        <p>Must be 8+ characters with uppercase, lowercase, numbers, and symbols (@$!%*#?&). <strong>Submission is only allowed when strength is "Strong".</strong></p>
+                        <p>Must be at least 8 characters, include a number, uppercase letter, lowercase letter, special character, and no spaces. <strong>Submission is only allowed when all requirements are met.</strong></p>
                     </div>
                 </div>
 
@@ -89,17 +89,12 @@
                                     .rule-item i { font-size: 0.8rem; width: 12px; }
                                 </style>
                                 <ul class="requirements-list">
-                                    <li class="rule-item invalid" id="rule-length"><i class="fas fa-times-circle"></i> 8+ Characters</li>
-                                    <li class="rule-item invalid" id="rule-number"><i class="fas fa-times-circle"></i> 1+ Number</li>
-                                    <li class="rule-item invalid" id="rule-capital"><i class="fas fa-times-circle"></i> 1+ Capital</li>
-                                    <li class="rule-item invalid" id="rule-lowercase"><i class="fas fa-times-circle"></i> 1+ Lowercase</li>
-                                    <li class="rule-item invalid" id="rule-special"><i class="fas fa-times-circle"></i> 1+ Special</li>
-                                    <li class="rule-item invalid" id="rule-no-space"><i class="fas fa-times-circle"></i> No Spaces</li>
-                                    <li class="rule-item invalid" id="rule-no-repeat"><i class="fas fa-times-circle"></i> No 3x Repeat</li>
-                                    <li class="rule-item invalid" id="rule-no-sequence"><i class="fas fa-times-circle"></i> No Sequence</li>
-                                    <li class="rule-item invalid" id="rule-not-common"><i class="fas fa-times-circle"></i> Not Common</li>
-                                    <li class="rule-item invalid" id="rule-no-links"><i class="fas fa-times-circle"></i> No Links</li>
-                                    <li class="rule-item invalid" id="rule-no-personal"><i class="fas fa-times-circle"></i> No Personal Info</li>
+                                    <li class="rule-item invalid" id="rule-length"><i class="fas fa-times-circle"></i> Minimum 8 characters</li>
+                                    <li class="rule-item invalid" id="rule-number"><i class="fas fa-times-circle"></i> At least 1 number</li>
+                                    <li class="rule-item invalid" id="rule-capital"><i class="fas fa-times-circle"></i> At least 1 uppercase letter</li>
+                                    <li class="rule-item invalid" id="rule-lowercase"><i class="fas fa-times-circle"></i> At least 1 lowercase letter</li>
+                                    <li class="rule-item invalid" id="rule-special"><i class="fas fa-times-circle"></i> At least 1 special character</li>
+                                    <li class="rule-item invalid" id="rule-no-space"><i class="fas fa-times-circle"></i> No spaces allowed</li>
                                 </ul>
                             </div>
                         </div>
@@ -177,14 +172,14 @@
         currentStrength = result.isValid ? 5 : 0; // Maintain internal logic for submit check
         validatePasswordMatch();
     }
-    
+
     function validatePasswordMatch() {
         const password = document.getElementById('new_password').value;
         const confirmPassword = document.getElementById('new_password_confirmation').value;
         const matchIndicator = document.getElementById('passwordMatch');
         const success = matchIndicator.querySelector('.match-success');
         const error = matchIndicator.querySelector('.match-error');
-        
+
         if (password && confirmPassword) {
             matchIndicator.style.display = 'block';
             if (password === confirmPassword) {
@@ -199,10 +194,10 @@
             success.style.display = 'none';
             error.style.display = 'none';
         }
-        
+
         checkSubmitButton();
     }
-    
+
     function checkSubmitButton() {
         const password = document.getElementById('new_password').value;
         const confirmPassword = document.getElementById('new_password_confirmation').value;
