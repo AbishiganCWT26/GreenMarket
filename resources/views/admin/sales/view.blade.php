@@ -12,7 +12,7 @@
 <div class="sales-container">
 	<div class="header-card">
 		<h1><i class="fas fa-chart-line"></i> System Sales & Transactions</h1>
-		<p>Comprehensive audit log of all paid orders, sales performance, and transaction analytics across the platform.</p>
+		<p>Comprehensive audit log of all orders, sales performance, and transaction analytics across the platform. View all order statuses including pending, confirmed, paid, ready for pickup, completed, cancelled, and refunded.</p>
 	</div>
 
 	<div class="filter-card">
@@ -49,8 +49,13 @@
 				<label class="filter-label"><i class="fas fa-tag"></i> Status</label>
 				<select id="filter-status" class="filter-select">
 					<option value="">All Status</option>
+					<option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+					<option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
 					<option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Paid</option>
+					<option value="ready_for_pickup" {{ request('status') == 'ready_for_pickup' ? 'selected' : '' }}>Ready for Pickup</option>
 					<option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+					<option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+					<option value="refunded" {{ request('status') == 'refunded' ? 'selected' : '' }}>Refunded</option>
 				</select>
 			</div>
 			<div class="filter-group">
@@ -90,42 +95,79 @@
 			</div>
 		</div>
 
-		<div class="sales-table-container">
+		<div class="sales-list-view view-table" id="sales-list-view" data-view="table">
 			@if(count($sales) > 0)
-			<table class="sales-table">
-				<thead>
-					<tr>
-						<th>Order ID</th>
-						<th>Date</th>
-						<th>Buyer</th>
-						<th>Lead Farmer</th>
-						<th>Total Value (LKR)</th>
-						<th>Status</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach($sales as $sale)
-					<tr>
-						<td>{{ $sale->order_number }}</td>
-						<td>{{ \Carbon\Carbon::parse($sale->created_at)->format('Y-m-d') }}</td>
-						<td>{{ $sale->buyer_name ?? 'N/A' }}</td>
-						<td>{{ $sale->lead_farmer_name ?? 'N/A' }}</td>
-						<td>{{ number_format($sale->total_amount, 2) }}</td>
-						<td>
-							<span class="status-badge status-{{ $sale->order_status }}">
-								{{ ucfirst($sale->order_status) }}
-							</span>
-						</td>
-						<td>
-							<a href="{{ route('admin.sales.details', $sale->id) }}" class="action-btn">
-								<i class="fas fa-eye"></i> View
-							</a>
-						</td>
-					</tr>
-					@endforeach
-				</tbody>
-			</table>
+			<div class="sales-table-container">
+				<table class="sales-table">
+					<thead>
+						<tr>
+							<th>Order ID</th>
+							<th>Date</th>
+							<th>Buyer</th>
+							<th>Lead Farmer</th>
+							<th>Total Value (LKR)</th>
+							<th>Status</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach($sales as $sale)
+						<tr>
+							<td>{{ $sale->order_number }}</td>
+							<td>{{ \Carbon\Carbon::parse($sale->created_at)->format('Y-m-d') }}</td>
+							<td>{{ $sale->buyer_name ?? 'N/A' }}</td>
+							<td>{{ $sale->lead_farmer_name ?? 'N/A' }}</td>
+							<td>{{ number_format($sale->total_amount, 2) }}</td>
+							<td>
+								<span class="status-badge status-{{ $sale->order_status }}">
+									{{ ucfirst($sale->order_status) }}
+								</span>
+							</td>
+							<td>
+								<a href="{{ route('admin.sales.details', $sale->id) }}" class="action-btn">
+									<i class="fas fa-eye"></i> View
+								</a>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+
+			<div class="sales-cards-container">
+				@foreach($sales as $sale)
+				<div class="sales-record-card">
+					<div class="sales-record-header">
+						<div>
+							<div class="sales-record-title">{{ $sale->order_number }}</div>
+							<div class="sales-record-meta">{{ \Carbon\Carbon::parse($sale->created_at)->format('Y-m-d') }}</div>
+						</div>
+						<span class="status-badge status-{{ $sale->order_status }}">
+							{{ ucfirst($sale->order_status) }}
+						</span>
+					</div>
+					<div class="sales-record-body">
+						<div class="sales-record-row">
+							<span>Buyer</span>
+							<strong>{{ $sale->buyer_name ?? 'N/A' }}</strong>
+						</div>
+						<div class="sales-record-row">
+							<span>Lead Farmer</span>
+							<strong>{{ $sale->lead_farmer_name ?? 'N/A' }}</strong>
+						</div>
+						<div class="sales-record-row">
+							<span>Total</span>
+							<strong>LKR {{ number_format($sale->total_amount, 2) }}</strong>
+						</div>
+					</div>
+					<div class="sales-record-footer">
+						<a href="{{ route('admin.sales.details', $sale->id) }}" class="action-btn">
+							<i class="fas fa-eye"></i> View Details
+						</a>
+					</div>
+				</div>
+				@endforeach
+			</div>
 			@else
 			<div class="no-data">
 				<i class="fas fa-database"></i>
@@ -136,9 +178,7 @@
 		</div>
 
 		@if($sales->hasPages())
-		<div class="pagination">
-			{{ $sales->links() }}
-		</div>
+		{{ $sales->links('vendor.pagination.sales-pagination') }}
 		@endif
 	</div>
 </div>
@@ -152,10 +192,8 @@
 		const farmerFilterGroup = document.getElementById('farmer-filter-group');
 		const farmerSelect = document.getElementById('filter-farmer');
 
-		// Set max date to today for date inputs
-		const today = new Date().toISOString().split('T')[0];
-		document.getElementById('start-date').max = today;
-		document.getElementById('end-date').max = today;
+			updateViewMode();
+			window.addEventListener('resize', debounce(updateViewMode, 180));
 
 		if (leadFarmerSelect) {
 			leadFarmerSelect.addEventListener('change', function() {
@@ -240,6 +278,51 @@
 			});
 	}
 
+	function getPerPage(view, width) {
+		if (view === 'card') {
+			if (width >= 800) return 15;
+			if (width >= 500) return 10;
+			return 5;
+		}
+
+		if (width >= 2560) return 15;
+		if (width >= 1500) return 15;
+		if (width >= 1200) return 10;
+		if (width >= 992) return 10;
+		return 10;
+	}
+
+	function updateViewMode() {
+		const width = window.innerWidth;
+		const view = width < 800 ? 'card' : 'table';
+		const perPage = getPerPage(view, width);
+		const listView = document.getElementById('sales-list-view');
+
+		if (listView) {
+			listView.classList.toggle('view-card', view === 'card');
+			listView.classList.toggle('view-table', view === 'table');
+			listView.setAttribute('data-view', view);
+		}
+
+		const url = new URL(window.location.href);
+		const currentView = url.searchParams.get('view');
+		const currentPerPage = url.searchParams.get('per_page');
+
+		if (currentView !== view || currentPerPage !== String(perPage)) {
+			url.searchParams.set('view', view);
+			url.searchParams.set('per_page', perPage);
+			window.location.href = `${url.pathname}?${url.searchParams.toString()}`;
+		}
+	}
+
+	function debounce(func, wait) {
+		let timeout;
+		return function(...args) {
+			clearTimeout(timeout);
+			timeout = setTimeout(() => func.apply(this, args), wait);
+		};
+	}
+
 	function applyFilters() {
 		const startDate = document.getElementById('start-date')?.value || '';
 		const endDate = document.getElementById('end-date')?.value || '';
@@ -268,7 +351,14 @@
 		showLoading('Applying filters...');
 
 		let url = new URL(window.location.href);
-		let params = new URLSearchParams();
+		let params = new URLSearchParams(url.search);
+
+		params.delete('start_date');
+		params.delete('end_date');
+		params.delete('lead_farmer_id');
+		params.delete('farmer_id');
+		params.delete('status');
+		params.delete('search');
 
 		if (startDate) params.append('start_date', startDate);
 		if (endDate) params.append('end_date', endDate);
@@ -307,7 +397,14 @@
 				showSuccess('Filters reset successfully');
 
 				setTimeout(() => {
-					window.location.href = window.location.pathname;
+					const url = new URL(window.location.href);
+					url.searchParams.delete('start_date');
+					url.searchParams.delete('end_date');
+					url.searchParams.delete('lead_farmer_id');
+					url.searchParams.delete('farmer_id');
+					url.searchParams.delete('status');
+					url.searchParams.delete('search');
+					window.location.href = `${url.pathname}?${url.searchParams.toString()}`;
 				}, 800);
 			}
 		});
@@ -333,7 +430,14 @@
 	function exportToPDF() {
         showLoading('Generating PDF report...');
 
-        const params = new URLSearchParams();
+        const params = new URLSearchParams(window.location.search);
+
+        params.delete('start_date');
+        params.delete('end_date');
+        params.delete('lead_farmer_id');
+        params.delete('farmer_id');
+        params.delete('status');
+        params.delete('search');
 
         const startDate = document.getElementById('start-date')?.value || '';
         const endDate = document.getElementById('end-date')?.value || '';

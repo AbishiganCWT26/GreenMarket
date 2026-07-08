@@ -131,6 +131,18 @@ class ProductController extends Controller
 
 	public function viewSales(Request $request)
 	{
+		$requestedView = $request->input('view', 'table');
+		$requestedPerPage = $request->input('per_page');
+		$perPage = 15;
+
+		if ($requestedView === 'card') {
+			$perPage = $requestedPerPage ? (int) $requestedPerPage : 10;
+		} else {
+			$perPage = $requestedPerPage ? (int) $requestedPerPage : 15;
+		}
+
+		$perPage = in_array($perPage, [5, 10, 15], true) ? $perPage : 15;
+
 		$query = DB::table('orders')
 			->leftJoin('buyers', 'orders.buyer_id', '=', 'buyers.id')
 			->leftJoin('lead_farmers', 'orders.lead_farmer_id', '=', 'lead_farmers.id')
@@ -138,8 +150,7 @@ class ProductController extends Controller
 				'orders.*',
 				'buyers.name as buyer_name',
 				'lead_farmers.name as lead_farmer_name'
-			)
-			->whereIn('orders.order_status', ['paid', 'completed']);
+			);
 
 		if ($request->has('start_date') && $request->start_date) {
 			$query->whereDate('orders.created_at', '>=', $request->start_date);
@@ -174,7 +185,7 @@ class ProductController extends Controller
 		$uniqueBuyers = DB::table('orders')->distinct('buyer_id')->count('buyer_id');
 
 		$sales = $query->orderBy('orders.created_at', 'desc')
-			->paginate(15)
+			->paginate($perPage)
 			->withQueryString();
 
 		$leadFarmers = DB::table('lead_farmers')->orderBy('name')->get();
@@ -204,16 +215,7 @@ class ProductController extends Controller
 					'lead_farmers.name as lead_farmer_name',
 					'orders.total_amount',
 					'orders.order_status'
-				)
-				->whereIn('orders.order_status', ['paid', 'completed']);
-
-			if ($request->has('start_date') && $request->start_date) {
-				$query->whereDate('orders.created_at', '>=', $request->start_date);
-			}
-
-			if ($request->has('end_date') && $request->end_date) {
-				$query->whereDate('orders.created_at', '<=', $request->end_date);
-			}
+			);
 
 			if ($request->has('lead_farmer_id') && $request->lead_farmer_id) {
 				$query->where('orders.lead_farmer_id', $request->lead_farmer_id);
