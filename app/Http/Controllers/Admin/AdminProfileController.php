@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use App\Services\PasswordPolicy;
-use Illuminate\Support\Facades\Storage;
-use App\Mail\AdminPasswordChangedMail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use App\Mail\AdminPasswordChangedMail;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\OtpVerification;
@@ -18,9 +18,20 @@ use Carbon\Carbon;
 
 class AdminProfileController extends Controller
 {
+    private function authenticatedUser(): User
+    {
+        $user = Auth::user();
+
+        if (!$user instanceof User) {
+            abort(401);
+        }
+
+        return $user;
+    }
+
     public function index()
     {
-        $admin = Auth::user();
+        $admin = $this->authenticatedUser();
         $adminDetails = $admin->adminDetails ?? null;
 
         return view('admin.profile.index', compact('admin', 'adminDetails'));
@@ -28,7 +39,7 @@ class AdminProfileController extends Controller
 
     public function editDetails()
     {
-        $admin = Auth::user();
+        $admin = $this->authenticatedUser();
         $adminDetails = $admin->adminDetails ?? null;
 
         return view('admin.profile.index', compact('admin', 'adminDetails'));
@@ -36,7 +47,7 @@ class AdminProfileController extends Controller
 
     public function updateDetails(Request $request)
     {
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:100',
@@ -50,7 +61,7 @@ class AdminProfileController extends Controller
         }
 
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
             $user->username = $request->username;
             $user->email = $request->email;
@@ -69,11 +80,11 @@ class AdminProfileController extends Controller
             $adminDetails->phone_number = $request->phone;
             $adminDetails->save();
 
-            \DB::commit();
+            DB::commit();
 
             return back()->with('success', 'Profile details updated successfully!');
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             return back()->with('error', 'Failed to update profile: ' . $e->getMessage());
         }
     }
@@ -104,7 +115,7 @@ class AdminProfileController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
 
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->with('error', 'Current password is incorrect.');
@@ -120,7 +131,7 @@ class AdminProfileController extends Controller
             try {
                 Mail::to($user->email)->send(new AdminPasswordChangedMail($user, $newPassword));
             } catch (\Exception $mailException) {
-                \Log::error('Failed to send password change email: ' . $mailException->getMessage());
+                Log::error('Failed to send password change email: ' . $mailException->getMessage());
             }
 
             return back()->with('success', 'Password updated successfully! An email has been sent with your new credentials.');
@@ -140,7 +151,7 @@ class AdminProfileController extends Controller
         }
 
         try {
-            $user = Auth::user();
+            $user = $this->authenticatedUser();
 
             if ($request->hasFile('profile_photo')) {
                 $file = $request->file('profile_photo');
@@ -180,7 +191,7 @@ class AdminProfileController extends Controller
     public function deletePhoto()
     {
         try {
-            $user = Auth::user();
+            $user = $this->authenticatedUser();
 
             if ($user->profile_photo && $user->profile_photo !== 'default-avatar.png') {
                 $photoPath = public_path('uploads/profile_pictures/' . $user->profile_photo);
@@ -212,7 +223,7 @@ class AdminProfileController extends Controller
     public function sendNicUpdateOtp(Request $request)
     {
         try {
-            $user = Auth::user();
+            $user = $this->authenticatedUser();
             $adminDetails = $user->adminDetails;
 
             if (!$adminDetails || !$adminDetails->phone_number) {
@@ -222,10 +233,10 @@ class AdminProfileController extends Controller
                 ], 400);
             }
 
-            $otp = rand(100000, 999999);
+            $otp = (int) substr((string) ((time() % 900000) + 100000), -6);
 
             // Log the OTP for development/testing
-            \Log::info("NIC Update OTP for Admin (User ID: {$user->id}): " . $otp);
+            Log::info("NIC Update OTP for Admin (User ID: {$user->id}): " . $otp);
 
             OtpVerification::create([
                 'user_id' => $user->id,
@@ -251,7 +262,7 @@ class AdminProfileController extends Controller
                 'message' => 'OTP sent successfully to your registered phone number.'
             ]);
         } catch (\Exception $e) {
-            \Log::error('NIC OTP Sending Error: ' . $e->getMessage());
+            Log::error('NIC OTP Sending Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send OTP: ' . $e->getMessage()
@@ -274,7 +285,7 @@ class AdminProfileController extends Controller
         }
 
         try {
-            $user = Auth::user();
+            $user = $this->authenticatedUser();
 
             $otpRecord = OtpVerification::where('user_id', $user->id)
                 ->where('otp', $request->otp)
@@ -316,7 +327,7 @@ class AdminProfileController extends Controller
                 ], 400);
             }
 
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
             $adminDetails = $user->adminDetails;
             $adminDetails->nic_no = $nic;
@@ -326,15 +337,15 @@ class AdminProfileController extends Controller
             $otpRecord->used_at = Carbon::now();
             $otpRecord->save();
 
-            \DB::commit();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'NIC updated successfully!'
             ]);
         } catch (\Exception $e) {
-            \DB::rollBack();
-            \Log::error('NIC Update Error: ' . $e->getMessage());
+            DB::rollBack();
+            Log::error('NIC Update Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update NIC: ' . $e->getMessage()
@@ -342,7 +353,7 @@ class AdminProfileController extends Controller
         }
     }
 
-    private function sendSMS($to, $message)
+    private function sendSMS(string $to, string $message): bool
     {
         try {
             $user = env('SMS_USER');
@@ -359,19 +370,19 @@ class AdminProfileController extends Controller
             $res = explode(":", $ret);
 
             if (trim($res[0]) == "OK") {
-                \Log::info("SMS Sent successfully to $to for NIC Update. Response: $ret");
+                Log::info("SMS Sent successfully to $to for NIC Update. Response: $ret");
                 return true;
             } else {
-                \Log::error("SMS Sending Failed to $to for NIC Update. Response: $ret");
+                Log::error("SMS Sending Failed to $to for NIC Update. Response: $ret");
                 return false;
             }
         } catch (\Exception $e) {
-            \Log::error('SMS Error: ' . $e->getMessage());
+            Log::error('SMS Error: ' . $e->getMessage());
             return false;
         }
     }
 
-    private function get_web_page($url)
+    private function get_web_page(string $url): string
     {
         $options = array(
             CURLOPT_RETURNTRANSFER => true,
