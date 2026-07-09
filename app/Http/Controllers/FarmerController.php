@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Farmer;
@@ -22,7 +23,6 @@ use App\Models\BuyerProductRequest;
 use App\Models\InventoryLog;
 use App\Models\ProductCategory;
 use App\Services\InventoryService;
-use App\Services\PasswordPolicy;
 use App\Services\PasswordPolicy;
 
 class FarmerController extends Controller
@@ -50,7 +50,7 @@ class FarmerController extends Controller
     public function update(Request $request)
     {
         // Debug: Check what's being received
-        \Log::info('Update request received:', [
+        Log::info('Update request received:', [
             'action' => $request->input('action'),
             'all_data' => $request->all()
         ]);
@@ -134,7 +134,7 @@ class FarmerController extends Controller
         ]);
     }
 
-    private function sendSMS($phone, $message)
+    private function sendSMS(string $phone, string $message)
     {
         try {
             $smsUser = env('SMS_USER', 'number');
@@ -155,7 +155,7 @@ class FarmerController extends Controller
             $res = explode(":", $ret);
             return trim($res[0]) == "OK";
         } catch (\Exception $e) {
-            \Log::error('SMS sending failed: ' . $e->getMessage());
+            Log::error('SMS sending failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -360,7 +360,7 @@ class FarmerController extends Controller
             $farmer->update($updateData);
 
             // Log the update
-            \Log::info('Payment settings updated for farmer:', [
+            Log::info('Payment settings updated for farmer:', [
                 'farmer_id' => $farmer->id,
                 'preferred_payment' => $preferredPayment,
                 'updated_at' => now()
@@ -372,7 +372,7 @@ class FarmerController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Error updating payment settings:', [
+            Log::error('Error updating payment settings:', [
                 'error' => $e->getMessage(),
                 'farmer_id' => $farmer->id
             ]);
@@ -382,7 +382,7 @@ class FarmerController extends Controller
                 'message' => 'Failed to update payment settings. Please try again.'
             ], 500);
         }
-    }    public function getOrderDetails($id)
+    }    public function getOrderDetails(int $id)
     {
         try {
             $order = Order::with([
@@ -442,7 +442,7 @@ class FarmerController extends Controller
         }
     }
 
-    public function markOrderReady($id)
+    public function markOrderReady(int $id)
     {
 
         try {
@@ -479,7 +479,7 @@ class FarmerController extends Controller
                 'message' => 'Order marked as ready for pickup. Buyer has been notified.'
             ]);
         } catch (\Exception $e) {
-            \Log::error('markOrderReady failed: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+            Log::error('markOrderReady failed: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update order status.'
@@ -633,7 +633,7 @@ class FarmerController extends Controller
         return view('farmer.products.removed', compact('removedProducts', 'removedCount'));
     }
 
-    public function viewProduct($id)
+    public function viewProduct(int $id)
     {
         try {
             $product = Product::with(['category', 'subcategory', 'farmer'])->findOrFail($id);
@@ -766,7 +766,7 @@ class FarmerController extends Controller
         return view('farmer.complaints.create', compact('leadFarmer', 'leadFarmerUser', 'orders'));
     }
 
-    private function getUserName($user)
+    private function getUserName(User $user)
     {
         switch($user->role) {
             case 'buyer':
@@ -880,7 +880,7 @@ class FarmerController extends Controller
         ));
     }
 
-    public function viewComplaint($id)
+    public function viewComplaint(int $id)
     {
         try {
             $user = Auth::user();
@@ -913,7 +913,7 @@ class FarmerController extends Controller
         }
     }
 
-    public function deleteComplaint($id)
+    public function deleteComplaint(int $id)
     {
         try {
             $user = Auth::user();
@@ -968,7 +968,14 @@ class FarmerController extends Controller
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
+        if (!$user instanceof User) {
+            abort(403);
+        }
+
         $farmer = Farmer::where('user_id', $user->id)->first();
+        if (!$farmer instanceof Farmer) {
+            abort(404);
+        }
 
         $request->validate([
             'name' => 'required|string|max:100',
@@ -1016,6 +1023,9 @@ class FarmerController extends Controller
     public function updateProfilePhoto(Request $request)
     {
         $user = Auth::user();
+        if (!$user instanceof User) {
+            abort(403);
+        }
 
         $request->validate([
             'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
@@ -1055,6 +1065,9 @@ class FarmerController extends Controller
     public function deleteProfilePhoto()
     {
         $user = Auth::user();
+        if (!$user instanceof User) {
+            abort(403);
+        }
 
         // Check if user has a custom profile photo
         if ($user->profile_photo && $user->profile_photo !== 'farmer-icon.svg') {
@@ -1132,7 +1145,7 @@ class FarmerController extends Controller
         ]);
     }
 
-    public function getRequestDetails($id)
+    public function getRequestDetails(int $id)
     {
         $request = DB::table('buyer_product_requests')
             ->where('id', $id)

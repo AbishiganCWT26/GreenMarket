@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\Facilitator;
 use App\Models\ProductCategory;
@@ -19,6 +21,8 @@ use App\Models\Order;
 use App\Models\BuyerProductRequest;
 use App\Models\LeadFarmer;
 use App\Models\Farmer;
+use App\Services\PasswordPolicy;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Carbon\Carbon;
 
 class FacilitatorController extends Controller
@@ -152,7 +156,7 @@ class FacilitatorController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed: ' . implode(' ', array_flatten($e->errors()))
+                'message' => 'Validation failed: ' . implode(' ', Arr::flatten($e->errors()))
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
@@ -211,7 +215,7 @@ class FacilitatorController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed: ' . implode(' ', array_flatten($e->errors()))
+                'message' => 'Validation failed: ' . implode(' ', Arr::flatten($e->errors()))
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
@@ -283,7 +287,7 @@ class FacilitatorController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed: ' . implode(' ', array_flatten($e->errors()))
+                'message' => 'Validation failed: ' . implode(' ', Arr::flatten($e->errors()))
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
@@ -428,7 +432,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    public function deleteProduct($id)
+    public function deleteProduct(int $id)
     {
         $product = ProductExample::findOrFail($id);
         $product->delete();
@@ -453,7 +457,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    private function reorderSubcategories($categoryId)
+    private function reorderSubcategories(int $categoryId)
     {
         $subcategories = ProductSubcategory::where('category_id', $categoryId)
             ->orderBy('display_order')
@@ -466,7 +470,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    private function reorderProducts($subcategoryId)
+    private function reorderProducts(int $subcategoryId)
     {
         $products = ProductExample::where('subcategory_id', $subcategoryId)
             ->orderBy('display_order')
@@ -508,7 +512,7 @@ class FacilitatorController extends Controller
                 'unit' => $unit
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error creating unit of measure: ' . $e->getMessage());
+            Log::error('Error creating unit of measure: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error creating unit of measure: ' . $e->getMessage()
@@ -516,7 +520,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    public function updateUnitOfMeasure(Request $request, $id)
+    public function updateUnitOfMeasure(Request $request, int $id)
     {
         try {
             $validated = $request->validate([
@@ -543,7 +547,7 @@ class FacilitatorController extends Controller
                 'message' => 'Unit of measure updated successfully!'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error updating unit of measure: ' . $e->getMessage());
+            Log::error('Error updating unit of measure: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating unit of measure: ' . $e->getMessage()
@@ -554,7 +558,7 @@ class FacilitatorController extends Controller
     /**
      * Reorder standards when display order changes
      */
-    private function reorderStandards($standardType, $currentId, $newOrder)
+    private function reorderStandards(string $standardType, int $currentId, int $newOrder)
     {
         DB::beginTransaction();
         try {
@@ -581,7 +585,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    public function deactivateUnitOfMeasure($id)
+    public function deactivateUnitOfMeasure(int $id)
     {
         try {
             $unit = SystemStandard::findOrFail($id);
@@ -595,7 +599,7 @@ class FacilitatorController extends Controller
                 'message' => 'Unit deactivated successfully!'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error deactivating unit: ' . $e->getMessage());
+            Log::error('Error deactivating unit: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error deactivating unit: ' . $e->getMessage()
@@ -603,7 +607,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    public function activateUnitOfMeasure($id)
+    public function activateUnitOfMeasure(int $id)
     {
         try {
             $unit = SystemStandard::findOrFail($id);
@@ -624,7 +628,7 @@ class FacilitatorController extends Controller
                 'message' => 'Unit activated successfully!'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error activating unit: ' . $e->getMessage());
+            Log::error('Error activating unit: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error activating unit: ' . $e->getMessage()
@@ -635,7 +639,7 @@ class FacilitatorController extends Controller
     /**
      * Reorder active standards after deactivation
      */
-    private function reorderActiveStandards($standardType)
+    private function reorderActiveStandards(string $standardType)
     {
         $activeStandards = SystemStandard::where('standard_type', $standardType)
             ->where('is_active', true)
@@ -691,7 +695,7 @@ class FacilitatorController extends Controller
                 'grade' => $grade
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error creating quality grade: ' . $e->getMessage());
+            Log::error('Error creating quality grade: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error creating quality grade: ' . $e->getMessage()
@@ -699,7 +703,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    public function updateQualityGrade(Request $request, $id)
+    public function updateQualityGrade(Request $request, int $id)
     {
         try {
             $validated = $request->validate([
@@ -729,7 +733,7 @@ class FacilitatorController extends Controller
                 'grade' => $grade
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error updating quality grade: ' . $e->getMessage());
+            Log::error('Error updating quality grade: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating quality grade: ' . $e->getMessage()
@@ -737,7 +741,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    public function activateQualityGrade($id)
+    public function activateQualityGrade(int $id)
     {
         try {
             $grade = SystemStandard::findOrFail($id);
@@ -766,7 +770,7 @@ class FacilitatorController extends Controller
                 'message' => 'Quality grade activated successfully!'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error activating quality grade: ' . $e->getMessage());
+            Log::error('Error activating quality grade: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error activating quality grade: ' . $e->getMessage()
@@ -799,12 +803,12 @@ class FacilitatorController extends Controller
         $user = Auth::user();
         $facilitator = $user->facilitator;
 
-        $assignedGnDivisions = \DB::table('facilitator_assignments')
+        $assignedGnDivisions = DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->pluck('gn_division')
             ->toArray();
 
-        $assignedDistrict = \DB::table('facilitator_assignments')
+        $assignedDistrict = DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->value('district');
 
@@ -867,7 +871,7 @@ class FacilitatorController extends Controller
         return view('facilitator.users', compact('users', 'userTypes'));
     }
 
-    public function userProfile($id)
+    public function userProfile(int $id)
     {
         try {
             $user = User::with(['farmer.leadFarmer', 'farmer', 'leadFarmer', 'buyer', 'facilitator'])->findOrFail($id);
@@ -885,7 +889,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    public function sendEditOTP($id)
+    public function sendEditOTP(int $id)
     {
         try {
             $user = User::findOrFail($id);
@@ -897,7 +901,13 @@ class FacilitatorController extends Controller
                 ]);
             }
 
-            $otp = rand(100000, 999999);
+            $otp = (int) substr((string) (now()->timestamp + now()->microsecond), -6);
+            if ($otp < 100000) {
+                $otp += 100000;
+            }
+            if ($otp > 999999) {
+                $otp = 100000 + ($otp % 900000);
+            }
 
             session([
                 'edit_otp' => $otp,
@@ -982,7 +992,7 @@ class FacilitatorController extends Controller
         ]);
     }
 
-    public function getUserForEdit($id)
+    public function getUserForEdit(int $id)
     {
         if (!session('otp_verified_for_edit') || session('otp_verified_user_id') != $id) {
             return response()->json([
@@ -1031,7 +1041,7 @@ class FacilitatorController extends Controller
         }
     }
 
-    public function updateUser(Request $request, $id)
+    public function updateUser(Request $request, int $id)
     {
         if (!session('otp_verified_for_edit') || session('otp_verified_user_id') != $id) {
             return response()->json([
@@ -1128,12 +1138,12 @@ class FacilitatorController extends Controller
             $user = Auth::user();
             $facilitator = $user->facilitator;
 
-            $assignedGnDivisions = \DB::table('facilitator_assignments')
+            $assignedGnDivisions = DB::table('facilitator_assignments')
                 ->where('facilitator_id', $facilitator->id)
                 ->pluck('gn_division')
                 ->toArray();
 
-            $assignedDistrict = \DB::table('facilitator_assignments')
+            $assignedDistrict = DB::table('facilitator_assignments')
                 ->where('facilitator_id', $facilitator->id)
                 ->value('district');
 
@@ -1157,7 +1167,7 @@ class FacilitatorController extends Controller
 
             $users = $query->orderBy('created_at', 'desc')->get();
 
-            $pdf = \PDF::loadView('facilitator.exports.users_pdf', [
+            $pdf = PDF::loadView('facilitator.exports.users_pdf', [
                 'users' => $users,
                 'includeContact' => $request->includeContact,
                 'includeLocation' => $request->includeLocation,
@@ -1223,7 +1233,13 @@ class FacilitatorController extends Controller
                 return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
             }
 
-            $otp = rand(100000, 999999);
+            $otp = (int) substr((string) (now()->timestamp + now()->microsecond), -6);
+            if ($otp < 100000) {
+                $otp += 100000;
+            }
+            if ($otp > 999999) {
+                $otp = 100000 + ($otp % 900000);
+            }
             $action = 'profile_update_' . $type;
 
             // Store in session
@@ -1362,6 +1378,10 @@ class FacilitatorController extends Controller
             ]);
 
             $user = Auth::user();
+            if (!$user instanceof User) {
+                throw new \RuntimeException('Authenticated user not found.');
+            }
+            /** @var User $user */
 
             if ($request->hasFile('profile_photo')) {
                 $image = $request->file('profile_photo');
@@ -1408,6 +1428,10 @@ class FacilitatorController extends Controller
     public function updateAccountSettings(Request $request)
     {
         $user = Auth::user();
+        if (!$user instanceof User) {
+            throw new \RuntimeException('Authenticated user not found.');
+        }
+        /** @var User $user */
 
         $validated = $request->validate([
             'current_password' => 'required',
@@ -1442,7 +1466,7 @@ class FacilitatorController extends Controller
         return view('facilitator.notifications', compact('notifications', 'unreadCount'));
     }
 
-    public function markNotificationRead($id)
+    public function markNotificationRead(int $id)
     {
         $user = Auth::user();
 
@@ -1474,6 +1498,10 @@ class FacilitatorController extends Controller
     {
         try {
             $user = Auth::user();
+            if (!$user instanceof User) {
+                throw new \RuntimeException('Authenticated user not found.');
+            }
+            /** @var User $user */
 
             $request->validate([
                 'new_password' => PasswordPolicy::rules(),
@@ -1506,7 +1534,7 @@ class FacilitatorController extends Controller
         $user = Auth::user();
         $facilitator = $user->facilitator;
 
-        $assignedGnDivisions = \DB::table('facilitator_assignments')
+        $assignedGnDivisions = DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->pluck('gn_division')
             ->toArray();
@@ -1609,7 +1637,7 @@ class FacilitatorController extends Controller
         $user = Auth::user();
         $facilitator = $user->facilitator;
 
-        $assignments = \DB::table('facilitator_assignments')
+        $assignments = DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->get();
 
@@ -1665,7 +1693,7 @@ class FacilitatorController extends Controller
         return view('facilitator.sales.index', compact('sales', 'totalSalesCount', 'totalRevenue'));
     }
 
-    public function salesDetails($id)
+    public function salesDetails(int $id)
     {
         try {
             $order = Order::with([
@@ -1694,7 +1722,7 @@ class FacilitatorController extends Controller
         $user = Auth::user();
         $facilitator = $user->facilitator;
 
-        $assignedGnDivisions = \DB::table('facilitator_assignments')
+        $assignedGnDivisions = DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->pluck('gn_division')
             ->toArray();
@@ -1770,7 +1798,7 @@ class FacilitatorController extends Controller
         $user = Auth::user();
         $facilitator = $user->facilitator;
 
-        $assignedDistrict = \DB::table('facilitator_assignments')
+        $assignedDistrict = DB::table('facilitator_assignments')
             ->where('facilitator_id', $facilitator->id)
             ->value('district');
 
@@ -1798,7 +1826,7 @@ class FacilitatorController extends Controller
         return view('facilitator.buyer-requests.index', compact('buyerRequests'));
     }
 
-    private function sendSMS($to, $message)
+    private function sendSMS(string $to, string $message)
     {
         try {
             $user = env('SMS_USER');
@@ -1815,19 +1843,19 @@ class FacilitatorController extends Controller
             $res = explode(":", $ret);
 
             if (trim($res[0]) == "OK") {
-                \Log::info("SMS Sent successfully to $to. Response: $ret");
+                Log::info("SMS Sent successfully to $to. Response: $ret");
                 return true;
             } else {
-                \Log::error("SMS Sending Failed to $to. Response: $ret");
+                Log::error("SMS Sending Failed to $to. Response: $ret");
                 return false;
             }
         } catch (\Exception $e) {
-            \Log::error('SMS Error: ' . $e->getMessage());
+            Log::error('SMS Error: ' . $e->getMessage());
             return false;
         }
     }
 
-    private function get_web_page($url)
+    private function get_web_page(string $url)
     {
         $options = array(
             CURLOPT_RETURNTRANSFER => true,
