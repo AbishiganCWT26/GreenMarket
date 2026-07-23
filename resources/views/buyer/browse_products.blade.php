@@ -166,7 +166,7 @@
     @endif
 
     <!-- Empty State -->
-    <div id="emptyState" class="empty-state" style="{{ $products->count() > 0 ? 'display: none;' : '' }}">
+    <div id="emptyState" class="empty-state" @if($products->count() > 0) style="display: none;" @endif>
         <i class="fa-solid fa-search fa-3x"></i>
         <h3>No Products Found</h3>
         <p>We couldn't find any products matching your criteria. Try adjusting your search or filters.</p>
@@ -183,9 +183,12 @@
 @endsection
 
 @section('scripts')
+<script id="all-subcategories-data" type="application/json">
+    {!! json_encode($allSubcategories ?? []) !!}
+</script>
 <script>
     // Store all subcategories in a JavaScript variable
-    const allSubcategories = @json($allSubcategories ?? []);
+    const allSubcategories = JSON.parse(document.getElementById('all-subcategories-data').textContent || '[]');
 
     document.addEventListener('DOMContentLoaded', function() {
         // --- DOM Elements ---

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordResetOTP;
@@ -75,7 +76,7 @@ class AuthController extends Controller
         return redirect('/login');
     }
 
-    protected function redirectByRole($role)
+    protected function redirectByRole(string $role)
     {
         switch ($role) {
             case 'admin':
@@ -145,7 +146,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $otp = substr(str_shuffle('0123456789'), 0, 6);
         $expiresAt = now()->addMinutes(10);
 
         DB::table('otp_verifications')->insert([
@@ -165,7 +166,7 @@ class AuthController extends Controller
                 Mail::to($email)->send(new PasswordResetOTP($otp));
             }
             catch (\Exception $e) {
-                \Log::error('Failed to send OTP email: ' . $e->getMessage());
+                Log::error('Failed to send OTP email: ' . $e->getMessage());
             }
         }
 
@@ -294,7 +295,7 @@ class AuthController extends Controller
                 ]);
             }
             catch (\Exception $e) {
-                \Log::warning('Could not insert into password_history: ' . $e->getMessage());
+                Log::warning('Could not insert into password_history: ' . $e->getMessage());
             }
         }
 
@@ -332,7 +333,7 @@ class AuthController extends Controller
         ]);
     }
 
-    private function getUserPhoneNumber($userId)
+    private function getUserPhoneNumber(int $userId)
     {
         $phone = DB::table('buyers')
             ->where('user_id', $userId)
@@ -366,7 +367,7 @@ class AuthController extends Controller
         return $phone;
     }
 
-    private function sendSmsOTP($phone, $otp)
+    private function sendSmsOTP(string $phone, string $otp)
     {
         try {
             $user = env('SMS_USER');
@@ -374,7 +375,7 @@ class AuthController extends Controller
             $baseurl = env('SMS_API_URL');
 
             if (!$user || !$password || !$baseurl) {
-                \Log::error('SMS credentials not configured.');
+                Log::error('SMS credentials not configured.');
                 return false;
             }
 
@@ -382,7 +383,7 @@ class AuthController extends Controller
             $to = preg_replace('/[^0-9]/', '', $phone);
 
             if (strlen($to) < 9 || strlen($to) > 15) {
-                \Log::error('Invalid phone number format: ' . $phone);
+                Log::error('Invalid phone number format: ' . $phone);
                 return false;
             }
 
@@ -401,21 +402,21 @@ class AuthController extends Controller
             curl_close($ch);
 
             if (strpos($response, 'OK') === 0) {
-                \Log::info('SMS sent successfully to ' . $phone);
+                Log::info('SMS sent successfully to ' . $phone);
                 return true;
             }
             else {
-                \Log::error('SMS failed: ' . $response);
+                Log::error('SMS failed: ' . $response);
                 return false;
             }
         }
         catch (\Exception $e) {
-            \Log::error('SMS error: ' . $e->getMessage());
+            Log::error('SMS error: ' . $e->getMessage());
             return false;
         }
     }
 
-    private function sendPasswordResetConfirmation($email, $username, $password, $phone = null)
+    private function sendPasswordResetConfirmation(string $email, string $username, string $password, ?string $phone = null)
     {
         $this->sendPasswordEmail($email, $username, $password);
 
@@ -424,20 +425,20 @@ class AuthController extends Controller
         }
     }
 
-    private function sendPasswordEmail($email, $username, $password)
+    private function sendPasswordEmail(string $email, string $username, string $password)
     {
         try {
             Mail::to($email)->send(new PasswordResetSuccess($username, $password));
-            \Log::info('Password reset email sent to: ' . $email);
+            Log::info('Password reset email sent to: ' . $email);
             return true;
         }
         catch (\Exception $e) {
-            \Log::error('Failed to send password reset email: ' . $e->getMessage());
+            Log::error('Failed to send password reset email: ' . $e->getMessage());
             return false;
         }
     }
 
-    private function sendPasswordSMS($phone, $username, $password)
+    private function sendPasswordSMS(string $phone, string $username, string $password)
     {
         try {
             $user = env('SMS_USER');
@@ -445,7 +446,7 @@ class AuthController extends Controller
             $baseurl = env('SMS_API_URL');
 
             if (!$user || !$password_sms || !$baseurl) {
-                \Log::error('SMS credentials not configured.');
+                Log::error('SMS credentials not configured.');
                 return false;
             }
 
@@ -453,7 +454,7 @@ class AuthController extends Controller
             $to = preg_replace('/[^0-9]/', '', $phone);
 
             if (strlen($to) < 9 || strlen($to) > 15) {
-                \Log::error('Invalid phone number format: ' . $phone);
+                Log::error('Invalid phone number format: ' . $phone);
                 return false;
             }
 
@@ -472,16 +473,16 @@ class AuthController extends Controller
             curl_close($ch);
 
             if (strpos($response, 'OK') === 0) {
-                \Log::info('Password reset SMS sent to ' . $phone);
+                Log::info('Password reset SMS sent to ' . $phone);
                 return true;
             }
             else {
-                \Log::error('Password reset SMS failed: ' . $response);
+                Log::error('Password reset SMS failed: ' . $response);
                 return false;
             }
         }
         catch (\Exception $e) {
-            \Log::error('SMS error: ' . $e->getMessage());
+            Log::error('SMS error: ' . $e->getMessage());
             return false;
         }
     }

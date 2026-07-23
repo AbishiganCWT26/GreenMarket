@@ -15,7 +15,7 @@ class NotificationAdminController extends Controller
 	{
 		$view = $request->get('view', 'card');
 		$perPage = $request->get('per_page', $view === 'card' ? 10 : 15);
-		
+
 		$notifications = Notification::with('user')
 			->orderByDesc('created_at')
 			->paginate($perPage)
@@ -78,14 +78,14 @@ class NotificationAdminController extends Controller
 	{
 		try{
 			DB::beginTransaction();
-			
+
 			Notification::where('is_read', false)->update([
 				'is_read' => true,
 				'updated_at' => now()
 			]);
-			
+
 			DB::commit();
-			
+
 			return response()->json([
 				'success' => true,
 				'message' => 'All notifications marked as read'
@@ -99,19 +99,19 @@ class NotificationAdminController extends Controller
 		}
 	}
 
-	public function markAsRead($id)
+	public function markAsRead(int $id)
 	{
 		try{
 			DB::beginTransaction();
-			
+
 			$notification = Notification::findOrFail($id);
 			$notification->update([
 				'is_read' => true,
 				'updated_at' => now()
 			]);
-			
+
 			DB::commit();
-			
+
 			return response()->json([
 				'success' => true,
 				'message' => 'Notification marked as read'

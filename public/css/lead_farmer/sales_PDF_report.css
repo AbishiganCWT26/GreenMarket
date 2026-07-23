@@ -1,0 +1,182 @@
+/* sales_PDF_report.css - Print styles for Sales Report */
+/* Using the updated color palette */
+
+:root {
+    --primary-green: #10B981;
+    --dark-green: #059669;
+    --body-bg: #f6f8fa;
+    --card-bg: #ffffff;
+    --text-color: #0f1724;
+    --muted: #6b7280;
+    --accent-amber: #f59e0b;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --yellow: #f59e0b;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 36, 0.04);
+    --shadow-md: 0 7px 15px rgba(15, 23, 36, 0.08);
+}
+
+@media print {
+
+    /* Hide everything by default */
+    body * {
+        visibility: hidden !important;
+    }
+
+    /* Only show the printable area and its children */
+    #printable-area,
+    #printable-area * {
+        visibility: visible !important;
+    }
+
+    #printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white;
+        padding: 10px;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: var(--text-color);
+        line-height: 1;
+    }
+
+    /* Hide any buttons or UI elements inside the printable area */
+    #printable-area .no-print {
+        display: none !important;
+    }
+
+    /* Filter summary styling */
+    .filter-summary {
+        background: var(--card-bg);
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 20px;
+    }
+
+    .filter-summary .filter-item {
+        font-size: 14px;
+        color: var(--text-color);
+    }
+
+    .filter-summary .filter-item strong {
+        color: var(--dark-green);
+        font-weight: 600;
+        margin-right: 6px;
+    }
+
+    .filter-summary .filter-item span {
+        color: var(--muted);
+    }
+
+    /* Card and table overrides */
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+        margin-bottom: 15px;
+        background: transparent !important;
+    }
+
+    .card-header {
+        background-color: var(--primary-green) !important;
+        color: white !important;
+        padding: 6px 10px;
+        border-radius: 4px 4px 0 0;
+        border-bottom: 2px solid var(--dark-green);
+    }
+
+    .card-header h6 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: white !important;
+    }
+
+    .card-body {
+        padding: 0;
+        background: transparent;
+    }
+
+    /* Table styles */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        margin-bottom: 0;
+        background: white;
+        border: 1px solid #d1d5db;
+        border-radius: 0 0 6px 6px;
+        overflow: hidden;
+    }
+
+    .table thead th {
+        background-color: var(--body-bg) !important;
+        color: var(--text-color);
+        font-weight: 600;
+        border-bottom: 2px solid var(--primary-green);
+        padding: 10px 12px;
+        text-align: left;
+    }
+
+    .table tbody td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #e5e7eb;
+        color: var(--text-color);
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table tbody tr.table-primary td {
+        background-color: #f0fdf4 !important;
+        font-weight: 600;
+        border-top: 2px solid var(--primary-green);
+    }
+
+    /* A4 landscape layout */
+    @page {
+        size: A4 landscape;
+        margin: 15mm 10mm;
+    }
+
+    /* Ensure tables don't break across pages badly */
+    .table {
+        page-break-inside: avoid;
+    }
+
+    .card {
+        page-break-inside: avoid;
+    }
+
+    .card:last-child {
+        page-break-after: avoid;
+    }
+
+    /* Remove extra spacing */
+    .container-fluid {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .row {
+        margin: 0 !important;
+    }
+
+    .col-12 {
+        padding: 0 !important;
+    }
+
+    .pagination-hidden {
+        display: table-row !important;
+    }
+
+    .pagination-controls {
+        display: none !important;
+    }
+}

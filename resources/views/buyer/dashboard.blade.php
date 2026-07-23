@@ -68,12 +68,14 @@
                     <label>Category</label>
                     <select id="categoryFilter" onchange="updateSubcategories()">
                         <option value="">All Categories</option>
-                        @foreach($categories ?? [] as $category)
-                            <option value="{{ $category->category_name }}"
-                                {{ request('category') == $category->category_name ? 'selected' : '' }}>
-                                {{ $category->category_name }}
-                            </option>
-                        @endforeach
+                        @if(!empty($categories))
+                            @foreach($categories as $category)
+                                <option value="{{ $category->category_name }}"
+                                    {{ request('category') == $category->category_name ? 'selected' : '' }}>
+                                    {{ $category->category_name }}
+                                </option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
 
@@ -81,12 +83,14 @@
                     <label>Subcategory</label>
                     <select id="subcategoryFilter">
                         <option value="">All Subcategories</option>
-                        @foreach($subcategories ?? [] as $subcategory)
-                            <option value="{{ $subcategory->subcategory_name }}"
-                                {{ request('subcategory') == $subcategory->subcategory_name ? 'selected' : '' }}>
-                                {{ $subcategory->subcategory_name }}
-                            </option>
-                        @endforeach
+                        @if(!empty($subcategories))
+                            @foreach($subcategories as $subcategory)
+                                <option value="{{ $subcategory->subcategory_name }}"
+                                    {{ request('subcategory') == $subcategory->subcategory_name ? 'selected' : '' }}>
+                                    {{ $subcategory->subcategory_name }}
+                                </option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
 
@@ -94,12 +98,14 @@
                     <label>District</label>
                     <select id="districtFilter">
                         <option value="">All Districts</option>
-                        @foreach($districts ?? [] as $district)
-                            <option value="{{ $district->district }}"
-                                {{ request('district') == $district->district ? 'selected' : '' }}>
-                                {{ $district->district }}
-                            </option>
-                        @endforeach
+                        @if(!empty($districts))
+                            @foreach($districts as $district)
+                                <option value="{{ $district->district }}"
+                                    {{ request('district') == $district->district ? 'selected' : '' }}>
+                                    {{ $district->district }}
+                                </option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
 
@@ -107,12 +113,14 @@
                     <label>Quality Grade</label>
                     <select id="gradeFilter">
                         <option value="">All Grades</option>
-                        @foreach($grades ?? [] as $grade)
-                            <option value="{{ $grade->standard_value }}"
-                                {{ request('grade') == $grade->standard_value ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('_', ' ', $grade->standard_value)) }}
-                            </option>
-                        @endforeach
+                        @if(!empty($grades))
+                            @foreach($grades as $grade)
+                                <option value="{{ $grade->standard_value }}"
+                                    {{ request('grade') == $grade->standard_value ? 'selected' : '' }}>
+                                    {{ ucfirst(str_replace('_', ' ', $grade->standard_value)) }}
+                                </option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
 
@@ -167,7 +175,8 @@
                     <div class="product-img-container">
                         <img src="{{ $product->product_photo ? asset('uploads/product_images/' . $product->product_photo) : asset('assets/images/product-placeholder.png') }}"
                             alt="{{ $product->product_name }}"
-                            onerror="this.src='{{ asset('assets/images/product-placeholder.png') }}'">
+                            data-fallback="{{ asset('assets/images/product-placeholder.png') }}"
+                            onerror="this.onerror=null; this.src=this.dataset.fallback;">
                     </div>
                     <div class="product-body">
                         <h5 class="product-title">{{ Str::limit($product->product_name, 50) }}</h5>
@@ -258,34 +267,48 @@
 @endif
 
 <script>
-    @if(session('success'))
-    Swal.fire({
-        @if(file_exists(public_path('assets/icons/Gif/success6.gif'))) imageUrl: '{{ asset('assets/icons/Gif/success2.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'success' @endif,
-        title: 'Success!',
-        text: '{{ session('success') }}',
-        timer: 3000,
-        showConfirmButton: false
-    });
-    @endif
+    <!-- Data for JS -->
+    const jsDataElement = document.createElement('div');
+    jsDataElement.id = 'js-data';
+    jsDataElement.style.display = 'none';
+    jsDataElement.dataset.success = "{{ session('success') }}";
+    jsDataElement.dataset.error = "{{ session('error') }}";
+    jsDataElement.dataset.errors = "{{ json_encode($errors->all()) }}";
+    jsDataElement.dataset.successImg = "{{ file_exists(public_path('assets/icons/Gif/success6.gif')) ? asset('assets/icons/Gif/success2.gif') : '' }}";
+    jsDataElement.dataset.errorImg = "{{ file_exists(public_path('assets/icons/Gif/error4.gif')) ? asset('assets/icons/Gif/error4.gif') : '' }}";
+    jsDataElement.dataset.validationImg = "{{ file_exists(public_path('assets/icons/Gif/Validation Error1.gif')) ? asset('assets/icons/Gif/Validation Error1.gif') : '' }}";
+    jsDataElement.dataset.reqSubcategory = "{{ request('subcategory') }}";
+    jsDataElement.dataset.routeDashboard = "{{ route('buyer.dashboard') }}";
+    jsDataElement.dataset.loadingImg = "{{ file_exists(public_path('assets/icons/Gif/loading3.gif')) ? asset('assets/icons/Gif/loading3.gif') : '' }}";
+    jsDataElement.dataset.clearImg = "{{ file_exists(public_path('assets/icons/Gif/Clear filters1.gif')) ? asset('assets/icons/Gif/Clear filters1.gif') : '' }}";
+    document.body.appendChild(jsDataElement);
 
-    @if(session('error'))
-    Swal.fire({
-        @if(file_exists(public_path('assets/icons/Gif/error4.gif'))) imageUrl: '{{ asset('assets/icons/Gif/error4.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
-        title: 'Error!',
-        text: '{{ session('error') }}',
-        timer: 4000,
-        showConfirmButton: true
-    });
-    @endif
+    const successMsg = jsDataElement.dataset.success;
+    const errorMsg = jsDataElement.dataset.error;
+    const errorsMsg = jsDataElement.dataset.errors && jsDataElement.dataset.errors !== '[]' ? JSON.parse(jsDataElement.dataset.errors) : [];
+    const successImg = jsDataElement.dataset.successImg;
+    const errorImg = jsDataElement.dataset.errorImg;
+    const validationImg = jsDataElement.dataset.validationImg;
 
-    @if($errors->any())
-    Swal.fire({
-        @if(file_exists(public_path('assets/icons/Gif/Validation Error1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Validation Error1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'error' @endif,
-        title: 'Validation Error!',
-        html: `@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach`,
-        showConfirmButton: true
-    });
-    @endif
+    if (successMsg) {
+        let options = { title: 'Success!', text: successMsg, timer: 3000, showConfirmButton: false };
+        if (successImg) { options.imageUrl = successImg; options.imageWidth = 60; options.imageHeight = 60; } else { options.icon = 'success'; }
+        Swal.fire(options);
+    }
+
+    if (errorMsg) {
+        let options = { title: 'Error!', text: errorMsg, timer: 4000, showConfirmButton: true };
+        if (errorImg) { options.imageUrl = errorImg; options.imageWidth = 60; options.imageHeight = 60; } else { options.icon = 'error'; }
+        Swal.fire(options);
+    }
+
+    if (errorsMsg.length > 0) {
+        let htmlMsg = '';
+        errorsMsg.forEach(function(error) { htmlMsg += '<p>' + error + '</p>'; });
+        let options = { title: 'Validation Error!', html: htmlMsg, showConfirmButton: true };
+        if (validationImg) { options.imageUrl = validationImg; options.imageWidth = 60; options.imageHeight = 60; } else { options.icon = 'error'; }
+        Swal.fire(options);
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
         const productGrid = document.querySelector('.product-grid-container');
@@ -319,7 +342,19 @@
         });
     });
 
-    let allSubcategories = @json($allSubcategories ?? []);
+    const allSubcategoriesDataElement = document.createElement('script');
+    allSubcategoriesDataElement.id = 'all-subcategories-data';
+    allSubcategoriesDataElement.type = 'application/json';
+    allSubcategoriesDataElement.textContent = `{!! json_encode($allSubcategories ?? []) !!}`;
+    document.body.appendChild(allSubcategoriesDataElement);
+
+    const allCategoriesDataElement = document.createElement('script');
+    allCategoriesDataElement.id = 'all-categories-data';
+    allCategoriesDataElement.type = 'application/json';
+    allCategoriesDataElement.textContent = `{!! json_encode($categories ?? []) !!}`;
+    document.body.appendChild(allCategoriesDataElement);
+
+    let allSubcategories = JSON.parse(document.getElementById('all-subcategories-data').textContent || '[]');
 
     function updateSubcategories() {
         const categorySelect = document.getElementById('categoryFilter');
@@ -329,7 +364,8 @@
         subcategorySelect.innerHTML = '<option value="">All Subcategories</option>';
 
         if (selectedCategory) {
-            const category = @json($categories ?? []).find(cat => cat.category_name === selectedCategory);
+            const allCategories = JSON.parse(document.getElementById('all-categories-data').textContent || '[]');
+            const category = allCategories.find(cat => cat.category_name === selectedCategory);
             if (category) {
                 const filteredSubcategories = allSubcategories.filter(sub => sub.category_id == category.id);
 
@@ -338,7 +374,8 @@
                     option.value = sub.subcategory_name;
                     option.textContent = sub.subcategory_name;
 
-                    if (sub.subcategory_name === "{{ request('subcategory') }}") {
+                    const reqSubcat = document.getElementById('js-data') ? document.getElementById('js-data').dataset.reqSubcategory : '';
+                    if (sub.subcategory_name === reqSubcat) {
                         option.selected = true;
                     }
 
@@ -351,7 +388,8 @@
                 option.value = sub.subcategory_name;
                 option.textContent = sub.subcategory_name;
 
-                if (sub.subcategory_name === "{{ request('subcategory') }}") {
+                const reqSubcat = document.getElementById('js-data') ? document.getElementById('js-data').dataset.reqSubcategory : '';
+                if (sub.subcategory_name === reqSubcat) {
                     option.selected = true;
                 }
 
@@ -387,32 +425,43 @@
         const sort = document.getElementById('sortFilter').value;
         if (sort) params.set('sort', sort);
 
-        const loadingAlert = Swal.fire({
+        const jsData = document.getElementById('js-data');
+        const loadingImg = jsData ? jsData.dataset.loadingImg : '';
+        const dashboardUrl = jsData ? jsData.dataset.routeDashboard : '';
+
+        let options = {
             title: 'Applying Filters...',
             text: 'Please wait while we filter the products',
-            @if(file_exists(public_path('assets/icons/Gif/loading3.gif'))) imageUrl: '{{ asset('assets/icons/Gif/loading3.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'info' @endif,
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
             }
-        });
+        };
+        if (loadingImg) { options.imageUrl = loadingImg; options.imageWidth = 60; options.imageHeight = 60; } else { options.icon = 'info'; }
+        
+        const loadingAlert = Swal.fire(options);
 
         setTimeout(() => {
-            window.location.href = '{{ route("buyer.dashboard") }}?' + params.toString();
+            window.location.href = dashboardUrl + '?' + params.toString();
         }, 500);
     }
 
     function clearFilters() {
-        Swal.fire({
+        const jsData = document.getElementById('js-data');
+        const clearImg = jsData ? jsData.dataset.clearImg : '';
+        
+        let options = {
             title: 'Clear all filters?',
             text: 'This will reset all search and filter settings',
-            @if(file_exists(public_path('assets/icons/Gif/Clear filters1.gif'))) imageUrl: '{{ asset('assets/icons/Gif/Clear filters1.gif') }}', imageWidth: 60, imageHeight: 60 @else icon: 'question' @endif,
             showCancelButton: true,
             confirmButtonColor: '#10B981',
             cancelButtonColor: '#6B7280',
             confirmButtonText: 'Yes, clear all',
             cancelButtonText: 'Cancel'
-        }).then((result) => {
+        };
+        if (clearImg) { options.imageUrl = clearImg; options.imageWidth = 60; options.imageHeight = 60; } else { options.icon = 'question'; }
+
+        Swal.fire(options).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById('searchInput').value = '';
                 document.getElementById('categoryFilter').value = '';
@@ -425,7 +474,8 @@
 
                 updateSubcategories();
 
-                window.location.href = '{{ route("buyer.dashboard") }}';
+                const jsData = document.getElementById('js-data');
+                window.location.href = jsData ? jsData.dataset.routeDashboard : '';
             }
         });
     }

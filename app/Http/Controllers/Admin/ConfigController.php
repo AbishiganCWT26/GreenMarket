@@ -16,7 +16,7 @@ class ConfigController extends Controller
         return view('admin.config.index');
     }
 
-    public function manage($group = 'footer')
+    public function manage(string $group = 'footer')
     {
         $allowedGroups = ['footer', 'about_us', 'how_it_works', 'general'];
 
@@ -32,7 +32,7 @@ class ConfigController extends Controller
         return view('admin.config.manage', compact('settings', 'group'));
     }
 
-    public function update(Request $request, $group)
+    public function update(Request $request, string $group)
     {
         $validator = Validator::make($request->all(), [
             'config.*' => 'nullable',

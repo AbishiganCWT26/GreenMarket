@@ -38,7 +38,7 @@ class BuyerController extends Controller
         return $buyer;
     }
 
-    private function getProductImagePath($productImage)
+    private function getProductImagePath(?string $productImage)
     {
         if (!$productImage) {
             return asset('assets/images/product-placeholder.png');
@@ -100,7 +100,7 @@ class BuyerController extends Controller
             ->where('products.quantity', '>', 0);
     }
 
-    private function applyFilters($query, $request)
+    private function applyFilters(\Illuminate\Database\Query\Builder $query, Request $request)
     {
         // Search with case-insensitive search across multiple fields
         if ($request->has('search') && !empty($request->search)) {
@@ -176,7 +176,7 @@ class BuyerController extends Controller
         return $query;
     }
 
-    private function getFilteredSubcategories($categoryName)
+    private function getFilteredSubcategories(?string $categoryName)
     {
         if (!$categoryName || $categoryName == 'all') {
             return [];
@@ -194,7 +194,7 @@ class BuyerController extends Controller
             ->get();
     }
 
-    private function sendSMS($phone, $message)
+    private function sendSMS(string $phone, string $message)
     {
         try {
             $user = env('SMS_USER', 'number');
@@ -215,7 +215,7 @@ class BuyerController extends Controller
             $res = explode(":", $ret);
             return trim($res[0]) == "OK";
         } catch (\Exception $e) {
-            \Log::error('SMS sending failed: ' . $e->getMessage());
+            Log::error('SMS sending failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -242,22 +242,22 @@ class BuyerController extends Controller
             $screenWidth >= 2560 => 20,
 
             // large Ultrawide / XXXL Screens: 1501px - 2559px
-            $screenWidth >= 1501 && $screenWidth <= 2559 => 15,
+            $screenWidth >= 1501 && $screenWidth <= 2559 => 10,
 
             // Ultrawide / XXL Screens: 1400px - 1500px
-            $screenWidth >= 1400 && $screenWidth <= 1500 => 15,
+            $screenWidth >= 1400 && $screenWidth <= 1500 => 10,
 
             // Extra Large Screens, Large Screens and Normal Tablets: 768px - 1399px
-            $screenWidth >= 768 && $screenWidth <= 1399 => 12,
+            $screenWidth >= 768 && $screenWidth <= 1399 => 10,
 
             // Small Screens: 576px - 767px
-            $screenWidth >= 576 && $screenWidth <= 767 => 9,
+            $screenWidth >= 576 && $screenWidth <= 767 => 8,
 
             // Extra Small to ultra Small: 575px and below
             $screenWidth <= 575 => 6,
 
             // Default fallback
-            default => 12
+            default => 4
         };
 
         $recommended = $query->limit($limit)->get();
@@ -275,7 +275,7 @@ class BuyerController extends Controller
         $commonData = $this->getCommonData();
         $query = $this->buildProductQuery();
         $query = $this->applyFilters($query, $request);
-        $products = $query->paginate(12)->withQueryString();
+        $products = $query->paginate(10)->withQueryString();
         $subcategories = $this->getFilteredSubcategories($request->category);
         if ($request->ajax()) {
             return response()->json([
@@ -297,7 +297,7 @@ class BuyerController extends Controller
         return response()->json($subcategories);
     }
 
-    public function productDetail($id)
+    public function productDetail(int $id)
     {
         $product = DB::table('products')
             ->select(
@@ -461,7 +461,7 @@ class BuyerController extends Controller
         return view('buyer.history', ['orders' => $orders]);
     }
 
-    public function getInvoiceData($orderId)
+    public function getInvoiceData(int $orderId)
     {
         $buyer = $this->getBuyer();
 
@@ -604,7 +604,7 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function submitFeedback(Request $request, $orderId)
+    public function submitFeedback(Request $request, int $orderId)
     {
         $buyer = $this->getBuyer();
         $request->validate([
@@ -698,11 +698,14 @@ class BuyerController extends Controller
                 'updated_at' => now(),
             ]);
         }
-        $user->refresh();
+        $currentUser = User::find($user->id);
+        if ($currentUser) {
+            $currentUser->refresh();
+        }
         return redirect()->route('buyer.profile.profile')->with('success', 'Profile updated successfully.');
     }
 
-    public function addToCart(Request $request, $productId)
+    public function addToCart(Request $request, int $productId)
     {
         $user = Auth::user();
         if (!$user) {
@@ -780,7 +783,7 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function removeFromCart(Request $request, $cartItemId)
+    public function removeFromCart(Request $request, int $cartItemId)
     {
         $buyer = $this->getBuyer();
         $deleted = DB::table('shopping_cart')
@@ -874,7 +877,7 @@ class BuyerController extends Controller
                 Mail::to($request->email)->send(new BuyerRegistrationMail($emailData));
                 $emailSent = true;
             } catch (\Throwable $e) {
-                \Log::error('Email sending failed: ' . $e->getMessage());
+                Log::error('Order cancellation failed: ' . $e->getMessage());
                 $emailSent = false;
                 $emailError = $e->getMessage();
             }
@@ -885,7 +888,7 @@ class BuyerController extends Controller
             try {
                 $smsSent = $this->sendSMS($request->primary_mobile, $smsMessage);
             } catch (\Exception $e) {
-                \Log::error('SMS sending failed: ' . $e->getMessage());
+                Log::error('SMS sending failed: ' . $e->getMessage());
                 $smsSent = false;
             }
             DB::commit();
@@ -910,7 +913,7 @@ class BuyerController extends Controller
             return redirect()->route('login')->with('success', $message)->with('email_error', $emailError ?? null);
         } catch (\Throwable $e) {
             DB::rollBack();
-            \Log::error('Registration error: ' . $e->getMessage());
+            Log::error('Invoice generation error: ' . $e->getMessage());
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
@@ -953,7 +956,10 @@ class BuyerController extends Controller
             'profile_photo' => $filename,
             'updated_at' => now(),
         ]);
-        $user->refresh();
+        $currentUser2 = User::find($user->id);
+        if ($currentUser2) {
+            $currentUser2->refresh();
+        }
         return redirect()->route('buyer.profile.photo')
             ->with('success', 'Profile photo updated successfully.');
     }
@@ -973,7 +979,10 @@ class BuyerController extends Controller
             'profile_photo' => 'default-buyer.png',
             'updated_at' => now(),
         ]);
-        $user->refresh();
+        $currentUser3 = User::find($user->id);
+        if ($currentUser3) {
+            $currentUser3->refresh();
+        }
         return redirect()->route('buyer.profile.photo')
             ->with('success', 'Profile photo removed successfully. Default photo restored.');
     }
@@ -1015,15 +1024,18 @@ class BuyerController extends Controller
             'new_password' => PasswordPolicy::rulesWithConfirmation(),
         ]);
         $user = Auth::user();
-        $user->update([
-            'password' => Hash::make($request->new_password),
-            'updated_at' => now(),
-        ]);
+        $userModel = User::find($user->id);
+        if ($userModel) {
+            $userModel->update([
+                'password' => Hash::make($request->new_password),
+                'updated_at' => now(),
+            ]);
+        }
         return redirect()->route('buyer.profile.profile')
             ->with('success', 'Password changed successfully.');
     }
 
-    public function generateInvoice($orderId)
+    public function generateInvoice(int $orderId)
     {
         $buyer = $this->getBuyer();
         $order = DB::table('orders')
@@ -1092,12 +1104,12 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function viewProduct($id)
+    public function viewProduct(int $id)
     {
         return $this->productDetail($id);
     }
 
-    public function product($id)
+    public function product(int $id)
     {
         return $this->productDetail($id);
     }
@@ -1180,7 +1192,7 @@ class BuyerController extends Controller
         }
     }
 
-    public function removeFromWishlistById($wishlistId)
+    public function removeFromWishlistById(int $wishlistId)
     {
         $buyer = $this->getBuyer();
         $deleted = DB::table('wishlists')
@@ -1194,7 +1206,7 @@ class BuyerController extends Controller
         }
     }
 
-    public function updateCartQuantity(Request $request, $cartItemId)
+    public function updateCartQuantity(Request $request, int $cartItemId)
     {
         $buyer = $this->getBuyer();
         $validated = $request->validate(['quantity' => 'required|numeric|min:0.01']);
@@ -1494,7 +1506,7 @@ class BuyerController extends Controller
         }
     }
 
-    public function checkoutSuccess($orderId)
+    public function checkoutSuccess(int $orderId)
     {
         $buyer = $this->getBuyer();
         $order = DB::table('orders')
@@ -1689,7 +1701,7 @@ class BuyerController extends Controller
     /**
      * Send SMS and Email notifications to farmer and lead farmer
      */
-    private function sendOrderNotifications($orderId, $buyer)
+    private function sendOrderNotifications(int $orderId, object $buyer)
     {
         try {
             // Get order details
@@ -1777,7 +1789,7 @@ class BuyerController extends Controller
         }
     }
 
-    public function cancelOrder(Request $request, $orderId)
+    public function cancelOrder(Request $request, int $orderId)
     {
         $buyer = $this->getBuyer();
         $order = DB::table('orders')
@@ -1891,7 +1903,7 @@ class BuyerController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Product request error: ' . $e->getMessage());
+            Log::error('Product request error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to submit request. Please try again.'
@@ -1939,7 +1951,7 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function updateRequestStatus(Request $request, $id)
+    public function updateRequestStatus(Request $request, int $id)
     {
         $buyer = $this->getBuyer();
         $validated = $request->validate([
@@ -1967,7 +1979,7 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function deleteRequest($id)
+    public function deleteRequest(int $id)
     {
         $buyer = $this->getBuyer();
         $requestRecord = DB::table('buyer_product_requests')
@@ -2072,7 +2084,7 @@ class BuyerController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Complaint submission error: ' . $e->getMessage());
+            Log::error('Complaint submission error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to submit complaint. Please try again.'
@@ -2125,7 +2137,7 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function viewComplaint($id)
+    public function viewComplaint(int $id)
     {
         $user = Auth::user();
         $complaint = DB::table('complaints')
@@ -2155,7 +2167,7 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function deleteComplaint($id)
+    public function deleteComplaint(int $id)
     {
         $user = Auth::user();
         DB::beginTransaction();
@@ -2187,7 +2199,7 @@ class BuyerController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Complaint deletion error: ' . $e->getMessage());
+            Log::error('Complaint deletion error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete complaint. Please try again.'
@@ -2195,7 +2207,7 @@ class BuyerController extends Controller
         }
     }
 
-    public function updateComplaint(Request $request, $id)
+    public function updateComplaint(Request $request, int $id)
     {
         $user = Auth::user();
         $validated = $request->validate([
@@ -2235,7 +2247,7 @@ class BuyerController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Complaint update error: ' . $e->getMessage());
+            Log::error('Complaint update error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update complaint. Please try again.'

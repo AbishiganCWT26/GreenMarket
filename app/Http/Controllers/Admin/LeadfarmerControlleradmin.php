@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
@@ -91,7 +92,7 @@ class LeadfarmerControlleradmin extends Controller
 
             return view('admin.lead-farmer-groups.index', compact('paginatedGroups'));
         } catch (\Exception $e) {
-            \Log::error('Lead farmer groups error: ' . $e->getMessage());
+                Log::error('Lead farmer groups error: ' . $e->getMessage());
             return back()->with('error', 'Failed to load lead farmer groups data.');
         }
     }

@@ -80,7 +80,7 @@ class BuyerRequestProductsController extends Controller
 		return view('admin.buyer-requests.index', compact('buyerRequests'));
 	}
 
-	private function sendSMS($to, $message)
+	private function sendSMS(string $to, string $message)
 	{
 		try {
 			$user = env('SMS_USER');
@@ -119,7 +119,7 @@ class BuyerRequestProductsController extends Controller
 		}
 	}
 
-	public function destroy($id)
+	public function destroy(int $id)
 	{
 		try {
 			DB::beginTransaction();

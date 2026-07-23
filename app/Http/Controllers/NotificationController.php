@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class NotificationController extends Controller
 {
@@ -33,7 +34,7 @@ class NotificationController extends Controller
         $notificationId = $id ?? $request->notification_id ?? $request->id;
 
         if (!$notificationId) {
-            \Log::warning('Notification markAsRead failed: No ID provided', ['request' => $request->all(), 'id_param' => $id]);
+            Log::warning('Notification markAsRead failed: No ID provided', ['request' => $request->all(), 'id_param' => $id]);
             return response()->json(['success' => false, 'message' => 'Notification ID not provided'], 400);
         }
 
@@ -46,7 +47,7 @@ class NotificationController extends Controller
             return response()->json(['success' => true]);
         }
 
-        \Log::error('Notification markAsRead failed: Notification not found or unauthorized', [
+        Log::error('Notification markAsRead failed: Notification not found or unauthorized', [
             'user_id' => Auth::id(),
             'notification_id' => $notificationId
         ]);

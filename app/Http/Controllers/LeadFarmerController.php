@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use App\Services\PasswordPolicy;
 
 
@@ -398,7 +399,7 @@ class LeadFarmerController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
 
-            \Log::error('Product creation error: ' . $e->getMessage());
+            Log::error('Product creation error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -464,7 +465,7 @@ class LeadFarmerController extends Controller
         return view('lead_farmer.manage_products', compact('products', 'farmers', 'categories', 'viewType'));
     }
 
-    public function getProductDetails($id)
+    public function getProductDetails(int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -488,7 +489,7 @@ class LeadFarmerController extends Controller
         ]);
     }
 
-    public function editProduct($id)
+    public function editProduct(int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -542,7 +543,7 @@ class LeadFarmerController extends Controller
         ));
     }
 
-    public function sendProductUpdateOtp(Request $request, $id)
+    public function sendProductUpdateOtp(Request $request, int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -561,9 +562,9 @@ class LeadFarmerController extends Controller
         }
 
         try {
-            $otp = rand(100000, 999999);
+            $otp = substr(str_shuffle('0123456789'), 0, 6);
 
-            \Log::info("Product Update OTP for Product {$id}: " . $otp);
+            Log::info("Product Update OTP for Product {$id}: " . $otp);
 
             OtpVerification::create([
                 'user_id' => Auth::id(),
@@ -590,7 +591,7 @@ class LeadFarmerController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('OTP Sending Error: ' . $e->getMessage());
+            Log::error('OTP Sending Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send OTP: ' . $e->getMessage()
@@ -598,7 +599,7 @@ class LeadFarmerController extends Controller
         }
     }
 
-    public function verifyProductUpdateOtp(Request $request, $id)
+    public function verifyProductUpdateOtp(Request $request, int $id)
     {
         $validator = Validator::make($request->all(), [
             'otp' => 'required|string|size:6'
@@ -645,7 +646,7 @@ class LeadFarmerController extends Controller
         }
     }
 
-    public function updateProduct(Request $request, $id)
+    public function updateProduct(Request $request, int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -786,7 +787,7 @@ class LeadFarmerController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
 
-            \Log::error('Product update error: ' . $e->getMessage());
+            Log::error('Product update error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -795,7 +796,7 @@ class LeadFarmerController extends Controller
         }
     }
 
-    public function deleteProduct($id)
+    public function deleteProduct(int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -874,8 +875,11 @@ class LeadFarmerController extends Controller
         DB::beginTransaction();
         try {
             if ($request->email != $user->email) {
-                $user->email = $request->email;
-                $user->save();
+                $userEmailModel = User::find($user->id);
+                if ($userEmailModel) {
+                    $userEmailModel->email = $request->email;
+                    $userEmailModel->save();
+                }
             }
 
             $leadFarmer->update([
@@ -926,8 +930,11 @@ class LeadFarmerController extends Controller
 
         try {
             $plainPassword = $request->new_password;
-            $user->password = Hash::make($plainPassword);
-            $user->save();
+            $userModel = User::find($user->id);
+            if ($userModel) {
+                $userModel->password = Hash::make($plainPassword);
+                $userModel->save();
+            }
 
             // Send SMS notification with updated login credentials
             try {
@@ -941,7 +948,7 @@ class LeadFarmerController extends Controller
                     $this->sendSMS($mobile, $message);
                 }
             } catch (\Exception $smsEx) {
-                \Log::warning('SMS failed after LF password update: ' . $smsEx->getMessage());
+                Log::warning('SMS failed after LF password update: ' . $smsEx->getMessage());
             }
 
             return response()->json([
@@ -996,8 +1003,11 @@ class LeadFarmerController extends Controller
 
             $photo->move($uploadPath, $filename);
 
-            $user->profile_photo = $filename;
-            $user->save();
+            $userModel2 = User::find($user->id);
+            if ($userModel2) {
+                $userModel2->profile_photo = $filename;
+                $userModel2->save();
+            }
 
             DB::commit();
 
@@ -1091,7 +1101,7 @@ class LeadFarmerController extends Controller
         return $pdf->download('Movement-Logs-' . date('Y-m-d') . '.pdf');
     }
 
-    public function getSubcategories($categoryId)
+    public function getSubcategories(int $categoryId)
     {
         $subcategories = ProductSubcategory::where('category_id', $categoryId)
             ->where('is_active', true)
@@ -1101,7 +1111,7 @@ class LeadFarmerController extends Controller
         return response()->json($subcategories);
     }
 
-    public function getProductExamples($subcategoryId)
+    public function getProductExamples(int $subcategoryId)
     {
         $products = ProductExample::where('subcategory_id', $subcategoryId)
             ->where('is_active', true)
@@ -1111,7 +1121,7 @@ class LeadFarmerController extends Controller
         return response()->json($products);
     }
 
-    public function viewOrder($id)
+    public function viewOrder(int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -1214,9 +1224,10 @@ class LeadFarmerController extends Controller
         return view('lead_farmer.reports.farmer_performance', compact('farmers', 'farmerSales'));
     }
 
-    public function notifications()
+    public function notifications(Request $request)
     {
         $user = Auth::user();
+        $perPage = $request->input('per_page', 15);
 
         $notifications = Notification::where('user_id', $user->id)
             ->orWhere(function($query) use ($user) {
@@ -1224,7 +1235,7 @@ class LeadFarmerController extends Controller
                     ->where('recipient_type', 'lead_farmer');
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(20)
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('lead_farmer.notifications', compact('notifications'));
@@ -1241,7 +1252,7 @@ class LeadFarmerController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function markNotificationRead($id)
+    public function markNotificationRead(int $id)
     {
         $user = Auth::user();
 
@@ -1261,7 +1272,7 @@ class LeadFarmerController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function getFarmerDetails($id)
+    public function getFarmerDetails(int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -1317,7 +1328,7 @@ class LeadFarmerController extends Controller
         ]);
     }
 
-    public function editFarmer($id)
+    public function editFarmer(int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -1343,7 +1354,7 @@ class LeadFarmerController extends Controller
         return view('lead_farmer.edit_farmer', compact('farmer', 'districts', 'paymentDetails'));
     }
 
-    public function updateFarmer(Request $request, $id)
+    public function updateFarmer(Request $request, int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -1468,7 +1479,7 @@ class LeadFarmerController extends Controller
         }
     }
 
-    public function sendUpdateOtp($id, Request $request)
+    public function sendUpdateOtp(int $id, Request $request)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
         $farmer = Farmer::where('id', $id)
@@ -1483,9 +1494,9 @@ class LeadFarmerController extends Controller
         }
 
         try {
-            $otp = rand(100000, 999999);
+            $otp = substr(str_shuffle('0123456789'), 0, 6);
 
-            \Log::info("Farmer Update OTP for User " . Auth::id() . ": " . $otp);
+            Log::info("Farmer Update OTP for User " . Auth::id() . ": " . $otp);
 
             OtpVerification::create([
                 'user_id' => Auth::id(),
@@ -1513,7 +1524,7 @@ class LeadFarmerController extends Controller
         }
     }
 
-    private function hasSensitiveChanges(Request $request, $farmer)
+    private function hasSensitiveChanges(Request $request, Farmer $farmer)
     {
         if ($request->primary_mobile !== $farmer->primary_mobile) return true;
         if ($request->preferred_payment !== $farmer->preferred_payment) return true;
@@ -1526,7 +1537,7 @@ class LeadFarmerController extends Controller
         return false;
     }
 
-    public function deleteFarmer($id)
+    public function deleteFarmer(int $id)
     {
         $leadFarmerId = Auth::user()->leadFarmer->id;
 
@@ -1560,7 +1571,7 @@ class LeadFarmerController extends Controller
         }
     }
 
-    private function sendSMS($to, $message)
+    private function sendSMS(string $to, string $message)
     {
         try {
             $user = env('SMS_USER');
@@ -1577,19 +1588,19 @@ class LeadFarmerController extends Controller
             $res = explode(":", $ret);
 
             if (trim($res[0]) == "OK") {
-                \Log::info("SMS Sent successfully to $to. Response: $ret");
+                Log::info("SMS Sent successfully to $to. Response: $ret");
                 return true;
             } else {
-                \Log::error("SMS Sending Failed to $to. Response: $ret");
+                Log::error("SMS Sending Failed to $to. Response: $ret");
                 return false;
             }
         } catch (\Exception $e) {
-            \Log::error('SMS Error: ' . $e->getMessage());
+            Log::error('SMS Error: ' . $e->getMessage());
             return false;
         }
     }
 
-    private function get_web_page($url)
+    private function get_web_page(string $url)
     {
         $options = array(
             CURLOPT_RETURNTRANSFER => true,
@@ -1818,7 +1829,7 @@ class LeadFarmerController extends Controller
     }
     public function inventoryDashboard(Request $request)
     {
-        $leadFarmerId = auth()->user()->leadFarmer->id;
+        $leadFarmerId = Auth::user()->leadFarmer->id;
 
         // Get all products for this lead farmer's group
         $products = Product::where('lead_farmer_id', $leadFarmerId)

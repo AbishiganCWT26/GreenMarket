@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ComplaintController extends Controller
 {
@@ -76,14 +78,14 @@ class ComplaintController extends Controller
                 'is_read' => false,
                 'related_id' => $complaint->id
             ]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Facilitator alerted successfully'
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Facilitator Alert failed: ' . $e->getMessage(), [
+            Log::error('Facilitator Alert failed: ' . $e->getMessage(), [
                 'request' => $request->all(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -94,7 +96,7 @@ class ComplaintController extends Controller
         }
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, int $id)
     {
         $request->validate([
             'status' => 'required|in:new,in_progress,resolved,rejected'
@@ -106,8 +108,8 @@ class ComplaintController extends Controller
             $oldStatus = $complaint->status;
             $complaint->status = $request->status;
 
-            if ($request->status === 'resolved' && auth()->user()->role === 'admin') {
-                $complaint->resolved_by_facilitator_id = auth()->id();
+            if ($request->status === 'resolved' && Auth::check() && Auth::user()->role === 'admin') {
+                $complaint->resolved_by_facilitator_id = Auth::id();
             }
 
             $complaint->save();
@@ -130,7 +132,7 @@ class ComplaintController extends Controller
         }
     }
 
-    public function getComplaintDetails($id)
+    public function getComplaintDetails(int $id)
     {
         $complaint = Complaint::with(['complainant', 'againstUser', 'order'])
             ->findOrFail($id);

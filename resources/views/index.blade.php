@@ -216,7 +216,10 @@
 		</div>
 		<div class="categories-grid">
 			@foreach($categories as $category)
-			<div class="category-card">
+			<div class="category-card" style="cursor: pointer; position: relative; z-index: 10;"
+				data-name="{{ $category->category_name }}"
+				data-image="{{ asset('assets/images/taxonomy-icons/' . ($category->icon_filename ?? 'default.png')) }}"
+				data-description="{{ $category->description ?? 'Fresh organic products' }}">
 				<div class="category-icon">
 					@php
 						$icon = $category->icon_filename ?? 'default.png';
@@ -237,6 +240,7 @@
 
 @section('scripts')
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/home-extras.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -327,6 +331,34 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		));
 	}
+
+	document.body.addEventListener('click', function(e) {
+		const card = e.target.closest('.category-card');
+		if (card) {
+			const name = card.getAttribute('data-name');
+			const image = card.getAttribute('data-image');
+			const description = card.getAttribute('data-description');
+
+			if (window.Swal) {
+				Swal.fire({
+					title: name,
+					imageUrl: image,
+					imageWidth: 80,
+					imageHeight: 80,
+					imageAlt: name,
+					html: `<p style="margin-top: 10px; color: #4b5563;">${description}</p>`,
+					confirmButtonColor: '#10B981',
+					background: '#ffffff',
+					color: '#0f1724',
+					customClass: {
+						popup: 'swal-responsive-popup'
+					}
+				});
+			} else {
+				alert(name + '\n' + description);
+			}
+		}
+	});
 });
 </script>
 @endsection

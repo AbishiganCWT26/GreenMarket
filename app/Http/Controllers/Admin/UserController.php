@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Mail\UserUpdateNotification;
 use App\Services\PasswordPolicy;
 use Illuminate\Support\Str;
@@ -111,7 +112,7 @@ class UserController extends Controller
                     'leadFarmers' => $leadFarmerList
                 ]);
             } catch (\Exception $e) {
-                \Log::error('Error loading users via AJAX: ' . $e->getMessage());
+                Log::error('Error loading users via AJAX: ' . $e->getMessage());
                 return response()->json([
                     'success' => false,
                     'error' => 'Failed to load users: ' . $e->getMessage()
@@ -136,7 +137,7 @@ class UserController extends Controller
         ]);
     }
 
-    private function getFullUserDetails($user)
+    private function getFullUserDetails(object $user)
     {
         switch($user->role) {
             case 'farmer':
@@ -173,7 +174,7 @@ class UserController extends Controller
         return $user;
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -428,7 +429,7 @@ class UserController extends Controller
             }
             // General database error handling to avoid showing raw SQL
             elseif (strpos($errorMessage, 'SQLSTATE') !== false) {
-                \Log::error('Database Error during user creation: ' . $errorMessage);
+                Log::error('Database Error during user creation: ' . $errorMessage);
                 $errorMessage = 'A database error occurred while creating the user: ' . $errorMessage;
             }
 
@@ -436,7 +437,7 @@ class UserController extends Controller
         }
     }
 
-    public function edit($id)
+    public function edit(int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -449,7 +450,7 @@ class UserController extends Controller
         return view('admin.users.edit', compact('user', 'details'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -469,11 +470,17 @@ class UserController extends Controller
             'email' => 'nullable|email|max:100|unique:users,email,' . $id,
             'role' => 'required|in:admin,facilitator,lead_farmer,farmer,buyer',
             'is_active' => 'required|boolean'
-        ]); {
-            $f = DB::table('farmers')->where('user_id', $userId)->select('lead_farmer_id')->first();
-            if ($f) {
-                $currentLeadFarmerId = $f->lead_farmer_id;
-            }
+        ]);
+
+        // Initialize helper variables used below
+        $userId = $user->id;
+        $role = $user->role;
+        $tables = ['farmers', 'lead_farmers', 'buyers', 'facilitators', 'admins'];
+        $currentLeadFarmerId = null;
+
+        $f = DB::table('farmers')->where('user_id', $userId)->select('lead_farmer_id')->first();
+        if ($f) {
+            $currentLeadFarmerId = $f->lead_farmer_id;
         }
 
         foreach ($tables as $table) {
@@ -563,7 +570,7 @@ class UserController extends Controller
         }
     }
 
-    private function updateBuyerDetails($user, $request, $userId)
+    private function updateBuyerDetails(object $user, Request $request, int $userId)
     {
         $buyer = DB::table('buyers')->where('user_id', $userId)->first();
 
@@ -594,7 +601,7 @@ class UserController extends Controller
         }
     }
 
-    private function updateFacilitatorDetails($user, $request, $userId)
+    private function updateFacilitatorDetails(object $user, Request $request, int $userId)
     {
         $facilitator = DB::table('facilitators')->where('user_id', $userId)->first();
 
@@ -691,7 +698,7 @@ class UserController extends Controller
         }
     }
 
-    private function updateAdminDetails($user, $request, $userId)
+    private function updateAdminDetails(object $user, Request $request, int $userId)
     {
         $admin = DB::table('admins')->where('user_id', $userId)->first();
 
@@ -719,7 +726,7 @@ class UserController extends Controller
 
 
 
-    public function deactivate($id)
+    public function deactivate(int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -741,7 +748,7 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message' => 'User deactivated successfully']);
     }
 
-    public function activate($id)
+    public function activate(int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -757,7 +764,7 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message' => 'User activated successfully']);
     }
 
-    public function suspend($id)
+    public function suspend(int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -779,7 +786,7 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message' => 'User suspended successfully']);
     }
 
-    public function promote($id)
+    public function promote(int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -882,7 +889,7 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'User mobile number not found'], 400);
         }
 
-        $otp = rand(100000, 999999);
+        $otp = substr(str_shuffle('0123456789'), 0, 6);
         $expiresAt = now()->addMinutes(5);
 
         DB::table('otp_verifications')->insert([
@@ -958,7 +965,7 @@ class UserController extends Controller
             ->where('used', false)
             ->delete();
 
-        $otp = rand(100000, 999999);
+        $otp = substr(str_shuffle('0123456789'), 0, 6);
         $expiresAt = now()->addMinutes(5);
 
         $action = $request->action ?? 'edit_payment';
@@ -1010,7 +1017,7 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message' => 'Notification sent']);
     }
 
-    private function sendSmsOtpCustom($mobile, $otp, $message)
+    private function sendSmsOtpCustom(string $mobile, string $otp, string $message)
     {
         try {
             $user = env('SMS_USER');
@@ -1018,7 +1025,7 @@ class UserController extends Controller
             $baseurl = env('SMS_API_URL');
 
             if (!$user || !$password || !$baseurl) {
-                \Log::info("SMS OTP for {$mobile}: {$otp} (SMS not configured). Msg: {$message}");
+                Log::info("SMS OTP for {$mobile}: {$otp} (SMS not configured). Msg: {$message}");
                 return true;
             }
 
@@ -1048,24 +1055,24 @@ class UserController extends Controller
             if ($response !== false) {
                 $result = explode(":", $response);
                 if (trim($result[0]) == "OK") {
-                    \Log::info("SMS OTP sent successfully to {$mobile}. Response: {$response}");
+                    Log::info("SMS OTP sent successfully to {$mobile}. Response: {$response}");
                     return true;
                 } else {
-                    \Log::error("SMS OTP failed for {$mobile}. Response: {$response}");
+                    Log::error("SMS OTP failed for {$mobile}. Response: {$response}");
                 }
             } else {
-                \Log::error("Curl error sending SMS OTP to {$mobile}. HTTP Code: {$httpCode}");
+                Log::error("Curl error sending SMS OTP to {$mobile}. HTTP Code: {$httpCode}");
             }
 
             return false;
 
         } catch (\Exception $e) {
-            \Log::error("SMS sending failed: " . $e->getMessage());
+            Log::error("SMS sending failed: " . $e->getMessage());
             return false;
         }
     }
 
-    private function sendSmsOtp($mobile, $otp)
+    private function sendSmsOtp(string $mobile, string $otp)
     {
         try {
             $user = env('SMS_USER');
@@ -1073,7 +1080,7 @@ class UserController extends Controller
             $baseurl = env('SMS_API_URL');
 
             if (!$user || !$password || !$baseurl) {
-                \Log::info("SMS OTP for {$mobile}: {$otp} (SMS not configured)");
+                Log::info("SMS OTP for {$mobile}: {$otp} (SMS not configured)");
                 return true;
             }
 
@@ -1103,24 +1110,24 @@ class UserController extends Controller
             if ($response !== false) {
                 $result = explode(":", $response);
                 if (trim($result[0]) == "OK") {
-                    \Log::info("SMS OTP sent successfully to {$mobile}. Response: {$response}");
+                    Log::info("SMS OTP sent successfully to {$mobile}. Response: {$response}");
                     return true;
                 } else {
-                    \Log::error("SMS OTP failed for {$mobile}. Response: {$response}");
+                    Log::error("SMS OTP failed for {$mobile}. Response: {$response}");
                 }
             } else {
-                \Log::error("Curl error sending SMS OTP to {$mobile}. HTTP Code: {$httpCode}");
+                Log::error("Curl error sending SMS OTP to {$mobile}. HTTP Code: {$httpCode}");
             }
 
             return false;
 
         } catch (\Exception $e) {
-            \Log::error("SMS sending failed: " . $e->getMessage());
+            Log::error("SMS sending failed: " . $e->getMessage());
             return false;
         }
     }
 
-    private function sendSms($mobile, $message)
+    private function sendSms(string $mobile, string $message)
     {
         try {
             $user = env('SMS_USER');
@@ -1128,7 +1135,7 @@ class UserController extends Controller
             $baseurl = env('SMS_API_URL');
 
             if (!$user || !$password || !$baseurl) {
-                \Log::info("SMS for {$mobile}: {$message} (SMS not configured)");
+                Log::info("SMS for {$mobile}: {$message} (SMS not configured)");
                 return true;
             }
 
@@ -1158,24 +1165,24 @@ class UserController extends Controller
             if ($response !== false) {
                 $result = explode(":", $response);
                 if (trim($result[0]) == "OK") {
-                    \Log::info("SMS sent successfully to {$mobile}. Response: {$response}");
+                    Log::info("SMS sent successfully to {$mobile}. Response: {$response}");
                     return true;
                 } else {
-                    \Log::error("SMS failed for {$mobile}. Response: {$response}");
+                    Log::error("SMS failed for {$mobile}. Response: {$response}");
                 }
             } else {
-                \Log::error("Curl error sending SMS to {$mobile}. HTTP Code: {$httpCode}");
+                Log::error("Curl error sending SMS to {$mobile}. HTTP Code: {$httpCode}");
             }
 
             return false;
 
         } catch (\Exception $e) {
-            \Log::error("SMS sending failed: " . $e->getMessage());
+            Log::error("SMS sending failed: " . $e->getMessage());
             return false;
         }
     }
 
-    private function getUserDetails($user)
+    private function getUserDetails(object $user)
     {
         $details = null;
 
@@ -1220,7 +1227,7 @@ class UserController extends Controller
         return $details;
     }
 
-    private function sendUserCreationNotification($userId, $role, $plainPassword = null)
+    private function sendUserCreationNotification(int $userId, string $role, ?string $plainPassword = null)
     {
         $user = DB::table('users')->find($userId);
         $passwordText = $plainPassword ? "{$plainPassword}" : "";
@@ -1233,7 +1240,7 @@ class UserController extends Controller
                     $user
                 ));
             } catch (\Exception $e) {
-                \Log::error("Email sending failed: " . $e->getMessage());
+                Log::error("Email sending failed: " . $e->getMessage());
             }
         }
 
@@ -1246,7 +1253,7 @@ class UserController extends Controller
         }
     }
 
-    private function sendUpdateNotification($userId, $oldData, $newData)
+    private function sendUpdateNotification(int $userId, array $oldData, array $newData)
     {
         $user = DB::table('users')->find($userId);
 
@@ -1265,7 +1272,7 @@ class UserController extends Controller
                     $user
                 ));
             } catch (\Exception $e) {
-                \Log::error("Email sending failed: " . $e->getMessage());
+                Log::error("Email sending failed: " . $e->getMessage());
             }
         }
 
@@ -1276,7 +1283,7 @@ class UserController extends Controller
         }
     }
 
-    private function checkSensitiveDataChanges($user, $request)
+    private function checkSensitiveDataChanges(object $user, Request $request)
     {
         $changed = false;
         $actions = [];
@@ -1312,7 +1319,7 @@ class UserController extends Controller
         return ['changed' => $changed, 'actions' => $actions];
     }
 
-    private function isOtpVerified($userId, $requiredActions)
+    private function isOtpVerified(int $userId, array $requiredActions)
     {
         // For security, an OTP is valid for 15 minutes after being used
         foreach ($requiredActions as $action) {
@@ -1328,7 +1335,7 @@ class UserController extends Controller
         return true;
     }
 
-    private function sendDeactivationNotification($userId)
+    private function sendDeactivationNotification(int $userId)
     {
         $user = DB::table('users')->find($userId);
 
@@ -1340,7 +1347,7 @@ class UserController extends Controller
                     $user
                 ));
             } catch (\Exception $e) {
-                \Log::error("Email sending failed: " . $e->getMessage());
+                Log::error("Email sending failed: " . $e->getMessage());
             }
         }
 
@@ -1351,7 +1358,7 @@ class UserController extends Controller
         }
     }
 
-    private function sendSuspensionNotification($userId)
+    private function sendSuspensionNotification(int $userId)
     {
         $user = DB::table('users')->find($userId);
 
@@ -1363,7 +1370,7 @@ class UserController extends Controller
                     $user
                 ));
             } catch (\Exception $e) {
-                \Log::error("Email sending failed: " . $e->getMessage());
+                Log::error("Email sending failed: " . $e->getMessage());
             }
         }
 
@@ -1374,7 +1381,7 @@ class UserController extends Controller
         }
     }
 
-    private function sendPromotionNotification($userId)
+    private function sendPromotionNotification(int $userId)
     {
         $user = DB::table('users')->find($userId);
 
@@ -1386,7 +1393,7 @@ class UserController extends Controller
                     $user
                 ));
             } catch (\Exception $e) {
-                \Log::error("Email sending failed: " . $e->getMessage());
+                Log::error("Email sending failed: " . $e->getMessage());
             }
         }
 
@@ -1397,7 +1404,7 @@ class UserController extends Controller
         }
     }
 
-    private function sendRoleChangeNotification($userId, $newRole)
+    private function sendRoleChangeNotification(int $userId, string $newRole)
     {
         $user = DB::table('users')->find($userId);
 
@@ -1409,7 +1416,7 @@ class UserController extends Controller
                     $user
                 ));
             } catch (\Exception $e) {
-                \Log::error("Email sending failed: " . $e->getMessage());
+                Log::error("Email sending failed: " . $e->getMessage());
             }
         }
 
@@ -1420,7 +1427,7 @@ class UserController extends Controller
         }
     }
 
-    private function getUserMobile($userId, $role)
+    private function getUserMobile(int $userId, string $role)
     {
         if ($role == 'farmer' || $role == 'lead_farmer') {
             $table = $role == 'farmer' ? 'farmers' : 'lead_farmers';
@@ -1440,7 +1447,7 @@ class UserController extends Controller
         return null;
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -1465,7 +1472,7 @@ class UserController extends Controller
         return response()->json(['success' => false, 'message' => 'Unknown user role'], 400);
     }
 
-    private function deleteFarmerUser($userId)
+    private function deleteFarmerUser(int $userId)
     {
         $user = DB::table('users')->find($userId);
         if (!$user) return;
@@ -1492,7 +1499,7 @@ class UserController extends Controller
         DB::table('users')->where('id', $userId)->delete();
     }
 
-    private function deleteFarmer($user)
+    private function deleteFarmer(object $user)
     {
         $farmer = DB::table('farmers')->where('user_id', $user->id)->first();
 
@@ -1530,7 +1537,7 @@ class UserController extends Controller
         }
     }
 
-    private function deleteLeadFarmer($user)
+    private function deleteLeadFarmer(object $user)
     {
         $leadFarmer = DB::table('lead_farmers')->where('user_id', $user->id)->first();
 
@@ -1589,7 +1596,7 @@ class UserController extends Controller
         }
     }
 
-    public function processLeadFarmerDeletion(Request $request, $id)
+    public function processLeadFarmerDeletion(Request $request, int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -1667,12 +1674,12 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Lead farmer process deletion error: ' . $e->getMessage());
+            Log::error('Lead farmer process deletion error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to delete lead farmer: ' . $e->getMessage()], 500);
         }
     }
 
-    private function deleteFacilitator($user)
+    private function deleteFacilitator(object $user)
     {
         $facilitator = DB::table('facilitators')->where('user_id', $user->id)->first();
 
@@ -1701,7 +1708,7 @@ class UserController extends Controller
         }
     }
 
-    private function deleteBuyer($user)
+    private function deleteBuyer(object $user)
     {
         $buyer = DB::table('buyers')->where('user_id', $user->id)->first();
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Support\Facades\Mail;
@@ -58,7 +59,7 @@ class PublicController extends Controller
 			->orderBy('display_order')
 			->get();
 
-		$taxonomyData = DB::table('product_categories as pc')
+$taxonomyData = DB::table('product_categories as pc')
 			->select(
 				'pc.id',
 				'pc.category_name',
@@ -140,7 +141,7 @@ class PublicController extends Controller
             $data = $request->all();
             
             // This will automatically use the 'brevo' mailer we configured in Railway!
-            Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($data));
+            Mail::to($adminEmail)->send(new ContactFormMail($data));
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
@@ -153,8 +154,8 @@ class PublicController extends Controller
 
         } catch (\Brevo\Exceptions\BrevoApiException $e) {
             $errorMsg = 'Brevo API request failed. Code: ' . $e->getCode() . '. Response: ' . $e->getBody();
-            \Log::error($errorMsg);
-            \Log::error('Error trace: ' . $e->getTraceAsString());
+            Log::error($errorMsg);
+            Log::error('Error trace: ' . $e->getTraceAsString());
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
@@ -168,8 +169,8 @@ class PublicController extends Controller
             return redirect()->back()->with('error', 'Failed to send message. ' . $errorMsg)->withInput();
 
         } catch (\Exception $e) {
-            \Log::error('Brevo API contact form error: ' . $e->getMessage());
-            \Log::error('Error trace: ' . $e->getTraceAsString());
+            Log::error('Brevo API contact form error: ' . $e->getMessage());
+            Log::error('Error trace: ' . $e->getTraceAsString());
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([

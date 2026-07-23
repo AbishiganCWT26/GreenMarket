@@ -773,7 +773,7 @@ class FarmerController extends Controller
                 $buyer = \App\Models\Buyer::where('user_id', $user->id)->first();
                 return $buyer ? $buyer->name : $user->username;
             case 'lead_farmer':
-                $leadFarmer = \App\Models\LeadFarmer::where('user_id', $user->id)->first();
+                $leadFarmer = LeadFarmer::where('user_id', $user->id)->first();
                 return $leadFarmer ? $leadFarmer->name : $user->username;
             case 'facilitator':
                 $facilitator = \App\Models\Facilitator::where('user_id', $user->id)->first();

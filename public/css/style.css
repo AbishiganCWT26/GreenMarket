@@ -1441,3 +1441,97 @@ body {
 		display: none !important;
 	}
 }
+
+/* SweetAlert Responsive & Centered Custom Styling */
+.swal-responsive-popup {
+	margin: auto !important;
+	border-radius: 16px !important;
+	padding: 1.5rem !important;
+}
+
+/* 1. XXXXL Screens (ultralarge Ultrawide): 2560px - 5000px or above */
+@media screen and (min-width: 2560px) {
+	.swal-responsive-popup {
+		width: 25% !important;
+		max-width: 800px !important;
+	}
+}
+
+/* 2. XXXL Screens (large Ultrawide): 1501px - 2559px */
+@media screen and (min-width: 1501px) and (max-width: 2559px) {
+	.swal-responsive-popup {
+		width: 32% !important;
+		max-width: 700px !important;
+	}
+}
+
+/* 3. XXL Screens (Ultrawide): 1400px - 1500px */
+@media screen and (min-width: 1400px) and (max-width: 1500px) {
+	.swal-responsive-popup {
+		width: 38% !important;
+	}
+}
+
+/* 4. Extra Large Screens (Large Desktops): 1200px - 1399px */
+@media screen and (min-width: 1200px) and (max-width: 1399px) {
+	.swal-responsive-popup {
+		width: 42% !important;
+	}
+}
+
+/* 5. Large Screens (Laptops & Small Desktops): 1001px - 1199px */
+@media screen and (min-width: 1001px) and (max-width: 1199px) {
+	.swal-responsive-popup {
+		width: 48% !important;
+	}
+}
+
+/* 6. Normal Screen Size: 1000px */
+@media screen and (width: 1000px) {
+	.swal-responsive-popup {
+		width: 52% !important;
+	}
+}
+
+/* 7. Normal Medium Screen Size: 992px - 999px */
+@media screen and (min-width: 992px) and (max-width: 999px) {
+	.swal-responsive-popup {
+		width: 55% !important;
+	}
+}
+
+/* 8. Medium Screens (Tablets): 768px - 991px */
+@media screen and (min-width: 768px) and (max-width: 991px) {
+	.swal-responsive-popup {
+		width: 65% !important;
+	}
+}
+
+/* 9. Small Screens (Large Phones in Landscape): 576px - 767px */
+@media screen and (min-width: 576px) and (max-width: 767px) {
+	.swal-responsive-popup {
+		width: 78% !important;
+	}
+}
+
+/* 10. Extra Small Screens (Standard Mobile Phones): 481px - 575px */
+@media screen and (min-width: 481px) and (max-width: 575px) {
+	.swal-responsive-popup {
+		width: 85% !important;
+	}
+}
+
+/* 11. Very Small Phones (Older/Narrow Mobile): 380px - 480px */
+@media screen and (min-width: 380px) and (max-width: 480px) {
+	.swal-responsive-popup {
+		width: 92% !important;
+	}
+}
+
+/* 12. Ultra Small Phones (Oldest Mobile): 379px and below */
+@media screen and (max-width: 379px) {
+	.swal-responsive-popup {
+		width: 96% !important;
+		padding: 1rem !important;
+	}
+}

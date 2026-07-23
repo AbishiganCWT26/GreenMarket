@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -69,7 +70,7 @@ class TaxonomyController extends Controller
         return response()->json($standards);
     }
 
-    public function getSubcategoriesByCategory($categoryId)
+    public function getSubcategoriesByCategory(int $categoryId)
     {
         $subcategories = DB::table('product_subcategories')
             ->where('category_id', $categoryId)
@@ -132,7 +133,7 @@ class TaxonomyController extends Controller
                 'description' => $request->description,
                 'icon_filename' => $iconFilename,
                 'display_order' => $request->display_order ?? 0,
-                'created_by_user_id' => auth()->id(),
+                'created_by_user_id' => Auth::id(),
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -268,7 +269,7 @@ class TaxonomyController extends Controller
         ]);
     }
 
-    public function editCategory($id)
+    public function editCategory(int $id)
     {
         $category = DB::table('product_categories')->find($id);
 
@@ -282,7 +283,7 @@ class TaxonomyController extends Controller
         return response()->json($category);
     }
 
-    public function editSubcategory($id)
+    public function editSubcategory(int $id)
     {
         $subcategory = DB::table('product_subcategories')->find($id);
 
@@ -296,7 +297,7 @@ class TaxonomyController extends Controller
         return response()->json($subcategory);
     }
 
-    public function editProduct($id)
+    public function editProduct(int $id)
     {
         $product = DB::table('product_examples')->find($id);
 
@@ -491,7 +492,7 @@ class TaxonomyController extends Controller
     }
 
     // Keep the old updateProduct method for compatibility with other routes if needed
-    public function updateProduct(Request $request, $id)
+    public function updateProduct(Request $request, int $id)
     {
         $validator = Validator::make($request->all(), [
             'product_name' => 'required|string|max:200|unique:product_examples,product_name,' . $id,
@@ -534,7 +535,7 @@ class TaxonomyController extends Controller
     }
 
     // Add new updateCategoryOld method to replace the old one for other routes
-    public function updateCategoryOld(Request $request, $id)
+    public function updateCategoryOld(Request $request, int $id)
     {
         $validator = Validator::make($request->all(), [
             'category_name' => 'required|string|max:100|unique:product_categories,category_name,' . $id,
@@ -599,7 +600,7 @@ class TaxonomyController extends Controller
     }
 
     // Add new updateSubcategoryOld method to replace the old one for other routes
-    public function updateSubcategoryOld(Request $request, $id)
+    public function updateSubcategoryOld(Request $request, int $id)
     {
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|exists:product_categories,id',
@@ -643,7 +644,7 @@ class TaxonomyController extends Controller
         ]);
     }
 
-    public function deleteCategory($id)
+    public function deleteCategory(int $id)
     {
         try {
             DB::beginTransaction();
@@ -696,7 +697,7 @@ class TaxonomyController extends Controller
         }
     }
 
-    public function deleteSubcategory($id)
+    public function deleteSubcategory(int $id)
     {
         try {
             DB::beginTransaction();
@@ -743,7 +744,7 @@ class TaxonomyController extends Controller
         }
     }
 
-    public function deleteProduct($id)
+    public function deleteProduct(int $id)
     {
         $product = DB::table('product_examples')->find($id);
 
@@ -809,7 +810,7 @@ class TaxonomyController extends Controller
         ]);
     }
 
-    public function updateStandard(Request $request, $id)
+    public function updateStandard(Request $request, int $id)
     {
         $validator = Validator::make($request->all(), [
             'standard_value' => 'required|string|max:100|unique:system_standards,standard_value,' . $id,
@@ -842,7 +843,7 @@ class TaxonomyController extends Controller
         ]);
     }
 
-    public function deleteStandard($id)
+    public function deleteStandard(int $id)
     {
         $standard = DB::table('system_standards')->find($id);
 
@@ -861,7 +862,7 @@ class TaxonomyController extends Controller
         ]);
     }
 
-    public function editStandard($id)
+    public function editStandard(int $id)
     {
         $standard = DB::table('system_standards')->find($id);
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Carbon\Carbon;
 
 class ReportController extends Controller
@@ -20,7 +20,7 @@ class ReportController extends Controller
         return view('admin.reports.generate');
     }
 
-    private function getReportData($type, $filters = [])
+    private function getReportData(string $type, array $filters = [])
     {
         $fromDate = $filters['from_date'] ?? Carbon::now()->subMonth();
         $toDate = $filters['to_date'] ?? Carbon::now();
@@ -89,7 +89,7 @@ class ReportController extends Controller
                 $salesSub = DB::table('order_items')
                     ->join('orders', 'order_items.order_id', '=', 'orders.id')
                     ->join('products', 'order_items.product_id', '=', 'products.id')
-                    ->select('products.category_id', 
+                    ->select('products.category_id',
                         DB::raw("SUM(order_items.quantity_ordered) as total_sold"),
                         DB::raw("SUM(order_items.item_total) as revenue")
                     )
@@ -225,8 +225,8 @@ class ReportController extends Controller
                         DB::raw("COUNT(DISTINCT buyers.id) as active_buyers"),
                         DB::raw("COUNT(DISTINCT orders.id) as total_orders"),
                         DB::raw("COALESCE(SUM(order_items.item_total), 0) as total_sales"),
-                        DB::raw("CASE WHEN COUNT(DISTINCT orders.id) > 0 
-                                 THEN COALESCE(SUM(order_items.item_total), 0) / COUNT(DISTINCT orders.id) 
+                        DB::raw("CASE WHEN COUNT(DISTINCT orders.id) > 0
+                                 THEN COALESCE(SUM(order_items.item_total), 0) / COUNT(DISTINCT orders.id)
                                  ELSE 0 END as avg_order_value")
                     )
                     ->leftJoin('products', 'farmers.id', '=', 'products.farmer_id')
@@ -290,7 +290,7 @@ class ReportController extends Controller
         return $data;
     }
 
-    public function viewReport($reportType)
+    public function viewReport(string $reportType)
     {
         $filters = request()->all();
         $data = $this->getReportData($reportType, $filters);
@@ -319,7 +319,7 @@ class ReportController extends Controller
         ]);
     }
 
-    public function generatePDF($reportType)
+    public function generatePDF(string $reportType)
     {
         $filters = request()->all();
         $data = $this->getReportData($reportType, $filters);
