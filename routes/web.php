@@ -44,6 +44,7 @@ Route::get('/unauthorized', function () {
 
 Route::get('/register/buyer', [BuyerController::class, 'showRegistrationForm'])->name('buyer.register');
 Route::post('/register/buyer', [BuyerController::class, 'register'])->name('buyer.register.submit');
+Route::get('/register/check-username', [BuyerController::class, 'checkUsername'])->name('buyer.checkUsername');
 
 Route::get('/how-it-works', [PublicController::class, 'howItWorks'])->name('how.it.works');
 

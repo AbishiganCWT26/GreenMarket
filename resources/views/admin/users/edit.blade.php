@@ -67,7 +67,8 @@
 								<label class="form-label">
 									<i class="fas fa-user"></i> Username
 								</label>
-								<input type="text" name="username" class="form-input" value="{{ $user->username }}" required>
+								<input type="text" name="username" id="username" class="form-input" value="{{ $user->username }}" required>
+								<div id="username_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 							</div>
 							<div class="form-group">
 								<label class="form-label">
@@ -667,6 +668,74 @@ $(document).ready(function() {
 		window.gnData = {};
 	}
 
+	let editUsernameDebounce = null;
+	window.isEditUsernameAvailable = true;
+	const currentUserId = {{ $user->id }};
+	const initialUsername = '{{ $user->username }}';
+
+	$('#username').on('input', function () {
+		const originalVal = $(this).val();
+		let newVal = originalVal.replace(/\s/g, '');
+
+		if (originalVal !== newVal) {
+			$(this).val(newVal);
+		}
+
+		const username = $(this).val().trim();
+		const statusDiv = $('#username_status');
+
+		if (editUsernameDebounce) clearTimeout(editUsernameDebounce);
+
+		if (!username) {
+			if (statusDiv.length) statusDiv.html('');
+			window.isEditUsernameAvailable = false;
+			return;
+		}
+
+		if (username === initialUsername) {
+			window.isEditUsernameAvailable = true;
+			if (statusDiv.length) {
+				statusDiv.html('<span style="color: #10B981; font-weight: 600;"><i class="fas fa-check-circle"></i> Username available.</span>');
+			}
+			return;
+		}
+
+		if (statusDiv.length) {
+			statusDiv.html('<span style="color: #6b7280; font-weight: 500;"><i class="fas fa-spinner fa-spin"></i> Checking availability...</span>');
+		}
+
+		editUsernameDebounce = setTimeout(function () {
+			const url = `{{ route('buyer.checkUsername') }}?username=${encodeURIComponent(username)}&user_id=${currentUserId}`;
+			$.ajax({
+				url: url,
+				method: 'GET',
+				dataType: 'json',
+				success: function (data) {
+					if ($('#username').val().trim() !== username) return;
+
+					if (data && data.available) {
+						window.isEditUsernameAvailable = true;
+						if (statusDiv.length) {
+							statusDiv.html('<span style="color: #10B981; font-weight: 600;"><i class="fas fa-check-circle"></i> Username available.</span>');
+						}
+					} else {
+						window.isEditUsernameAvailable = false;
+						if (statusDiv.length) {
+							statusDiv.html('<span style="color: #EF4444; font-weight: 600;"><i class="fas fa-times-circle"></i> Username taken</span>');
+						}
+					}
+				},
+				error: function () {
+					if ($('#username').val().trim() !== username) return;
+					window.isEditUsernameAvailable = false;
+					if (statusDiv.length) {
+						statusDiv.html('<span style="color: #EF4444; font-weight: 600;"><i class="fas fa-exclamation-circle"></i> Error checking username availability</span>');
+					}
+				}
+			});
+		}, 300);
+	});
+
 	let otpTimer = null;
 	let timeLeft = 300;
 	let otpVerified = false;
@@ -754,6 +823,11 @@ $(document).ready(function() {
 	// Moved form submission handler higher to ensure it's attached
 	$('#editUserForm').submit(function(e) {
 		e.preventDefault();
+
+		if (!window.isEditUsernameAvailable) {
+			showError('The username is taken or unavailable. Please try another username.');
+			return;
+		}
 
 		try {
 			const userRole = '{{ $user->role }}';
@@ -1313,7 +1387,9 @@ $(document).ready(function() {
 			processData: false,
 			contentType: false,
 			headers: {
-				'X-CSRF-TOKEN': '{{ csrf_token() }}'
+				'X-CSRF-TOKEN': '{{ csrf_token() }}',
+				'X-Requested-With': 'XMLHttpRequest',
+				'Accept': 'application/json'
 			},
 			success: function(response) {
 				Swal.fire({
@@ -1327,7 +1403,7 @@ $(document).ready(function() {
 					background: 'var(--card-bg)',
 					color: 'var(--text-color)'
 				}).then((result) => {
-					window.location.href = '{{ route("admin.users.index") }}';
+					window.location.href = '{{ url("admin/users/" . $user->id) }}';
 				});
 			},
 			error: function(xhr) {
@@ -1487,3 +1563,4 @@ $(document).ready(function() {
 });
 </script>
 @endsection
+

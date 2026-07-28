@@ -164,7 +164,7 @@
 										<i class="fas fa-at"></i>
 										<input type="text" class="form-control @error('username') is-invalid @enderror"
 											id="username" name="username" value="{{ old('username') }}"
-											placeholder="Choose a username" required>
+											placeholder="Enter a username" required>
 									</div>
 									<div class="nic-status" id="usernameStatus"></div>
 									@error('username')
@@ -515,6 +515,66 @@
 				});
 			}
 
+			let usernameDebounceTimer = null;
+			let isUsernameAvailable = false;
+			let lastCheckedUsername = '';
+
+			function checkUsernameAvailability(username) {
+				username = (username || '').trim();
+				if (!username) {
+					usernameStatus.className = 'nic-status';
+					usernameStatus.textContent = '';
+					isUsernameAvailable = false;
+					lastCheckedUsername = '';
+					updateNavigationButtons();
+					return;
+				}
+
+				if (containsLink(username) || /\s/.test(username)) {
+					usernameStatus.className = 'nic-status invalid';
+					usernameStatus.innerHTML = '<i class="fas fa-times-circle"></i> Invalid username format';
+					isUsernameAvailable = false;
+					lastCheckedUsername = username;
+					updateNavigationButtons();
+					return;
+				}
+
+				usernameStatus.className = 'nic-status text-muted';
+				usernameStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking availability...';
+
+				fetch(`{{ route('buyer.checkUsername') }}?username=${encodeURIComponent(username)}`, {
+					headers: {
+						'Accept': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest'
+					}
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (usernameInput.value.trim() !== username) return;
+
+					lastCheckedUsername = username;
+					if (data && data.available) {
+						usernameStatus.className = 'nic-status valid';
+						usernameStatus.innerHTML = '<i class="fas fa-check-circle"></i> Username available';
+						isUsernameAvailable = true;
+					} else {
+						usernameStatus.className = 'nic-status invalid';
+						usernameStatus.innerHTML = '<i class="fas fa-times-circle"></i> Username taken';
+						isUsernameAvailable = false;
+					}
+					updateNavigationButtons();
+				})
+				.catch(error => {
+					console.error('Error checking username:', error);
+					if (usernameInput.value.trim() !== username) return;
+
+					usernameStatus.className = 'nic-status invalid';
+					usernameStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error checking username availability';
+					isUsernameAvailable = false;
+					updateNavigationButtons();
+				});
+			}
+
 			let currentStep = 1;
 
 			function updateStep(step) {
@@ -561,6 +621,11 @@
 								allValid = false;
 							}
 						}
+						if (field.id === 'username' && field.value.trim()) {
+							if (!isUsernameAvailable || containsLink(field.value) || /\s/.test(field.value)) {
+								allValid = false;
+							}
+						}
 					});
 					// Instead of disabling the button, we keep it enabled so we can show an error popup on click.
 					// We will only disable it if there's no nextStep
@@ -587,6 +652,12 @@
 						const val = field.value.toLowerCase();
 						const outlookPattern = /@(outlook\.com|hotmail\.com|live\.com|msn\.com)$/i;
 						if (containsLink(val) || outlookPattern.test(val)) {
+							return false;
+						}
+					}
+					if (field.id === 'username') {
+						const val = field.value.trim();
+						if (!val || !isUsernameAvailable || containsLink(val) || /\s/.test(val)) {
 							return false;
 						}
 					}
@@ -660,9 +731,14 @@
 									isValid = false;
 									errorMessage = 'Invalid Email Address: Outlook / Hotmail / Live addresses are not allowed. Please use a different email provider.<br><br>Please check your details and try again.';
 								}
-							} else if (field.id === 'username' && (containsLink(val) || /\s/.test(val))) {
-								isValid = false;
-								errorMessage = 'Invalid Username: Username cannot contain spaces or links. Use letters, numbers, underscores, or dots only.<br><br>Please check your details and try again.';
+							} else if (field.id === 'username') {
+								if (containsLink(val) || /\s/.test(val)) {
+									isValid = false;
+									errorMessage = 'Invalid Username: Username cannot contain spaces or links. Use letters, numbers, underscores, or dots only.<br><br>Please check your details and try again.';
+								} else if (!isUsernameAvailable) {
+									isValid = false;
+									errorMessage = 'The "' + val + '" Username Taken.<br><br>Please try another username.';
+								}
 							} else if ((field.id === 'primary_mobile' || field.id === 'whatsapp_number') && (val.length !== 10 || /[^0-9]/.test(val))) {
 								isValid = false;
 								const labelName = field.id === 'primary_mobile' ? 'Mobile Number' : 'WhatsApp Number';
@@ -864,11 +940,32 @@
 					this.value = newValue;
 				}
 				
-				if (this.value.includes('.')) {
-					// Allowing dots per requirements, remove old specific logic rejecting it, but leaving status just in case
+				const trimmedVal = this.value.trim();
+
+				if (usernameDebounceTimer) {
+					clearTimeout(usernameDebounceTimer);
+				}
+
+				if (!trimmedVal) {
+					usernameStatus.className = 'nic-status';
+					usernameStatus.textContent = '';
+					isUsernameAvailable = false;
+					lastCheckedUsername = '';
+					updateNavigationButtons();
+				} else {
+					isUsernameAvailable = false;
+					usernameStatus.className = 'nic-status text-muted';
+					usernameStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking availability...';
+					usernameDebounceTimer = setTimeout(() => {
+						checkUsernameAvailability(trimmedVal);
+					}, 300);
 				}
 				updateNavigationButtons();
 			});
+
+			if (usernameInput && usernameInput.value.trim()) {
+				checkUsernameAvailability(usernameInput.value.trim());
+			}
 
 			// 5 & 9. Mobile and WhatsApp Number
 			const handlePhoneInput = function(e) {

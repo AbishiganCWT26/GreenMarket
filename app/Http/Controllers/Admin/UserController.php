@@ -475,98 +475,140 @@ class UserController extends Controller
         // Initialize helper variables used below
         $userId = $user->id;
         $role = $user->role;
-        $tables = ['farmers', 'lead_farmers', 'buyers', 'facilitators', 'admins'];
         $currentLeadFarmerId = null;
 
+        // Map each role to only the table(s) it should touch.
+        // A lead_farmer also has a farmers row, but a plain farmer must NEVER touch lead_farmers.
+        $roleTableMap = [
+            'farmer'      => ['farmers'],
+            'lead_farmer' => ['lead_farmers', 'farmers'],
+            'buyer'       => ['buyers'],
+            'facilitator' => ['facilitators'],
+            'admin'       => ['admins'],
+        ];
+
+        $tables = $roleTableMap[$role] ?? [];
+
+        // Pre-fetch the lead_farmer_id from the existing farmers row (if any)
         $f = DB::table('farmers')->where('user_id', $userId)->select('lead_farmer_id')->first();
         if ($f) {
             $currentLeadFarmerId = $f->lead_farmer_id;
         }
 
-        foreach ($tables as $table) {
-            $details = DB::table($table)->where('user_id', $userId)->first();
+        DB::beginTransaction();
 
-            $updateData = [
+        try {
+            // ── 1. Always update the users table itself ───────────────────────
+            $usersUpdate = [
+                'username'   => $validated['username'],
+                'email'      => $validated['email'] ?? null,
+                'is_active'  => $validated['is_active'],
                 'updated_at' => now(),
-                'updated_by' => Auth::id()
             ];
+            DB::table('users')->where('id', $userId)->update($usersUpdate);
 
-            $paymentFields = ['preferred_payment', 'account_number', 'account_holder_name',
-                            'bank_name', 'bank_branch', 'ezcash_mobile', 'mcash_mobile'];
+            // ── 2. Update / create the role-specific profile table(s) ─────────
+            foreach ($tables as $table) {
+                $details = DB::table($table)->where('user_id', $userId)->first();
 
-            $profileFields = ['name', 'nic_no', 'primary_mobile', 'whatsapp_number', 'residential_address',
-                             'grama_niladhari_division', 'divisional_secretariat', 'gn_division_code', 'district', 'group_name', 'group_number'];
+                $updateData = [
+                    'updated_at' => now(),
+                    'updated_by' => Auth::id()
+                ];
 
-            foreach ($profileFields as $field) {
-                // Filter fields based on table schema
-                if ($table == 'farmers' && in_array($field, ['group_name', 'group_number'])) continue;
-                if ($table == 'lead_farmers' && in_array($field, ['email', 'is_active'])) continue;
+                $paymentFields = ['preferred_payment', 'account_number', 'account_holder_name',
+                                'bank_name', 'bank_branch', 'ezcash_mobile', 'mcash_mobile'];
 
-                if ($request->has($field)) {
-                    $updateData[$field] = $request->$field ?? '';
-                }
-            }
+                $profileFields = ['name', 'nic_no', 'primary_mobile', 'whatsapp_number', 'residential_address',
+                                 'grama_niladhari_division', 'divisional_secretariat', 'gn_division_code', 'district', 'group_name', 'group_number'];
 
-            foreach ($paymentFields as $field) {
-                // Filter fields based on table schema
-                if ($table == 'lead_farmers' && in_array($field, ['ezcash_mobile', 'mcash_mobile'])) continue;
+                foreach ($profileFields as $field) {
+                    // Filter fields based on table schema
+                    if ($table == 'farmers' && in_array($field, ['group_name', 'group_number'])) continue;
+                    if ($table == 'lead_farmers' && in_array($field, ['email', 'is_active'])) continue;
 
-                if ($request->has($field)) {
-                    $updateData[$field] = $request->$field;
-                }
-            }
-
-            if ($details) {
-                DB::table($table)->where('user_id', $userId)->update($updateData);
-
-                // If we just updated lead_farmer record, ensure we have its ID for the next iteration
-                if ($table == 'lead_farmers') {
-                    $currentLeadFarmerId = $details->id;
-                }
-            } else {
-                $userRecord = DB::table('users')->find($userId);
-
-                $createData = array_merge($updateData, [
-                    'user_id' => $userId,
-                    'name' => $request->name ?? $userRecord->username,
-                    'nic_no' => $request->nic_no ?? '',
-                    'primary_mobile' => $request->primary_mobile ?? '',
-                    'whatsapp_number' => $request->whatsapp_number ?? null,
-                    'residential_address' => $request->residential_address ?? '',
-                    'grama_niladhari_division' => $request->grama_niladhari_division ?? '',
-                    'gn_division_code' => $request->gn_division_code ?? '',
-                    'divisional_secretariat' => $request->divisional_secretariat ?? '',
-                    'district' => $request->district ?? 'Colombo',
-                    'created_at' => now()
-                ]);
-
-                // Handle table-specific fields for insertion
-                if ($table == 'farmers') {
-                    $createData['is_active'] = true;
-
-                    // If this is a lead farmer, they are their own lead farmer
-                    // If regular farmer, get from request or use existing/default
-                    if ($role == 'lead_farmer') {
-                        $createData['lead_farmer_id'] = $currentLeadFarmerId;
-                    } else {
-                        if (!$currentLeadFarmerId) {
-                            $defaultLF = DB::table('lead_farmers')->first();
-                            $currentLeadFarmerId = $defaultLF ? $defaultLF->id : null;
-                        }
-                        $createData['lead_farmer_id'] = $currentLeadFarmerId;
+                    if ($request->has($field)) {
+                        $updateData[$field] = $request->$field ?? '';
                     }
                 }
 
-                if ($table == 'lead_farmers') {
-                    $createData['group_name'] = $request->group_name ?? ($userRecord->username . "'s Group");
-                    $createData['group_number'] = $request->group_number ?? ('GRP-' . strtoupper(Str::random(6)));
+                foreach ($paymentFields as $field) {
+                    // Filter fields based on table schema
+                    if ($table == 'lead_farmers' && in_array($field, ['ezcash_mobile', 'mcash_mobile'])) continue;
 
-                    $newId = DB::table($table)->insertGetId($createData);
-                    $currentLeadFarmerId = $newId;
+                    if ($request->has($field)) {
+                        $updateData[$field] = $request->$field;
+                    }
+                }
+
+                if ($details) {
+                    DB::table($table)->where('user_id', $userId)->update($updateData);
+
+                    // If we just updated lead_farmer record, ensure we have its ID for the next iteration
+                    if ($table == 'lead_farmers') {
+                        $currentLeadFarmerId = $details->id;
+                    }
                 } else {
-                    DB::table($table)->insert($createData);
+                    $userRecord = DB::table('users')->find($userId);
+
+                    $createData = array_merge($updateData, [
+                        'user_id' => $userId,
+                        'name' => $request->name ?? $userRecord->username,
+                        'nic_no' => $request->nic_no ?? '',
+                        'primary_mobile' => $request->primary_mobile ?? '',
+                        'whatsapp_number' => $request->whatsapp_number ?? null,
+                        'residential_address' => $request->residential_address ?? '',
+                        'grama_niladhari_division' => $request->grama_niladhari_division ?? '',
+                        'gn_division_code' => $request->gn_division_code ?? '',
+                        'divisional_secretariat' => $request->divisional_secretariat ?? '',
+                        'district' => $request->district ?? 'Colombo',
+                        'created_at' => now()
+                    ]);
+
+                    // Handle table-specific fields for insertion
+                    if ($table == 'farmers') {
+                        $createData['is_active'] = true;
+
+                        // If this is a lead farmer, they are their own lead farmer
+                        // If regular farmer, get from request or use existing/default
+                        if ($role == 'lead_farmer') {
+                            $createData['lead_farmer_id'] = $currentLeadFarmerId;
+                        } else {
+                            if (!$currentLeadFarmerId) {
+                                $defaultLF = DB::table('lead_farmers')->first();
+                                $currentLeadFarmerId = $defaultLF ? $defaultLF->id : null;
+                            }
+                            $createData['lead_farmer_id'] = $currentLeadFarmerId;
+                        }
+                    }
+
+                    if ($table == 'lead_farmers') {
+                        $createData['group_name'] = $request->group_name ?? ($userRecord->username . "'s Group");
+                        $createData['group_number'] = $request->group_number ?? ('GRP-' . strtoupper(Str::random(6)));
+
+                        $newId = DB::table($table)->insertGetId($createData);
+                        $currentLeadFarmerId = $newId;
+                    } else {
+                        DB::table($table)->insert($createData);
+                    }
                 }
             }
+
+            DB::commit();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'User updated successfully']);
+            }
+            return redirect()->route('admin.users.show', $userId)->with('success', 'User updated successfully');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('User update failed for user ' . $userId . ': ' . $e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Failed to update user: ' . $e->getMessage()], 500);
+            }
+            return redirect()->back()->withInput()->with('error', 'Failed to update user: ' . $e->getMessage());
         }
     }
 

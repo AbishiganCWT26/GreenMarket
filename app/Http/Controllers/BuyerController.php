@@ -808,6 +808,37 @@ class BuyerController extends Controller
         }
     }
 
+    public function checkUsername(Request $request)
+    {
+        $username = trim($request->input('username', ''));
+        $ignoreUserId = $request->input('user_id') ?: $request->input('ignore_user_id');
+
+        if ($username === '') {
+            return response()->json([
+                'available' => false,
+                'message' => 'Username is required.'
+            ], 400);
+        }
+
+        try {
+            $query = User::where('username', $username);
+            if ($ignoreUserId) {
+                $query->where('id', '!=', $ignoreUserId);
+            }
+            $exists = $query->exists();
+
+            return response()->json([
+                'available' => !$exists
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error checking username availability: ' . $e->getMessage());
+            return response()->json([
+                'available' => false,
+                'message' => 'An error occurred while checking username availability.'
+            ], 500);
+        }
+    }
+
     public function showRegistrationForm()
     {
         return view('register');

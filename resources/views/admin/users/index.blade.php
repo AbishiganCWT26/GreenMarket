@@ -568,6 +568,7 @@
 																														<div class="form-group">
 																															<label>Username <span class="required">*</span></label>
 																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
+																															<div id="username_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 																														</div>
 																														<div class="form-group">
 																															<label>Email</label>
@@ -684,6 +685,7 @@
 																														<div class="form-group">
 																															<label>Username <span class="required">*</span></label>
 																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
+																															<div id="username_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 																														</div>
 																														<div class="form-group">
 																															<label>Email</label>
@@ -783,6 +785,7 @@
 																														<div class="form-group">
 																															<label>Username <span class="required">*</span></label>
 																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
+																															<div id="username_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 																														</div>
 																														<div class="form-group">
 																															<label>Email</label>
@@ -861,6 +864,7 @@
 																														<div class="form-group">
 																															<label>Username <span class="required">*</span></label>
 																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
+																															<div id="username_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 																														</div>
 																														<div class="form-group">
 																															<label>Email</label>
@@ -937,6 +941,7 @@
 																														<div class="form-group">
 																															<label>Username <span class="required">*</span></label>
 																															<input type="text" id="username" class="form-input" placeholder="Enter username" required>
+																															<div id="username_status" class="nic-status mt-1" style="font-size: 11px;"></div>
 																														</div>
 																														<div class="form-group">
 																															<label>Email</label>
@@ -1176,6 +1181,64 @@
 								}
 							});
 
+							let adminUsernameDebounce = null;
+							window.isAdminUsernameAvailable = false;
+
+							$(document).on('input', '#username', function () {
+								const originalVal = $(this).val();
+								let newVal = originalVal.replace(/\s/g, '');
+
+								if (originalVal !== newVal) {
+									$(this).val(newVal);
+								}
+
+								const username = $(this).val().trim();
+								const statusDiv = $('#username_status');
+
+								if (adminUsernameDebounce) clearTimeout(adminUsernameDebounce);
+
+								if (!username) {
+									if (statusDiv.length) statusDiv.html('');
+									window.isAdminUsernameAvailable = false;
+									return;
+								}
+
+								if (statusDiv.length) {
+									statusDiv.html('<span style="color: #6b7280; font-weight: 500;"><i class="fas fa-spinner fa-spin"></i> Checking availability...</span>');
+								}
+
+								adminUsernameDebounce = setTimeout(function () {
+									const url = `{{ route('buyer.checkUsername') }}?username=${encodeURIComponent(username)}`;
+									$.ajax({
+										url: url,
+										method: 'GET',
+										dataType: 'json',
+										success: function (data) {
+											if ($('#username').val().trim() !== username) return;
+
+											if (data && data.available) {
+												window.isAdminUsernameAvailable = true;
+												if (statusDiv.length) {
+													statusDiv.html('<span style="color: #10B981; font-weight: 600;"><i class="fas fa-check-circle"></i> Username available</span>');
+												}
+											} else {
+												window.isAdminUsernameAvailable = false;
+												if (statusDiv.length) {
+													statusDiv.html('<span style="color: #EF4444; font-weight: 600;"><i class="fas fa-times-circle"></i> Username taken</span>');
+												}
+											}
+										},
+										error: function () {
+											if ($('#username').val().trim() !== username) return;
+											window.isAdminUsernameAvailable = false;
+											if (statusDiv.length) {
+												statusDiv.html('<span style="color: #EF4444; font-weight: 600;"><i class="fas fa-exclamation-circle"></i> Error checking username availability</span>');
+											}
+										}
+									});
+								}, 300);
+							});
+
 							$(document).on('input', '#username, #email', function () {
 								const pwd = $('#password').val();
 								if (pwd) {
@@ -1252,6 +1315,11 @@
 
 						if (!userType || !name || !username || !password) {
 							Swal.showValidationMessage('Please fill all required fields');
+							return false;
+						}
+
+						if (!window.isAdminUsernameAvailable) {
+							Swal.showValidationMessage('The username is taken or unavailable. Please choose a different username.');
 							return false;
 						}
 
